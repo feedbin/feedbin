@@ -114,6 +114,7 @@ module ImageCrawler
     end
 
     def send_to_feedbin
+      image_record = create_image
       preset.job_class.perform_async(id, {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
@@ -121,12 +122,11 @@ module ImageCrawler
         "height"            => height,
         "placeholder_color" => placeholder_color
       })
-
-      create_image
+      preset.job_class.const_get(:Receiver)
     end
 
     def create_image
-      data = {
+      ::Image.create_from_pipeline({
         provider: provider,
         provider_id: provider_id,
         url: original_url,
@@ -138,9 +138,7 @@ module ImageCrawler
         height: height,
         placeholder_color: placeholder_color,
         storage_fingerprint: storage_fingerprint
-      }
-      record = ::Image.create_with(data).find_or_create_by(provider:, provider_id:)
-      record.update(data)
+      })
     end
 
     def image_name
@@ -152,7 +150,7 @@ module ImageCrawler
     end
 
     def storage_fingerprint
-      ::Image.fingerprint(data: [provider, original_url])
+      ::Image.fingerprint([provider, original_url])
     end
 
     def storage_path

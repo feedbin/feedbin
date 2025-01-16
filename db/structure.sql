@@ -2560,13 +2560,6 @@ CREATE INDEX index_image_tags_on_imageable ON public.image_tags USING btree (ima
 
 
 --
--- Name: index_images_on_provider_and_provider_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_images_on_provider_and_provider_id ON public.images USING btree (provider, provider_id);
-
-
---
 -- Name: index_images_on_storage_fingerprint; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3191,6 +3184,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250116154412'),
 ('20250116124158'),
 ('20241031110936'),
 ('20240502090914'),

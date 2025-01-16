@@ -20,13 +20,13 @@ class BackfillProviderIds
         provider_data[entry.id]           = Entry.providers[:twitter]
         provider_id_data[entry.id]        = entry.tweet.main_tweet.id
         image_provider_id_data[entry.id]  = entry.tweet.main_tweet.user.screen_name
-        image_provider_data[entry.id]     = Image.providers[:avatar]
+        image_provider_data[entry.id]     = Image.providers[:avatar_provider]
       elsif id = entry.data.safe_dig("youtube_video_id")
         provider_data[entry.id]    = Entry.providers[:youtube]
         provider_id_data[entry.id] = id
         video_map[entry.id]        = id
       elsif entry.feed.pages?
-        image_provider_data[entry.id]    = Image.providers[:avatar]
+        image_provider_data[entry.id]    = Image.providers[:avatar_provider]
         image_provider_id_data[entry.id] = entry.hostname
       end
     end
@@ -37,7 +37,7 @@ class BackfillProviderIds
         if channel_id = channel_map[video_id]
           provider_parent_id_data[entry_id] = channel_id
           image_provider_id_data[entry_id]  = channel_id
-          image_provider_data[entry.id]     = Image.providers[:avatar]
+          image_provider_data[entry.id]     = Image.providers[:avatar_provider]
         end
       end
     end

@@ -25,7 +25,7 @@ module ImageCrawler
           id: "#{@feed.id}-#{name}-itunes",
           preset_name: "podcast_feed",
           image_urls: [url],
-          provider: ::Image.providers[:avatar],
+          provider: ::Image.providers[:avatar_url],
           provider_id: @feed.id
         )
         Pipeline::Find.perform_async(image.to_h)

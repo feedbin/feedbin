@@ -12,20 +12,21 @@
 
 class Image < ApplicationRecord
   enum :provider, {
-    avatar:             0,     # entry specific icon (microposts, mastodon, podcast, youtube, twitter)
-    preview_entry:      1,     # main preview image
-    preview_link:       2,     # link preview image
-    remote_file:        3,     # adhoc images
-    website_favicon:    4,     # favicon
-    website_touch_icon: 5,     # apple touch icon
+    avatar_url:           0,     # url based icon (microposts, mastodon, podcast)
+    avatar_provider:      1,     # provider based icon (youtube, twitter)
+    preview_entry:        2,     # main preview image
+    preview_link:         3,     # link preview image
+    remote_file:          4,     # adhoc images
+    website_favicon:      5,     # favicon
+    website_touch_icon:   6,     # apple touch icon
   }, prefix: true
 
   has_many :image_tags
   has_many :entries, through: :image_tags, source: :imageable, source_type: "Entry"
   has_many :feeds, through: :image_tags, source: :imageable, source_type: "Feed"
 
-  scope :favicons, -> { where(provider: %i[website_favicon website_touch_icon]) }
-  scope :avatars,  -> { where(provider: %i[avatar]) }
+  scope :favicons, -> { where(provider: [:website_favicon, :website_touch_icon]) }
+  scope :avatars,  -> { where(provider: [:avatar_url, :avatar_provider]) }
 
   before_validation :generate_columns
 
@@ -36,10 +37,19 @@ class Image < ApplicationRecord
   def generate_columns
     self[:url]                 = url.strip
     self[:url_fingerprint]     = Digest::MD5.hexdigest(self[:url])
-    self[:storage_fingerprint] = self.class.fingerprint(data: [provider, self[:url]])
+    self[:storage_fingerprint] = self.class.fingerprint([provider, self[:url]])
   end
 
-  def self.fingerprint(data:)
+  def self.fingerprint(data)
     Digest::MD5.hexdigest(data.map(&:to_s).join(":"))
+  end
+
+  def self.create_from_pipeline(data)
+    fingerprint = fingerprint([data[:provider], data[:url]])
+    record = create_with(data).create_or_find_by(
+      provider: data[:provider],
+      storage_fingerprint: fingerprint
+    )
+    record.update(data)
   end
 end
