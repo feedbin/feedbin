@@ -122,8 +122,11 @@ module ImageCrawler
         "height"            => height,
         "placeholder_color" => placeholder_color
       })
-      image_record = create_image
-      preset.job_class.const_get(:Receiver).perform_async(provider_id, image_record.id)
+
+      unless provider == ::Image.providers[:remote_file]
+        image_record = create_image
+        preset.job_class.const_get(:Receiver).perform_async(provider_id, image_record.id)
+      end
     end
 
     def create_image
