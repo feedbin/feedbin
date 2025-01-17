@@ -36,7 +36,7 @@
     <li class="source-section section-feeds">
         Feeds
     </li>
-    <%= render partial: "feeds/feed", collection: feeds, cached: -> (feed) { [feed, feed.favicon, "v3"] } %>
+    <%= render partial: "feeds/feed", collection: feeds, cached: -> (feed) { [feed, feed.favicon, "v4"] } %>
 <% end %>
 
 <script>
