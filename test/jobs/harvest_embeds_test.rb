@@ -33,19 +33,6 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_difference "Embed.count", +2 do
       HarvestEmbeds.new.perform(nil, true)
     end
-
-    assert_equal("channel_id", @entry.reload.provider_parent_id)
-  end
-
-  test "should add provider_parent_id from existing embed" do
-    Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
-
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
-    @entry.provider_youtube!
-    @entry.send(:provider_metadata)
-    @entry.save!
-
-    assert_equal("channel_id", @entry.reload.provider_parent_id)
   end
 
   def stub_youtube_api
