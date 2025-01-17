@@ -668,47 +668,6 @@ ALTER SEQUENCE public.feeds_id_seq OWNED BY public.feeds.id;
 
 
 --
--- Name: images; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.images (
-    id bigint NOT NULL,
-    provider bigint NOT NULL,
-    provider_id text NOT NULL,
-    url text NOT NULL,
-    url_fingerprint uuid NOT NULL,
-    storage_url text NOT NULL,
-    image_fingerprint uuid NOT NULL,
-    width bigint NOT NULL,
-    height bigint NOT NULL,
-    placeholder_color text NOT NULL,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    settings jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.images_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.images_id_seq OWNED BY public.images.id;
-
-
---
 -- Name: import_items; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1708,13 +1667,6 @@ ALTER TABLE ONLY public.feeds ALTER COLUMN id SET DEFAULT nextval('public.feeds_
 
 
 --
--- Name: images id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.images ALTER COLUMN id SET DEFAULT nextval('public.images_id_seq'::regclass);
-
-
---
 -- Name: import_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2023,14 +1975,6 @@ ALTER TABLE ONLY public.feed_stats
 
 ALTER TABLE ONLY public.feeds
     ADD CONSTRAINT feeds_pkey PRIMARY KEY (id);
-
-
---
--- Name: images images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.images
-    ADD CONSTRAINT images_pkey PRIMARY KEY (id);
 
 
 --
@@ -2483,20 +2427,6 @@ CREATE INDEX index_feeds_on_push_expiration ON public.feeds USING btree (push_ex
 --
 
 CREATE INDEX index_feeds_on_standalone_request_at ON public.feeds USING btree (standalone_request_at DESC) WHERE (standalone_request_at IS NOT NULL);
-
-
---
--- Name: index_images_on_provider_and_provider_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_images_on_provider_and_provider_id ON public.images USING btree (provider, provider_id);
-
-
---
--- Name: index_images_on_url_fingerprint; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_images_on_url_fingerprint ON public.images USING btree (url_fingerprint);
 
 
 --
@@ -3102,6 +3032,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250117094633'),
 ('20240502090914'),
 ('20240226114227'),
 ('20231122160929'),
