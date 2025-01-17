@@ -362,6 +362,12 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def attached_image_next
+    if record = entry.images.find { it.provider_preview_entry? }
+      image(record.storage_url, record.placeholder_color)
+    end
+  end
+
   def image(src, placeholder_color = nil)
     @template.content_tag :span, class: "entry-image" do
       @template.content_tag :span, "", data: {src:}, style: placeholder_color ? "background-color: ##{placeholder_color}" : ""

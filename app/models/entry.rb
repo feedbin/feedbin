@@ -59,7 +59,7 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
+    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings).includes(:images)
   end
 
   def self.sort_preference(sort)

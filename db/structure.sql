@@ -711,6 +711,7 @@ ALTER SEQUENCE public.image_tags_id_seq OWNED BY public.image_tags.id;
 CREATE TABLE public.images (
     id bigint NOT NULL,
     provider bigint NOT NULL,
+    source bigint DEFAULT 0 NOT NULL,
     provider_id text NOT NULL,
     url text NOT NULL,
     storage_url text NOT NULL,

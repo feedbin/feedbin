@@ -2,6 +2,7 @@ class CreateAllImage < ActiveRecord::Migration[7.2]
   def change
     create_table :images do |t|
       t.bigint :provider,            null: false
+      t.bigint :source,              null: false, default: 0
       t.text   :provider_id,         null: false
       t.text   :url,                 null: false
       t.text   :storage_url,         null: false
