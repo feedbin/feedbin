@@ -35,6 +35,7 @@ class RemoteFile < ApplicationRecord
   end
 
   def self.camo_url(url)
+    url = url.to_s
     host = URI(ENV["CAMO_HOST"]).host
     signature = OpenSSL::HMAC.hexdigest("sha1", secret_key, url)
     hex_url = url.to_enum(:each_byte).map { |byte| "%02x" % byte }.join

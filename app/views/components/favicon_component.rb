@@ -33,7 +33,7 @@ class FaviconComponent < ApplicationComponent
     span class: "favicon-wrap twitter-profile-image" do
       helpers.image_tag_with_fallback(
         helpers.image_url("favicon-profile-default.png"),
-        RemoteFile.signed_url(@feed.twitter_user.profile_image_uri_https(:original)),
+        RemoteFile.camo_url(@feed.twitter_user.profile_image_uri_https(:original)),
         alt: ""
       )
     end
@@ -43,7 +43,7 @@ class FaviconComponent < ApplicationComponent
     span class: "favicon-wrap twitter-profile-image icon-format-#{@feed.custom_icon_format || @feed.default_icon_format}" do
       helpers.image_tag_with_fallback(
         helpers.image_url("favicon-profile-default.png"),
-        RemoteFile.signed_url(@feed.icon),
+        RemoteFile.camo_url(@feed.icon),
         alt: ""
       )
     end
