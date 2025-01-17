@@ -10,8 +10,8 @@ module ImageCrawler
         @image = Image.new(image_hash)
         storage_url = upload
         storage_url_next = upload_next
+        @image.bytesize = File.size(@image.processed_path)
         @image.storage_url = storage_url
-        @image.original_storage_url = storage_url
         @image.storage_url_next = storage_url_next
         @image.send_to_feedbin
 

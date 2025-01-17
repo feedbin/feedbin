@@ -32,7 +32,7 @@ module ImageCrawler
       include Sidekiq::Worker
       sidekiq_options retry: false
 
-      def perform(image)
+      def perform(id, image)
       end
     end
   end

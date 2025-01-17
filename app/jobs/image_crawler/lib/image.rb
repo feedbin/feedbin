@@ -1,6 +1,8 @@
 module ImageCrawler
   class Image
     ATTRIBUTES = %i[
+      bytesize
+      source
       camo
       download_path
       entry_url
@@ -17,7 +19,6 @@ module ImageCrawler
       processed_path
       storage_url
       storage_url_next
-      original_storage_url
       provider
       provider_id
       fingerprint
@@ -127,17 +128,18 @@ module ImageCrawler
 
     def create_image
       ::Image.create_from_pipeline({
-        provider: provider,
-        provider_id: provider_id,
-        url: original_url,
-        final_url: final_url,
-        storage_url: storage_url_next,
+        provider:             provider,
+        provider_id:          provider_id,
+        url:                  original_url,
+        final_url:            final_url,
+        storage_url:          storage_url_next,
         original_storage_url: storage_url,
-        image_fingerprint: fingerprint,
-        width: width,
-        height: height,
-        placeholder_color: placeholder_color,
-        storage_fingerprint: storage_fingerprint
+        image_fingerprint:    fingerprint,
+        width:                width,
+        height:               height,
+        bytesize:             bytesize,
+        placeholder_color:    placeholder_color,
+        storage_fingerprint:  storage_fingerprint
       })
     end
 

@@ -16,9 +16,10 @@ module ImageCrawler
         placeholder_color = "0867e2"
         width = 300
         height = 200
+        bytesize = 1234
 
 
-        image = Image.new_with_attributes(id:, preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, fingerprint: SecureRandom.hex, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:)
+        image = Image.new_with_attributes(id:, preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, fingerprint: SecureRandom.hex, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, bytesize:)
 
         stub_request(:put, /s3\.amazonaws\.com/)
 

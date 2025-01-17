@@ -37,6 +37,7 @@ if Rails.env.development?
     image_fingerprint: SecureRandom.uuid,
     width: 1920,
     height: 1080,
+    bytesize: 12344,
     placeholder_color: "#FFFFFF",
     data: { description: "A sample image", tags: ["sample", "image", "example"] },
     original_storage_url: "https://original.example.com/sample.jpg",

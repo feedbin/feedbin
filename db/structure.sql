@@ -530,7 +530,9 @@ CREATE TABLE public.entries (
     provider_id text,
     provider_parent_id text,
     chapters jsonb,
-    categories jsonb
+    categories jsonb,
+    image_provider bigint,
+    image_provider_id text
 );
 
 
@@ -644,7 +646,9 @@ CREATE TABLE public.feeds (
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
-    crawl_data jsonb
+    crawl_data jsonb,
+    image_provider bigint,
+    image_provider_id text
 );
 
 
@@ -665,6 +669,82 @@ CREATE SEQUENCE public.feeds_id_seq
 --
 
 ALTER SEQUENCE public.feeds_id_seq OWNED BY public.feeds.id;
+
+
+--
+-- Name: image_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.image_tags (
+    id bigint NOT NULL,
+    image_id bigint NOT NULL,
+    imageable_type character varying NOT NULL,
+    imageable_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: image_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.image_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: image_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.image_tags_id_seq OWNED BY public.image_tags.id;
+
+
+--
+-- Name: images; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.images (
+    id bigint NOT NULL,
+    provider bigint NOT NULL,
+    provider_id text NOT NULL,
+    url text NOT NULL,
+    storage_url text NOT NULL,
+    width bigint NOT NULL,
+    height bigint NOT NULL,
+    bytesize bigint NOT NULL,
+    placeholder_color text NOT NULL,
+    url_fingerprint uuid NOT NULL,
+    image_fingerprint uuid NOT NULL,
+    storage_fingerprint uuid NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    settings jsonb DEFAULT '{}'::jsonb NOT NULL
+);
+
+
+--
+-- Name: images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.images_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.images_id_seq OWNED BY public.images.id;
 
 
 --
@@ -1667,6 +1747,20 @@ ALTER TABLE ONLY public.feeds ALTER COLUMN id SET DEFAULT nextval('public.feeds_
 
 
 --
+-- Name: image_tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.image_tags ALTER COLUMN id SET DEFAULT nextval('public.image_tags_id_seq'::regclass);
+
+
+--
+-- Name: images id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.images ALTER COLUMN id SET DEFAULT nextval('public.images_id_seq'::regclass);
+
+
+--
 -- Name: import_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1978,6 +2072,22 @@ ALTER TABLE ONLY public.feeds
 
 
 --
+-- Name: image_tags image_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.image_tags
+    ADD CONSTRAINT image_tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: images images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.images
+    ADD CONSTRAINT images_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: import_items import_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2175,6 +2285,13 @@ ALTER TABLE ONLY public.updated_entries
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_on_imageable_id_image_id_imageable_type_3a18c1c6d6; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_on_imageable_id_image_id_imageable_type_3a18c1c6d6 ON public.image_tags USING btree (imageable_id, image_id, imageable_type);
 
 
 --
@@ -2427,6 +2544,27 @@ CREATE INDEX index_feeds_on_push_expiration ON public.feeds USING btree (push_ex
 --
 
 CREATE INDEX index_feeds_on_standalone_request_at ON public.feeds USING btree (standalone_request_at DESC) WHERE (standalone_request_at IS NOT NULL);
+
+
+--
+-- Name: index_image_tags_on_image_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_tags_on_image_id ON public.image_tags USING btree (image_id);
+
+
+--
+-- Name: index_image_tags_on_imageable; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_tags_on_imageable ON public.image_tags USING btree (imageable_type, imageable_id);
+
+
+--
+-- Name: index_images_on_url_fingerprint_and_provider; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_images_on_url_fingerprint_and_provider ON public.images USING btree (url_fingerprint, provider);
 
 
 --
@@ -2978,6 +3116,14 @@ ALTER TABLE ONLY public.newsletter_senders
 
 
 --
+-- Name: image_tags fk_rails_32b653599c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.image_tags
+    ADD CONSTRAINT fk_rails_32b653599c FOREIGN KEY (image_id) REFERENCES public.images(id);
+
+
+--
 -- Name: podcast_subscriptions fk_rails_4bb4824ec6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3032,6 +3178,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250117094912'),
 ('20250117094633'),
 ('20240502090914'),
 ('20240226114227'),
