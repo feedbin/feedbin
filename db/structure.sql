@@ -712,6 +712,7 @@ CREATE TABLE public.images (
     id bigint NOT NULL,
     provider bigint NOT NULL,
     source bigint DEFAULT 0 NOT NULL,
+    source_name text,
     provider_id text NOT NULL,
     url text NOT NULL,
     storage_url text NOT NULL,

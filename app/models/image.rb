@@ -21,8 +21,8 @@ class Image < ApplicationRecord
     website_touch_icon:   6,     # apple touch icon
   }, prefix: true
 
-  enum :source {
-    default: 0 # (favicon, podcast, preview, etc…)
+  enum :source, {
+    default: 0, # (favicon, podcast, preview, etc…)
     social:  1 # (micropost, youtube twitter)
   }, prefix: true
 
