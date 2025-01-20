@@ -9,7 +9,7 @@ module App
 
     def view_template
       dialog data: stimulus_controller, class: dialog_class do
-        div class: "flex flex-col max-h-[90vh]" do
+        div class: "flex flex-col max-h-[100dvh] sm:max-h-[90vh]" do
           div class: "p-4 shrink-0 relative border-b" do
             if title?
               h2 class: "text-700 font-bold m-0 truncate pr-[56px]", &@title
@@ -21,7 +21,12 @@ module App
           div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, for: @stimulus_controller), class: "px-5 py-4 overflow-y-scroll overscroll-y-contain"  do
             render App::ExpandableContainerComponent.new(open: true) do |expandable|
               expandable.content do
-                2.times do
+                render Form::TextInputComponent.new do |input|
+                  input.input do
+                    input(type: "search", class: "peer text-input", placeholder: "Placeholder", data: {focused: true})
+                  end
+                end
+                20.times do
                   p class: "mb-4" do
                     "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                   end
@@ -61,7 +66,13 @@ module App
 
     def dialog_class
       "
-        group p-0 bg-base text-600 border border-300 rounded-xl shadow-lg animate-slide-in max-w-[550px] w-[calc(100%-32px)] max-h-[90vh]
+        group p-0 bg-base text-600 animate-slide-in
+
+        h-dvh w-dvw max-h-[100dvh] max-w-[100dvw] backdrop:invisible
+
+        sm:max-w-[550px] sm:w-[calc(100%-32px)] sm:max-h-[90vh]
+        sm:border sm:border-300 sm:rounded-xl sm:shadow-lg sm:backdrop:visible
+
         backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
         data-[dialog-closing-value=true]:animate-slide-out
         data-[dialog-closing-value=true]:backdrop:animate-fade-out

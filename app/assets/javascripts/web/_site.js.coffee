@@ -2878,6 +2878,11 @@ $.extend feedbin,
               console.log error
         event.preventDefault()
 
+    # modal2: ->
+    #   callback = ->
+    #     window.dispatchEvent new CustomEvent('dialog:open', detail: purpose: 'edit_subscription')
+    #   setTimeout callback, 500
+
 
 $.each feedbin.preInit, (i, item) ->
   item()
