@@ -62,7 +62,7 @@ module App
     def dialog_class
       "
         group p-0 bg-base text-600 border border-300 rounded-xl shadow-lg animate-slide-in max-w-[550px] w-[calc(100%-32px)] max-h-[90vh]
-        backdrop:backdrop-blur-[1px] backdrop:bg-[rgb(var(--dusk-color-600)/0.8)] backdrop:animate-fade-in
+        backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
         data-[dialog-closing-value=true]:animate-slide-out
         data-[dialog-closing-value=true]:backdrop:animate-fade-out
       "
