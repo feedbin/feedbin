@@ -27,25 +27,23 @@ export default class extends Controller {
     this.checkScroll()
     this.boundCheckScroll = this.checkScroll.bind(this)
     window.addEventListener("resize", this.boundCheckScroll)
-    window.visualViewport.addEventListener("resize", this.boundCheckScroll)
 
     this.checkVisualViewport()
     this.boundCheckVisualViewport = this.checkVisualViewport.bind(this)
     window.visualViewport.addEventListener("resize", this.boundCheckVisualViewport)
+
+    document.addEventListener("blur", this.boundCheckVisualViewport, true)
   }
 
   disconnect() {
     this.element.removeEventListener("cancel", this.boundCancel)
     window.removeEventListener("resize", this.boundCheckScroll)
     window.visualViewport.removeEventListener("resize", this.boundCheckVisualViewport)
-    window.visualViewport.removeEventListener("resize", this.boundCheckScroll)
+    document.removeEventListener("blur", this.boundCheckVisualViewport)
   }
 
   openWithPurpose(event) {
-    console.log(event);
-    console.log(this.purposeValue);
     if (event?.detail?.purpose == this.purposeValue) {
-      console.log("yes");
       this.open()
     }
   }
@@ -57,7 +55,7 @@ export default class extends Controller {
       this.checkScroll()
       setTimeout(() => {
         this.dispatch("shown")
-      }, 300)
+      }, 350)
     }
   }
 
@@ -72,7 +70,7 @@ export default class extends Controller {
         this.closingValue = false
         this.element.close()
         this.dispatch("hidden")
-      }, 200)
+      }, 250)
     }
   }
 
@@ -89,11 +87,41 @@ export default class extends Controller {
 
   checkVisualViewport() {
     const keyboardHeight = window.innerHeight - window.visualViewport.height
-    if (keyboardHeight === 0) {
+    const inputActive = this.isKeyboardable(document.activeElement)
+
+    if (keyboardHeight === 0 || !inputActive) {
       this.footerTarget.style.height = `env(safe-area-inset-bottom)`
     } else {
       this.footerTarget.style.height = `${keyboardHeight}px`
     }
+    afterTransition(this.footerTarget, true, () => {
+      this.checkScroll()
+    })
+  }
+
+  isKeyboardable(element) {
+      // Check if it's a textarea
+      if (element.tagName === 'TEXTAREA') return true;
+
+      // Check if it's an input with text-accepting type
+      if (element.tagName === 'INPUT') {
+          const textTypes = [
+              'text',
+              'password',
+              'email',
+              'search',
+              'tel',
+              'url',
+              null,
+              ''
+          ];
+          return textTypes.includes(element.type.toLowerCase());
+      }
+
+      // Check if it's contenteditable
+      if (element.isContentEditable) return true;
+
+      return false;
   }
 
   checkScroll() {

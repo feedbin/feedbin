@@ -9,9 +9,9 @@ module App
 
     def view_template
       dialog data: stimulus_controller, class: dialog_class do
-        div class: "flex flex-col max-h-screen min-h-screen sm:min-h-min sm:max-h-[90vh]" do
+        div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[90vh]" do
           div class: "shrink-0", style: "height: env(safe-area-inset-top);"
-          div class: "p-4 text-base flex items-baseline shrink-0 relative border-b" do
+          div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
             if title?
               h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
             end
@@ -40,7 +40,7 @@ module App
           div class: "py-2 sm:py-4 px-4 shrink-0 relative text-right" do
             div class: "absolute left-0 right-0 top-0 h-px bg-200 opacity-0 transition-opacity group-data-[dialog-footer-border-value=true]:opacity-100"
             button data: stimulus_item(actions: {click: :close}, for: @stimulus_controller), class: "button"  do
-              "Close"
+              "Subscribe"
             end
           end
           div class: "shrink-0 transition-all", style: "height: env(safe-area-inset-bottom);", data: stimulus_item(target: :footer, for: @stimulus_controller)
@@ -72,10 +72,10 @@ module App
       "
         group p-0 bg-base text-600 animate-slide-in
 
-        h-screen w-screen max-h-[100vh] max-w-[100vw] backdrop:invisible
+        h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible
 
         sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)] sm:!max-h-[90vh]
-        sm:border sm:border-300 sm:rounded-xl sm:shadow-lg sm:backdrop:visible
+        sm:rounded-xl sm:shadow-lg sm:backdrop:visible
 
         backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
         data-[dialog-closing-value=true]:animate-slide-out
