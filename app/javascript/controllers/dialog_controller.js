@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { afterTransition } from "helpers"
 
 export default class extends Controller {
-  static targets = ["content", "headerBorder", "footerBorder"]
+  static targets = ["content", "headerBorder", "footerBorder", "footer"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
@@ -11,15 +12,33 @@ export default class extends Controller {
   }
 
   connect() {
-    this.checkScroll()
-    window.addEventListener("resize", () => this.checkScroll())
+    document.addEventListener("keydown", this.closeHandler.bind(this))
+  }
 
+  disconnect() {
+    document.removeEventListener("keydown", this.closeHandler.bind(this))
+  }
+
+  connect() {
+    // remap cancel to custom cancel
     this.boundCancel = this.cancel.bind(this)
     this.element.addEventListener("cancel", this.boundCancel)
+
+    this.checkScroll()
+    this.boundCheckScroll = this.checkScroll.bind(this)
+    window.addEventListener("resize", this.boundCheckScroll)
+    window.visualViewport.addEventListener("resize", this.boundCheckScroll)
+
+    this.checkVisualViewport()
+    this.boundCheckVisualViewport = this.checkVisualViewport.bind(this)
+    window.visualViewport.addEventListener("resize", this.boundCheckVisualViewport)
   }
 
   disconnect() {
     this.element.removeEventListener("cancel", this.boundCancel)
+    window.removeEventListener("resize", this.boundCheckScroll)
+    window.visualViewport.removeEventListener("resize", this.boundCheckVisualViewport)
+    window.visualViewport.removeEventListener("resize", this.boundCheckScroll)
   }
 
   openWithPurpose(event) {
@@ -36,12 +55,9 @@ export default class extends Controller {
     if (!showEvent.defaultPrevented) {
       this.element.showModal()
       this.checkScroll()
-      this.element.addEventListener(
-        "animationend", () => {
-          this.dispatch("shown")
-        },
-        { once: true }
-      )
+      setTimeout(() => {
+        this.dispatch("shown")
+      }, 300)
     }
   }
 
@@ -51,15 +67,12 @@ export default class extends Controller {
     if (!hideEvent.defaultPrevented) {
       this.closingValue = true
       this.element.setAttribute("closing", "")
-      this.element.addEventListener(
-        "animationend", () => {
-          this.element.removeAttribute("closing")
-          this.closingValue = false
-          this.element.close()
-          this.dispatch("hidden")
-        },
-        { once: true }
-      )
+      setTimeout(() => {
+        this.element.removeAttribute("closing")
+        this.closingValue = false
+        this.element.close()
+        this.dispatch("hidden")
+      }, 200)
     }
   }
 
@@ -71,6 +84,15 @@ export default class extends Controller {
   clickOutside(event) {
     if (event.target === this.element) {
       this.close()
+    }
+  }
+
+  checkVisualViewport() {
+    const keyboardHeight = window.innerHeight - window.visualViewport.height
+    if (keyboardHeight === 0) {
+      this.footerTarget.style.height = `env(safe-area-inset-bottom)`
+    } else {
+      this.footerTarget.style.height = `${keyboardHeight}px`
     }
   }
 
