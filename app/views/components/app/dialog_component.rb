@@ -37,13 +37,13 @@ module App
               end
             end
           end
-          div class: "py-2 sm:py-4 px-4 shrink-0 relative text-right" do
+          div class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all" do
             div class: "absolute left-0 right-0 top-0 h-px bg-200 opacity-0 transition-opacity group-data-[dialog-footer-border-value=true]:opacity-100"
             button data: stimulus_item(actions: {click: :close}, for: @stimulus_controller), class: "button"  do
               "Subscribe"
             end
           end
-          div class: "shrink-0 transition-all", style: "height: env(safe-area-inset-bottom);", data: stimulus_item(target: :footer, for: @stimulus_controller)
+          div class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))]", data: stimulus_item(target: :footer_spacer, for: @stimulus_controller)
         end
       end
     end
@@ -52,9 +52,10 @@ module App
       stimulus(
         controller: @stimulus_controller,
         actions: {
-          "click" => "clickOutside",
-          "dialog:open@window" => "openWithPurpose",
-          "dialog:close@window" => "close"
+          "click"                         => "clickOutside",
+          "dialog:open@window"            => "openWithPurpose",
+          "dialog:close@window"           => "close",
+          "visual-viewport:change@window" => "delayedCheckScroll"
         },
         values: {
           purpose: @purpose,

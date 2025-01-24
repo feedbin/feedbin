@@ -2,21 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 import { afterTransition } from "helpers"
 
 export default class extends Controller {
-  static targets = ["content", "headerBorder", "footerBorder", "footer"]
+  static targets = ["content", "footerSpacer", "headerBorder", "footerBorder"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
     headerBorder: Boolean,
     footerBorder: Boolean,
     purpose: String,
-  }
-
-  connect() {
-    document.addEventListener("keydown", this.closeHandler.bind(this))
-  }
-
-  disconnect() {
-    document.removeEventListener("keydown", this.closeHandler.bind(this))
   }
 
   connect() {
@@ -27,19 +19,11 @@ export default class extends Controller {
     this.checkScroll()
     this.boundCheckScroll = this.checkScroll.bind(this)
     window.addEventListener("resize", this.boundCheckScroll)
-
-    this.checkVisualViewport()
-    this.boundCheckVisualViewport = this.checkVisualViewport.bind(this)
-    window.visualViewport.addEventListener("resize", this.boundCheckVisualViewport)
-
-    document.addEventListener("blur", this.boundCheckVisualViewport, true)
   }
 
   disconnect() {
     this.element.removeEventListener("cancel", this.boundCancel)
     window.removeEventListener("resize", this.boundCheckScroll)
-    window.visualViewport.removeEventListener("resize", this.boundCheckVisualViewport)
-    document.removeEventListener("blur", this.boundCheckVisualViewport)
   }
 
   openWithPurpose(event) {
@@ -85,43 +69,11 @@ export default class extends Controller {
     }
   }
 
-  checkVisualViewport() {
-    const keyboardHeight = window.innerHeight - window.visualViewport.height
-    const inputActive = this.isKeyboardable(document.activeElement)
-
-    if (keyboardHeight === 0 || !inputActive) {
-      this.footerTarget.style.height = `env(safe-area-inset-bottom)`
-    } else {
-      this.footerTarget.style.height = `${keyboardHeight}px`
-    }
-    afterTransition(this.footerTarget, true, () => {
+  delayedCheckScroll() {
+    console.log("called");
+    afterTransition(this.footerSpacerTarget, true, () => {
       this.checkScroll()
     })
-  }
-
-  isKeyboardable(element) {
-      // Check if it's a textarea
-      if (element.tagName === 'TEXTAREA') return true;
-
-      // Check if it's an input with text-accepting type
-      if (element.tagName === 'INPUT') {
-          const textTypes = [
-              'text',
-              'password',
-              'email',
-              'search',
-              'tel',
-              'url',
-              null,
-              ''
-          ];
-          return textTypes.includes(element.type.toLowerCase());
-      }
-
-      // Check if it's contenteditable
-      if (element.isContentEditable) return true;
-
-      return false;
   }
 
   checkScroll() {
@@ -129,12 +81,6 @@ export default class extends Controller {
     const scrollHeight = this.contentTarget.scrollHeight
     const clientHeight = this.contentTarget.clientHeight
     const maxScroll = scrollHeight - clientHeight
-
-    // if (scrollTop > 0) {
-    //   this.headerBorderValue = true
-    // } else {
-    //   this.headerBorderValue = false
-    // }
 
     if (scrollHeight > clientHeight && scrollTop < maxScroll) {
       this.footerBorderValue = true

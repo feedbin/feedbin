@@ -19,12 +19,12 @@ export default class extends Controller {
   }
 
   checkVisualViewport() {
-    const keyboardHeight = window.innerHeight - window.visualViewport.height
+    const offsetHeight = window.innerHeight - window.visualViewport.height
     const inputActive = this.isKeyboardable(document.activeElement)
-    this.keyboardOffsetValue = (!inputActive) ? 0 : keyboardHeight
+    this.offsetValue = (!inputActive) ? 0 : offsetHeight
 
-    document.documentElement.style.setProperty("--visual-viewport-offset", this.keyboardOffsetValue);
-    this.dispatch("change", { detail: { offset: this.keyboardOffsetValue } })
+    document.documentElement.style.setProperty("--visual-viewport-offset", `${this.offsetValue}px`);
+    this.dispatch("change", { detail: { offset: this.offsetValue } })
   }
 
   isKeyboardable(element) {
