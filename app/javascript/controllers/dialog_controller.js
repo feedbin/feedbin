@@ -2,11 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 import { afterTransition } from "helpers"
 
 export default class extends Controller {
-  static targets = ["content", "footerSpacer", "headerBorder", "footerBorder"]
+  static targets = ["dialog", "contentTemplate", "content", "footerSpacer", "footerBorder"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
-    headerBorder: Boolean,
     footerBorder: Boolean,
     purpose: String,
   }
@@ -14,15 +13,14 @@ export default class extends Controller {
   connect() {
     // remap cancel to custom cancel
     this.boundCancel = this.cancel.bind(this)
-    this.element.addEventListener("cancel", this.boundCancel)
+    this.dialogTarget.addEventListener("cancel", this.boundCancel)
 
-    this.checkScroll()
     this.boundCheckScroll = this.checkScroll.bind(this)
     window.addEventListener("resize", this.boundCheckScroll)
   }
 
   disconnect() {
-    this.element.removeEventListener("cancel", this.boundCancel)
+    this.dialogTarget.removeEventListener("cancel", this.boundCancel)
     window.removeEventListener("resize", this.boundCheckScroll)
   }
 
@@ -35,7 +33,11 @@ export default class extends Controller {
   open() {
     const showEvent = this.dispatch("willShow")
     if (!showEvent.defaultPrevented) {
-      this.element.showModal()
+      const contentTemplate = this.contentTemplateTarget.content.cloneNode(true)
+      this.dialogTarget.innerHTML = ""
+      this.dialogTarget.append(contentTemplate)
+
+      this.dialogTarget.showModal()
       this.checkScroll()
       setTimeout(() => {
         this.dispatch("shown")
@@ -48,11 +50,11 @@ export default class extends Controller {
 
     if (!hideEvent.defaultPrevented) {
       this.closingValue = true
-      this.element.setAttribute("closing", "")
+      this.dialogTarget.setAttribute("closing", "")
       setTimeout(() => {
-        this.element.removeAttribute("closing")
+        this.dialogTarget.removeAttribute("closing")
         this.closingValue = false
-        this.element.close()
+        this.dialogTarget.close()
         this.dispatch("hidden")
       }, 250)
     }
@@ -64,13 +66,12 @@ export default class extends Controller {
   }
 
   clickOutside(event) {
-    if (event.target === this.element) {
+    if (event.target === this.dialogTarget) {
       this.close()
     }
   }
 
   delayedCheckScroll() {
-    console.log("called");
     afterTransition(this.footerSpacerTarget, true, () => {
       this.checkScroll()
     })

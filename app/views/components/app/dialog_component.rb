@@ -1,6 +1,6 @@
 module App
   class DialogComponent < ApplicationComponent
-    slots :content, :title, :body, :footer
+    slots :title, :body, :footer
 
     def initialize(purpose:)
       @purpose = purpose
@@ -8,43 +8,9 @@ module App
     end
 
     def view_template
-      dialog data: stimulus_controller, class: dialog_class do
-        div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[90vh]" do
-          div class: "shrink-0 h-[env(safe-area-inset-top)]"
-          div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
-            if title?
-              h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
-            end
-            button type: "button", class: "absolute shrink-0 right-0 inset-y-0 pr-4 text-600", data: stimulus_item(actions: {click: :close}, for: @stimulus_controller), aria_label: "Close" do
-              "Close"
-            end
-          end
-          div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, for: @stimulus_controller), class: "px-5 py-4 overflow-y-scroll overscroll-y-contain grow"  do
-            render App::ExpandableContainerComponent.new(open: true, selector: :dialog_content) do |expandable|
-              expandable.content do
-                div class: "pb-4" do
-                  render Form::TextInputComponent.new do |input|
-                    input.input do
-                      input(type: "search", class: "peer text-input", placeholder: "Placeholder")
-                    end
-                  end
-                end
-                2.times do
-                  p class: "mb-4" do
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                  end
-                end
-              end
-            end
-          end
-          div class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all" do
-            div class: "absolute left-0 right-0 top-0 h-px bg-200 opacity-0 transition-opacity group-data-[dialog-footer-border-value=true]:opacity-100"
-            button data: stimulus_item(actions: {click: :close}, for: @stimulus_controller), class: "button"  do
-              "Subscribe"
-            end
-          end
-          div class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))]", data: stimulus_item(target: :footer_spacer, for: @stimulus_controller)
-        end
+      div data: stimulus_controller, class: "group" do
+        dialog class: dialog_class, data: stimulus_item(target: :dialog, for: @stimulus_controller)
+        content_template
       end
     end
 
@@ -71,7 +37,7 @@ module App
 
     def dialog_class
       "
-        group p-0 bg-base text-600 animate-slide-in mt-0 mx-auto sm:mt-16
+        p-0 bg-base text-600 animate-slide-in mt-0 mx-auto sm:mt-16
 
         h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible
 
@@ -79,9 +45,50 @@ module App
         sm:rounded-xl sm:shadow-lg sm:backdrop:visible
 
         backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
-        data-[dialog-closing-value=true]:animate-slide-out
-        data-[dialog-closing-value=true]:backdrop:animate-fade-out
+        group-data-[dialog-closing-value=true]:animate-slide-out
+        group-data-[dialog-closing-value=true]:backdrop:animate-fade-out
       "
+    end
+
+    def content_template
+      template_tag data: stimulus_item(target: :content_template, for: @stimulus_controller) do
+        div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[90vh]" do
+          div class: "shrink-0 h-[env(safe-area-inset-top)]"
+          div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
+            if title?
+              h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
+            end
+            button type: "button", class: "absolute shrink-0 right-0 inset-y-0 pr-4 text-600", data: stimulus_item(actions: {click: :close}, for: @stimulus_controller) do
+              "Close"
+            end
+          end
+          div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, for: @stimulus_controller), class: "px-5 py-4 overflow-y-scroll overscroll-y-contain grow"  do
+            render App::ExpandableContainerComponent.new(open: true, selector: :dialog_content) do |expandable|
+              expandable.content do
+                div class: "pb-4" do
+                  render Form::TextInputComponent.new do |input|
+                    input.input do
+                      input(type: "text", class: "peer text-input", placeholder: "Placeholder")
+                    end
+                  end
+                end
+                2.times do
+                  p class: "mb-4" do
+                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                  end
+                end
+              end
+            end
+          end
+          div class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all" do
+            div class: "absolute left-0 right-0 top-0 h-px bg-200 opacity-0 transition-opacity group-data-[dialog-footer-border-value=true]:opacity-100"
+            button data: stimulus_item(actions: {click: :close}, for: @stimulus_controller), class: "button"  do
+              "Subscribe"
+            end
+          end
+          div class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))]", data: stimulus_item(target: :footer_spacer, for: @stimulus_controller)
+        end
+      end
     end
   end
 end
