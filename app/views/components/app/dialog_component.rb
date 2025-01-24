@@ -10,7 +10,7 @@ module App
     def view_template
       dialog data: stimulus_controller, class: dialog_class do
         div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[90vh]" do
-          div class: "shrink-0", style: "height: env(safe-area-inset-top);"
+          div class: "shrink-0 h-[env(safe-area-inset-top)]"
           div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
             if title?
               h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
@@ -20,7 +20,7 @@ module App
             end
           end
           div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, for: @stimulus_controller), class: "px-5 py-4 overflow-y-scroll overscroll-y-contain grow"  do
-            render App::ExpandableContainerComponent.new(open: true) do |expandable|
+            render App::ExpandableContainerComponent.new(open: true, selector: :dialog_content) do |expandable|
               expandable.content do
                 div class: "pb-4" do
                   render Form::TextInputComponent.new do |input|
@@ -60,7 +60,7 @@ module App
           purpose: @purpose,
           closing: "false",
           header_border: "true",
-          footer_border: "false"
+          footer_border: "false",
         },
         outlets: {
           expandable: "[data-controller=expandable]"
@@ -70,7 +70,7 @@ module App
 
     def dialog_class
       "
-        group p-0 bg-base text-600 animate-slide-in
+        group p-0 bg-base text-600 animate-slide-in mt-0 mx-auto sm:mt-16
 
         h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible
 

@@ -8,7 +8,7 @@ export default class extends Controller {
     closing: Boolean,
     headerBorder: Boolean,
     footerBorder: Boolean,
-    purpose: String
+    purpose: String,
   }
 
   connect() {

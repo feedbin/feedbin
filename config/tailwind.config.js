@@ -62,12 +62,12 @@ module.exports = {
       },
       keyframes: {
         "slide-in": {
-          "0%": { transform: "translateY(100%)" },
-          "100%": { transform: "translateY(0)" },
+          "0%": { transform: "translateY(100vh)" },
+          "100%": { transform: "translateY(0vh)" },
         },
         "slide-out": {
-          "0%": { transform: "translateY(0)" },
-          "100%": { transform: "translateY(100%)" },
+          "0%": { transform: "translateY(0vh)" },
+          "100%": { transform: "translateY(100vh)" },
         },
         "fade-in": {
           "0%": { opacity: "0" },
