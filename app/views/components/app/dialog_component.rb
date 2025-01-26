@@ -37,11 +37,11 @@ module App
 
     def dialog_class
       "
-        p-0 bg-base text-600 animate-slide-in mt-0 mx-auto sm:mt-16
+        p-0 bg-base text-600 animate-slide-in my-0 mx-auto sm:mt-16
 
         h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible
 
-        sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)] sm:!max-h-[90vh]
+        sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)] sm:!max-h-[calc(90vh-4rem)]
         sm:rounded-xl sm:shadow-lg sm:backdrop:visible
 
         backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
@@ -52,14 +52,16 @@ module App
 
     def content_template
       template_tag data: stimulus_item(target: :content_template, for: @stimulus_controller) do
-        div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[90vh]" do
+        div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
           div class: "shrink-0 h-[env(safe-area-inset-top)]"
           div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
             if title?
               h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
             end
             button type: "button", class: "absolute shrink-0 right-0 inset-y-0 pr-4 text-600", data: stimulus_item(actions: {click: :close}, for: @stimulus_controller) do
-              "Close"
+              span class: "relative native:top-[-6px]" do
+                "Close"
+              end
             end
           end
           div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, for: @stimulus_controller), class: "px-5 py-4 overflow-y-scroll overscroll-y-contain grow"  do
@@ -72,7 +74,7 @@ module App
                     end
                   end
                 end
-                2.times do
+                20.times do
                   p class: "mb-4" do
                     "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                   end
