@@ -40,7 +40,7 @@ class Subscription < ApplicationRecord
   end
 
   def title
-    self[:title] || feed.title
+    self[:title] || feed&.title
   end
 
   def mark_as_unread

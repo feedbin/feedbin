@@ -2880,7 +2880,12 @@ $.extend feedbin,
 
     modal2: ->
       callback = ->
-        window.dispatchEvent new CustomEvent('dialog:open', detail: purpose: 'edit_subscription')
+        content =
+          purpose: "edit_subscription"
+          data: []
+
+        event = new CustomEvent('dialog:open', detail: content)
+        window.dispatchEvent event
       setTimeout callback, 500
 
       $(document).on 'click', (event) ->

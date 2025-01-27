@@ -128,7 +128,7 @@ export default class extends Controller {
       let element = hydrate(header, [
         {
           type: "text",
-          name: "text",
+          selector: "text",
           value: section,
         },
       ])
@@ -138,12 +138,13 @@ export default class extends Controller {
         let updates = [
           {
             type: "text",
-            name: "text",
+            selector: "text",
             value: item.title,
           },
           {
             type: "attribute",
-            name: `data-${this.identifier}-index-param`,
+            selector: `[data-${this.identifier}-index-param]`,
+            attribute: `data-${this.identifier}-index-param`,
             value: item.index,
           },
         ]
@@ -151,7 +152,7 @@ export default class extends Controller {
         if ("icon" in item) {
           updates.push({
             type: "html",
-            name: "icon",
+            selector: "icon",
             value: item.icon.cloneNode(true),
           })
         }
