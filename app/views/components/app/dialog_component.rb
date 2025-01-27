@@ -55,13 +55,11 @@ module App
         div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
           div class: "shrink-0 h-[env(safe-area-inset-top)]"
           div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
+            button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: @stimulus_controller) do
+              render SvgComponent.new "icon-close", class: "relative native:top-[-6px] fill-500", title: "Close"
+            end
             if title?
               h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
-            end
-            button type: "button", class: "absolute shrink-0 right-0 inset-y-0 pr-4 text-600", data: stimulus_item(actions: {click: :close}, for: @stimulus_controller) do
-              span class: "relative native:top-[-6px]" do
-                "Close"
-              end
             end
           end
           div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, for: @stimulus_controller), class: "px-5 py-4 overflow-y-scroll overscroll-y-contain grow"  do
