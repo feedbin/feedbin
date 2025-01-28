@@ -32,7 +32,7 @@
         <% end %>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
             <ul>
-                <%= render partial: "feeds/feed", collection: tag.user_feeds, cached: true %>
+                <%= render Common::FeedsList.new(feeds: tag.user_feeds) %>
             </ul>
         </div>
     </li>

@@ -2878,19 +2878,19 @@ $.extend feedbin,
               console.log error
         event.preventDefault()
 
-    modal2: ->
-      callback = ->
-        content =
-          purpose: "edit_subscription"
-          data: []
-
-        event = new CustomEvent('dialog:open', detail: content)
-        window.dispatchEvent event
-      setTimeout callback, 500
-
-      $(document).on 'click', (event) ->
-        unless feedbin.isRelated('dialog', event.target)
-          callback()
+    # modal2: ->
+    #   callback = ->
+    #     content =
+    #       purpose: "edit_subscription"
+    #       data: []
+    #
+    #     event = new CustomEvent('dialog:open', detail: content)
+    #     window.dispatchEvent event
+    #   setTimeout callback, 500
+    #
+    #   $(document).on 'click', (event) ->
+    #     unless feedbin.isRelated('dialog', event.target)
+    #       callback()
 
 
 
