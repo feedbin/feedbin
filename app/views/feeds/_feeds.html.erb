@@ -1,19 +1,17 @@
 <%= render partial: "collections/collection", collection: collections %>
 
 <% if page_feed.present? %>
-    <% present page_feed do |feed_presenter| %>
-        <%= content_tag :li, class: "collection-pages collection-source", data: {feed_id: page_feed.id, behavior: "keyboard_navigable" } do %>
-            <%= render Common::FeedLink.new(feed: page_feed, link: pages_feed_path(page_feed), behavior: "selectable show_entries open_item feed_link") do %>
-                <span class="link-inner">
-                    <%= feed_presenter.favicon(page_feed) %>
-                    <span class="collection-label-wrap" >
-                        <span class="collection-label">Pages</span>
-                    </span>
-                    <span class="count-wrap">
-                        <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "byFeed", count_group_id: page_feed.id} %>
-                    </span>
+    <%= content_tag :li, class: "collection-pages collection-source", data: {feed_id: page_feed.id, behavior: "keyboard_navigable" } do %>
+        <%= render Common::FeedLink.new(feed: page_feed, link: pages_feed_path(page_feed), behavior: "selectable show_entries open_item feed_link") do %>
+            <span class="link-inner">
+                <%= render FaviconComponent.new(feed: page_feed) %>
+                <span class="collection-label-wrap" >
+                    <span class="collection-label">Pages</span>
                 </span>
-            <% end %>
+                <span class="count-wrap">
+                    <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "byFeed", count_group_id: page_feed.id} %>
+                </span>
+            </span>
         <% end %>
     <% end %>
 <% end %>
