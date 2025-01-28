@@ -23,7 +23,7 @@ class Common::FeedsList < ApplicationComponent
           span class: "link-inner" do
             render FaviconComponent.new(feed: feed)
             span class: "collection-label-wrap", data: { behavior: "rename_target user_title", form_action: feed_rename_path(feed.id), input_name: "feed[title]", title: feed.title, original_title: feed.original_title, feed_id: feed.id } do
-              span class: "collection-label", data_behavior: "user_title rename_title", data_feed_id: feed.id do
+              span class: "collection-label", data: { behavior: "user_title rename_title", feed_id: feed.id } do
                 feed.title
               end
             end
