@@ -1,5 +1,5 @@
-module App
-  class DialogComponent < ApplicationComponent
+module Dialog
+  class Template < ApplicationComponent
     STIMULUS_CONTROLLER = :dialog
 
     def view_template

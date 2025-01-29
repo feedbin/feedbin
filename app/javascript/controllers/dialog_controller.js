@@ -24,12 +24,12 @@ export default class extends Controller {
   }
 
   openWithPurpose(event) {
-    if (!event?.detail?.purpose || !event?.detail?.id) {
-      console.trace(`purpose and id required for modal`, event)
+    if (!event?.detail?.purpose) {
+      console.trace(`purpose required for modal`, event)
       return
     }
 
-    let contentTemplate = document.querySelector(`[data-dialog-id=${event.detail.id}][data-purpose=${event.detail.purpose}]`)
+    let contentTemplate = document.querySelector(`[data-purpose=${event.detail.purpose}]`)
 
     if (!contentTemplate) {
       console.trace(`unknown template`, event?.detail?.purpose)

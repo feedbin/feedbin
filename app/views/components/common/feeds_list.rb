@@ -1,22 +1,20 @@
 class Common::FeedsList < ApplicationComponent
 
-  def initialize(feeds:, subscriptions:)
+  def initialize(feeds:)
     @feeds = feeds
-    @subscriptions = subscriptions
   end
 
   def view_template
     @feeds.each do |feed|
-      render Item.new(feed: feed, subscription: @subscriptions[feed.id])
+      render Item.new(feed: feed)
     end
   end
 
   class Item < ApplicationComponent
     attr_accessor :feed
 
-    def initialize(feed:, subscription:)
+    def initialize(feed:)
       @feed = feed
-      @subscription = subscription
     end
 
     def view_template

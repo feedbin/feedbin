@@ -1738,7 +1738,7 @@ $.extend feedbin,
         element = $(@)
         button = $('[data-behavior~=feed_settings]')
         if element.is('[data-behavior~=has_settings]')
-          button.attr('href', element.data('settings-path'))
+          button.data('open-dialog', element.data('dialog-id'))
           button.removeAttr('disabled')
         else
           button.attr('disabled', 'disabled')
@@ -2879,18 +2879,21 @@ $.extend feedbin,
         event.preventDefault()
 
     modal2: ->
-      callback = ->
-        content =
-          purpose: "edit_subscription"
-          id: "subscription_3"
-
-        event = new CustomEvent('dialog:open', detail: content)
-        window.dispatchEvent event
-      setTimeout callback, 500
-
-      $(document).on 'click', (event) ->
-        unless feedbin.isRelated('dialog', event.target)
-          callback()
+      $(document).on 'click', '[data-open-dialog]', (event) ->
+        purpose = $(@).data('open-dialog')
+        window.dispatchEvent new CustomEvent('dialog:open', detail: purpose: purpose)
+      # callback = ->
+      #   content =
+      #     purpose: "edit_subscription_1"
+      #
+      #   event = new CustomEvent('dialog:open', detail: content)
+      #   window.dispatchEvent event
+      # setTimeout callback, 500
+      #
+      #
+      # $(document).on 'click', (event) ->
+      #   unless feedbin.isRelated('dialog', event.target)
+      #     callback()
 
 
 
