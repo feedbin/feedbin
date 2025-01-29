@@ -36,7 +36,6 @@ class Common::FeedsList < ApplicationComponent
               end
             end
             render SourceMenu::Feed.new(feed: feed, source_target: feed.id)
-            render App::DialogEditSubscriptionComponent.new(subscription: @subscription, tag_editor: TagEditor.new(helpers.current_user, @feed), app: false)
           end
         end
       end

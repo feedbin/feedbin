@@ -37,6 +37,8 @@
       </li>
       <%= render Common::FeedsList.new(feeds: feeds, subscriptions: subscriptions) %>
   <% end %>
+  render App::DialogEditSubscriptionComponent.new(subscription: @subscription, tag_editor: TagEditor.new(helpers.current_user, @feed), app: false)
+  
 <% end %>
 
 <script>
