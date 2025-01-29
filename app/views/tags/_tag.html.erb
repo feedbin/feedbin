@@ -32,7 +32,7 @@
         <% end %>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
             <ul>
-                <%= render Common::FeedsList.new(feeds: tag.user_feeds) %>
+                <%= render Common::FeedsList.new(feeds: tag.user_feeds, subscriptions: @subscriptions) %>
             </ul>
         </div>
     </li>

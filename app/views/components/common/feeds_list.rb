@@ -1,20 +1,22 @@
 class Common::FeedsList < ApplicationComponent
 
-  def initialize(feeds:)
+  def initialize(feeds:, subscriptions:)
     @feeds = feeds
+    @subscriptions = subscriptions
   end
 
   def view_template
     @feeds.each do |feed|
-      render Item.new(feed: feed)
+      render Item.new(feed: feed, subscription: @subscriptions[feed.id])
     end
   end
 
   class Item < ApplicationComponent
     attr_accessor :feed
 
-    def initialize(feed:)
+    def initialize(feed:, subscription:)
       @feed = feed
+      @subscription = subscription
     end
 
     def view_template
@@ -34,6 +36,7 @@ class Common::FeedsList < ApplicationComponent
               end
             end
             render SourceMenu::Feed.new(feed: feed, source_target: feed.id)
+            render App::DialogEditSubscriptionComponent.new(subscription: @subscription, tag_editor: TagEditor.new(helpers.current_user, @feed), app: false)
           end
         end
       end

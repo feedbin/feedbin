@@ -193,6 +193,7 @@ class ApplicationController < ActionController::Base
   def get_feeds_list
     @user = current_user
     @page_feed = @user.feeds.pages.first
+    @subscriptions = @user.subscriptions.index_by(&:feed_id)
 
     excluded_feeds = @user.taggings.distinct.pluck(:feed_id)
     excluded_feeds += [@page_feed&.id]

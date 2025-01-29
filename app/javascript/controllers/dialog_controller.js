@@ -24,34 +24,34 @@ export default class extends Controller {
   }
 
   openWithPurpose(event) {
-    if (!event?.detail?.purpose || !event?.detail?.data) {
-      console.trace(`purpose and data required for modal`, event)
+    if (!event?.detail?.purpose || !event?.detail?.id) {
+      console.trace(`purpose and id required for modal`, event)
       return
     }
 
-    let contentTemplate = this.contentTemplateTargets.find((template) => template.dataset.purpose === event.detail.purpose)
+    let contentTemplate = document.querySelector(`[data-dialog-id=${event.detail.id}][data-purpose=${event.detail.purpose}]`)
+
     if (!contentTemplate) {
       console.trace(`unknown template`, event?.detail?.purpose)
       return
     }
 
     let content = contentTemplate.content.cloneNode(true)
-    let hydratedContent = hydrate(content, event.detail.data)
     let dialogParts = [
       {
         type: "text",
         selector: "title",
-        value: hydratedContent.querySelector("[data-dialog-content=title]").textContent,
+        value: content.querySelector("[data-dialog-content=title]").textContent,
       },
       {
         type: "html",
         selector: "body",
-        value: [...hydratedContent.querySelector("[data-dialog-content=body]").children],
+        value: [...content.querySelector("[data-dialog-content=body]").children],
       },
       {
         type: "html",
         selector: "footer",
-        value: [...hydratedContent.querySelector("[data-dialog-content=footer]").children],
+        value: [...content.querySelector("[data-dialog-content=footer]").children],
       },
     ]
 

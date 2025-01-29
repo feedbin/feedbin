@@ -6,9 +6,6 @@ module App
       div data: stimulus_controller, class: "group" do
         dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER)
         dialog_template
-
-        # content templates
-        render DialogEditSubscriptionComponent.new
       end
     end
 
@@ -68,12 +65,13 @@ module App
     class Content < ApplicationComponent
       slots :title, :body, :footer
 
-      def initialize(purpose: )
+      def initialize(purpose:, record: nil)
         @purpose = purpose
+        @record = record
       end
 
       def view_template
-        template_tag data: stimulus_item(target: :content_template, data: {purpose: @purpose}, for: STIMULUS_CONTROLLER) do
+        template_tag data: stimulus_item(target: :content_template, data: {purpose: @purpose, dialog_id: @record.present? ? helpers.dom_id(@record) : false}, for: STIMULUS_CONTROLLER) do
           div data: {dialog_content: "title"}, &@title
           div data: {dialog_content: "body"}, &@body
           div data: {dialog_content: "footer"}, &@footer
