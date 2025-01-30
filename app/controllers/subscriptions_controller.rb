@@ -31,12 +31,6 @@ class SubscriptionsController < ApplicationController
     get_feeds_list
   end
 
-  def edit
-    @user = current_user
-    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
-    @tag_editor = TagEditor.new(@user, @subscription.feed)
-  end
-
   def update
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])

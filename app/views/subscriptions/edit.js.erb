@@ -1,3 +1,0 @@
-<% if @subscription %>
-    feedbin.replaceModal("modal-purpose-edit", "<%= j render(Subscriptions::FormComponent.new(subscription: @subscription, tag_editor: @tag_editor, app: params[:app].present?)) %>");
-<% end %>

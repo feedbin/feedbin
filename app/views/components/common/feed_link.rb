@@ -18,7 +18,7 @@ class Common::FeedLink < ApplicationComponent
       class: "feed-link",
       data: {
         remote: "true",
-        behavior: @behavior || "selectable show_entries open_item feed_link renamable user_title has_settings",
+        behavior: @behavior || "selectable show_entries open_item feed_link renamable has_settings",
         settings_path: edit_subscription_path(@feed, app: true),
         dialog_id: helpers.dom_id(@feed),
         feed_id: @feed.id,

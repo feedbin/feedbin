@@ -29,6 +29,9 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
+  closeDialog: ->
+    window.dispatchEvent new CustomEvent('dialog:close')
+
   toggleItemInArray: (array, item) ->
     index = array.indexOf(item)
     if index isnt -1
@@ -2689,6 +2692,9 @@ $.extend feedbin,
       $(document).on 'submit', '[data-behavior~=disable_on_submit]', (event) ->
         $('[type=submit]', @).attr('disabled', 'disabled')
 
+      $(document).on 'submit', '[data-behavior~=close_dialog_on_submit]', (event) ->
+        feedbin.closeDialog()
+
     showContainer: ->
       $(document).on 'click', '[data-behavior~=show_container]', (event) ->
         target = $(@).data('target')
@@ -2725,7 +2731,7 @@ $.extend feedbin,
 
     unsubscribe: ->
       callback = (item) ->
-        $('.modal').modal('hide')
+        feedbin.closeDialog()
         feed = item.data('feed-id')
         if (feedbin.data.viewMode != 'view_starred')
           $(".feeds [data-feed-id=#{feed}]").remove()

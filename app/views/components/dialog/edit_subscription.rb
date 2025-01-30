@@ -1,7 +1,8 @@
 module Dialog
   class EditSubscription < ApplicationComponent
-    def initialize(subscriptions:)
+    def initialize(subscriptions:, app: true)
       @subscriptions = subscriptions
+      @app = app
     end
 
     def view_template
@@ -9,7 +10,7 @@ module Dialog
         render Item.new(
           subscription: subscription,
           tag_editor: TagEditor.new(helpers.current_user, subscription.feed),
-          app: false
+          app: @app # used to distinguish between the edit modal in the main app vs settings
         )
       end
     end
@@ -27,7 +28,7 @@ module Dialog
             "Edit Subscription"
           end
           dialog.body do
-            form_for(@subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |form_builder|
+            form_for(@subscription, remote: true, method: :patch, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|
               if @app
                 hidden_field_tag :app, 1
               end
@@ -52,24 +53,29 @@ module Dialog
           end
           dialog.footer do
             div class: "flex items-center" do
-              unsubscribe_class = "button-text delete-button text-sm flex items-center gap-2"
-              if @app
-                link_to subscription_path(@subscription), method: :delete, remote: true, class: unsubscribe_class, data: { confirm: "Are you sure you want to unsubscribe?", feed_id: @subscription.feed.id, behavior: "unsubscribe" } do
-                  render SvgComponent.new("icon-delete")
-                  plain " Unsubscribe"
-                end
-              else
-                link_to settings_subscription_path(@subscription), method: :delete, class: unsubscribe_class, data: { confirm: "Are you sure you want to unsubscribe?" } do
-                  render SvgComponent.new("icon-delete")
-                  plain " Unsubscribe"
-                end
-              end
+              unsubscribe_link
 
-              button type: "submit", class: "button ml-auto", value: "save" do
+              button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@subscription, :edit) do
                 "Save"
               end
             end
           end
+        end
+      end
+
+      def unsubscribe_link
+        data = { confirm: "Are you sure you want to unsubscribe?" }
+        path = settings_subscription_path(@subscription)
+
+        if @app
+          data[:feed_id] = @subscription.feed.id
+          data[:behavior] = "unsubscribe"
+          path = subscription_path(@subscription)
+        end
+
+        link_to path, method: :delete, class: "!text-600 button-text text-sm flex items-center gap-2", data: data do
+          render SvgComponent.new("icon-delete")
+          plain " Unsubscribe"
         end
       end
     end
