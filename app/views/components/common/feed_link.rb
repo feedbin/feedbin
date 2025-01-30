@@ -20,7 +20,7 @@ class Common::FeedLink < ApplicationComponent
         remote: "true",
         behavior: @behavior || "selectable show_entries open_item feed_link renamable user_title has_settings",
         settings_path: edit_subscription_path(@feed, app: true),
-        dialog_id: "edit_subscription_#{@feed.id}",
+        dialog_id: helpers.dom_id(@feed),
         feed_id: @feed.id,
         sourceable_target: "source",
         action: "sourceable#selected",

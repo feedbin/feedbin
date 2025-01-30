@@ -22,7 +22,7 @@ module Dialog
       end
 
       def view_template
-        render Dialog::Template::Content.new(purpose: "edit_subscription_#{@subscription.feed.id}") do |dialog|
+        render Dialog::Template::Content.new(dialog_id: helpers.dom_id(@subscription.feed)) do |dialog|
           dialog.title do
             "Edit Subscription"
           end

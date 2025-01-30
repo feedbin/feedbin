@@ -5,24 +5,20 @@ module Dialog
     def view_template
       div data: stimulus_controller, class: "group" do
         dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER)
-        dialog_template
-      end
-    end
-
-    def dialog_template
-      template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
-        div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
-          div class: "shrink-0 h-[env(safe-area-inset-top)]"
-          div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
-            button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
-              render SvgComponent.new "icon-close", class: "relative native:top-[-6px] fill-500", title: "Close"
+        template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
+          div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
+            div class: "shrink-0 h-[env(safe-area-inset-top)]"
+            div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
+              button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
+                render SvgComponent.new "icon-close", class: "relative native:top-[-6px] fill-500", title: "Close"
+              end
+              h2 class: "text-700 grow font-bold m-0 truncate text-center", data: {template: "title"}
             end
-            h2 class: "text-700 grow font-bold m-0 truncate text-center", data: {template: "title"}
-          end
 
-          div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, data: {template: "body"}, for: STIMULUS_CONTROLLER), class: "p-4 overflow-y-scroll overscroll-y-contain grow"
-          div data: {template: "footer"}, class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all border-t border-transparent group-data-[dialog-footer-border-value=true]:border-200"
-          div data: stimulus_item(target: :footer_spacer, for: STIMULUS_CONTROLLER), class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))]"
+            div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, data: {template: "body"}, for: STIMULUS_CONTROLLER), class: "p-4 overflow-y-scroll overscroll-y-contain grow"
+            div data: {template: "footer"}, class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all border-t border-transparent group-data-[dialog-footer-border-value=true]:border-200"
+            div data: stimulus_item(target: :footer_spacer, for: STIMULUS_CONTROLLER), class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))]"
+          end
         end
       end
     end
@@ -65,13 +61,12 @@ module Dialog
     class Content < ApplicationComponent
       slots :title, :body, :footer
 
-      def initialize(purpose:, record: nil)
-        @purpose = purpose
-        @record = record
+      def initialize(dialog_id:)
+        @dialog_id = dialog_id
       end
 
       def view_template
-        template_tag data: stimulus_item(target: :content_template, data: {purpose: @purpose, dialog_id: @record.present? ? helpers.dom_id(@record) : false}, for: STIMULUS_CONTROLLER) do
+        template_tag data: {dialog_id: @dialog_id} do
           div data: {dialog_content: "title"}, &@title
           div data: {dialog_content: "body"}, &@body
           div data: {dialog_content: "footer"}, &@footer

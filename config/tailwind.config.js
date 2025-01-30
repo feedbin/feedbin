@@ -79,10 +79,10 @@ module.exports = {
         },
       },
       animation: {
-        "slide-in": "slide-in 0.35s ease-out",
+        "slide-in": "slide-in 0.3s ease-out",
         "slide-out": "slide-out 0.25s ease-in",
-        "fade-in": "fade-in 0.35s ease-in",
-        "fade-out": "fade-out 0.25s ease-out",
+        "fade-in": "fade-in 0.3s linear",
+        "fade-out": "fade-out 0.25s linear",
       },
     },
   },

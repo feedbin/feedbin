@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { afterTransition, hydrate, html } from "helpers"
 
 export default class extends Controller {
-  static targets = ["dialog", "dialogTemplate", "content", "footerSpacer", "contentTemplate"]
+  static targets = ["dialog", "dialogTemplate", "content", "footerSpacer"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
@@ -24,15 +24,15 @@ export default class extends Controller {
   }
 
   openWithPurpose(event) {
-    if (!event?.detail?.purpose) {
-      console.trace(`purpose required for modal`, event)
+    if (!event?.detail?.dialog_id) {
+      console.trace(`dialog_id required for modal`, event)
       return
     }
 
-    let contentTemplate = document.querySelector(`[data-purpose=${event.detail.purpose}]`)
+    let contentTemplate = document.querySelector(`template[data-dialog-id=${event.detail.dialog_id}]`)
 
     if (!contentTemplate) {
-      console.trace(`unknown template`, event?.detail?.purpose)
+      console.trace(`unknown template`, event?.detail?.dialog_id)
       return
     }
 

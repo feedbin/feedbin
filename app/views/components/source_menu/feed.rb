@@ -11,7 +11,7 @@ module SourceMenu
         # render ActionEdit.new(href: helpers.edit_subscription_path(@feed, app: true))
 
         li do
-          button data: {open_dialog: "edit_subscription_#{@feed.id}"} do
+          button data: {open_dialog: helpers.dom_id(@feed)} do
             span class: "icon-wrap" do
               render SvgComponent.new("menu-icon-edit")
             end
