@@ -5,6 +5,8 @@ class PasswordResetsController < ApplicationController
   end
 
   def create
+    Rails.logger.info("password_reset user=#{params[:email]} ip=#{request.remote_ip}")
+
     success_message = "Email sent with password reset instructions."
     if rate_limited?(10, 5.days)
       redirect_to(login_url, notice: success_message) and return
