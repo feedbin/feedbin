@@ -5,14 +5,14 @@ class PasswordResetsController < ApplicationController
   end
 
   def create
-    Rails.logger.info("password_reset user=#{params[:email]} ip=#{request.remote_ip}")
-
+    log
     success_message = "Email sent with password reset instructions."
     if rate_limited?(10, 5.days)
       redirect_to(login_url, notice: success_message) and return
     end
 
     if user = User.find_by_email(params[:email])
+      log(user: user)
       if user.password_reset_sent_at.nil? || user.password_reset_sent_at.before?(1.hour.ago)
         user.send_password_reset
       end
@@ -42,6 +42,15 @@ class PasswordResetsController < ApplicationController
   end
 
   private
+
+  def log(user: nil)
+    default = "password_reset user=#{params[:email]} ip=#{request.remote_ip}"
+    if user
+      Rails.logger.error("#{default} created=#{user.created_at.iso8601} subscriptions_count=#{user.subscriptions.count}")
+    else
+      Rails.logger.error(default)
+    end
+  end
 
   def user_params
     params.require(:user).permit(:password)
