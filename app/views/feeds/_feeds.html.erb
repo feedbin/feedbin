@@ -24,7 +24,7 @@
 <% end %>
 
 <% if tags.present? %>
-  <% cache [tag, tag.user_feeds, "v9"] do %>
+  <% cache [tags, tags.map(&:user_feeds), "v9"] do %>
     <li class="source-section section-tags">
         Tags
     </li>
@@ -41,7 +41,7 @@
   <% end %>
 <% end %>
 
-<%= render Dialog::EditSubscription.new(subscriptions: subscriptions) %>
+  <%= render Dialog::EditSubscription.new(subscriptions: subscriptions) %>
 
 <script>
   feedbin.formatFeeds();

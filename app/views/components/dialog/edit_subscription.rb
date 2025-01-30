@@ -6,19 +6,25 @@ module Dialog
     end
 
     def view_template
+      stats = FeedStat.daily_counts(feed_ids: @subscriptions.map(&:feed_id))
+
+      taggings = helpers.current_user.taggings.group(:feed_id).pluck(:feed_id, "array_agg(tag_id)").to_h
       @subscriptions.each do |subscription|
+        tag_editor = TagEditor.new(taggings: taggings, user: helpers.current_user, feed: subscription.feed)
         render Item.new(
           subscription: subscription,
-          tag_editor: TagEditor.new(helpers.current_user, subscription.feed),
+          tag_editor: tag_editor,
+          stats: stats,
           app: @app # used to distinguish between the edit modal in the main app vs settings
         )
       end
     end
 
     class Item < ApplicationComponent
-      def initialize(subscription:, tag_editor:, app:)
+      def initialize(subscription:, tag_editor:, stats:, app:)
         @subscription = subscription
         @tag_editor = tag_editor
+        @stats = stats
         @app = app
       end
 
@@ -43,7 +49,7 @@ module Dialog
                 end
               end
               div class: "mb-6" do
-                render App::FeedStatsComponent.new(feed: @subscription.feed, stats: FeedStat.daily_counts(feed_ids: [@subscription.feed.id]))
+                render App::FeedStatsComponent.new(feed: @subscription.feed, stats: @stats)
               end
               render Settings::H2Component.new do
                 "Tags"
