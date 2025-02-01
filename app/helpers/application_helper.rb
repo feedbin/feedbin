@@ -165,6 +165,8 @@ module ApplicationHelper
     url = Addressable::URI.heuristic_parse(url)
     parts = ([url.host] + url.path.split("/")).filter { _1.present? }
     parts.join(" › ")
+  rescue Addressable::URI::InvalidURIError
+    "None"
   end
 
   def short_url(url)
