@@ -7,8 +7,7 @@ module Dialog
 
     def view_template
       stats = FeedStat.daily_counts(feed_ids: @subscriptions.map(&:feed_id))
-
-      taggings = helpers.current_user.taggings.group(:feed_id).pluck(:feed_id, "array_agg(tag_id)").to_h
+      taggings = TagEditor.taggings(helpers.current_user)
       @subscriptions.each do |subscription|
         tag_editor = TagEditor.new(taggings: taggings, user: helpers.current_user, feed: subscription.feed)
         render Item.new(
