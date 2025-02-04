@@ -3343,7 +3343,8 @@ $feed-title-width: 115px;
   line-height: 1.6;
   @include color($color-contrast-600);
   text-rendering: optimizeLegibility;
-  overflow-wrap: break-word strong {
+  overflow-wrap: break-word;
+  strong {
     font-weight: 700;
     font-style: normal;
   }
