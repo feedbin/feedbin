@@ -12,6 +12,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params).with_params(user_params)
     if @user.save
+      log(@user.email)
       Librato.increment("user.trial.signup")
       flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers")
       sign_in @user
@@ -61,6 +62,10 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def log(user)
+    Rails.logger.error("user_created user=#{user} ip=#{request.remote_ip}")
+  end
 
   def set_user
     @user = current_user
