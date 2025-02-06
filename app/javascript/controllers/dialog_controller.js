@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { afterTransition, hydrate, html } from "helpers"
 
 export default class extends Controller {
-  static targets = ["dialog", "dialogTemplate", "content", "footerSpacer"]
+  static targets = ["dialog", "dialogContent", "dialogTemplate", "content", "footerSpacer"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
@@ -62,7 +62,7 @@ export default class extends Controller {
     const showEvent = this.dispatch("willShow")
     if (!showEvent.defaultPrevented) {
       const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
-      html(this.dialogTarget, [hydrate(dialogTemplate, content)])
+      html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
 
       this.dialogTarget.showModal()
       this.checkScroll()

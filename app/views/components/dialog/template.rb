@@ -4,7 +4,9 @@ module Dialog
 
     def view_template
       div data: stimulus_controller, class: "group" do
-        dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER)
+        dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER) do
+          div class: "bg-base sm:rounded-xl sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
+        end
         template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
           div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
             div class: "shrink-0 h-[env(safe-area-inset-top)]"
@@ -45,16 +47,18 @@ module Dialog
 
     def dialog_class
       "
-        p-0 bg-base text-600 animate-slide-in my-0 mx-auto sm:mt-16
+      p-0 sm:pt-16 text-600 my-0 mx-auto bg-transparent animate-slide-in sm:animate-slide-in-top overflow-visible
 
-        h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible
+      h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible sm:backdrop:visible
 
-        sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)] sm:!max-h-[calc(90vh-4rem)]
-        sm:rounded-xl sm:shadow-lg sm:backdrop:visible
+      sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)] sm:!max-h-[calc(90vh-4rem)]
 
-        backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
-        group-data-[dialog-closing-value=true]:animate-slide-out
-        group-data-[dialog-closing-value=true]:backdrop:animate-fade-out
+      backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
+
+      group-data-[dialog-closing-value=true]:animate-slide-out
+      sm:group-data-[dialog-closing-value=true]:animate-slide-out-top
+
+      group-data-[dialog-closing-value=true]:backdrop:animate-fade-out
       "
     end
 

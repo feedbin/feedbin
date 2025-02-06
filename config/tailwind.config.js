@@ -22,24 +22,24 @@ module.exports = {
     },
     extend: {
       boxShadow: {
-        "one": "0 1px 1px 0          var(--color-shadow-100)",
-        "two": "0px 4px 6px 2px      var(--color-shadow-100)",
-        "selected": "0px 0px 0px 1px rgb(var(--color-blue-600))",
+        one: "0 1px 1px 0          var(--color-shadow-100)",
+        two: "0px 4px 6px 2px      var(--color-shadow-100)",
+        selected: "0px 0px 0px 1px rgb(var(--color-blue-600))",
       },
       borderColor: {
         DEFAULT: "rgb(var(--border-color))",
       },
       colors: {
-        base:    "rgb(var(--color-base))",
-        100:     "rgb(var(--color-100))",
-        200:     "rgb(var(--color-200))",
-        300:     "rgb(var(--color-300))",
-        400:     "rgb(var(--color-400))",
-        500:     "rgb(var(--color-500))",
-        600:     "rgb(var(--color-600))",
-        700:     "rgb(var(--color-700))",
+        base: "rgb(var(--color-base))",
+        100: "rgb(var(--color-100))",
+        200: "rgb(var(--color-200))",
+        300: "rgb(var(--color-300))",
+        400: "rgb(var(--color-400))",
+        500: "rgb(var(--color-500))",
+        600: "rgb(var(--color-600))",
+        700: "rgb(var(--color-700))",
         sidebar: "rgb(var(--color-sidebar))",
-        link:    "rgb(var(--color-link))",
+        link: "rgb(var(--color-link))",
         light: {
           100: "rgb(var(--color-light-100))",
         },
@@ -69,6 +69,14 @@ module.exports = {
           "0%": { transform: "translateY(0vh)" },
           "100%": { transform: "translateY(100vh)" },
         },
+        "slide-in-top": {
+          "0%": { transform: "translateY(-34px)", opacity: "0.75" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "slide-out-top": {
+          "0%": { transform: "translateY(0)", opacity: "1" },
+          "100%": { transform: "translateY(-34px)", opacity: "0.0" },
+        },
         "fade-in": {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
@@ -81,6 +89,8 @@ module.exports = {
       animation: {
         "slide-in": "slide-in 0.3s ease-out",
         "slide-out": "slide-out 0.25s ease-in",
+        "slide-in-top": "slide-in-top 0.3s ease-out",
+        "slide-out-top": "slide-out-top 0.25s ease-in",
         "fade-in": "fade-in 0.3s linear",
         "fade-out": "fade-out 0.25s linear",
       },
@@ -89,9 +99,13 @@ module.exports = {
   plugins: [
     plugin(function ({ addVariant }) {
       let pseudoVariants = [
-        "checked", "focus", "active", "disabled", "checked:disabled"
+        "checked",
+        "focus",
+        "active",
+        "disabled",
+        "checked:disabled",
       ].map((variant) =>
-        Array.isArray(variant) ? variant : [variant, `&:${variant}`],
+        Array.isArray(variant) ? variant : [variant, `&:${variant}`]
       );
 
       for (let [variantName, state] of pseudoVariants) {
@@ -102,8 +116,7 @@ module.exports = {
       }
     }),
     plugin(({ addVariant }) => {
-      addVariant(`native`, [`.native &`, `&.native`])
+      addVariant(`native`, [`.native &`, `&.native`]);
     }),
-  ]
-}
-
+  ],
+};
