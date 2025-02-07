@@ -24,7 +24,7 @@ class Common::FeedLink < ApplicationComponent
         feed_id: @feed.id,
         sourceable_target: "source",
         action: "sourceable#selected",
-        sourceable_payload_param: @feed.sourceable.to_h,
+        sourceable_payload_param: JSON.dump(@feed.sourceable.to_h),
         mark_read: {
           type: "feed",
           data: @feed.id,

@@ -70,10 +70,14 @@ module Dialog
       end
 
       def view_template
-        template_tag data: {dialog_id: @dialog_id} do
-          div data: {dialog_content: "title"}, &@title
-          div data: {dialog_content: "body"}, &@body
-          div data: {dialog_content: "footer"}, &@footer
+        script data: {dialog_id: @dialog_id}, type: "application/json" do
+          unsafe_raw(
+            JSON.generate({
+              title:  capture { yield_content(&@title) },
+              body:   capture { yield_content(&@body) },
+              footer: capture { yield_content(&@footer) },
+            }, script_safe: true)
+          )
         end
       end
     end

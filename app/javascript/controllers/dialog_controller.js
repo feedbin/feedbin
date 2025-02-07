@@ -30,29 +30,29 @@ export default class extends Controller {
       return
     }
 
-    let contentTemplate = document.querySelector(`template[data-dialog-id=${event.detail.dialog_id}]`)
+    let dataElement = document.querySelector(`script[data-dialog-id=${event.detail.dialog_id}]`)
 
-    if (!contentTemplate) {
+    if (!dataElement) {
       console.trace(`unknown template`, event?.detail?.dialog_id)
       return
     }
 
-    let content = contentTemplate.content.cloneNode(true)
+    let data = JSON.parse(dataElement.textContent)
     let dialogParts = [
       {
         type: "text",
         selector: "title",
-        value: content.querySelector("[data-dialog-content=title]").textContent,
+        value: data.title,
       },
       {
         type: "html",
         selector: "body",
-        value: [...content.querySelector("[data-dialog-content=body]").children],
+        value: data.body,
       },
       {
         type: "html",
         selector: "footer",
-        value: [...content.querySelector("[data-dialog-content=footer]").children],
+        value: data.footer,
       },
     ]
 
@@ -66,6 +66,7 @@ export default class extends Controller {
       html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
 
       this.dialogTarget.showModal()
+      this.dispatch("show")
       this.checkScroll()
       setTimeout(() => {
         this.dispatch("shown")

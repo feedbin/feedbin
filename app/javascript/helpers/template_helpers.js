@@ -10,7 +10,11 @@ export function templateText(element, selector, value) {
 export function templateHTML(element, selector, value) {
   let result = element.querySelector(`[data-template~=${selector}]`)
   if (result) {
-    html(result, [value].flat())
+    if (typeof(value) === "object") {
+      html(result, [value])
+    } else {
+      result.innerHTML = value
+    }
   } else {
     console.trace(`templateHTML missing selector: ${selector}`)
   }
