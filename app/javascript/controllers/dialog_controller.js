@@ -7,6 +7,7 @@ export default class extends Controller {
   static values = {
     closing: Boolean,
     footerBorder: Boolean,
+    headerBorder: Boolean,
   }
 
   connect() {
@@ -114,6 +115,12 @@ export default class extends Controller {
     const scrollHeight = this.contentTarget.scrollHeight
     const clientHeight = this.contentTarget.clientHeight
     const maxScroll = scrollHeight - clientHeight
+
+    if (scrollTop > 0) {
+      this.headerBorderValue = true
+    } else {
+      this.headerBorderValue = false
+    }
 
     if (scrollHeight > clientHeight && scrollTop < maxScroll) {
       this.footerBorderValue = true

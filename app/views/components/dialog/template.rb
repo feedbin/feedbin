@@ -10,7 +10,7 @@ module Dialog
         template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
           div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
             div class: "shrink-0 h-[env(safe-area-inset-top)]"
-            div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b" do
+            div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b border-transparent group-data-[dialog-header-border-value=true]:border-200" do
               button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
                 render SvgComponent.new "icon-close-small", class: "relative native:top-[-6px] fill-600", title: "Close"
               end
