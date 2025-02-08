@@ -18,7 +18,7 @@ module App
     end
 
     def default_rows
-      @auto_open ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"
+      @auto_open ? "[grid-template-rows:1fr] sm:[grid-template-rows:0fr]" : "[grid-template-rows:0fr]"
     end
   end
 end

@@ -25,7 +25,7 @@
         <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>" data-controller="toolbar" data-toolbar-section-value="feeds-column" data-action="click->toolbar#show">
             <div class="inner-column">
                 <div class="top-toolbar">
-                    <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe"><%= svg_tag "icon-plus", size: "16x16" %></button>
+                    <button type="button" class="show-subscribe" data-behavior="show_subscribe" data-open-dialog="<%= Dialog::AddFeed::DIALOG_ID %>"><%= svg_tag "icon-plus", size: "16x16" %></button>
                     <%= render partial: 'shared/view_mode' %>
                     <%= render partial: 'shared/hamburger_menu_button' %>
                 </div>
@@ -125,6 +125,7 @@
 
     <%= render Dialog::KeyboardShortcuts.new %>
     <%= render Dialog::ExtractedContent::Placeholder.new %>
+    <%= render Dialog::AddFeed.new %>
 
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>

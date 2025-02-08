@@ -51,7 +51,7 @@ export default class extends Controller {
     let element = document.createElement("div")
     element.innerHTML = event.detail.data
 
-    this.open(element, event.detail.dialog_id, true)
+    this.open(element, event.detail.dialog_id, !!event?.detail?.wait)
   }
 
   open(element, id, wait = false) {

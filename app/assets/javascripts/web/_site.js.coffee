@@ -1399,11 +1399,12 @@ $.extend feedbin,
     $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled')
     $('.modal-purpose-subscribe #basic_username').focus()
 
-  updateDialog: (id, data) ->
+  updateDialog: (id, data, wait) ->
     window.dispatchEvent new CustomEvent('dialog:update',
       detail:
         dialog_id: id
-        data: data
+        data: data,
+        wait: wait
     )
 
   showDialog: (id) ->
