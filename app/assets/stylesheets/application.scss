@@ -3773,8 +3773,8 @@ $feed-title-width: 115px;
   }
 }
 
-.entry-inner {
-  @media (max-width: $small-breakpoint) {
+@media (max-width: $small-breakpoint) {
+  .entry-inner {
     img[data-camo-src],
     .full-width-candidate {
       visibility: hidden;
@@ -3783,6 +3783,8 @@ $feed-title-width: 115px;
         visibility: visible;
       }
     }
+  }
+  .entry-column .entry-inner {
     img.full-width,
     .fluid-width-video-wrapper,
     .media-container {

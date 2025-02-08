@@ -1,7 +1,8 @@
-target = $('.modal-purpose-view_link .modal-body')
 <% if @content %>
     feedbin.updateDialog("<%= Dialog::ExtractedContent::DIALOG_ID %>", "<%= j render Dialog::ExtractedContent.new(page: @content_info, content: @content) %>");
 <% else %>
     feedbin.updateDialog("<%= Dialog::ExtractedContent::DIALOG_ID %>", "<%= j render Dialog::ExtractedContent::Error.new(url: @url) %>");
 <% end %>
-feedbin.formatLinkContents();
+setTimeout(function() {
+  feedbin.formatLinkContents();
+}, 351)

@@ -51,10 +51,10 @@ export default class extends Controller {
     let element = document.createElement("div")
     element.innerHTML = event.detail.data
 
-    this.open(element, event.detail.dialog_id)
+    this.open(element, event.detail.dialog_id, true)
   }
 
-  open(element, id) {
+  open(element, id, wait = false) {
     let dataElement = element.querySelector(`script[data-dialog-id=${id}]`)
 
     if (!dataElement) {
@@ -91,18 +91,27 @@ export default class extends Controller {
 
     const showEvent = this.dispatch("willShow")
     if (!showEvent.defaultPrevented) {
-      const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
-      html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
-
+      if (!wait) {
+        this.writeContent(content)
+      }
       this.isOpen = true
       this.dialogTarget.showModal()
       this.dispatch("show")
-      this.checkScroll()
+
       setTimeout(() => {
+        if (wait) {
+          this.writeContent(content)
+        }
         this.dispatch("shown")
         this.isLoaded = true
       }, 350)
     }
+  }
+
+  writeContent(content) {
+      const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
+      html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
+      this.checkScroll()
   }
 
   close() {
