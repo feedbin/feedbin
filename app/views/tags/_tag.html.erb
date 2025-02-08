@@ -7,6 +7,7 @@
             mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json,
             sourceable_target: "source",
             action: "sourceable#selected",
+            dialog_id: dom_id(tag),
             sourceable_payload_param: tag.sourceable.to_h,
             settings_path: edit_tag_path(tag)
         } do

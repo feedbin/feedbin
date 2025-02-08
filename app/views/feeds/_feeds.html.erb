@@ -41,7 +41,9 @@
   <% end %>
 <% end %>
 
-  <%= render Dialog::EditSubscription.new(subscriptions: subscriptions) %>
+<%= render Dialog::EditSubscription.new(subscriptions: subscriptions) %>
+<%= render Dialog::EditTag.new(tags: tags) %>
+<%= render Dialog::EditSavedSearch.new(saved_searches: saved_searches) %>
 
 <script>
   feedbin.formatFeeds();

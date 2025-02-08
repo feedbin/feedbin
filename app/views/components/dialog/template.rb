@@ -12,7 +12,7 @@ module Dialog
             div class: "shrink-0 h-[env(safe-area-inset-top)]"
             div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b border-transparent group-data-[dialog-header-border-value=true]:border-200" do
               button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
-                render SvgComponent.new "icon-close-small", class: "relative native:top-[-6px] fill-600", title: "Close"
+                render SvgComponent.new "icon-close", class: "relative native:top-[-6px] fill-600", title: "Close"
               end
               h2 class: "text-700 grow font-bold m-0 truncate text-center", data: {template: "title"}
             end

@@ -1731,6 +1731,11 @@ $.extend feedbin,
         $('.modal').modal('hide')
         return
 
+    closeDialogLink: ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=close_dialog]', ->
+        feedbin.closeDialog()
+        return
+
     entryLinks: ->
       $(document).on 'click', '[data-behavior~=external_links] a', ->
         $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
@@ -2731,7 +2736,6 @@ $.extend feedbin,
 
     unsubscribe: ->
       callback = (item) ->
-        feedbin.closeDialog()
         feed = item.data('feed-id')
         if (feedbin.data.viewMode != 'view_starred')
           $(".feeds [data-feed-id=#{feed}]").remove()

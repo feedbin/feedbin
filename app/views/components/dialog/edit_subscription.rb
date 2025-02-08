@@ -74,12 +74,12 @@ module Dialog
 
         if @app
           data[:feed_id] = @subscription.feed.id
-          data[:behavior] = "unsubscribe"
+          data[:behavior] = "unsubscribe close_dialog"
           path = subscription_path(@subscription)
         end
 
-        link_to path, method: :delete, class: "!text-600 button-text text-sm flex items-center gap-2", data: data do
-          render SvgComponent.new("icon-delete")
+        link_to path, method: :delete, remote: true, class: "!text-600 button-text text-sm flex items-center gap-2", data: data do
+          render SvgComponent.new("icon-delete", class: "fill-600")
           plain " Unsubscribe"
         end
       end

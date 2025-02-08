@@ -115,6 +115,10 @@ module.exports = {
         });
       }
     }),
+    plugin(function ({ addVariant }) {
+      addVariant("pointer-coarse", "@media (pointer: coarse)");
+      addVariant("pointer-fine", "@media (pointer: fine)");
+    }),
     plugin(({ addVariant }) => {
       addVariant(`native`, [`.native &`, `&.native`]);
     }),
