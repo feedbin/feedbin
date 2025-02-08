@@ -18,10 +18,14 @@ module Dialog
       def view_template
         render Dialog::Template::Content.new(dialog_id: helpers.dom_id(@saved_search)) do |dialog|
           dialog.title do
-            "Edit Saved Search"
+            if @saved_search.persisted?
+              "Edit Saved Search"
+            else
+              "New Saved Search"
+            end
           end
           dialog.body do
-            form_for(@saved_search, remote: true, method: :patch, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|
+            form_for(@saved_search, remote: true, method: @saved_search.persisted? ? :patch : :post, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|
               div class: "mb-4" do
                 render Form::TextInputComponent.new do |text|
                   text.label do
@@ -52,7 +56,7 @@ module Dialog
                 end
               end
 
-              button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@saved_search, :edit) do
+              button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@saved_search, @saved_search.persisted? ? :edit : :new) do
                 "Save"
               end
             end

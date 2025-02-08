@@ -195,6 +195,8 @@ class EntriesController < ApplicationController
     @escaped_query = params[:query].tr("\"", "'").html_safe if params[:query]
     params[:query] = "#{params[:query]} #{params[:query_extra]}"
 
+    @saved_search = @user.saved_searches.build(query: params[:query])
+
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
     @entries = result.records(Entry).includes(:feed)
@@ -211,8 +213,6 @@ class EntriesController < ApplicationController
     @search_message = "Mark #{helpers.number_with_delimiter(@total_results)} #{"article".pluralize(@total_results)} that #{"match".pluralize(@total_results == 1 ? 2 : 1)} the search “#{@escaped_query}” as read?"
 
     @collection_title = "Search"
-
-    @saved_search = SavedSearch.new
 
     respond_to do |format|
       format.js { render partial: "shared/entries" }
