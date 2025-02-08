@@ -31,8 +31,13 @@ module Dialog
                   p(class: "post-meta") { plain @page.domain }
                 end
               end
-              div(class: "content-styles entry-type-default", data_behavior: "view_link_markup_wrap external_links") do
-                unsafe_raw @content.html_safe
+
+              render App::ExpandableContainerComponent.new(auto_open: true) do |expandable|
+                expandable.content do
+                  div(class: "content-styles entry-type-default", data_behavior: "view_link_markup_wrap external_links") do
+                    unsafe_raw @content.html_safe
+                  end
+                end
               end
             end
           end
