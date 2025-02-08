@@ -8,7 +8,7 @@ export default class extends Controller {
 
   connect() {
     this.checkVisualViewport()
-    this.boundCheckVisualViewport = this.checkVisualViewport.bind(this)
+    this.boundCheckVisualViewport = this.delayedCheck.bind(this)
     window.visualViewport.addEventListener("resize", this.boundCheckVisualViewport)
     document.addEventListener("blur", this.boundCheckVisualViewport, true)
   }
@@ -25,6 +25,14 @@ export default class extends Controller {
 
     document.documentElement.style.setProperty("--visual-viewport-offset", `${this.offsetValue}px`);
     this.dispatch("change", { detail: { offset: this.offsetValue } })
+  }
+
+  delayedCheck() {
+    // When switching between fields, blur is called
+    // and the other field does not have focus yet
+    setTimeout(()=>{
+      this.checkVisualViewport()
+    }, 10)
   }
 
   isKeyboardable(element) {
