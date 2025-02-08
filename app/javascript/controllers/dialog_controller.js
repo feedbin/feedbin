@@ -6,6 +6,7 @@ export default class extends Controller {
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
+    footer: Boolean,
     footerBorder: Boolean,
     headerBorder: Boolean,
   }
@@ -17,6 +18,8 @@ export default class extends Controller {
 
     this.boundCheckScroll = this.checkScroll.bind(this)
     window.addEventListener("resize", this.boundCheckScroll)
+
+    this.cleanup()
   }
 
   disconnect() {
@@ -24,21 +27,45 @@ export default class extends Controller {
     window.removeEventListener("resize", this.boundCheckScroll)
   }
 
+  cleanup() {
+    this.isOpen = false
+    this.isLoaded = false
+    this.currentDialogId = null
+  }
+
   openWithPurpose(event) {
-    if (!event?.detail?.dialog_id) {
+    let requestedDialog = event?.detail?.dialog_id
+    if (!requestedDialog) {
       console.trace(`dialog_id required for modal`, event)
       return
     }
+    this.open(document, requestedDialog)
+  }
 
-    let dataElement = document.querySelector(`script[data-dialog-id=${event.detail.dialog_id}]`)
-
-    if (!dataElement) {
-      console.trace(`unknown template`, event?.detail?.dialog_id)
+  updateContent(event) {
+    if (!event?.detail?.dialog_id || !event?.detail?.data) {
+      console.trace(`dialog_id and datarequired for dialog`, event)
       return
     }
 
+    let element = document.createElement("div")
+    element.innerHTML = event.detail.data
+
+    this.open(element, event.detail.dialog_id)
+  }
+
+  open(element, id) {
+    let dataElement = element.querySelector(`script[data-dialog-id=${id}]`)
+
+    if (!dataElement) {
+      console.trace(`unknown template`, id)
+      return
+    }
+
+    this.currentDialogId = id
+
     let data = JSON.parse(dataElement.textContent)
-    let dialogParts = [
+    let content = [
       {
         type: "text",
         selector: "title",
@@ -56,20 +83,24 @@ export default class extends Controller {
       },
     ]
 
-    this.open(dialogParts)
-  }
+    if (data.footer === "") {
+      this.footerValue = false
+    } else {
+      this.footerValue = true
+    }
 
-  open(content) {
     const showEvent = this.dispatch("willShow")
     if (!showEvent.defaultPrevented) {
       const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
       html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
 
+      this.isOpen = true
       this.dialogTarget.showModal()
       this.dispatch("show")
       this.checkScroll()
       setTimeout(() => {
         this.dispatch("shown")
+        this.isLoaded = true
       }, 350)
     }
   }
@@ -80,6 +111,7 @@ export default class extends Controller {
     if (!hideEvent.defaultPrevented) {
       this.closingValue = true
       this.dialogTarget.setAttribute("closing", "")
+      this.cleanup()
       setTimeout(() => {
         this.dialogTarget.removeAttribute("closing")
         this.closingValue = false

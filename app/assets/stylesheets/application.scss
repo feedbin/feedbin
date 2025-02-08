@@ -2688,6 +2688,9 @@ $feed-title-width: 115px;
   .modal & {
     padding-top: 40px;
   }
+  dialog & {
+    padding: 0;
+  }
 }
 
 .next-entry-preview {
@@ -4005,7 +4008,8 @@ $feed-title-width: 115px;
 .entry-final-content a,
 .tweet-text a,
 .micropost-text a,
-.modal-content .content-styles a {
+.modal-content .content-styles a,
+dialog .content-styles a {
   text-decoration: underline;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
   @include color($color-contrast-700);
@@ -4976,7 +4980,7 @@ Settings
       }
     }
   }
-  .modal & {
+  .modal &, dialog & {
     a {
       @include color($color-contrast-700);
     }
@@ -5285,13 +5289,13 @@ Link Viewer
 .placeholder-content p:empty {
   height: 12px;
 }
-.placeholder-content p:nth-child(2n) {
+.placeholder-content p:nth-child(2n), .placeholder-content svg:nth-child(2n) {
   width: 90%;
 }
-.placeholder-content p:nth-child(3n) {
+.placeholder-content p:nth-child(3n), .placeholder-content svg:nth-child(3n) {
   width: 96%;
 }
-.placeholder-content p:last-child {
+.placeholder-content p:last-child, .placeholder-content svg:last-child {
   width: 30%;
 }
 
@@ -6685,6 +6689,11 @@ Media Queries
     }
   }
 }
+
+.one-up dialog .entry-inner {
+  padding: 0;
+}
+
 
 /*------------------------------------------------------------------------------
 Add

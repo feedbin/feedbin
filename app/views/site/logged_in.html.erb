@@ -113,7 +113,6 @@
     <div class="hide" data-behavior="pagination"></div>
 
     <%= render Shared::Modals::AddFormComponent.new %>
-    <%= render Shared::Modals::KeyboardShortcutsComponent.new %>
     <%= render Shared::Modals::ViewLinkComponent.new %>
     <%= render Shared::Modals::SettingsComponent.new %>
     <%= render Shared::Modals::ConversationComponent.new %>
@@ -124,6 +123,8 @@
 
     <%= render Dialog::Template.new %>
 
+    <%= render Dialog::KeyboardShortcuts.new %>
+    <%= render Dialog::ExtractedContent::Placeholder.new %>
 
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>

@@ -1399,6 +1399,16 @@ $.extend feedbin,
     $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled')
     $('.modal-purpose-subscribe #basic_username').focus()
 
+  updateDialog: (id, data) ->
+    window.dispatchEvent new CustomEvent('dialog:update',
+      detail:
+        dialog_id: id
+        data: data
+    )
+
+  showDialog: (id) ->
+    window.dispatchEvent new CustomEvent('dialog:open', detail: dialog_id: id)
+
   showModal: (target, title = null) ->
     modal = $("#modal")
     classes = modal[0].className.split(/\s+/)
@@ -1422,7 +1432,7 @@ $.extend feedbin,
     modalClass
 
   loadLink: (href) ->
-    feedbin.showModal("view_link");
+    feedbin.showDialog("extracted_content_placeholder");
     $.get(feedbin.data.modal_extracts_path, {url: href});
 
   updateFeedSearchMessage: ->
@@ -1732,9 +1742,8 @@ $.extend feedbin,
         return
 
     closeDialogLink: ->
-      $(document).on 'ajax:beforeSend', '[data-behavior~=close_dialog]', ->
+      $(document).on 'click', '[data-behavior~=close_dialog]', ->
         feedbin.closeDialog()
-        return
 
     entryLinks: ->
       $(document).on 'click', '[data-behavior~=external_links] a', ->
@@ -2895,7 +2904,7 @@ $.extend feedbin,
     openDialog: ->
       $(document).on 'click', '[data-open-dialog]', (event) ->
         id = $(@).data('open-dialog')
-        window.dispatchEvent new CustomEvent('dialog:open', detail: dialog_id: id)
+        feedbin.showDialog(id)
 
 
 

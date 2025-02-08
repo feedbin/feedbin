@@ -18,8 +18,8 @@ module Dialog
             end
 
             div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, data: {template: "body"}, for: STIMULUS_CONTROLLER), class: "p-4 overflow-y-scroll overscroll-y-contain grow"
-            div data: {template: "footer"}, class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all border-t border-transparent group-data-[dialog-footer-border-value=true]:border-200"
-            div data: stimulus_item(target: :footer_spacer, for: STIMULUS_CONTROLLER), class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))]"
+            div data: {template: "footer"}, class: "py-2 sm:py-4 px-4 shrink-0 relative text-right transition-all border-t border-transparent group-data-[dialog-footer-border-value=true]:border-200 group-data-[dialog-footer-value=false]:tw-hidden"
+            div data: stimulus_item(target: :footer_spacer, for: STIMULUS_CONTROLLER), class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))] group-data-[dialog-footer-value=false]:tw-hidden"
           end
         end
       end
@@ -31,6 +31,7 @@ module Dialog
         actions: {
           "click"                         => "clickOutside",
           "dialog:open@window"            => "openWithPurpose",
+          "dialog:update@window"          => "updateContent",
           "dialog:close@window"           => "close",
           "visual-viewport:change@window" => "delayedCheckScroll"
         },
@@ -38,6 +39,7 @@ module Dialog
           closing: "false",
           header_border: "true",
           footer_border: "false",
+          footer: "true"
         },
         outlets: {
           expandable: "[data-controller=expandable]"

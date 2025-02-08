@@ -3,7 +3,7 @@ import { afterTransition } from "helpers"
 
 // Connects to data-controller="search-form"
 export default class extends Controller {
-  static targets = ["query", "sortLabel", "sortOption", "saveSearch"]
+  static targets = ["query", "sortLabel", "sortOption"]
   static outlets = ["search-token"]
   static values = {
     visible: Boolean,

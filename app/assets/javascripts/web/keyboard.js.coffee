@@ -209,10 +209,7 @@ class feedbin.Keyboard
 
     # Show Keyboard shortcuts
     Mousetrap.bind '?', (event, combo) =>
-      if $('.modal-purpose-help').hasClass('show')
-        $('.modal').modal('hide')
-      else
-        feedbin.showModal("help")
+      feedbin.showDialog("keyboard_shortcuts")
       event.preventDefault()
 
     # Focus search
