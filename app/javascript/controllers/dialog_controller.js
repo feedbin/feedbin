@@ -109,9 +109,11 @@ export default class extends Controller {
   }
 
   writeContent(content) {
-      const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
-      html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
+    const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
+    html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
+    setTimeout(() => {
       this.checkScroll()
+    }, 0)
   }
 
   close() {
@@ -153,6 +155,7 @@ export default class extends Controller {
     if (!this.hasContentTarget) {
       return
     }
+
     const scrollTop = this.contentTarget.scrollTop
     const scrollHeight = this.contentTarget.scrollHeight
     const clientHeight = this.contentTarget.clientHeight

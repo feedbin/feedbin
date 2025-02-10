@@ -13,7 +13,7 @@ module Dialog
           end
         end
         template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
-          div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
+          div class: "flex flex-col max-h-dvh min-h-dvh sm:overflow-hidden sm:min-h-0 sm:max-h-[calc(90vh-4rem)]" do
             div class: "shrink-0 h-[env(safe-area-inset-top)]"
             div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b border-transparent group-data-[dialog-header-border-value=true]:border-200" do
               button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
@@ -58,7 +58,7 @@ module Dialog
 
       h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible sm:backdrop:visible
 
-      sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)] sm:!max-h-[calc(90vh-4rem)]
+      sm:max-w-[550px] sm:h-fit sm:w-[calc(100%-32px)]
 
       backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
 

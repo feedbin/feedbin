@@ -5,3 +5,7 @@ export function afterTransition(element, condition, callback) {
   }
   setTimeout(callback, timeout)
 }
+
+export function nextFrame() {
+  return new Promise(requestAnimationFrame)
+}
