@@ -54,6 +54,8 @@ export default class extends Controller {
     let element = document.createElement("div")
     element.innerHTML = event.detail.data
 
+    console.log(element);
+
     this.open(element, event.detail.dialog_id, true)
   }
 
@@ -133,6 +135,7 @@ export default class extends Controller {
       this.contentTarget.style.height = `${afterHeight}px`
       this.contentTarget.addEventListener("transitionend", () => {
         this.contentTarget.style.height = ""
+        this.checkScroll()
       }, { once: true })
     })
   }

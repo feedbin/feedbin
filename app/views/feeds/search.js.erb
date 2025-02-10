@@ -6,8 +6,7 @@
     }
     feedbin.basicAuthForm();
 <% elsif @feeds.present? %>
-    $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j(@search ? svg_tag("icon-search", class: "fill-400") : favicon_with_host(@feeds.first.host) ) %>');
-    $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('<%= j render Subscriptions::NewView.new(feeds: @feeds, tag_editor: @tag_editor, search: @search) %>');
+    feedbin.updateDialog("<%= Dialog::AddFeed::DIALOG_ID %>", "<%= j render Dialog::AddFeed::Results.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search) %>");
     feedbin.showSubscribeResults()
     window.history.replaceState({}, document.title, "/");
     feedbin.updateFeedSearchMessage();

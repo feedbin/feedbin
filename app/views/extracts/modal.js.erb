@@ -1,7 +1,7 @@
 <% if @content %>
-    feedbin.updateDialog("<%= Dialog::ExtractedContent::DIALOG_ID %>", "<%= j render Dialog::ExtractedContent.new(page: @content_info, content: @content) %>", true);
+    feedbin.updateDialog("<%= Dialog::ExtractedContent::DIALOG_ID %>", "<%= j render Dialog::ExtractedContent.new(page: @content_info, content: @content) %>");
 <% else %>
-    feedbin.updateDialog("<%= Dialog::ExtractedContent::DIALOG_ID %>", "<%= j render Dialog::ExtractedContent::Error.new(url: @url) %>", true);
+    feedbin.updateDialog("<%= Dialog::ExtractedContent::DIALOG_ID %>", "<%= j render Dialog::ExtractedContent::Error.new(url: @url) %>");
 <% end %>
 setTimeout(function() {
   feedbin.formatLinkContents();
