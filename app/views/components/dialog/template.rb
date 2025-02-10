@@ -5,10 +5,10 @@ module Dialog
     def view_template
       div data: stimulus_controller, class: "group" do
         dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER) do
-          div class: "h-dvh overflow-y-scroll snap-y snap-mandatory hide-scrollbar overscroll-none sm:h-auto sm:overflow-y-visible sm:snap-none sm:overscroll-auto" do
-            div class: "snap-start h-dvh sm:tw-hidden"
+          div class: "h-dvh overflow-y-scroll snap-y snap-mandatory hide-scrollbar overscroll-none sm:h-auto sm:overflow-y-visible sm:snap-none sm:overscroll-auto", data: stimulus_item(target: :snap_container, for: STIMULUS_CONTROLLER) do
+            div class: "snap-start h-dvh sm:tw-hidden bg-300"
             div class: "snap-start h-dvh sm:snap-align-none sm:h-auto" do
-              div class: "bg-base sm:rounded-xl shadow-border-top sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
+              div class: "bg-base shadow-border-top sm:rounded-xl sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
             end
           end
         end

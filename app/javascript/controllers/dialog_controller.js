@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { afterTransition, hydrate, html } from "helpers"
 
 export default class extends Controller {
-  static targets = ["dialog", "dialogContent", "dialogTemplate", "content", "footerSpacer"]
+  static targets = ["dialog", "dialogContent", "dialogTemplate", "snapContainer", "content", "footerSpacer"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
@@ -97,6 +97,12 @@ export default class extends Controller {
       this.isOpen = true
       this.dialogTarget.showModal()
       this.dispatch("show")
+
+      // scroll to end of snapContainer to skip
+      // blank container above
+      this.snapContainerTarget.scrollTo({
+        top: this.snapContainerTarget.scrollHeight,
+      })
 
       setTimeout(() => {
         if (wait) {
