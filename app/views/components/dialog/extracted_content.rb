@@ -32,12 +32,8 @@ module Dialog
                 end
               end
 
-              render App::ExpandableContainerComponent.new(auto_open: true) do |expandable|
-                expandable.content do
-                  div(class: "content-styles entry-type-default pb-1", data_behavior: "view_link_markup_wrap external_links") do
-                    unsafe_raw @content.html_safe
-                  end
-                end
+              div(class: "content-styles entry-type-default pb-1", data_behavior: "view_link_markup_wrap external_links") do
+                unsafe_raw @content.html_safe
               end
             end
           end

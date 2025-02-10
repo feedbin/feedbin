@@ -19,17 +19,20 @@ export default class extends Controller {
     this.boundCheckScroll = this.checkScroll.bind(this)
     window.addEventListener("resize", this.boundCheckScroll)
 
+    // Add scroll event listener for snapContainer
+    this.boundCheckSnapScroll = this.checkSnapScroll.bind(this)
+    this.snapContainerTarget.addEventListener("scroll", this.boundCheckSnapScroll)
+
     this.cleanup()
   }
 
   disconnect() {
     this.dialogTarget.removeEventListener("cancel", this.boundCancel)
     window.removeEventListener("resize", this.boundCheckScroll)
+    this.snapContainerTarget.removeEventListener("scroll", this.boundCheckSnapScroll)
   }
 
   cleanup() {
-    this.isOpen = false
-    this.isLoaded = false
     this.currentDialogId = null
   }
 
@@ -51,10 +54,10 @@ export default class extends Controller {
     let element = document.createElement("div")
     element.innerHTML = event.detail.data
 
-    this.open(element, event.detail.dialog_id, !!event?.detail?.wait)
+    this.open(element, event.detail.dialog_id, true)
   }
 
-  open(element, id, wait = false) {
+  open(element, id, update = false) {
     let dataElement = element.querySelector(`script[data-dialog-id=${id}]`)
 
     if (!dataElement) {
@@ -63,8 +66,34 @@ export default class extends Controller {
     }
 
     this.currentDialogId = id
+    this.dispatch("willShow")
 
-    let data = JSON.parse(dataElement.textContent)
+    let content = this.formatContent(dataElement)
+    if (!update) {
+      this.writeContent(content)
+    }
+
+    this.dialogTarget.showModal()
+    this.dispatch("show")
+
+    // scroll to end of snapContainer to skip
+    // blank container above
+    this.snapContainerTarget.scrollTo({
+      top: this.snapContainerTarget.scrollHeight,
+    })
+
+    // setTimeout needs to match animation
+    // timing from tailwind.config.js slide-in
+    setTimeout(() => {
+      if (update) {
+        this.writeContent(content)
+      }
+      this.dispatch("shown")
+    }, 300)
+  }
+
+  formatContent(element) {
+    let data = JSON.parse(element.textContent)
     let content = [
       {
         type: "text",
@@ -89,29 +118,7 @@ export default class extends Controller {
       this.footerValue = true
     }
 
-    const showEvent = this.dispatch("willShow")
-    if (!showEvent.defaultPrevented) {
-      if (!wait) {
-        this.writeContent(content)
-      }
-      this.isOpen = true
-      this.dialogTarget.showModal()
-      this.dispatch("show")
-
-      // scroll to end of snapContainer to skip
-      // blank container above
-      this.snapContainerTarget.scrollTo({
-        top: this.snapContainerTarget.scrollHeight,
-      })
-
-      setTimeout(() => {
-        if (wait) {
-          this.writeContent(content)
-        }
-        this.dispatch("shown")
-        this.isLoaded = true
-      }, 350)
-    }
+    return content
   }
 
   writeContent(content) {
@@ -154,6 +161,16 @@ export default class extends Controller {
       afterTransition(this.footerSpacerTarget, true, () => {
         this.checkScroll()
       })
+    }
+  }
+
+  checkSnapScroll() {
+    // autoclose if snapContainer below 5% of the height
+    const scrollTop = this.snapContainerTarget.scrollTop
+    const scrollHeight = this.snapContainerTarget.scrollHeight
+    const threshold = scrollHeight * 0.05
+    if (scrollTop < threshold) {
+      this.close()
     }
   }
 
