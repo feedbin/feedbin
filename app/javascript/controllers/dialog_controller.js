@@ -66,11 +66,9 @@ export default class extends Controller {
     }
 
     this.currentDialogId = id
-    this.dispatch("willShow")
 
-    let content = this.formatContent(dataElement)
     if (!update) {
-      this.writeContent(content)
+      this.writeContent(dataElement, update)
     }
 
     this.dialogTarget.showModal()
@@ -86,13 +84,13 @@ export default class extends Controller {
     // timing from tailwind.config.js slide-in
     setTimeout(() => {
       if (update) {
-        this.writeContent(content)
+        this.writeContent(dataElement, update)
       }
       this.dispatch("shown")
     }, 300)
   }
 
-  formatContent(element) {
+  writeContent(element, update) {
     let data = JSON.parse(element.textContent)
     let content = [
       {
@@ -112,37 +110,47 @@ export default class extends Controller {
       },
     ]
 
-    if (data.footer === "") {
-      this.footerValue = false
-    } else {
-      this.footerValue = true
+    this.footerValue = (data.footer === "") ? false : true
+    const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
+    const beforeHeight = (this.hasContentTarget) ? this.contentTarget.clientHeight : 0
+
+    html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
+
+    if (update) {
+      this.animateUpdate(beforeHeight)
     }
 
-    return content
-  }
-
-  writeContent(content) {
-    const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
-    html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
     setTimeout(() => {
       this.checkScroll()
     }, 0)
   }
 
-  close() {
-    const hideEvent = this.dispatch("willHide")
+  animateUpdate(beforeHeight) {
+    const afterHeight = this.contentTarget.clientHeight
+    this.contentTarget.style.height = `${beforeHeight}px`
 
-    if (!hideEvent.defaultPrevented) {
-      this.closingValue = true
-      this.dialogTarget.setAttribute("closing", "")
-      this.cleanup()
-      setTimeout(() => {
-        this.dialogTarget.removeAttribute("closing")
-        this.closingValue = false
-        this.dialogTarget.close()
-        this.dispatch("hidden")
-      }, 250)
-    }
+    requestAnimationFrame(() => {
+      this.contentTarget.style.height = `${afterHeight}px`
+      this.contentTarget.addEventListener("transitionend", () => {
+        this.contentTarget.style.height = ""
+      }, { once: true })
+    })
+  }
+
+  close() {
+    this.dispatch("willHide")
+    this.closingValue = true
+    this.dialogTarget.setAttribute("closing", "")
+    this.cleanup()
+
+    // setTimeout needs to match animation
+    // timing from tailwind.config.js slide-out
+    setTimeout(() => {
+      this.dialogTarget.removeAttribute("closing")
+      this.closingValue = false
+      this.dialogTarget.close()
+      this.dispatch("hidden")
+    }, 250)
   }
 
   cancel(event) {
