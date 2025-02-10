@@ -34,7 +34,7 @@ module Dialog
 
               render App::ExpandableContainerComponent.new(auto_open: true) do |expandable|
                 expandable.content do
-                  div(class: "content-styles entry-type-default", data_behavior: "view_link_markup_wrap external_links") do
+                  div(class: "content-styles entry-type-default pb-1", data_behavior: "view_link_markup_wrap external_links") do
                     unsafe_raw @content.html_safe
                   end
                 end
@@ -82,14 +82,9 @@ module Dialog
             "Extracted Content"
           end
           dialog.body do
-            div(class: "entry-inner") do
-              p class: "text-center mb-4 text-500" do
+            div(class: "entry-inner inset-0 absolute sm:static flex flex-center text-500") do
+              p class: "sm:py-40" do
                 "Loading…"
-              end
-              div(class: "placeholder-content") do
-                7.times do
-                  render Line.new
-                end
               end
             end
           end
