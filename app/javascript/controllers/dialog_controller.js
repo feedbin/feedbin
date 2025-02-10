@@ -150,7 +150,7 @@ export default class extends Controller {
       this.closingValue = false
       this.dialogTarget.close()
       this.dispatch("hidden")
-    }, 250)
+    }, 245)
   }
 
   cancel(event) {
