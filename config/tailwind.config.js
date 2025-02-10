@@ -23,9 +23,10 @@ module.exports = {
     },
     extend: {
       boxShadow: {
-        one: "0 1px 1px 0          var(--color-shadow-100)",
-        two: "0px 4px 6px 2px      var(--color-shadow-100)",
-        selected: "0px 0px 0px 1px rgb(var(--color-blue-600))",
+        one:          "0px  1px 1px 0px var(--color-shadow-100)",
+        two:          "0px  4px 6px 2px var(--color-shadow-100)",
+        selected:     "0px  0px 0px 1px rgb(var(--color-blue-600))",
+        "border-top": "0px -1px 0px 0px rgb(var(--border-color))",
       },
       borderColor: {
         DEFAULT: "rgb(var(--border-color))",

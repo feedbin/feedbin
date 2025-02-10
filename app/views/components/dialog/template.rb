@@ -8,12 +8,12 @@ module Dialog
           div class: "h-dvh overflow-y-scroll snap-y snap-mandatory hide-scrollbar overscroll-none sm:h-auto sm:overflow-y-visible sm:snap-none sm:overscroll-auto" do
             div class: "snap-start h-dvh sm:tw-hidden"
             div class: "snap-start h-dvh sm:snap-align-none sm:h-auto" do
-              div class: "bg-base shadow-[0_-1px_0_0_rgb(var(--border-color))] sm:rounded-xl sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
+              div class: "bg-base sm:rounded-xl shadow-border-top sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
             end
           end
         end
         template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
-          div class: "flex flex-col max-h-dvh min-h-dvh sm:overflow-hidden sm:min-h-0 sm:max-h-[calc(90vh-4rem)]" do
+          div class: "flex flex-col max-h-dvh min-h-dvh sm:overflow-hidden sm:min-h-0 sm:max-h-[calc(100vh-128px)]" do
             div class: "shrink-0 h-[env(safe-area-inset-top)]"
             div class: "p-4 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b border-transparent group-data-[dialog-header-border-value=true]:border-200" do
               button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
@@ -54,7 +54,7 @@ module Dialog
 
     def dialog_class
       "
-      p-0 sm:pt-16 text-600 my-0 mx-auto bg-transparent animate-slide-in sm:animate-slide-in-top overflow-visible
+      p-0 sm:pt-[64px] text-600 my-0 mx-auto bg-transparent animate-slide-in sm:animate-slide-in-top overflow-visible
 
       h-screen w-screen max-h-dvh max-w-[100vw] backdrop:invisible sm:backdrop:visible
 
