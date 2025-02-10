@@ -5,7 +5,12 @@ module Dialog
     def view_template
       div data: stimulus_controller, class: "group" do
         dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER) do
-          div class: "bg-base sm:rounded-xl sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
+          div class: "h-dvh overflow-y-scroll snap-y snap-mandatory hide-scrollbar overscroll-none" do
+            div class: "snap-start h-dvh w-screen"
+            div class: "snap-start h-dvh w-screen" do
+              div class: "bg-base shadow-[0_-1px_0_0_rgb(var(--border-color))] sm:rounded-xl sm:shadow-lg", data: stimulus_item(target: :dialog_content, for: STIMULUS_CONTROLLER)
+            end
+          end
         end
         template_tag data: stimulus_item(target: :dialog_template, for: STIMULUS_CONTROLLER) do
           div class: "flex flex-col max-h-dvh min-h-dvh sm:min-h-min sm:max-h-[calc(90vh-4rem)]" do
