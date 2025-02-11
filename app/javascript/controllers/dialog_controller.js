@@ -71,8 +71,9 @@ export default class extends Controller {
       this.writeContent(dataElement, update)
     }
 
-    this.dialogTarget.showModal()
     this.dispatch("show")
+    this.closingValue = false
+    this.dialogTarget.showModal()
 
     // scroll to end of snapContainer to skip
     // blank container above
@@ -141,17 +142,14 @@ export default class extends Controller {
   close() {
     this.dispatch("willHide")
     this.closingValue = true
-    this.dialogTarget.setAttribute("closing", "")
     this.cleanup()
 
     // setTimeout needs to match animation
     // timing from tailwind.config.js slide-out
     setTimeout(() => {
-      this.dialogTarget.removeAttribute("closing")
-      this.closingValue = false
       this.dialogTarget.close()
       this.dispatch("hidden")
-    }, 245)
+    }, 250)
   }
 
   cancel(event) {
