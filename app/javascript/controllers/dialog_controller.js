@@ -54,8 +54,6 @@ export default class extends Controller {
     let element = document.createElement("div")
     element.innerHTML = event.detail.data
 
-    console.log(element);
-
     this.open(element, event.detail.dialog_id, true)
   }
 

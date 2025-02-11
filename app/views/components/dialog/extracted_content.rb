@@ -15,7 +15,7 @@ module Dialog
           end
 
           dialog.body do
-            div(class: "entry-inner #{user_presenter.display_prefs}") do
+            div(class: "entry-inner animate-fade-in #{user_presenter.display_prefs}") do
               header(class: "entry-header") do
                 link_to @page.url, target: "_blank", rel: "noopener noreferrer" do
                   h1 { @page.title || "Untitled" }
