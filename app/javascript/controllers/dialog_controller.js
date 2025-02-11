@@ -119,17 +119,18 @@ export default class extends Controller {
     })
   }
 
-  close() {
+  close(now = false) {
     this.dispatch("willHide")
     this.closingValue = true
     this.cleanup()
 
     // setTimeout needs to match animation
     // timing from tailwind.config.js slide-out
+    const timeout = (now === true) ? 0 : 250
     setTimeout(() => {
       this.dialogTarget.close()
       this.dispatch("hidden")
-    }, 250)
+    }, timeout)
   }
 
   cancel(event) {
@@ -155,9 +156,9 @@ export default class extends Controller {
     // autoclose if snapContainer below 5% of the height
     const scrollTop = this.snapContainerTarget.scrollTop
     const scrollHeight = this.snapContainerTarget.scrollHeight
-    const threshold = scrollHeight * 0.05
+    const threshold = scrollHeight * 0.01
     if (scrollTop < threshold) {
-      this.close()
+      this.close(true)
     }
   }
 

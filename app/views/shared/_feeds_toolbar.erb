@@ -1,11 +1,11 @@
 <div class="bottom-toolbar feed-toolbar">
     <div class="toolbar-inner">
-        <button class="toolbar-button edit-button" disabled="disabled" data-behavior="feed_settings" data-open-dialog="">
+        <a href="" disabled="disabled" data-behavior="feed_settings" data-remote="true" data-open-dialog="" class="toolbar-button edit-button">
             <div class="toolbar-button-inner">
                 <%= svg_tag "icon-edit" %>
             </div>
             <span>Edit</span>
-        </button>
+        </a>
 
         <button class="toolbar-button add-button" data-behavior="show_subscribe" data-open-dialog="<%= Dialog::AddFeed.dom_id %>">
             <div class="toolbar-button-inner">

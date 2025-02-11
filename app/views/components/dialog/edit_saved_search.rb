@@ -1,32 +1,44 @@
 module Dialog
+
   class EditSavedSearch < ApplicationComponent
     TITLE = "Edit Saved Search"
 
-    def initialize(saved_searches:)
-      @saved_searches = saved_searches
+    def initialize(saved_search:)
+      @saved_search = saved_search
     end
 
     def view_template
-      @saved_searches.each do |saved_search|
-        render Item.new(saved_search: saved_search)
-      end
+      render SavedSearchForm.new(saved_search: @saved_search, title: TITLE, dialog_id: self.class.dom_id)
+    end
+  end
+
+  class NewSavedSearch < ApplicationComponent
+    TITLE = "New Saved Search"
+
+    def initialize(saved_search:)
+      @saved_search = saved_search
     end
 
-    class Item < ApplicationComponent
-      def initialize(saved_search:)
-        @saved_search = saved_search
-      end
+    def view_template
+      render SavedSearchForm.new(saved_search: @saved_search, title: TITLE, dialog_id: self.class.dom_id)
+    end
+  end
 
-      def view_template
-        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
-          dialog.title do
-            if @saved_search.persisted?
-              TITLE
-            else
-              "New Saved Search"
-            end
-          end
-          dialog.body do
+  class SavedSearchForm < ApplicationComponent
+
+    def initialize(saved_search:, title:, dialog_id:)
+      @saved_search = saved_search
+      @title = title
+      @dialog_id = dialog_id
+    end
+
+    def view_template
+      render Dialog::Template::Content.new(dialog_id: @dialog_id) do |dialog|
+        dialog.title do
+          @title
+        end
+        dialog.body do
+          div class: "animate-fade-in" do
             form_for(@saved_search, remote: true, method: @saved_search.persisted? ? :patch : :post, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|
               div class: "mb-4" do
                 render Form::TextInputComponent.new do |text|

@@ -1,0 +1,4 @@
+<% if @subscription %>
+    feedbin.updateDialog("<%= Dialog::EditSubscription.dom_id %>", "<%= j render Dialog::EditSubscription.new(subscription: @subscription, tag_editor: @tag_editor, stats: @stats, app: params[:app].present?) %>");
+<% end %>
+

@@ -102,7 +102,7 @@ module App
                 end
               end
             end
-            button class: "ml-auto !text-600 font-bold hover:no-underline text-xs flex items-center px-2 border border-transparent", data: {open_dialog: helpers.dom_id(SavedSearch.new)} do
+            button class: "ml-auto !text-600 font-bold hover:no-underline text-xs flex items-center px-2 border border-transparent", data: {open_dialog: Dialog::NewSavedSearch.dom_id} do
               "Save Search"
             end
           end

@@ -8,20 +8,7 @@ module SourceMenu
     def view_template
       render(Wrapper.new) do
         render ActionMarkRead.new(source_target: @source_target)
-        # render ActionEdit.new(href: helpers.edit_subscription_path(@feed, app: true))
-
-        li do
-          button data: {open_dialog: helpers.dom_id(@feed)} do
-            span class: "icon-wrap" do
-              render SvgComponent.new("menu-icon-edit")
-            end
-            span class: "menu-text" do
-              span class: "title" do
-                "Edit"
-              end
-            end
-          end
-        end
+        render ActionEdit.new(href: helpers.edit_subscription_path(@feed, app: true))
 
         li do
           button data: {behavior: "source_menu_mute", feed_id: @source_target} do

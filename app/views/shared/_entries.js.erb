@@ -29,8 +29,8 @@ var callback = function() {
         }})
         window.dispatchEvent(custom)
 
-        var existingSearch = $("script[data-dialog-id=<%= dom_id(@saved_search) %>]");
-        var dialog = "<%= j render Dialog::EditSavedSearch::Item.new(saved_search: @saved_search) %>";
+        var dialog = "<%= j render Dialog::NewSavedSearch.new(saved_search: @saved_search) %>";
+        var existingSearch = $("template[data-dialog-id=<%= Dialog::NewSavedSearch.dom_id %>]");
         if (existingSearch.length > 0) {
           existingSearch.replaceWith(dialog);
         } else {

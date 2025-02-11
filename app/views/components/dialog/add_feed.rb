@@ -37,26 +37,28 @@ module Dialog
               render SearchField.new(query: @query)
             end
 
-            form_tag(subscriptions_path, method: :post, remote: true, data: { behavior: "subscription_options" }) do
-              hidden_field_tag "valid_feed_ids", @valid_feed_ids
+            div class: "animate-fade-in" do
+              form_tag(subscriptions_path, method: :post, remote: true, data: { behavior: "subscription_options" }) do
+                hidden_field_tag "valid_feed_ids", @valid_feed_ids
 
-              render Settings::H2Component.new do
-                "Feed".pluralize(@feeds.length)
-              end
+                render Settings::H2Component.new do
+                  "Feed".pluralize(@feeds.length)
+                end
 
-              div(class: "mb-6") do
-                @feeds.each_with_index do |feed, index|
-                  fields_for "feeds[]", feed do |form_builder|
-                    feed_row(feed, index, form_builder)
+                div(class: "mb-6") do
+                  @feeds.each_with_index do |feed, index|
+                    fields_for "feeds[]", feed do |form_builder|
+                      feed_row(feed, index, form_builder)
+                    end
                   end
                 end
-              end
 
-              render Settings::H2Component.new do
-                "Tags"
+                render Settings::H2Component.new do
+                  "Tags"
+                end
+                render App::TagFieldsComponent.new(tag_editor: @tag_editor)
+                submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: { behavior: "submit_add" })
               end
-              render App::TagFieldsComponent.new(tag_editor: @tag_editor)
-              submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: { behavior: "submit_add" })
             end
           end
 

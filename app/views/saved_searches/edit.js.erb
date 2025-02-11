@@ -1,1 +1,1 @@
-feedbin.replaceModal("modal-purpose-edit", "<%= j render SavedSearches::FormComponent.new(saved_search: @saved_search) %>");
+feedbin.updateDialog("<%= Dialog::EditSavedSearch.dom_id %>", "<%= j render Dialog::EditSavedSearch.new(saved_search: @saved_search) %>");

@@ -80,9 +80,10 @@ module Dialog
     class Placeholder < ApplicationComponent
       slots :title
 
-      def initialize(dialog_id:, title:)
+      def initialize(dialog_id:, title:, size: :lg)
         @dialog_id = dialog_id
         @title = title
+        @size = size
       end
 
       def view_template
@@ -90,11 +91,23 @@ module Dialog
           content.title { @title }
           content.body do
             div(class: "inset-0 absolute sm:static flex flex-center text-500") do
-              p class: "sm:py-40" do
+              p class: size do
                 "Loading…"
               end
             end
           end
+        end
+      end
+
+      def size
+        case @size
+        when :xs
+          "sm:py-2"
+        when :sm
+          "sm:py-8"
+        when :lg
+          "sm:py-40"
+        else
         end
       end
     end
