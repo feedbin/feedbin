@@ -1,15 +1,15 @@
 module Dialog
   class AddFeed < ApplicationComponent
-    DIALOG_ID = "add_feed"
+    TITLE = "Add Feed"
 
     def initialize(query: "")
       @query = query
     end
 
     def view_template
-      render Dialog::Template::Content.new(dialog_id: DIALOG_ID) do |dialog|
+      render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
         dialog.title do
-          "Add Feed"
+          TITLE
         end
 
         dialog.body do
@@ -27,9 +27,9 @@ module Dialog
         @valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
       end
       def view_template
-        render Dialog::Template::Content.new(dialog_id: DIALOG_ID) do |dialog|
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
-            "Add Feed"
+            TITLE
           end
 
           dialog.body do

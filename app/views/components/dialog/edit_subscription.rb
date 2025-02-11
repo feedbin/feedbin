@@ -1,5 +1,7 @@
 module Dialog
   class EditSubscription < ApplicationComponent
+    TITLE = "Edit Subscription"
+
     def initialize(subscriptions:, app: true)
       @subscriptions = subscriptions
       @app = app
@@ -28,9 +30,9 @@ module Dialog
       end
 
       def view_template
-        render Dialog::Template::Content.new(dialog_id: helpers.dom_id(@subscription.feed)) do |dialog|
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
-            "Edit Subscription"
+            TITLE
           end
           dialog.body do
             form_for(@subscription, remote: true, method: :patch, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|

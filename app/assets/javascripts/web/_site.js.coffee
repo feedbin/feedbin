@@ -1432,7 +1432,7 @@ $.extend feedbin,
     modalClass
 
   loadLink: (href) ->
-    feedbin.showDialog("extracted_content_placeholder");
+    feedbin.showDialog("dialog_extracted_content");
     $.get(feedbin.data.modal_extracts_path, {url: href});
 
   updateFeedSearchMessage: ->

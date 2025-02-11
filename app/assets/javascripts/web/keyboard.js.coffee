@@ -209,7 +209,7 @@ class feedbin.Keyboard
 
     # Show Keyboard shortcuts
     Mousetrap.bind '?', (event, combo) =>
-      feedbin.showDialog("keyboard_shortcuts")
+      feedbin.showDialog("dialog_keyboard_shortcuts")
       event.preventDefault()
 
     # Focus search

@@ -1,5 +1,7 @@
 module Dialog
   class EditSavedSearch < ApplicationComponent
+    TITLE = "Edit Saved Search"
+
     def initialize(saved_searches:)
       @saved_searches = saved_searches
     end
@@ -16,10 +18,10 @@ module Dialog
       end
 
       def view_template
-        render Dialog::Template::Content.new(dialog_id: helpers.dom_id(@saved_search)) do |dialog|
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
             if @saved_search.persisted?
-              "Edit Saved Search"
+              TITLE
             else
               "New Saved Search"
             end

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { afterTransition, hydrate, html } from "helpers"
 
 export default class extends Controller {
-  static targets = ["dialog", "dialogContent", "dialogTemplate", "snapContainer", "content", "footerSpacer"]
+  static targets = ["dialog", "dialogContent", "snapContainer", "content", "footerSpacer"]
   static outlets = ["expandable"]
   static values = {
     closing: Boolean,
@@ -58,7 +58,7 @@ export default class extends Controller {
   }
 
   open(element, id, update = false) {
-    let dataElement = element.querySelector(`script[data-dialog-id=${id}]`)
+    let dataElement = element.querySelector(`template[data-dialog-id=${id}]`)
 
     if (!dataElement) {
       console.trace(`unknown template`, id)
@@ -92,30 +92,10 @@ export default class extends Controller {
   }
 
   writeContent(element, update) {
-    let data = JSON.parse(element.textContent)
-    let content = [
-      {
-        type: "text",
-        selector: "title",
-        value: data.title,
-      },
-      {
-        type: "html",
-        selector: "body",
-        value: data.body,
-      },
-      {
-        type: "html",
-        selector: "footer",
-        value: data.footer,
-      },
-    ]
-
-    this.footerValue = (data.footer === "") ? false : true
-    const dialogTemplate = this.dialogTemplateTarget.content.cloneNode(true)
+    const content = element.content.cloneNode(true)
     const beforeHeight = (this.hasContentTarget) ? this.contentTarget.clientHeight : 0
 
-    html(this.dialogContentTarget, [hydrate(dialogTemplate, content)])
+    html(this.dialogContentTarget, content)
 
     if (update) {
       this.animateUpdate(beforeHeight)

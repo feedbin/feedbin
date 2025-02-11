@@ -1,7 +1,7 @@
 module Dialog
   class KeyboardShortcuts < ApplicationComponent
     def view_template
-      render Dialog::Template::Content.new(dialog_id: "keyboard_shortcuts") do |dialog|
+      render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
         dialog.title do
           "Keyboard Shortcuts"
         end

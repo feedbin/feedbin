@@ -1,6 +1,6 @@
 module Dialog
   class ExtractedContent < ApplicationComponent
-    DIALOG_ID = "extracted_content"
+    TITLE = "Extracted Content"
 
     def initialize(page:, content:)
       @page = page
@@ -9,9 +9,9 @@ module Dialog
 
     def view_template
       helpers.present helpers.current_user do |user_presenter|
-        render Dialog::Template::Content.new(dialog_id: DIALOG_ID) do |dialog|
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
-            "Extracted Content"
+            TITLE
           end
 
           dialog.body do
@@ -37,8 +37,6 @@ module Dialog
               end
             end
           end
-
-
         end
       end
     end
@@ -49,9 +47,9 @@ module Dialog
       end
 
       def view_template
-        render Dialog::Template::Content.new(dialog_id: DIALOG_ID) do |dialog|
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
-            "Extracted Content"
+            TITLE
           end
 
           dialog.body do
@@ -63,40 +61,6 @@ module Dialog
                 "Visit Page"
               end
               button(class: "button", data_behavior: "close_dialog") { "Close" }
-            end
-          end
-        end
-      end
-    end
-
-    class Placeholder < ApplicationComponent
-      DIALOG_ID = "extracted_content_placeholder"
-
-      def view_template
-        render Dialog::Template::Content.new(dialog_id: DIALOG_ID) do |dialog|
-          dialog.title do
-            "Extracted Content"
-          end
-          dialog.body do
-            div(class: "entry-inner inset-0 absolute sm:static flex flex-center text-500") do
-              p class: "sm:py-40" do
-                "Loading…"
-              end
-            end
-          end
-        end
-      end
-
-      class Line < Phlex::SVG
-        def initialize
-          @height = 12
-          @duration = "#{3 + rand}s"
-        end
-
-        def view_template
-          svg(height: @height, width: "100%", ) do |s|
-            s.rect(width: "100%", height: @height, class: "[fill:rgb(var(--color-300))]") do
-              s.animate(attributename: "opacity", values: "0.4;1;0.4", dur: @duration, repeatcount: "indefinite" )
             end
           end
         end

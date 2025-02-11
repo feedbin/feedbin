@@ -1,5 +1,7 @@
 module Dialog
   class EditTag < ApplicationComponent
+    TITLE = "Edit Tag"
+
     def initialize(tags:)
       @tags = tags
     end
@@ -16,9 +18,9 @@ module Dialog
       end
 
       def view_template
-        render Dialog::Template::Content.new(dialog_id: helpers.dom_id(@tag)) do |dialog|
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
-            "Edit Tag"
+            TITLE
           end
           dialog.body do
             form_for(@tag, remote: true, method: :patch, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|
@@ -46,3 +48,5 @@ module Dialog
     end
   end
 end
+
+

@@ -11,7 +11,7 @@ export function templateHTML(element, selector, value) {
   let result = element.querySelector(`[data-template~=${selector}]`)
   if (result) {
     if (typeof(value) === "object") {
-      html(result, [value])
+      html(result, value)
     } else {
       result.innerHTML = value
     }
@@ -31,7 +31,7 @@ export function templateAttribute(element, selector, value, attribute) {
 
 export function html(target, elements) {
   target.innerHTML = ""
-  target.append(...elements)
+  target.append(...[elements].flat())
 }
 
 export function hydrate(element, items) {

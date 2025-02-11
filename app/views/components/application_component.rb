@@ -28,6 +28,10 @@ class ApplicationComponent < Phlex::HTML
     end
   end
 
+  def self.dom_id
+    self.to_s.underscore.parameterize(separator: "_")
+  end
+
   def stimulus(controller:, actions: {}, values: {}, outlets: {}, classes: {}, data: {})
     stimulus_controller = controller.to_s.dasherize
 

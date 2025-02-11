@@ -6,7 +6,7 @@
     }
     feedbin.basicAuthForm();
 <% elsif @feeds.present? %>
-    feedbin.updateDialog("<%= Dialog::AddFeed::DIALOG_ID %>", "<%= j render Dialog::AddFeed::Results.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search) %>");
+    feedbin.updateDialog("<%= Dialog::AddFeed.dom_id %>", "<%= j render Dialog::AddFeed::Results.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search) %>");
     feedbin.showSubscribeResults()
     window.history.replaceState({}, document.title, "/");
     feedbin.updateFeedSearchMessage();
