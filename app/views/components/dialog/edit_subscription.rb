@@ -33,9 +33,7 @@ module Dialog
               div class: "mb-6" do
                 render App::FeedStatsComponent.new(feed: @subscription.feed, stats: @stats)
               end
-              render Settings::H2Component.new do
-                "Tags"
-              end
+
               render App::TagFieldsComponent.new(tag_editor: @tag_editor)
             end
           end

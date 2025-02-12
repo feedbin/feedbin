@@ -24,8 +24,8 @@ module Dialog
         @feeds = feeds
         @tag_editor = tag_editor
         @search = search
-        @valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
       end
+
       def view_template
         render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
@@ -33,82 +33,58 @@ module Dialog
           end
 
           dialog.body do
-            div class: "mb-4" do
-              render SearchField.new(query: @query)
-            end
-
-            div class: "animate-fade-in" do
-              form_tag(subscriptions_path, method: :post, remote: true, data: { behavior: "subscription_options" }) do
-                hidden_field_tag "valid_feed_ids", @valid_feed_ids
-
-                render Settings::H2Component.new do
-                  "Feed".pluralize(@feeds.length)
-                end
-
-                div(class: "mb-6") do
-                  @feeds.each_with_index do |feed, index|
-                    fields_for "feeds[]", feed do |form_builder|
-                      feed_row(feed, index, form_builder)
-                    end
-                  end
-                end
-
-                render Settings::H2Component.new do
-                  "Tags"
-                end
-                render App::TagFieldsComponent.new(tag_editor: @tag_editor)
-                submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: { behavior: "submit_add" })
-              end
-            end
+            body
           end
 
           dialog.footer do
-            div(class: "password-footer hide") do
-              button type: "button", class: "button button-tertiary", data_dismiss: "modal" do
-                "Cancel"
-              end
-              button type: "button", class: "button", data_behavior: "submit_add" do
-                "Continue"
-              end
-            end
-
-            div class: "subscribe-footer" do
-              span data_behavior: "feeds_search_messages", class: "modal-footer-message" do
-                span data_behavior: "feeds_search_message message_none", class: "hide" do
-                  "Select one or more feeds"
-                end
-                span data_behavior: "feeds_search_message message_one", class: "hide" do
-                  "Subscribe to the selected feed"
-                end
-                span data_behavior: "feeds_search_message message_multiple", class: "hide" do
-                  "Subscribe to the selected feeds"
-                end
-              end
-
-              button type: "button", class: "button", data_behavior: "submit_add", disabled: "disabled" do
-                "Add"
-              end
-            end
+            footer
           end
-
         end
       end
 
-      def feed_row(feed, index, form_builder)
+      def body
+        stimulus_controller = :add__form
+        div class: "mb-4" do
+          render SearchField.new(query: @query)
+        end
+
+        div class: "animate-fade-in", data: stimulus(controller: stimulus_controller, values: {count: @feeds.length}) do
+          form_tag(subscriptions_path, method: :post, remote: true, id: "add_form", data: { behavior: "subscription_options close_dialog_on_submit" }) do
+            hidden_field_tag "valid_feed_ids", valid_feed_ids
+
+            render Settings::H2Component.new do
+              "Feed".pluralize(@feeds.length)
+            end
+
+            div(class: "mb-6") do
+              @feeds.each_with_index do |feed, index|
+                fields_for "feeds[]", feed do |form_builder|
+                  feed_row(feed, index, form_builder, stimulus_controller)
+                end
+              end
+            end
+
+            render Settings::H2Component.new do
+              "Tags"
+            end
+            render App::TagFieldsComponent.new(tag_editor: @tag_editor)
+          end
+        end
+      end
+
+      def feed_row(feed, index, form_builder, stimulus_controller)
         div(class: "mb-4", data: { behavior: "subscription_option" }) do
           div(class: "flex items-center mb-2") do
             div(class: tokens("self-stretch", -> { @feeds.length == 1 } => "hide")) do
-              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: { behavior: "check_toggle" }
+              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: stimulus_controller)
               form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
                 render Form::CheckboxComponent.new
               end
             end
             div(class: "grow") do
               render Form::TextInputComponent.new do |input|
-                if @search
-                  input.accessory_leading do
-                    span(class: "pl-2") {render FaviconComponent.new(feed: feed)}
-                  end
+                input.accessory_leading do
+                  span(class: "pl-2") {render FaviconComponent.new(feed: feed)}
                 end
 
                 input.input do
@@ -123,6 +99,35 @@ module Dialog
         end
       end
 
+      def footer
+        stimulus_controller = :add__footer
+        div class: "flex items-center group gap-2 animate-fade-in", data: stimulus(controller: stimulus_controller, values: {selected: 0}, actions: {"add--form:selectionChanged@window" => "update"}) do
+          div(class: "password-footer hide") do
+            button type: "button", class: "button", data_behavior: "submit_add" do
+              "Continue"
+            end
+          end
+
+          message_class = "text-sm truncate min-w-0"
+          div class: "#{message_class} tw-hidden group-data-[add--footer-selected-value=0]:block" do
+            "Select one or more feeds"
+          end
+          div class: "#{message_class} tw-hidden group-data-[add--footer-selected-value=1]:block" do
+            "Subscribe to the selected feed"
+          end
+          div class: "#{message_class} group-data-[add--footer-selected-value=0]:tw-hidden group-data-[add--footer-selected-value=1]:tw-hidden" do
+            "Subscribe to the selected feeds"
+          end
+
+          button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: stimulus_controller) do
+            "Add"
+          end
+        end
+      end
+
+      def valid_feed_ids
+        Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
+      end
     end
 
     class SearchField < ApplicationComponent
