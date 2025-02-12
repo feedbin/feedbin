@@ -1,6 +1,5 @@
 <% if action.valid? %>
-    $('body').append("<%= j render Actions::PreviewModalComponent.new(action: action) %>");
-    feedbin.showModal("action_preview");
+  feedbin.updateDialog("<%= Dialog::ActionResults.dom_id %>", "<%= j render Dialog::ActionResults.new(action: action) %>");
 <% else %>
-    feedbin.showNotification('Invalid action: <%= j action.errors.full_messages.join('. ') %>', true);
+  feedbin.updateDialog("<%= Dialog::ActionResults::Error.dom_id %>", "<%= j render Dialog::ActionResults::Error.new(action: action) %>");
 <% end %>

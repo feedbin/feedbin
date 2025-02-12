@@ -10,7 +10,7 @@ module App
           placeholder: "+ New Tag",
           type: "text",
           name: "tag_name[]",
-          class: "placeholder:font-bold cursor-pointer placeholder:text-center placeholder:!text-700 focus:placeholder:text-500 focus:placeholder:text-left focus:placeholder:font-normal"
+          class: "placeholder:font-bold cursor-pointer placeholder:text-center placeholder:!text-700 placeholder:focus:!text-500 focus:placeholder:text-left focus:placeholder:font-normal"
         )
       end
 

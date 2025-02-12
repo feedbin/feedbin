@@ -62,7 +62,7 @@ module Dialog
             end
           end
           dialog.footer do
-            div class: "flex items-center" do
+            div class: "flex items-center animate-fade-in" do
               if @saved_search.persisted?
                 link_to saved_search_path(@saved_search), method: :delete, remote: true, class: "!text-600 button-text text-sm flex items-center gap-2", data: { behavior: "close_dialog",confirm: "Are you sure you want to delete this search?" } do
                   render SvgComponent.new("icon-delete", class: "fill-600")

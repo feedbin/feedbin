@@ -5084,7 +5084,7 @@ Settings
   }
 }
 
-.modal-purpose-action_preview {
+dialog {
   .action-description {
     border-radius: 8px;
     margin-bottom: 16px;
@@ -5114,6 +5114,10 @@ Settings
   .link-preview,
   .summary-status {
     display: none !important;
+  }
+  .entry-summary-link, .entry-summary-inner {
+    padding-left: 0;
+    padding-right: 0;
   }
   a,
   div {

@@ -41,7 +41,7 @@ module Dialog
           end
         end
         dialog.footer do
-          div class: "flex items-center" do
+          div class: "flex items-center animate-fade-in" do
             unsubscribe_link
 
             button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@subscription, :edit) do

@@ -34,6 +34,7 @@ export default class extends Controller {
 
   cleanup() {
     this.currentDialogId = null
+    this.isShown = false
   }
 
   openWithPurpose(event) {
@@ -59,7 +60,6 @@ export default class extends Controller {
 
   open(element, id, update = false) {
     let dataElement = element.querySelector(`template[data-dialog-id=${id}]`)
-
     if (!dataElement) {
       console.trace(`unknown template`, id)
       return
@@ -67,13 +67,13 @@ export default class extends Controller {
 
     this.currentDialogId = id
 
-    if (!update) {
+    if (!update || this.isShown) {
       this.writeContent(dataElement, update)
+    } else {
+      window.addEventListener("dialog:shown", () => {
+        this.writeContent(dataElement, update)
+      }, { once: true })
     }
-
-    this.dispatch("show")
-    this.closingValue = false
-    this.dialogTarget.showModal()
 
     // scroll to end of snapContainer to skip
     // blank container above
@@ -81,14 +81,18 @@ export default class extends Controller {
       top: this.snapContainerTarget.scrollHeight,
     })
 
+    this.dispatch("show")
+    this.closingValue = false
+    this.dialogTarget.showModal()
+
     // setTimeout needs to match animation
     // timing from tailwind.config.js slide-in
-    setTimeout(() => {
-      if (update) {
-        this.writeContent(dataElement, update)
-      }
-      this.dispatch("shown")
-    }, 300)
+    if (!update) {
+      setTimeout(() => {
+        this.isShown = true
+        this.dispatch("shown")
+      }, 300)
+    }
   }
 
   writeContent(element, update) {

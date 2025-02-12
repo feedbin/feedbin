@@ -118,7 +118,7 @@
     <% if @action.persisted? %>
       <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>
     <% end %>
-    <button type="submit" name="preview" class="button button-secondary">View Results</button>
+    <button type="submit" name="preview" class="button button-secondary" data-open-dialog="<%= Dialog::ActionResults.dom_id %>">View Results</button>
     <button type="submit" name="commit" class="button">Save</button>
   <% end %>
 

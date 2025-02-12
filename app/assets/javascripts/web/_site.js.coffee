@@ -1754,6 +1754,9 @@ $.extend feedbin,
         return
 
     feedSettingsButton: ->
+      $(document).on 'click', 'button[data-remote]', (event) ->
+        $.get($(@).attr('href'))
+
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
         element = $(@)
         button = $('[data-behavior~=feed_settings]')
