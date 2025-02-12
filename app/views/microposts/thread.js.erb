@@ -1,4 +1,4 @@
-feedbin.modalContent("modal-purpose-conversation", "<%= j render partial: 'thread', locals: {microposts: @microposts} %>");
+feedbin.updateDialog("<%= Dialog::SocialReplies.dom_id %>", "<%= j render Dialog::SocialReplies.new(posts: @microposts) %>");
 feedbin.entryTime();
 feedbin.audioVideo("general_modal");
 feedbin.formatImages();

@@ -76,7 +76,7 @@
             </div>
 
             <div style="text-align: center; margin-top: 8px; font-size: 13px;">
-              <%= link_to "Advanced", settings_appearance_path, remote: true, data: {behavior: "open_modal", modal_target: "appearance"} %>
+              <%= link_to "Advanced", settings_appearance_path, remote: true, data: {open_dialog: Dialog::EditAppearance.dom_id} %>
             </div>
 
 

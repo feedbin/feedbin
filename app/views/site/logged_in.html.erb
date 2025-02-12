@@ -122,15 +122,15 @@
 
 
     <%= render Dialog::Template.new %>
-
     <%= render Dialog::KeyboardShortcuts.new %>
     <%= render Dialog::AddFeed.new %>
 
-    <%= render Dialog::Template::Placeholder.new(dialog_id: Dialog::ExtractedContent.dom_id, title: Dialog::ExtractedContent::TITLE) %>
-    <%= render Dialog::Template::Placeholder.new(dialog_id: Dialog::EditSubscription.dom_id, title: Dialog::EditSubscription::TITLE) %>
-
-    <%= render Dialog::Template::Placeholder.new(dialog_id: Dialog::EditTag.dom_id,          title: Dialog::EditTag::TITLE,         size: :xs) %>
-    <%= render Dialog::Template::Placeholder.new(dialog_id: Dialog::EditSavedSearch.dom_id,  title: Dialog::EditSavedSearch::TITLE, size: :sm) %>
+    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::ExtractedContent) %>
+    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSubscription) %>
+    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditAppearance) %>
+    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::SocialReplies) %>
+    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditTag, size: :xs) %>
+    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSavedSearch, size: :sm) %>
 
 
     <%= render partial: "shared/readability_loading" %>
