@@ -2584,11 +2584,6 @@ $.extend feedbin,
         title = $(@).data("modal-title")
         feedbin.showModal(target, title)
 
-    settingsModal: ->
-      $(document).on 'click', '[data-behavior~=open_settings_modal]', (event) ->
-        unless $(@).is('[disabled]')
-          feedbin.showModal('edit')
-
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->
         message = $(@).data("message")
