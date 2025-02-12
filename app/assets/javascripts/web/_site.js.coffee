@@ -1647,9 +1647,12 @@ $.extend feedbin,
             "class": "rename-form"
           form = $('<form>', formAttributes)
 
+          decoded = document.createElement('textarea')
+          decoded.innerHTML = data.title
+
           inputAttributes =
             "placeholder": data.originalTitle
-            "value": data.title
+            "value": decoded.value
             "name": data.inputName
             "data-behavior": "rename_input"
             "type": "text"
@@ -1882,10 +1885,13 @@ $.extend feedbin,
         true
 
     feedSelected: ->
-      $(document).on 'click', '[data-behavior~=show_feeds]', ->
+      $(document).on 'click', '[data-behavior~=show_feeds_panel]', ->
         feedbin.showPanel(1)
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
+        feedbin.showPanel(2)
+
+      $(document).on 'click', '[data-behavior~=show_entries_panel]', (event) ->
         feedbin.showPanel(2)
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
@@ -2899,7 +2905,7 @@ $.extend feedbin,
         event.preventDefault()
 
     dialogShow: ->
-      $(window).on 'dialog:show', (event) ->
+      $(window).on 'dialog:shown', (event) ->
         feedbin.faviconColors($("dialog"))
 
     openDialog: ->

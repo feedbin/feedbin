@@ -4,7 +4,7 @@
             <div class="hamburger-menu"></div>
         </div>
     <% end %>
-    <div class="web-settings-button hamburger-menu-wrap mobile-hamburger" data-behavior="open_modal" data-modal-target="settings_nav" role="button">
+    <button class="web-settings-button hamburger-menu-wrap mobile-hamburger" data-open-dialog="<%= Dialog::SettingsNav.dom_id %>">
         <div class="hamburger-menu"></div>
-    </div>
+    </button>
 </div>

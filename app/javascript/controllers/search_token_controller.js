@@ -137,7 +137,7 @@ export default class extends Controller {
         let element = resultTemplate.cloneNode(true)
         let updates = [
           {
-            type: "text",
+            type: "html",
             selector: "text",
             value: item.title,
           },

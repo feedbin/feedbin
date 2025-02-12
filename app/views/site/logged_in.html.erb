@@ -41,7 +41,7 @@
         </div>
         <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>" data-controller="toolbar"  data-toolbar-section-value="entries-column" data-action="click->toolbar#show">
             <div class="entries-header" data-behavior="entries_header">
-                <button class="back-button" data-behavior="show_feeds">
+                <button class="back-button" data-behavior="show_feeds_panel">
                     <%= svg_tag "icon-arrow", size: "9x15" %>
                 </button>
                 <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
@@ -124,6 +124,7 @@
     <%= render Dialog::Template.new %>
     <%= render Dialog::KeyboardShortcuts.new %>
     <%= render Dialog::AddFeed.new %>
+    <%= render Dialog::SettingsNav.new %>
 
     <%= render Dialog::Template::Placeholder.new(dialog: Dialog::ExtractedContent) %>
     <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSubscription) %>

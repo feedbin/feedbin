@@ -15,7 +15,7 @@
           <%= render Shared::SettingsNavView.new(user: @user) %>
       </div>
       <div class="basis-[700px] shrink-[4] relative min-w-0 mb-8">
-          <button class="flex h-[36px] w-[36px] absolute top-[45px] right-[16px] items-center justify-end md:hidden" data-behavior="open_modal" data-modal-target="settings_nav">
+          <button class="flex h-[36px] w-[36px] absolute top-[45px] right-[16px] items-center justify-end md:hidden" data-open-dialog="<%= Dialog::SettingsNav.dom_id %>">
               <%= svg_tag "icon-menu", class: "fill-600" %>
           </button>
           <div class="px-4 md:pr-[20px] md:pl-[37px]">
@@ -24,7 +24,8 @@
       </div>
   </div>
   <%= render partial: "shared/svg" %>
-  <%= render Shared::Modals::SettingsComponent.new %>
-  <%= render Shared::Modals::AddFormComponent.new %>
+  <%= render Dialog::Template.new %>
+  <%= render Dialog::SettingsNav.new %>
+  <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSubscription) %>
 <% end %>
 <%= render template: "layouts/application" %>
