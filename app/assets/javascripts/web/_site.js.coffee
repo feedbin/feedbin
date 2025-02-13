@@ -29,6 +29,19 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
+  delegate: (eventName, {parameters}) ->
+    handler = (args...) ->
+      console.log "args", args
+      data = {}
+      data[name] = args[index] for name, index in parameters
+      delegatedEvent = new CustomEvent("jquery:#{eventName}",
+        bubbles: true,
+        cancelable: true,
+        detail: data)
+      console.log "data.event", data.event
+      data.event.target.dispatchEvent(delegatedEvent)
+    $(document).on(eventName, handler)
+
   closeDialog: ->
     window.dispatchEvent new CustomEvent('dialog:close')
 
@@ -2910,6 +2923,10 @@ $.extend feedbin,
       $(document).on 'click', '[data-open-dialog]', (event) ->
         id = $(@).data('open-dialog')
         feedbin.showDialog(id)
+
+    delegateAjax: ->
+      # forward jquery ajax events to dom events for stimulus
+      feedbin.delegate('ajax:complete', parameters: ['event', 'response', 'status'])
 
 
 

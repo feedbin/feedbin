@@ -4,16 +4,21 @@ module Dialog
 
     def initialize(query: "")
       @query = query
+      @stimulus_controller = :add_form
     end
 
     def view_template
-      render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
-        dialog.title do
-          TITLE
-        end
+      render Dialog::Template::Wrapper.new(dialog_id: self.class.dom_id) do
+        div data: stimulus(controller: stimulus_controller, values: {count: @feeds.length}) do
+          render Dialog::Template::InnerContent.new do |dialog|
+            dialog.title do
+              TITLE
+            end
 
-        dialog.body do
-          render SearchField.new(query: @query)
+            dialog.body do
+              render SearchField.new(query: @query)
+            end
+          end
         end
       end
     end
@@ -43,12 +48,11 @@ module Dialog
       end
 
       def body
-        stimulus_controller = :add__form
         div class: "mb-4" do
           render SearchField.new(query: @query)
         end
 
-        div class: "animate-fade-in", data: stimulus(controller: stimulus_controller, values: {count: @feeds.length}) do
+        div class: "animate-fade-in" do
           form_tag(subscriptions_path, method: :post, remote: true, id: "add_form", data: { behavior: "subscription_options close_dialog_on_submit" }) do
             hidden_field_tag "valid_feed_ids", valid_feed_ids
 
@@ -59,7 +63,7 @@ module Dialog
             div(class: "mb-6") do
               @feeds.each_with_index do |feed, index|
                 fields_for "feeds[]", feed do |form_builder|
-                  feed_row(feed, index, form_builder, stimulus_controller)
+                  feed_row(feed, index, form_builder)
                 end
               end
             end
@@ -72,11 +76,11 @@ module Dialog
         end
       end
 
-      def feed_row(feed, index, form_builder, stimulus_controller)
+      def feed_row(feed, index, form_builder)
         div(class: "mb-4", data: { behavior: "subscription_option" }) do
           div(class: "flex items-center mb-2") do
             div(class: tokens("self-stretch", -> { @feeds.length == 1 } => "hide")) do
-              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: stimulus_controller)
+              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: @stimulus_controller)
               form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
                 render Form::CheckboxComponent.new
               end
@@ -100,8 +104,7 @@ module Dialog
       end
 
       def footer
-        stimulus_controller = :add__footer
-        div class: "flex items-center group gap-2 animate-fade-in", data: stimulus(controller: stimulus_controller, values: {selected: 0}, actions: {"add--form:selectionChanged@window" => "update"}) do
+        div class: "flex items-center group gap-2 animate-fade-in" do
           div(class: "password-footer hide") do
             button type: "button", class: "button", data_behavior: "submit_add" do
               "Continue"
@@ -119,7 +122,7 @@ module Dialog
             "Subscribe to the selected feeds"
           end
 
-          button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: stimulus_controller) do
+          button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: @stimulus_controller) do
             "Add"
           end
         end
@@ -136,8 +139,7 @@ module Dialog
       end
 
       def view_template
-        form_with url: search_feeds_path, data: { behavior: "feeds_search", remote: true }, html: { autocomplete: "off", novalidate: true } do
-
+        form_with url: search_feeds_path, data: stimulus_item(target: :search_form, data: { remote: true, behavior: "spinner" }, for: @stimulus_controller), html: { autocomplete: "off", novalidate: true, class: "group" } do
           render Form::TextInputComponent.new do |text|
             text.input do
               search_field_tag :q, @query, placeholder: "Search or URL", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, autofocus: true, data: { behavior: "feeds_search_field autofocus" }
@@ -145,12 +147,11 @@ module Dialog
             text.accessory_leading do
               render SvgComponent.new "favicon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
             end
-          end
-
-          span data_behavior: "feeds_search_favicon_target", class: "favicon-target"
-
-          div class: "absolute right-6 inset-y-0" do
-            render App::SpinnerComponent.new
+            text.accessory_trailing do
+              div class: "mx-2" do
+                render App::SpinnerComponent.new
+              end
+            end
           end
         end
       end

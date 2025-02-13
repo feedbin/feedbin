@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { afterTransition, hydrate, html } from "helpers"
+import { afterTransition, hydrate, html, animateHeight } from "helpers"
 
 export default class extends Controller {
   static targets = ["dialog", "dialogContent", "snapContainer", "content", "footerSpacer"]
@@ -102,24 +102,16 @@ export default class extends Controller {
     html(this.dialogContentTarget, content)
 
     if (update) {
-      this.animateUpdate(beforeHeight)
+      const afterHeight = this.contentTarget.clientHeight
+      this.contentTarget.style.height = `${beforeHeight}px`
+
+      animateHeight(this.contentTarget, beforeHeight, afterHeight, () => {
+        this.checkScroll()
+      })
     }
 
-    setTimeout(() => {
-      this.checkScroll()
-    }, 0)
-  }
-
-  animateUpdate(beforeHeight) {
-    const afterHeight = this.contentTarget.clientHeight
-    this.contentTarget.style.height = `${beforeHeight}px`
-
     requestAnimationFrame(() => {
-      this.contentTarget.style.height = `${afterHeight}px`
-      this.contentTarget.addEventListener("transitionend", () => {
-        this.contentTarget.style.height = ""
-        this.checkScroll()
-      }, { once: true })
+      this.checkScroll()
     })
   }
 

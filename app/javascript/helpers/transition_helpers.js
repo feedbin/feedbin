@@ -9,3 +9,16 @@ export function afterTransition(element, condition, callback) {
 export function nextFrame() {
   return new Promise(requestAnimationFrame)
 }
+
+
+export function animateHeight(element, start, end, callback) {
+  element.style.height = `${start}px`
+
+  requestAnimationFrame(() => {
+    element.style.height = `${end}px`
+    element.addEventListener("transitionend", () => {
+      element.style.height = ""
+      callback()
+    }, { once: true })
+  })
+}
