@@ -18,7 +18,9 @@ export function animateHeight(element, start, end, callback) {
     element.style.height = `${end}px`
     element.addEventListener("transitionend", () => {
       element.style.height = ""
-      callback()
+      if (callback) {
+        callback()
+      }
     }, { once: true })
   })
 }

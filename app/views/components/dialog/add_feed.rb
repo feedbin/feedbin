@@ -1,29 +1,58 @@
 module Dialog
   class AddFeed < ApplicationComponent
     TITLE = "Add Feed"
+    STIMULUS_CONTROLLER = :add_feed
 
     def initialize(query: "")
       @query = query
-      @stimulus_controller = :add_form
     end
 
     def view_template
+      controller = stimulus(
+        controller: STIMULUS_CONTROLLER,
+        values: {count: 0, selected: 0},
+        actions: {
+          "add-feed:updateContent@window" => "updateContent",
+        }
+      )
       render Dialog::Template::Wrapper.new(dialog_id: self.class.dom_id) do
-        div data: stimulus(controller: stimulus_controller, values: {count: @feeds.length}) do
+        div class: "group", data: controller do
           render Dialog::Template::InnerContent.new do |dialog|
             dialog.title do
               TITLE
             end
 
             dialog.body do
-              render SearchField.new(query: @query)
+              form_with url: search_feeds_path, data: stimulus_item(target: :search_form, actions: {submit: :clearResults}, data: { remote: true, behavior: "spinner" }, for: STIMULUS_CONTROLLER), html: { autocomplete: "off", novalidate: true, class: "group" } do
+                render Form::TextInputComponent.new do |text|
+                  text.input do
+                    search_field_tag :q, @query, placeholder: "Search or URL", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, autofocus: true, data: stimulus_item(target: :search_input, data: { behavior: "autofocus" }, for: STIMULUS_CONTROLLER)
+                  end
+                  text.accessory_leading do
+                    render SvgComponent.new "favicon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+                  end
+                  text.accessory_trailing do
+                    div class: "mx-2" do
+                      render App::SpinnerComponent.new
+                    end
+                  end
+                end
+              end
+
+              div class: "transition-[height] duration-200 ease-out", data: stimulus_item(target: :results_body, for: STIMULUS_CONTROLLER)
+            end
+
+            dialog.footer do
+              div data: stimulus_item(target: :results_footer, for: STIMULUS_CONTROLLER)
             end
           end
         end
       end
     end
 
-    class Results < ApplicationComponent
+    class ResultsData < ApplicationComponent
+      component_options(skip_comment: true)
+
       def initialize(query:, feeds:, tag_editor:, search:)
         @query = query
         @feeds = feeds
@@ -32,27 +61,17 @@ module Dialog
       end
 
       def view_template
-        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
-          dialog.title do
-            TITLE
-          end
-
-          dialog.body do
-            body
-          end
-
-          dialog.footer do
-            footer
-          end
-        end
+        unsafe_raw(
+          JSON.generate({
+            body:   capture { body },
+            footer:   capture { footer },
+          }, script_safe: true)
+        )
       end
 
-      def body
-        div class: "mb-4" do
-          render SearchField.new(query: @query)
-        end
 
-        div class: "animate-fade-in" do
+      def body
+        div class: "animate-fade-in mt-4" do
           form_tag(subscriptions_path, method: :post, remote: true, id: "add_form", data: { behavior: "subscription_options close_dialog_on_submit" }) do
             hidden_field_tag "valid_feed_ids", valid_feed_ids
 
@@ -80,7 +99,7 @@ module Dialog
         div(class: "mb-4", data: { behavior: "subscription_option" }) do
           div(class: "flex items-center mb-2") do
             div(class: tokens("self-stretch", -> { @feeds.length == 1 } => "hide")) do
-              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: @stimulus_controller)
+              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: STIMULUS_CONTROLLER)
               form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
                 render Form::CheckboxComponent.new
               end
@@ -112,17 +131,17 @@ module Dialog
           end
 
           message_class = "text-sm truncate min-w-0"
-          div class: "#{message_class} tw-hidden group-data-[add--footer-selected-value=0]:block" do
+          div class: "#{message_class} tw-hidden group-data-[add-feed-selected-value=0]:block" do
             "Select one or more feeds"
           end
-          div class: "#{message_class} tw-hidden group-data-[add--footer-selected-value=1]:block" do
+          div class: "#{message_class} tw-hidden group-data-[add-feed-selected-value=1]:block" do
             "Subscribe to the selected feed"
           end
-          div class: "#{message_class} group-data-[add--footer-selected-value=0]:tw-hidden group-data-[add--footer-selected-value=1]:tw-hidden" do
+          div class: "#{message_class} group-data-[add-feed-selected-value=0]:tw-hidden group-data-[add-feed-selected-value=1]:tw-hidden" do
             "Subscribe to the selected feeds"
           end
 
-          button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: @stimulus_controller) do
+          button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: STIMULUS_CONTROLLER) do
             "Add"
           end
         end
@@ -130,30 +149,6 @@ module Dialog
 
       def valid_feed_ids
         Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
-      end
-    end
-
-    class SearchField < ApplicationComponent
-      def initialize(query: "")
-        @query = query
-      end
-
-      def view_template
-        form_with url: search_feeds_path, data: stimulus_item(target: :search_form, data: { remote: true, behavior: "spinner" }, for: @stimulus_controller), html: { autocomplete: "off", novalidate: true, class: "group" } do
-          render Form::TextInputComponent.new do |text|
-            text.input do
-              search_field_tag :q, @query, placeholder: "Search or URL", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, autofocus: true, data: { behavior: "feeds_search_field autofocus" }
-            end
-            text.accessory_leading do
-              render SvgComponent.new "favicon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
-            end
-            text.accessory_trailing do
-              div class: "mx-2" do
-                render App::SpinnerComponent.new
-              end
-            end
-          end
-        end
       end
     end
   end

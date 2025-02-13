@@ -103,8 +103,6 @@ export default class extends Controller {
 
     if (update) {
       const afterHeight = this.contentTarget.clientHeight
-      this.contentTarget.style.height = `${beforeHeight}px`
-
       animateHeight(this.contentTarget, beforeHeight, afterHeight, () => {
         this.checkScroll()
       })

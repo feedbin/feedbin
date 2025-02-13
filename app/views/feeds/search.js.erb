@@ -6,12 +6,14 @@
     }
     feedbin.basicAuthForm();
 <% elsif @feeds.present? %>
-    feedbin.updateDialog("<%= Dialog::AddFeed::Results.dom_id %>", "<%= j render Dialog::AddFeed::Results.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search) %>");
-    feedbin.showSubscribeResults()
+    window.dispatchEvent(new CustomEvent("add-feed:updateContent", {
+      detail: {
+        data: "<%= j render Dialog::AddFeed::ResultsData.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search) %>"
+      }
+    }))
+
     window.history.replaceState({}, document.title, "/");
-    feedbin.updateFeedSearchMessage();
-    feedbin.faviconColors(".modal");
+    feedbin.faviconColors("dialog");
 <% else %>
     feedbin.showNotification('No feed found.', true);
-    feedbin.hideSubscribeResults();
 <% end %>
