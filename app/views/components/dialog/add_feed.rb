@@ -13,6 +13,7 @@ module Dialog
         values: {count: 0, selected: 0},
         actions: {
           "add-feed:updateContent@window" => "updateContent",
+          "add-feed:clearResults@window" => "clearResults",
         }
       )
       render Dialog::Template::Wrapper.new(dialog_id: self.class.dom_id) do
@@ -51,47 +52,88 @@ module Dialog
     end
 
     class ResultsData < ApplicationComponent
-      component_options(skip_comment: true)
+      component_options skip_comment: true
 
-      def initialize(query:, feeds:, tag_editor:, search:)
+      def initialize(query:, feeds:, tag_editor:, search:, basic_auth:, auth_attempted:)
         @query = query
         @feeds = feeds
         @tag_editor = tag_editor
         @search = search
+        @basic_auth = basic_auth
+        @auth_attempted = auth_attempted
       end
 
       def view_template
         unsafe_raw(
           JSON.generate({
-            body:   capture { body },
-            footer:   capture { footer },
+            body: capture { body },
+            footer: capture { footer },
           }, script_safe: true)
         )
       end
 
-
       def body
         div class: "animate-fade-in mt-4" do
-          form_tag(subscriptions_path, method: :post, remote: true, id: "add_form", data: { behavior: "subscription_options close_dialog_on_submit" }) do
-            hidden_field_tag "valid_feed_ids", valid_feed_ids
+          if @basic_auth
+            auth
+          else
+            feeds
+          end
+        end
+      end
 
-            render Settings::H2Component.new do
-              "Feed".pluralize(@feeds.length)
-            end
+      def auth
+        form_tag({ controller: "feeds", action: "search" }, id: "add_form", method: :post, remote: true, data: stimulus_item(actions: {submit: :clearResults}, for: STIMULUS_CONTROLLER)) do
+          hidden_field_tag :q, @query
 
-            div(class: "mb-6") do
-              @feeds.each_with_index do |feed, index|
-                fields_for "feeds[]", feed do |form_builder|
-                  feed_row(feed, index, form_builder)
-                end
+          p class: "text-sm text-500 mb-4"  do
+            "This feed is protected. Enter your username and password to continue."
+          end
+
+          div class: "mb-4" do
+            render Form::TextInputComponent.new do |text|
+              text.label { label_tag :basic_username, "Username" }
+              text.input do
+                text_field_tag :username, "", id: "basic_username", class: "peer text-input"
               end
             end
-
-            render Settings::H2Component.new do
-              "Tags"
-            end
-            render App::TagFieldsComponent.new(tag_editor: @tag_editor)
           end
+
+          render Form::TextInputComponent.new do |text|
+            text.label { label_tag :basic_password, "Password" }
+            text.input do
+              password_field_tag :password, "", id: "basic_password", class: "peer text-input"
+            end
+          end
+
+          if @auth_attempted
+            p class: "text-red-600 mt-2 text-center" do
+              "Invalid username or password."
+            end
+          end
+        end
+      end
+
+      def feeds
+        form_tag(subscriptions_path, method: :post, remote: true, id: "add_form", data: { behavior: "subscription_options close_dialog_on_submit" }) do
+          hidden_field_tag "valid_feed_ids", valid_feed_ids
+
+          render Settings::H2Component.new do
+            "Feed".pluralize(@feeds.length)
+          end
+
+          div(class: "mb-6") do
+            @feeds.each_with_index do |feed, index|
+              fields_for "feeds[]", feed do |form_builder|
+                feed_row(feed, index, form_builder)
+              end
+            end
+          end
+
+          render Settings::H2Component.new do
+            "Tags"
+          end
+          render App::TagFieldsComponent.new(tag_editor: @tag_editor)
         end
       end
 
@@ -124,25 +166,26 @@ module Dialog
 
       def footer
         div class: "flex items-center group gap-2 animate-fade-in" do
-          div(class: "password-footer hide") do
-            button type: "button", class: "button", data_behavior: "submit_add" do
+          if @basic_auth
+            button type: "submit", class: "ml-auto button", form: "add_form" do
               "Continue"
             end
-          end
+          else
+            message_class = "text-sm truncate min-w-0"
+            div class: "#{message_class} tw-hidden group-data-[add-feed-selected-value=0]:block" do
+              "Select one or more feeds"
+            end
+            div class: "#{message_class} tw-hidden group-data-[add-feed-selected-value=1]:block" do
+              "Subscribe to the selected feed"
+            end
+            div class: "#{message_class} group-data-[add-feed-selected-value=0]:tw-hidden group-data-[add-feed-selected-value=1]:tw-hidden" do
+              "Subscribe to the selected feeds"
+            end
 
-          message_class = "text-sm truncate min-w-0"
-          div class: "#{message_class} tw-hidden group-data-[add-feed-selected-value=0]:block" do
-            "Select one or more feeds"
-          end
-          div class: "#{message_class} tw-hidden group-data-[add-feed-selected-value=1]:block" do
-            "Subscribe to the selected feed"
-          end
-          div class: "#{message_class} group-data-[add-feed-selected-value=0]:tw-hidden group-data-[add-feed-selected-value=1]:tw-hidden" do
-            "Subscribe to the selected feeds"
-          end
+            button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: STIMULUS_CONTROLLER) do
+              "Add"
+            end
 
-          button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: STIMULUS_CONTROLLER) do
-            "Add"
           end
         end
       end

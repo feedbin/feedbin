@@ -1,19 +1,13 @@
-<% if @basic_auth.present? %>
-    if ($('[data-behavior~=feed_password_form]').length > 0) {
-        feedbin.showNotification('Incorrect username or password.', true);
-    } else {
-        feedbin.showAuthField('<%= j render partial: "subscriptions/password", locals: {feed_url: @feed_url} %>');
+<% if @basic_auth.present? || @feeds.present?%>
+  window.dispatchEvent(new CustomEvent("add-feed:updateContent", {
+    detail: {
+      data: "<%= j render Dialog::AddFeed::ResultsData.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search, basic_auth: @basic_auth, auth_attempted: @auth_attempted) %>"
     }
-    feedbin.basicAuthForm();
-<% elsif @feeds.present? %>
-    window.dispatchEvent(new CustomEvent("add-feed:updateContent", {
-      detail: {
-        data: "<%= j render Dialog::AddFeed::ResultsData.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search) %>"
-      }
-    }))
+  }))
 
-    window.history.replaceState({}, document.title, "/");
-    feedbin.faviconColors("dialog");
+  window.history.replaceState({}, document.title, "/");
+  feedbin.faviconColors("dialog");
 <% else %>
-    feedbin.showNotification('No feed found.', true);
+  window.dispatchEvent(new CustomEvent("add-feed:clearResults"))
+  feedbin.showNotification('No feed found.', true);
 <% end %>

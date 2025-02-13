@@ -2401,13 +2401,6 @@ $.extend feedbin,
 
       $(document).on 'change', '[data-behavior~=auto_submit]', callback
 
-    submitAdd: ->
-      $(document).on 'submit', '[data-behavior~=subscription_options]', (event) ->
-        $('[data-behavior~=submit_add]').attr('disabled', 'disabled')
-
-      $(document).on 'click', '[data-behavior~=submit_add]', (event) ->
-        $("[data-behavior~=subscription_options]").submit()
-
     toggleContent: ->
       $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
         $(@).parents("form").submit()

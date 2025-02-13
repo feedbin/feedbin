@@ -112,27 +112,7 @@
     </div>
     <div class="hide" data-behavior="pagination"></div>
 
-    <%= render Shared::Modals::AddFormComponent.new %>
-    <%= render Shared::Modals::ViewLinkComponent.new %>
-    <%= render Shared::Modals::SettingsComponent.new %>
-    <%= render Shared::Modals::ConversationComponent.new %>
-    <%= render Shared::Modals::GenericComponent.new %>
-    <%= render Shared::Modals::EditComponent.new %>
-    <%= render Shared::Modals::AppearanceComponent.new %>
-
-
-    <%= render Dialog::Template.new %>
-    <%= render Dialog::KeyboardShortcuts.new %>
-    <%= render Dialog::AddFeed.new %>
-    <%= render Dialog::SettingsNav.new %>
-
-    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::ExtractedContent) %>
-    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSubscription) %>
-    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditAppearance) %>
-    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::SocialReplies) %>
-    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditTag, size: :xs) %>
-    <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSavedSearch, size: :sm) %>
-
+    <%= render Dialog::All.new %>
 
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>

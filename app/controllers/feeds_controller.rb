@@ -24,7 +24,7 @@ class FeedsController < ApplicationController
   def search
     @user = current_user
     @query = params[:q].strip
-    @feeds = if @query.include?(".") && !@query.include?(" ")
+    @feeds = if @query.start_with?("http") || (@query.include?(".") && !@query.include?(" "))
       FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
     else
       @search = true
@@ -37,7 +37,7 @@ class FeedsController < ApplicationController
     @feeds = nil
     if exception.basic_auth?
       @basic_auth = true
-      @feed_url = params[:q]
+      @auth_attempted = params[:username].present? || params[:password].present?
     end
   rescue => exception
     ErrorService.notify(exception)

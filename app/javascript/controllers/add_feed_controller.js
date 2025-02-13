@@ -17,6 +17,7 @@ export default class extends Controller {
 
     this.hasResults = false
     this.isClosing = false
+
     this.subscribeByQueryString()
   }
 
@@ -42,6 +43,7 @@ export default class extends Controller {
     animateHeight(this.resultsBodyTarget, beforeHeight, afterHeight, () => {
       this.resultsBodyTarget.innerHTML = ""
       this.isClosing = false
+      this.hasResults = false
       this.dispatch("closed")
     })
 
@@ -49,16 +51,16 @@ export default class extends Controller {
   }
 
   updateContent(event) {
-    this.hasResults = true
-
-    const data = JSON.parse(event.detail.data)
     callback = () => {
+      const data = JSON.parse(event.detail.data)
+
       this.resultsBodyTarget.innerHTML = data.body
       this.resultsFooterTarget.innerHTML = data.footer
 
       const afterHeight = this.resultsBodyTarget.clientHeight
       animateHeight(this.resultsBodyTarget, 0, afterHeight)
 
+      this.hasResults = true
       this.countSelected()
     }
 

@@ -24,9 +24,6 @@
       </div>
   </div>
   <%= render partial: "shared/svg" %>
-  <%= render Dialog::Template.new %>
-  <%= render Dialog::SettingsNav.new %>
-  <%= render Dialog::Template::Placeholder.new(dialog: Dialog::EditSubscription) %>
-  <%= render Dialog::Template::Placeholder.new(dialog: Dialog::ActionResults) %>
+  <%= render Dialog::All.new %>
 <% end %>
 <%= render template: "layouts/application" %>
