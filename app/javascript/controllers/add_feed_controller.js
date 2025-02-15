@@ -3,13 +3,15 @@ import { animateHeight, afterTransition } from "helpers"
 
 // Connects to data-controller="add-feed"
 export default class extends Controller {
-  static targets = ["subscribeSubmitButton", "searchSubmitButton", "checkbox", "resultsBody", "resultsFooter", "searchForm", "searchInput", "heightContainer"]
+  static targets = ["subscribeSubmitButton", "searchSubmitButton", "checkbox", "resultsBody", "resultsFooter", "searchForm", "searchInput"]
 
   static values = {
     count: Number,
     selected: Number,
     open: Boolean,
   }
+
+  static outlets = ["expandable"]
 
   #clearing = null
 
@@ -37,9 +39,6 @@ export default class extends Controller {
       this.subscribeSubmitButtonTarget.disabled = true
     }
 
-    const beforeHeight = this.resultsBodyTarget.clientHeight
-    const afterHeight = 0
-
     this.clearing = new Promise((resolve, reject) => {
       callback = () => {
         if (event.detail?.error) {
@@ -53,7 +52,8 @@ export default class extends Controller {
 
       if (this.openValue) {
         this.openValue = false
-        animateHeight(this.heightContainerTarget, beforeHeight, afterHeight, false, () => {
+        this.expandableOutlet.toggle()
+        afterTransition(this.expandableOutlet.transitionContainerTarget, true, () => {
           setTimeout(callback, 150)
         })
       } else {
@@ -64,17 +64,14 @@ export default class extends Controller {
 
   async updateContent(event) {
     const callback = () => {
-      this.openValue = true
-
       const data = JSON.parse(event.detail.data)
 
+      this.openValue = true
       this.resultsBodyTarget.innerHTML = data.body
       this.resultsFooterTarget.innerHTML = data.footer
+      this.expandableOutlet.toggle()
 
-      const afterHeight = this.resultsBodyTarget.clientHeight
-      animateHeight(this.heightContainerTarget, 0, afterHeight, true)
-
-      afterTransition(this.heightContainerTarget, true, () => {
+      afterTransition(this.expandableOutlet.transitionContainerTarget, true, () => {
         this.countSelected()
         this.searchSubmitButtonTarget.disabled = false
       })

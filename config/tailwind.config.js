@@ -8,7 +8,7 @@ module.exports = {
     "./app/javascript/**/*.js",
     "./app/views/**/*.{erb,html,rb}",
     "./app/components/**/*.{erb,html,rb}",
-    "./app/assets/svg/*.{svg}",
+    "./app/assets/svg/*.svg",
     "./test/components/**/*.{erb,html,rb}"
   ],
   theme: {

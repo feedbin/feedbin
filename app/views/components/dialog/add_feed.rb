@@ -11,6 +11,10 @@ module Dialog
       controller = stimulus(
         controller: STIMULUS_CONTROLLER,
         values: {count: 0, selected: 0, open: "false"},
+        outlets: {
+          expandable: "[data-add-feed-expandable]",
+          dialog: "[data-controller=dialog]",
+        },
         actions: {
           "add-feed:updateContent@window" => "updateContent",
           "add-feed:clearResults@window" => "clearResults",
@@ -42,8 +46,13 @@ module Dialog
                 button type: "submit", class: "visually-hidden", tabindex: "-1", data: stimulus_item(target: :search_submit_button, for: STIMULUS_CONTROLLER)
               end
 
-              div class: "transition-[height] duration-300 ease-out overflow-y-clip", data: stimulus_item(target: :height_container, for: STIMULUS_CONTROLLER) do
-                div class: "pb-[1px]", data: stimulus_item(target: :results_body, for: STIMULUS_CONTROLLER)
+              # force expandable container open on mobile to prevent height transition, which does not look good
+              div class: "max-sm:[&_[data-expandable-target=transitionContainer]]:[grid-template-rows:1fr_!important]" do
+                render App::ExpandableContainerComponent.new(selector: "add_feed_expandable") do |expandable|
+                  expandable.content do
+                    div data: stimulus_item(target: :results_body, for: STIMULUS_CONTROLLER)
+                  end
+                end
               end
             end
 
