@@ -14,6 +14,7 @@ module Dialog
         actions: {
           "add-feed:updateContent@window" => "updateContent",
           "add-feed:clearResults@window" => "clearResults",
+          "dialog:shown@window" => "autofocus",
         }
       )
       render Dialog::Template::Wrapper.new(dialog_id: self.class.dom_id) do

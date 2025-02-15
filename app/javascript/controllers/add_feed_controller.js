@@ -31,6 +31,7 @@ export default class extends Controller {
   }
 
   clearResults(event) {
+    this.searchInputTarget.blur()
     this.searchSubmitButtonTarget.disabled = true
     if (this.hasSubscribeSubmitButtonTarget) {
       this.subscribeSubmitButtonTarget.disabled = true
@@ -84,6 +85,12 @@ export default class extends Controller {
     }
 
     callback()
+  }
+
+  autofocus(event) {
+    if (window.matchMedia('(pointer:fine)').matches) {
+      this.searchInputTarget.focus()
+    }
   }
 
   // subscribe via query string support ?subscribe=http://example.com
