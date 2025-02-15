@@ -10,7 +10,7 @@ module Dialog
     def view_template
       controller = stimulus(
         controller: STIMULUS_CONTROLLER,
-        values: {count: 0, selected: 0},
+        values: {count: 0, selected: 0, open: "false"},
         actions: {
           "add-feed:updateContent@window" => "updateContent",
           "add-feed:clearResults@window" => "clearResults",
@@ -27,7 +27,7 @@ module Dialog
               form_with url: search_feeds_path, data: stimulus_item(target: :search_form, actions: {submit: :clearResults}, data: { remote: true, behavior: "spinner" }, for: STIMULUS_CONTROLLER), html: { autocomplete: "off", novalidate: true, class: "group" } do
                 render Form::TextInputComponent.new do |text|
                   text.input do
-                    search_field_tag :q, @query, placeholder: "Search or URL", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, autofocus: true, data: stimulus_item(target: :search_input, data: { behavior: "autofocus" }, for: STIMULUS_CONTROLLER)
+                    search_field_tag :q, @query, placeholder: "Search or URL", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: stimulus_item(target: :search_input, data: { behavior: "autofocus" }, for: STIMULUS_CONTROLLER)
                   end
                   text.accessory_leading do
                     render SvgComponent.new "favicon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
@@ -38,9 +38,12 @@ module Dialog
                     end
                   end
                 end
+                button type: "submit", class: "visually-hidden", tabindex: "-1", data: stimulus_item(target: :search_submit_button, for: STIMULUS_CONTROLLER)
               end
 
-              div class: "transition-[height] duration-200 ease-out", data: stimulus_item(target: :results_body, for: STIMULUS_CONTROLLER)
+              div class: "transition-[height] duration-300 ease-out overflow-y-clip", data: stimulus_item(target: :height_container, for: STIMULUS_CONTROLLER) do
+                div class: "pb-[1px]", data: stimulus_item(target: :results_body, for: STIMULUS_CONTROLLER)
+              end
             end
 
             dialog.footer do
@@ -73,7 +76,7 @@ module Dialog
       end
 
       def body
-        div class: "animate-fade-in mt-4" do
+        div class: "animate-fade-in pt-4 group-data-[add-feed-open-value=false]:opacity-0 duration-200" do
           if @basic_auth
             auth
           else
@@ -165,7 +168,7 @@ module Dialog
       end
 
       def footer
-        div class: "flex items-center group gap-2 animate-fade-in" do
+        div class: "flex items-center group gap-2 animate-fade-in duration-200 group-data-[add-feed-open-value=false]:opacity-0 sm:group-data-[add-feed-open-value=false]:tw-hidden" do
           if @basic_auth
             button type: "submit", class: "ml-auto button", form: "add_form" do
               "Continue"
@@ -182,7 +185,7 @@ module Dialog
               "Subscribe to the selected feeds"
             end
 
-            button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :submit, for: STIMULUS_CONTROLLER) do
+            button type: "submit", class: "ml-auto button", disabled: "disabled", form: "add_form", data: stimulus_item(target: :subscribe_submit_button, for: STIMULUS_CONTROLLER) do
               "Add"
             end
 

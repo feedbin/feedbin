@@ -1,22 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
-import { animateHeight } from "helpers"
+import { animateHeight, afterTransition } from "helpers"
 
 // Connects to data-controller="add-feed"
 export default class extends Controller {
-  static targets = ["checkbox", "submit", "resultsBody", "resultsFooter", "searchForm", "searchInput"]
+  static targets = ["subscribeSubmitButton", "searchSubmitButton", "checkbox", "resultsBody", "resultsFooter", "searchForm", "searchInput", "heightContainer"]
 
   static values = {
     count: Number,
     selected: Number,
+    open: Boolean,
   }
+
+  #clearing = null
 
   connect() {
     requestAnimationFrame(() => {
       this.countSelected()
     })
-
-    this.hasResults = false
-    this.isClosing = false
 
     this.subscribeByQueryString()
   }
@@ -25,52 +25,65 @@ export default class extends Controller {
     const count = this.checkboxTargets.filter((input) => input.checked).length
     this.selectedValue = count
 
-    if (this.hasSubmitTarget) {
-      this.submitTarget.disabled = (count === 0) ? true : false
+    if (this.hasSubscribeSubmitButtonTarget) {
+      this.subscribeSubmitButtonTarget.disabled = (count === 0) ? true : false
     }
   }
 
   clearResults(event) {
-    if (!this.hasResults) {
-      return
+    this.searchSubmitButtonTarget.disabled = true
+    if (this.hasSubscribeSubmitButtonTarget) {
+      this.subscribeSubmitButtonTarget.disabled = true
     }
-
-    this.isClosing = true
 
     const beforeHeight = this.resultsBodyTarget.clientHeight
     const afterHeight = 0
 
-    animateHeight(this.resultsBodyTarget, beforeHeight, afterHeight, () => {
-      this.resultsBodyTarget.innerHTML = ""
-      this.isClosing = false
-      this.hasResults = false
-      this.dispatch("closed")
-    })
+    this.clearing = new Promise((resolve, reject) => {
+      callback = () => {
+        if (event.detail?.error) {
+          this.searchSubmitButtonTarget.disabled = false
+          this.resultsBodyTarget.innerHTML = ""
+          this.resultsFooterTarget.innerHTML = ""
+        }
+        resolve()
+        this.clearing = null
+      }
 
-    this.resultsFooterTarget.innerHTML = ""
+      if (this.openValue) {
+        this.openValue = false
+        animateHeight(this.heightContainerTarget, beforeHeight, afterHeight, false, () => {
+          setTimeout(callback, 150)
+        })
+      } else {
+        callback()
+      }
+    });
   }
 
-  updateContent(event) {
-    callback = () => {
+  async updateContent(event) {
+    const callback = () => {
+      this.openValue = true
+
       const data = JSON.parse(event.detail.data)
 
       this.resultsBodyTarget.innerHTML = data.body
       this.resultsFooterTarget.innerHTML = data.footer
 
       const afterHeight = this.resultsBodyTarget.clientHeight
-      animateHeight(this.resultsBodyTarget, 0, afterHeight)
+      animateHeight(this.heightContainerTarget, 0, afterHeight, true)
 
-      this.hasResults = true
-      this.countSelected()
+      afterTransition(this.heightContainerTarget, true, () => {
+        this.countSelected()
+        this.searchSubmitButtonTarget.disabled = false
+      })
     }
 
-    if (this.isClosing) {
-      window.addEventListener("add-feed:closed", () => {
-        setTimeout(callback, 150)
-      }, { once: true })
-    } else {
-      callback()
+    if (this.clearing) {
+      await this.clearing
     }
+
+    callback()
   }
 
   // subscribe via query string support ?subscribe=http://example.com

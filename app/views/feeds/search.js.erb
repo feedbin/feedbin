@@ -8,6 +8,6 @@
   window.history.replaceState({}, document.title, "/");
   feedbin.faviconColors("dialog");
 <% else %>
-  window.dispatchEvent(new CustomEvent("add-feed:clearResults"))
+  window.dispatchEvent(new CustomEvent("add-feed:clearResults", {detail: {error: true}}))
   feedbin.showNotification('No feed found.', true);
 <% end %>

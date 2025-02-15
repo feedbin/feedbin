@@ -11,16 +11,18 @@ export function nextFrame() {
 }
 
 
-export function animateHeight(element, start, end, callback) {
+export function animateHeight(element, start, end, unsetHeight, callback) {
   element.style.height = `${start}px`
 
   requestAnimationFrame(() => {
     element.style.height = `${end}px`
-    element.addEventListener("transitionend", () => {
-      element.style.height = ""
+    afterTransition(element, true, () => {
+      if (unsetHeight) {
+        element.style.height = ""
+      }
       if (callback) {
         callback()
       }
-    }, { once: true })
+    })
   })
 }
