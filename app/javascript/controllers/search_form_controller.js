@@ -3,7 +3,7 @@ import { afterTransition } from "helpers"
 
 // Connects to data-controller="search-form"
 export default class extends Controller {
-  static targets = ["query", "sortLabel", "sortOption", "saveSearch"]
+  static targets = ["query", "sortLabel", "sortOption"]
   static outlets = ["search-token"]
   static values = {
     visible: Boolean,
@@ -44,7 +44,6 @@ export default class extends Controller {
 
   showSearchControls(event) {
     this.optionsVisibleValue = true
-    this.saveSearchTarget.setAttribute("href", event.detail.savedSearchPath)
 
     document.body.classList.remove("nothing-selected", "entry-selected")
     document.body.classList.add("feed-selected")

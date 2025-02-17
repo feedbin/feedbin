@@ -118,14 +118,14 @@
   --color-light-100:  var(--color-100);
   --color-sidebar:    var(--color-100);
   --color-link:       var(--color-blue-600);
-  --color-shadow-100: var(--color-black) / 0.1);
+  --color-shadow-100: rgb(var(--color-black) / 0.1);
 }
 
 .theme-dusk, .theme-midnight {
   --color-light-100:  var(--color-600);
   --color-sidebar:    var(--color-base);
   --color-link:       var(--color-white);
-  --color-shadow-100: var(--color-black) / 0.5);
+  --color-shadow-100: rgb(var(--color-black) /0.5);
 
   --color-blue-600:  var(--color-blue-600-dark-mode);
   --color-green-600: var(--color-green-600-dark-mode);
@@ -151,7 +151,7 @@ a flash of the default theme before prefers-dark class is applied
     --color-light-100:  var(--color-600);
     --color-sidebar:    var(--color-base);
     --color-link:       var(--color-white);
-    --color-shadow-100: var(--color-black) / 0.5);
+    --color-shadow-100: rgb(var(--color-black) / 0.5);
 
     --color-blue-600:  var(--color-blue-600-dark-mode);
     --color-green-600: var(--color-green-600-dark-mode);

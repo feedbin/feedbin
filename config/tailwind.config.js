@@ -8,6 +8,7 @@ module.exports = {
     "./app/javascript/**/*.js",
     "./app/views/**/*.{erb,html,rb}",
     "./app/components/**/*.{erb,html,rb}",
+    "./app/assets/svg/*.svg",
     "./test/components/**/*.{erb,html,rb}"
   ],
   theme: {
@@ -22,24 +23,26 @@ module.exports = {
     },
     extend: {
       boxShadow: {
-        "one": "0 1px 1px 0          rgb(var(--color-shadow-100))",
-        "two": "0px 4px 6px 2px      rgb(var(--color-shadow-100))",
-        "selected": "0px 0px 0px 1px rgb(var(--color-blue-600))",
+        one:            "0px  1px 1px 0px var(--color-shadow-100)",
+        two:            "0px  4px 6px 2px var(--color-shadow-100)",
+        selected:       "0px  0px 0px 1px rgb(var(--color-blue-600))",
+        "selected-700": "0px  0px 0px 1px rgb(var(--color-600))",
+        "border-top":   "0px -1px 0px 0px rgb(var(--border-color))",
       },
       borderColor: {
         DEFAULT: "rgb(var(--border-color))",
       },
       colors: {
-        base:    "rgb(var(--color-base))",
-        100:     "rgb(var(--color-100))",
-        200:     "rgb(var(--color-200))",
-        300:     "rgb(var(--color-300))",
-        400:     "rgb(var(--color-400))",
-        500:     "rgb(var(--color-500))",
-        600:     "rgb(var(--color-600))",
-        700:     "rgb(var(--color-700))",
+        base: "rgb(var(--color-base))",
+        100: "rgb(var(--color-100))",
+        200: "rgb(var(--color-200))",
+        300: "rgb(var(--color-300))",
+        400: "rgb(var(--color-400))",
+        500: "rgb(var(--color-500))",
+        600: "rgb(var(--color-600))",
+        700: "rgb(var(--color-700))",
         sidebar: "rgb(var(--color-sidebar))",
-        link:    "rgb(var(--color-link))",
+        link: "rgb(var(--color-link))",
         light: {
           100: "rgb(var(--color-light-100))",
         },
@@ -62,12 +65,20 @@ module.exports = {
       },
       keyframes: {
         "slide-in": {
-          "0%": { transform: "translateY(100%)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
+          "0%": { transform: "translateY(100vh)" },
+          "100%": { transform: "translateY(0vh)" },
         },
         "slide-out": {
+          "0%": { transform: "translateY(0vh)" },
+          "100%": { transform: "translateY(100vh)" },
+        },
+        "slide-in-top": {
+          "0%": { transform: "translateY(-34px)", opacity: "0.75" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "slide-out-top": {
           "0%": { transform: "translateY(0)", opacity: "1" },
-          "100%": { transform: "translateY(100%)", opacity: "0" },
+          "100%": { transform: "translateY(-34px)", opacity: "0.0" },
         },
         "fade-in": {
           "0%": { opacity: "0" },
@@ -79,19 +90,25 @@ module.exports = {
         },
       },
       animation: {
-        "slide-in": "slide-in 0.2s ease-in",
-        "slide-out": "slide-out 0.15s ease-out",
-        "fade-in": "fade-in 0.2s ease-in",
-        "fade-out": "fade-out 0.15s ease-out",
+        "slide-in": "slide-in 0.3s ease-out forwards",
+        "slide-out": "slide-out 0.25s ease-in forwards",
+        "slide-in-top": "slide-in-top 0.3s ease-out forwards",
+        "slide-out-top": "slide-out-top 0.25s ease-in forwards",
+        "fade-in": "fade-in 0.3s linear forwards",
+        "fade-out": "fade-out 0.25s linear forwards",
       },
     },
   },
   plugins: [
     plugin(function ({ addVariant }) {
       let pseudoVariants = [
-        "checked", "focus", "active", "disabled", "checked:disabled"
+        "checked",
+        "focus",
+        "active",
+        "disabled",
+        "checked:disabled",
       ].map((variant) =>
-        Array.isArray(variant) ? variant : [variant, `&:${variant}`],
+        Array.isArray(variant) ? variant : [variant, `&:${variant}`]
       );
 
       for (let [variantName, state] of pseudoVariants) {
@@ -101,6 +118,12 @@ module.exports = {
         });
       }
     }),
-  ]
-}
-
+    plugin(function ({ addVariant }) {
+      addVariant("pointer-coarse", "@media (pointer: coarse)");
+      addVariant("pointer-fine", "@media (pointer: fine)");
+    }),
+    plugin(({ addVariant }) => {
+      addVariant(`native`, [`.native &`, `&.native`]);
+    }),
+  ],
+};

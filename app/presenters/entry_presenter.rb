@@ -855,7 +855,7 @@ class EntryPresenter < BasePresenter
         yield
       end
     elsif subscriptions.include?(entry.feed.id)
-      @template.link_to @template.edit_subscription_path(entry.feed, app: true), remote: true, class: "feed-button link", title: "Edit feed", data: {behavior: "open_settings_modal", toggle: "tooltip"} do
+      @template.link_to @template.edit_subscription_path(entry.feed, app: true), remote: true, class: "feed-button link", title: "Edit Subscription", data: {open_dialog: Dialog::EditSubscription.dom_id, toggle: "tooltip"} do
         yield
       end
     else

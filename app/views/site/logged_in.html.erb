@@ -25,7 +25,7 @@
         <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>" data-controller="toolbar" data-toolbar-section-value="feeds-column" data-action="click->toolbar#show">
             <div class="inner-column">
                 <div class="top-toolbar">
-                    <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe"><%= svg_tag "icon-plus", size: "16x16" %></button>
+                    <button type="button" class="show-subscribe" data-behavior="show_subscribe" data-open-dialog="<%= Dialog::AddFeed.dom_id %>"><%= svg_tag "icon-plus", size: "16x16" %></button>
                     <%= render partial: 'shared/view_mode' %>
                     <%= render partial: 'shared/hamburger_menu_button' %>
                 </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>" data-controller="toolbar"  data-toolbar-section-value="entries-column" data-action="click->toolbar#show">
             <div class="entries-header" data-behavior="entries_header">
-                <button class="back-button" data-behavior="show_feeds">
+                <button class="back-button" data-behavior="show_feeds_panel">
                     <%= svg_tag "icon-arrow", size: "9x15" %>
                 </button>
                 <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
@@ -112,14 +112,7 @@
     </div>
     <div class="hide" data-behavior="pagination"></div>
 
-    <%= render Shared::Modals::AddFormComponent.new %>
-    <%= render Shared::Modals::KeyboardShortcutsComponent.new %>
-    <%= render Shared::Modals::ViewLinkComponent.new %>
-    <%= render Shared::Modals::SettingsComponent.new %>
-    <%= render Shared::Modals::ConversationComponent.new %>
-    <%= render Shared::Modals::GenericComponent.new %>
-    <%= render Shared::Modals::EditComponent.new %>
-    <%= render Shared::Modals::AppearanceComponent.new %>
+    <%= render Dialog::All.new %>
 
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>

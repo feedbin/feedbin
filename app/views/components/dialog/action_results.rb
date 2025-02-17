@@ -1,14 +1,17 @@
-module Actions
-  class PreviewModalComponent < ApplicationComponent
+module Dialog
+  class ActionResults < ApplicationComponent
+    TITLE = "Action Results"
+
     def initialize(action:)
       @action = action
     end
+
     def view_template
-      render App::ModalComponent.new(purpose: "action_preview") do |modal|
-        modal.title do
-          "Action Results"
+      render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
+        dialog.title do
+          TITLE
         end
-        modal.body do
+        dialog.body do
           div(class: "action-description") do
             div(class: "content") do
               render partial: "text_description", locals: { action: @action, summary: false }
@@ -25,16 +28,27 @@ module Actions
               ul { render partial: "entries/entry", collection: @action.results.records }
             end
           end
+        end
+      end
+    end
 
-          script do
-            unsafe_raw(
-              <<-JAVASCRIPT
-              $('.modal').on('hidden.bs.modal', function (event) {
-                $("body > [data-modal-purpose=action_preview]").remove();
-              });
-              feedbin.localizeTime();
-              JAVASCRIPT
-            )
+    class Error < ApplicationComponent
+      TITLE = "Action Results"
+
+      def initialize(action:)
+        @action = action
+      end
+
+      def view_template
+        render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
+          dialog.title do
+            TITLE
+          end
+
+          dialog.body do
+            ErrorMessage() do
+              "Invalid Action: #{@action.errors.full_messages.join('. ')}"
+            end
           end
         end
       end

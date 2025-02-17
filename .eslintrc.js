@@ -10,13 +10,13 @@ module.exports = {
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": [
-      "error",
-      {
-        "semi": false
-      }
-    ]
-  }
+  // "plugins": ["prettier"],
+  // "rules": {
+  //   "prettier/prettier": [
+  //     "error",
+  //     {
+  //       "semi": false
+  //     }
+  //   ]
+  // }
 }

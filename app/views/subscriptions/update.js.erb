@@ -9,5 +9,5 @@ $('.modal').modal('hide')
     feedbin.data.user_titles[<%= @subscription.feed_id %>] = "<%= j @subscription.title %>";
     feedbin.applyUserTitles(false);
 <% else %>
-    $('[data-behavior~=user_title]').text("<%= j @subscription.title %>");
+    $('[data-behavior~=user_title]').html("<%= j @subscription.title %>");
 <% end %>

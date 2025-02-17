@@ -23,20 +23,21 @@ class FeedsController < ApplicationController
 
   def search
     @user = current_user
-    query = params[:q].strip
-    @feeds = if query.include?(".") && !query.include?(" ")
+    @query = params[:q].strip
+    @feeds = if @query.start_with?("http") || (@query.include?(".") && !@query.include?(" "))
       FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
     else
       @search = true
-      Feed.search(query)
+      Feed.search(@query)
     end
     @feeds.map { |feed| feed.priority_refresh(@user) }
-    @tag_editor = TagEditor.new(@user, nil)
+    taggings = TagEditor.taggings(@user)
+    @tag_editor = TagEditor.new(taggings: taggings, user: @user, feed: nil)
   rescue Feedkit::Unauthorized => exception
     @feeds = nil
     if exception.basic_auth?
       @basic_auth = true
-      @feed_url = params[:q]
+      @auth_attempted = params[:username].present? || params[:password].present?
     end
   rescue => exception
     ErrorService.notify(exception)

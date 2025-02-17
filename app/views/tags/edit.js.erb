@@ -1,1 +1,5 @@
-feedbin.replaceModal("modal-purpose-edit", "<%= j render ::Tags::FormComponent.new(tag: @tag) %>");
+if ("updateDialog" in feedbin) {
+  feedbin.updateDialog("<%= Dialog::EditTag.dom_id %>", "<%= j render Dialog::EditTag.new(tag: @tag) %>");
+} else {
+  feedbin.replaceModal("modal-purpose-edit", "<%= j render ::Tags::FormComponent.new(tag: @tag) %>");
+}

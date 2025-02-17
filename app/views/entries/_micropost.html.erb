@@ -15,7 +15,7 @@
             </a>
             <% if micropost.micropost.microblog? %>
               <span class="tweet-actions">
-                <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_target: "conversation"} do %>
+                <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {open_dialog: Dialog::SocialReplies.dom_id} do %>
                   <%= svg_tag "icon-micro-blog" %>
                 <% end %>
               </span>

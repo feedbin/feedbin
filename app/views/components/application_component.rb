@@ -17,8 +17,11 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::SubmitTag
   include Phlex::Rails::Helpers::LabelTag
   include Phlex::Rails::Helpers::CollectionCheckBoxes
+  include Phlex::Rails::Helpers::PasswordFieldTag
 
   include Common
+
+  @@component_options = {}
 
   def self.slots(*items)
     include Phlex::DeferredRender
@@ -26,6 +29,14 @@ class ApplicationComponent < Phlex::HTML
       define_method item.to_sym, -> (&block) { instance_variable_set("@#{item.to_s}", block) }
       define_method "#{item}?".to_sym, -> (&block) { instance_variable_get("@#{item.to_s}").present? }
     end
+  end
+
+  def self.component_options(options = {})
+    @@component_options = options
+  end
+
+  def self.dom_id
+    self.to_s.underscore.parameterize(separator: "_")
   end
 
   def stimulus(controller:, actions: {}, values: {}, outlets: {}, classes: {}, data: {})
@@ -90,12 +101,16 @@ class ApplicationComponent < Phlex::HTML
 
   if Rails.env.development?
     def before_template
-      comment { "Start: #{self.class.name}" }
+      unless @@component_options[:skip_comment] == true
+        comment { "Start: #{self.class.name}" }
+      end
       super
     end
 
     def after_template
-      comment { "End: #{self.class.name}" }
+      unless @@component_options[:skip_comment] == true
+        comment { "End: #{self.class.name}" }
+      end
       super
     end
   end

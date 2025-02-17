@@ -2,7 +2,7 @@
 
 <div class="border rounded-md p-6 md:p-12 mb-8">
   <%= form_tag sessions_path, {novalidate: true} do %>
-    <h1 class="font-bold text-lg mb-4">Log in to Feedbin</h1>
+    <h1 class="font-bold text-lg mb-4">Sign in to Feedbin</h1>
     <%= render partial: "shared/flash", locals: {flash: flash} %>
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
@@ -28,7 +28,7 @@
       <% end %>
     </div>
 
-    <button type="submit" class="button flex w-full" tabindex="3">Log In</button>
+    <button type="submit" class="button flex w-full" tabindex="3">Sign In</button>
   <% end %>
 </div>
 <p class="text-center text-500">Start your free <%= Feedbin::Application.config.trial_days %>-day trial</p>

@@ -10,7 +10,6 @@ module SourceMenu
         render ActionMarkRead.new(source_target: @source_target)
         render ActionEdit.new(href: helpers.edit_subscription_path(@feed, app: true))
 
-
         li do
           button data: {behavior: "source_menu_mute", feed_id: @source_target} do
             span class: "icon-wrap" do

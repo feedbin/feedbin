@@ -21,7 +21,6 @@ var callback = function() {
         feedbin.updatePager("");
     <% end %>
 
-    <%# Remove showSearchControls and hideSearch after a week or so  %>
     <% if @search %>
         const custom = new CustomEvent("show-search-controls", {detail: {
           query: "<%= @escaped_query %>",
@@ -30,12 +29,12 @@ var callback = function() {
         }})
         window.dispatchEvent(custom)
 
-        if ("showSearchControls" in feedbin) {
-          feedbin.showSearchControls("<%= params[:sort] %>", "<%= @escaped_query %>", "<%= @saved_search_path %>", "<%= @search_message %>");
-        }
-    <% else %>
-        if ("hideSearch" in feedbin) {
-          feedbin.hideSearch()
+        var dialog = "<%= j render Dialog::NewSavedSearch.new(saved_search: @saved_search) %>";
+        var existingSearch = $("template[data-dialog-id=<%= Dialog::NewSavedSearch.dom_id %>]");
+        if (existingSearch.length > 0) {
+          existingSearch.replaceWith(dialog);
+        } else {
+          $("body").append(dialog)
         }
     <% end %>
 

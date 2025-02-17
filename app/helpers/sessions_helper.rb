@@ -26,7 +26,7 @@ module SessionsHelper
       if request.subdomain == "api"
         request_http_basic_authentication
       else
-        flash[:notice] = "Please log in."
+        flash[:notice] = "Please sign in."
         if request.xhr?
           head :unauthorized
         else

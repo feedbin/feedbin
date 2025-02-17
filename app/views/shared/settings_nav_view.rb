@@ -147,7 +147,7 @@ module Shared
 
       ul(class: "tw-hidden group-data-[nav=dropdown]:block") do
         render(::SettingsNav::NavComponent.new(
-          title: "Log Out",
+          title: "Sign Out",
           url: [helpers.logout_path, { method: :delete }],
           icon: "menu-icon-log-out"
         ))
@@ -181,7 +181,7 @@ module Shared
             "Mastodon"
           end
           render ::SettingsNav::NavSmallComponent.new url: helpers.logout_path, method: "delete" do
-            "Log Out"
+            "Sign Out"
           end
         end
       end

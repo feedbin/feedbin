@@ -34,7 +34,11 @@ class SubscriptionsController < ApplicationController
   def edit
     @user = current_user
     @subscription = @user.subscriptions.find_by_feed_id(params[:id])
-    @tag_editor = TagEditor.new(@user, @subscription.feed)
+
+    taggings = TagEditor.taggings(@user)
+
+    @stats = FeedStat.daily_counts(feed_ids: [@subscription.feed])
+    @tag_editor = TagEditor.new(taggings: taggings, user: @user, feed: @subscription.feed)
   end
 
   def update

@@ -29,6 +29,20 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
+  delegate: (eventName, {parameters}) ->
+    handler = (args...) ->
+      data = {}
+      data[name] = args[index] for name, index in parameters
+      delegatedEvent = new CustomEvent("jquery:#{eventName}",
+        bubbles: true,
+        cancelable: true,
+        detail: data)
+      data.event.target.dispatchEvent(delegatedEvent)
+    $(document).on(eventName, handler)
+
+  closeDialog: ->
+    window.dispatchEvent new CustomEvent('dialog:close')
+
   toggleItemInArray: (array, item) ->
     index = array.indexOf(item)
     if index isnt -1
@@ -440,42 +454,6 @@ $.extend feedbin,
     feedbin.reveal element, ->
       feedbin.data.viewMode = viewMode
 
-  replaceModal: (target, body) ->
-    modal = $(".#{target}")
-    placeholderHeight = modal.find('.modal-dialog').outerHeight()
-    body = $(body)
-    body.css({height: "#{placeholderHeight}px"}).addClass('loading')
-
-    modal.find('.modal-dialog').html(body)
-    contentHeight = modal.find('.modal-content').outerHeight()
-
-    modal.find('.modal-wrapper').addClass('loaded')
-
-    if placeholderHeight != contentHeight
-      windowHeight = window.innerHeight
-      if windowHeight < contentHeight
-        contentHeight = windowHeight - modal.find('.modal-dialog').offset().top
-      modal.find('.modal-wrapper').css({height: "#{contentHeight}px"})
-
-    setTimeout ( ->
-      modal.find('.modal-wrapper').css({height: 'auto'})
-      modal.find('.modal-wrapper').removeClass('loading')
-      input = modal.find('[data-behavior~=autofocus]')
-      if input.length
-        input.focus()
-        length = input.val().length
-        input[0].setSelectionRange(length, length)
-    ), 150
-
-    setTimeout ( ->
-      $("body").addClass("modal-replaced")
-    ), 300
-
-
-  modalContent: (target, body) ->
-    modal = $(".#{target}")
-    $(".modal-body", modal).html(body);
-
   mobileView: ->
     if $(window).width() <= 700
       true
@@ -552,7 +530,7 @@ $.extend feedbin,
     container = $('[data-behavior~=notification_container]')
     content = $('[data-behavior~=notification_content]')
 
-    if !container.hasClass('shake') && !container.hasClass('hide') && container.hasClass('error') && content.text() == text
+    if !container.hasClass('shake') && !container.hasClass('hide') && container.hasClass('error') && content.first().text() == text
       container.addClass('shake')
       callback = ->
         container.removeClass('shake')
@@ -916,7 +894,7 @@ $.extend feedbin,
   fullWidthImage: (img) ->
     load = ->
       width = img.get(0).naturalWidth
-      if width > 528 && img.parents(".system-content").length == 0 && img.parents(".modal").length == 0  && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
+      if width > 528 && img.parents(".system-content").length == 0 && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
         img.addClass("full-width")
       img.addClass("show")
 
@@ -1370,70 +1348,19 @@ $.extend feedbin,
       $.ajax(xhr)
     )
 
-  hideSubscribeResults: ->
-    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').hide()
-    $('.modal-purpose-subscribe .modal-dialog').removeClass('done');
-    $('[data-behavior~=feeds_search_favicon_target]').html('')
-    $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('')
+  updateDialog: (id, data) ->
+    window.dispatchEvent new CustomEvent('dialog:update',
+      detail:
+        dialog_id: id
+        data: data,
+    )
 
-  showSubscribeResults: ->
-    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(feedbin.fastAnimation)
-    $('.modal-purpose-subscribe .modal-dialog').addClass('done');
-    $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled');
-    $('.modal-purpose-subscribe .title').first().find("input").focus();
-    $('.modal-purpose-subscribe .password-footer').addClass('hide')
-    $('.modal-purpose-subscribe .subscribe-footer').removeClass('hide')
-
-  showAuthField: (html) ->
-    $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html(html);
-    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(feedbin.fastAnimation)
-    $('.modal-purpose-subscribe .modal-dialog').addClass('done');
-    $('.modal-purpose-subscribe .password-footer').removeClass('hide')
-    $('.modal-purpose-subscribe .subscribe-footer').addClass('hide')
-    window.history.replaceState({}, document.title, "/");
-
-  basicAuthForm: ->
-    $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled')
-    $('.modal-purpose-subscribe #basic_username').focus()
-
-  showModal: (target, title = null) ->
-    modal = $("#modal")
-    classes = modal[0].className.split(/\s+/)
-    classPrefix = "modal-purpose"
-    modalClass = "#{classPrefix}-#{target}"
-    feedbin.hideFormatMenu()
-
-    content = $($("[data-modal-purpose=#{target}]").html())
-
-    titleElement = content.find(".modal-title")
-    if title
-      titleElement.text(title)
-
-    $.each classes, (index, className) ->
-      if className.indexOf(classPrefix) != -1
-        modal.removeClass className
-
-    modal.html(content)
-    modal.addClass(modalClass)
-    modal.modal('show')
-    modalClass
+  showDialog: (id) ->
+    window.dispatchEvent new CustomEvent('dialog:open', detail: dialog_id: id)
 
   loadLink: (href) ->
-    feedbin.showModal("view_link");
+    feedbin.showDialog("dialog_extracted_content");
     $.get(feedbin.data.modal_extracts_path, {url: href});
-
-  updateFeedSearchMessage: ->
-    length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
-    show = (message) ->
-      $(".modal-purpose-subscribe [data-behavior~=feeds_search_message]").addClass("hide")
-      $(".modal-purpose-subscribe [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
-
-    if length == 0
-      show("message_none")
-    else if length == 1
-      show("message_one")
-    else
-      show("message_multiple")
 
   measureEntryColumn: ->
     width = $(".entry-column").outerWidth()
@@ -1634,9 +1561,12 @@ $.extend feedbin,
             "class": "rename-form"
           form = $('<form>', formAttributes)
 
+          decoded = document.createElement('textarea')
+          decoded.innerHTML = data.title
+
           inputAttributes =
             "placeholder": data.originalTitle
-            "value": data.title
+            "value": decoded.value
             "name": data.inputName
             "data-behavior": "rename_input"
             "type": "text"
@@ -1723,10 +1653,9 @@ $.extend feedbin,
       $(document).on 'ajax:beforeSend', '[data-behavior~=needs_extract]', (event, xhr, settings) ->
         settings.url = "#{settings.url}?extract=#{feedbin.readabilityActive()}"
 
-    choicesSubmit: ->
-      $(document).on 'ajax:beforeSend', '[data-choice-form]', ->
-        $('.modal').modal('hide')
-        return
+    closeDialogLink: ->
+      $(document).on 'click', '[data-behavior~=close_dialog]', ->
+        feedbin.closeDialog()
 
     entryLinks: ->
       $(document).on 'click', '[data-behavior~=external_links] a', ->
@@ -1734,11 +1663,16 @@ $.extend feedbin,
         return
 
     feedSettingsButton: ->
+      $(document).on 'click', 'button[data-remote-href]', (event) ->
+        $.get($(@).data('remote-href'))
+        event.preventDefault()
+
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
         element = $(@)
         button = $('[data-behavior~=feed_settings]')
         if element.is('[data-behavior~=has_settings]')
-          button.attr('href', element.data('settings-path'))
+          button.data('open-dialog', element.data('dialog-id'))
+          button.data('remote-href', element.data('settings-path'))
           button.removeAttr('disabled')
         else
           button.attr('disabled', 'disabled')
@@ -1864,10 +1798,13 @@ $.extend feedbin,
         true
 
     feedSelected: ->
-      $(document).on 'click', '[data-behavior~=show_feeds]', ->
+      $(document).on 'click', '[data-behavior~=show_feeds_panel]', ->
         feedbin.showPanel(1)
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
+        feedbin.showPanel(2)
+
+      $(document).on 'click', '[data-behavior~=show_entries_panel]', (event) ->
         feedbin.showPanel(2)
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
@@ -2465,25 +2402,9 @@ $.extend feedbin,
 
       $(document).on 'change', '[data-behavior~=auto_submit]', callback
 
-    submitAdd: ->
-      $(document).on 'submit', '[data-behavior~=subscription_options]', (event) ->
-        $('[data-behavior~=submit_add]').attr('disabled', 'disabled')
-
-      $(document).on 'click', '[data-behavior~=submit_add]', (event) ->
-        $("[data-behavior~=subscription_options]").submit()
-
     toggleContent: ->
       $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
         $(@).parents("form").submit()
-
-    checkToggle: ->
-      $(document).on 'change', '[data-behavior~=subscription_option] [data-behavior~=check_toggle]', (event) ->
-        length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
-        if length == 0
-          $('.modal-purpose-subscribe [data-behavior~=submit_add]').attr('disabled', 'disabled')
-        else
-          $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
-        feedbin.updateFeedSearchMessage()
 
     linkActionsHover: ->
       cacheLink = (link) ->
@@ -2554,17 +2475,6 @@ $.extend feedbin,
           feedbin.loadLink(href)
           event.preventDefault()
 
-    openModal: ->
-      $(document).on 'click', '[data-behavior~=open_modal]', (event) ->
-        target = $(@).data("modal-target")
-        title = $(@).data("modal-title")
-        feedbin.showModal(target, title)
-
-    settingsModal: ->
-      $(document).on 'click', '[data-behavior~=open_settings_modal]', (event) ->
-        unless $(@).is('[disabled]')
-          feedbin.showModal('edit')
-
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->
         message = $(@).data("message")
@@ -2596,49 +2506,6 @@ $.extend feedbin,
             target.html iframe
 
           $(@).closest(".iframe-embed").addClass("loaded")
-
-    modalShowHide: ->
-      $(document).on 'show.bs.modal', () ->
-          feedbin.setNativeBorders("back")
-          feedbin.setNativeTheme(true)
-
-      $(document).on 'shown.bs.modal', () ->
-        feedbin.faviconColors($(".modal"))
-        setTimeout ( ->
-          $("body").addClass("modal-shown")
-        ), 150
-
-      $(document).on 'hide.bs.modal', () ->
-        $("body").removeClass("modal-shown")
-        $("body").removeClass("modal-replaced")
-        feedbin.setNativeBorders()
-        feedbin.setNativeTheme(false, 160)
-
-    modalScrollPosition: ->
-      $(document).on 'hide.bs.modal', (event) ->
-        $("body").removeClass("modal-top")
-        $("body").removeClass("modal-bottom")
-
-      $(document).on 'shown.bs.modal', (event) ->
-        $("body").removeClass("modal-top")
-        $("body").removeClass("modal-bottom")
-
-      $('.modal').on 'scroll', (event) ->
-        modalHeader = $('.modal .modal-content').get(0)
-        if modalHeader
-          modalAtTop = modalHeader.getBoundingClientRect().top <= 0
-          if modalAtTop
-            $("body").addClass("modal-top")
-          else
-            $("body").removeClass("modal-top")
-
-        modalFooter = $('.modal .modal-footer').get(0)
-        if modalFooter
-          modalAtBottom = modalFooter.getBoundingClientRect().bottom == $('body').get(0).getBoundingClientRect().bottom
-          if modalAtBottom
-            $("body").addClass("modal-bottom")
-          else
-            $("body").removeClass("modal-bottom")
 
     viewModeEffects: ->
       scrollStop = $('.view-mode').css("top")
@@ -2689,6 +2556,9 @@ $.extend feedbin,
       $(document).on 'submit', '[data-behavior~=disable_on_submit]', (event) ->
         $('[type=submit]', @).attr('disabled', 'disabled')
 
+      $(document).on 'submit', '[data-behavior~=close_dialog_on_submit]', (event) ->
+        feedbin.closeDialog()
+
     showContainer: ->
       $(document).on 'click', '[data-behavior~=show_container]', (event) ->
         target = $(@).data('target')
@@ -2700,22 +2570,6 @@ $.extend feedbin,
       $('.loading-app').addClass('hide')
       $('.feeds').addClass('show')
 
-    subscribe: ->
-      $(document).on 'shown.bs.modal', (event) ->
-        className = "modal-purpose-subscribe"
-        if $(event.target).hasClass(className)
-          $(".#{className} [data-behavior~=feeds_search_field]").focus()
-
-      $(document).on 'hide.bs.modal', (event) ->
-        $('input').blur()
-
-      subscription = feedbin.queryString('subscribe')
-      if subscription?
-        $('[data-behavior~=show_subscribe]')[0]?.click()
-        field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
-        field.val(subscription)
-        field.closest("form").submit()
-
     tooltips: ->
       feedbin.tooltips()
 
@@ -2725,7 +2579,6 @@ $.extend feedbin,
 
     unsubscribe: ->
       callback = (item) ->
-        $('.modal').modal('hide')
         feed = item.data('feed-id')
         if (feedbin.data.viewMode != 'view_starred')
           $(".feeds [data-feed-id=#{feed}]").remove()
@@ -2878,6 +2731,18 @@ $.extend feedbin,
               console.log error
         event.preventDefault()
 
+    dialogShow: ->
+      $(window).on 'dialog:show', (event) ->
+        feedbin.faviconColors($("dialog"))
+
+    openDialog: ->
+      $(document).on 'click', '[data-open-dialog]', (event) ->
+        id = $(@).data('open-dialog')
+        feedbin.showDialog(id)
+
+    delegateAjax: ->
+      # forward jquery ajax events to dom events for stimulus
+      feedbin.delegate('ajax:complete', parameters: ['event', 'response', 'status'])
 
 $.each feedbin.preInit, (i, item) ->
   item()

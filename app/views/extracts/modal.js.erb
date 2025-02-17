@@ -1,7 +1,18 @@
-target = $('.modal-purpose-view_link .modal-body')
-<% if @content %>
-    feedbin.replaceModal("modal-purpose-view_link", "<%= j render Extracts::ModalComponent.new(page: @content_info, content: @content) %>");
-<% else %>
-    target.html("<%= j render partial: 'modal_error', locals: {url: @url} %>")
-<% end %>
-feedbin.formatLinkContents();
+if ("updateDialog" in feedbin) {
+  <% if @content %>
+      feedbin.updateDialog("<%= Dialog::ExtractedContent.dom_id %>", "<%= j render Dialog::ExtractedContent.new(page: @content_info, content: @content) %>");
+  <% else %>
+      feedbin.updateDialog("<%= Dialog::ExtractedContent.dom_id %>", "<%= j render Dialog::ExtractedContent::Error.new(url: @url) %>");
+  <% end %>
+  setTimeout(function() {
+    feedbin.formatLinkContents();
+  }, 351)
+} else {
+  target = $('.modal-purpose-view_link .modal-body')
+  <% if @content %>
+      feedbin.replaceModal("modal-purpose-view_link", "<%= j render Extracts::ModalComponent.new(page: @content_info, content: @content) %>");
+  <% else %>
+      target.html("<%= j render partial: 'modal_error', locals: {url: @url} %>")
+  <% end %>
+  feedbin.formatLinkContents();
+}

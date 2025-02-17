@@ -1,40 +1,38 @@
-<% cache [tag, tag.user_feeds, "v9"] do %>
-    <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable keyboard_navigable">
-        <%= link_to tag_path(tag.id),
-            remote: true,
-            class: 'feed-link tag-link',
-            data: {
-                behavior: 'selectable show_entries open_item feed_link renamable has_settings',
-                mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json,
-                sourceable_target: "source",
-                action: "sourceable#selected",
-                sourceable_payload_param: tag.sourceable.to_h,
-                settings_path: edit_tag_path(tag)
-            } do
-        %>
-            <span class="link-inner">
-                <div style="height: 20px; width: 0;"></div>
-                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', authenticity_token: false, html: { class: 'tag-visibility-control', data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
-                    <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
-                    <%= hidden_field_tag 'tag', tag.id %>
-                    <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'feed_action' } do %>
-                        <%= svg_tag "icon-caret", size: "12x7" %>
-                    <% end %>
+<li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable keyboard_navigable">
+    <%= link_to tag_path(tag.id),
+        remote: true,
+        class: 'feed-link tag-link',
+        data: {
+            behavior: 'selectable show_entries open_item feed_link renamable has_settings',
+            mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json,
+            sourceable_target: "source",
+            action: "sourceable#selected",
+            dialog_id: Dialog::EditTag.dom_id,
+            sourceable_payload_param: tag.sourceable.to_h,
+            settings_path: edit_tag_path(tag)
+        } do
+    %>
+        <span class="link-inner">
+            <div style="height: 20px; width: 0;"></div>
+            <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', authenticity_token: false, html: { class: 'tag-visibility-control', data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
+                <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
+                <%= hidden_field_tag 'tag', tag.id %>
+                <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'feed_action' } do %>
+                    <%= svg_tag "icon-caret", size: "12x7" %>
                 <% end %>
-                <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
-                    <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
-                </span>
-                <span class="count-wrap">
-                    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
-                </span>
-                <%= render SourceMenu::Tag.new(tag: tag, source_target: "tag-#{tag.id}") %>
+            <% end %>
+            <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
+                <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
             </span>
-        <% end %>
-        <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
-            <ul>
-                <%= render partial: "feeds/feed", collection: tag.user_feeds, cached: true %>
-            </ul>
-        </div>
-    </li>
-<% end %>
-
+            <span class="count-wrap">
+                <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
+            </span>
+            <%= render SourceMenu::Tag.new(tag: tag, source_target: "tag-#{tag.id}") %>
+        </span>
+    <% end %>
+    <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
+        <ul>
+            <%= render Common::FeedsList.new(feeds: tag.user_feeds) %>
+        </ul>
+    </div>
+</li>

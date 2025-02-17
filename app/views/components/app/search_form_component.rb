@@ -102,7 +102,9 @@ module App
                 end
               end
             end
-            link_to "Save Search", new_saved_search_path, remote: true, class: "ml-auto !text-600 font-bold hover:no-underline text-xs flex items-center px-2 border border-transparent", data: {behavior: "open_settings_modal", search_form_target: "saveSearch"}
+            button class: "ml-auto !text-600 font-bold hover:no-underline text-xs flex items-center px-2 border border-transparent", data: {open_dialog: Dialog::NewSavedSearch.dom_id} do
+              "Save Search"
+            end
           end
         end
       end

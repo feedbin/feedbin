@@ -24,7 +24,7 @@ module Settings
               span(data_behavior: "user_title", class: "truncate text-lg mr-6") do
                 subscription.title
               end
-              link_to "Edit", edit_subscription_path(subscription.feed), remote: true, class: "button button-secondary !ml-auto", data: { behavior: "open_settings_modal feed_settings", modal_target: "edit" }
+              link_to "Edit", edit_subscription_path(subscription.feed), remote: true, class: "button button-secondary !ml-auto", data: { open_dialog: Dialog::EditSubscription.dom_id }
             end
             if subscription.feed.twitter_feed?
               twitter_notice
