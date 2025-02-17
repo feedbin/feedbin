@@ -7057,6 +7057,13 @@ $tooltip-arrow-height: 6px;
   }
 }
 
+.one-line {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .two-lines {
   display: -webkit-box;
   -webkit-line-clamp: 2;

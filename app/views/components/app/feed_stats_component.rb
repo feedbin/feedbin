@@ -16,7 +16,7 @@ module App
       end
 
       div class: "flex gap-4 items-baseline text-xs mt-1" do
-        p(class: "truncate grow min-w-0", title: @feed.feed_description) do
+        p(class: "text-ellipsis one-line grow min-w-0", title: @feed.feed_description) do
           @feed.feed_description
         end
         p(class: "shrink-0") do
