@@ -4,9 +4,9 @@ if ("updateDialog" in feedbin) {
   <% else %>
       feedbin.updateDialog("<%= Dialog::ExtractedContent.dom_id %>", "<%= j render Dialog::ExtractedContent::Error.new(url: @url) %>");
   <% end %>
-  setTimeout(function() {
+  window.addEventListener("dialog:shown", () => {
     feedbin.formatLinkContents();
-  }, 351)
+  }, { once: true })
 } else {
   target = $('.modal-purpose-view_link .modal-body')
   <% if @content %>
