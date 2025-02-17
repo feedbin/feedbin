@@ -21,16 +21,16 @@ module Dialog
               end
             end
           end
-          dialog.footer do
-            div class: "flex items-center animate-fade-in" do
-              link_to tag_path(@tag), method: :delete, remote: true, class: "!text-600 button-text text-sm flex items-center gap-2", data: { behavior: "close_dialog", confirm: "Are you sure you want to delete this tag?" } do
-                render SvgComponent.new("icon-delete", class: "fill-600")
-                plain " Delete"
-              end
+        end
+        dialog.footer do
+          div class: "flex items-center animate-fade-in" do
+            link_to tag_path(@tag), method: :delete, remote: true, class: "!text-600 button-text text-sm flex items-center gap-2", data: { behavior: "close_dialog", confirm: "Are you sure you want to delete this tag?" } do
+              render SvgComponent.new("icon-delete", class: "fill-600")
+              plain " Delete"
+            end
 
-              button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@tag, :edit) do
-                "Save"
-              end
+            button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@tag, :edit) do
+              "Save"
             end
           end
         end
