@@ -273,6 +273,10 @@ class User < ApplicationRecord
     plan.stripe_id == "app-subscription"
   end
 
+  def trial_plan?
+    plan.stripe_id == "trial"
+  end
+
   def trial_plan_valid
     return if free_ok == true
     trial_plan = Plan.find_by_stripe_id("trial")

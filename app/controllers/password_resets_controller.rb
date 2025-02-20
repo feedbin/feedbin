@@ -5,21 +5,16 @@ class PasswordResetsController < ApplicationController
   end
 
   def create
-    log
     success_message = "Email sent with password reset instructions."
-    if rate_limited?(10, 5.days)
-      redirect_to(login_url, notice: success_message) and return
-    end
-
     if user = User.find_by_email(params[:email])
       log(user: user)
-      if user.password_reset_sent_at.nil? || user.password_reset_sent_at.before?(1.hour.ago)
+      if user.trial_plan?
+        success_message = "Email #{ENV["FROM_ADDRESS"]} to request a password reset."
+      elsif user.password_reset_sent_at.nil? || user.password_reset_sent_at.before?(1.hour.ago)
         user.send_password_reset
       end
-      redirect_to login_url, notice: success_message
-    else
-      redirect_to new_password_reset_path, alert: "Invalid Email Address."
     end
+    redirect_to login_url, notice: success_message
   end
 
   def edit
