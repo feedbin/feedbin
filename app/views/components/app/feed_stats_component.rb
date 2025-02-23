@@ -7,7 +7,7 @@ module App
 
     def view_template
       div class: "flex gap-4 items-baseline" do
-        p(class: "grow text-sm truncate text-600", title: @feed.feed_url) do
+        p(class: "grow text-sm one-line text-600", title: @feed.feed_url) do
           helpers.display_url(@feed.feed_url)
         end
         div class: "" do
