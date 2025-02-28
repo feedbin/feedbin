@@ -1,6 +1,6 @@
 def summary(entry)
   default = entry.data&.safe_dig("itunes_subtitle").clean(transform: :to_plain_text)
-  if default && default.length < 4
+  if !default || default.length < 4
     default = entry.summary
   end
   default
