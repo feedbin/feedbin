@@ -6,7 +6,8 @@ module Dialog
       stimulus_controller = stimulus(
         controller: STIMULUS_CONTROLLER,
         actions: {
-          "click"                         => "clickOutside",
+          "mousedown"                     => "closeStart",
+          "mouseup"                       => "closeEnd",
           "dialog:open@window"            => "openWithPurpose",
           "dialog:update@window"          => "updateContent",
           "dialog:close@window"           => "close",
