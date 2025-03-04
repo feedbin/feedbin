@@ -32,15 +32,16 @@ module FeedCrawler
     end
 
     def counter_key
-      @counter_key ||= begin
-        "refresher_redirect_tmp_" + Digest::SHA1.hexdigest(@redirects.map(&:cache_key).join)
-      end
+      parts = @redirects.map { |redirect| redirect_cache_key(@feed_id, redirect) }.join
+      "refresher_redirect_tmp_" + Digest::SHA1.hexdigest(parts)
+    end
+
+    def redirect_cache_key(feed_id, redirect)
+      Digest::SHA1.hexdigest([feed_id, redirect.status, redirect.from, redirect.to].join)
     end
 
     def stable_key
-      @stable_key ||= begin
-        "refresher_redirect_stable_#{@feed_id}"
-      end
+      "refresher_redirect_stable_#{@feed_id}"
     end
   end
 end

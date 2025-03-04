@@ -2,11 +2,8 @@ class CrawlData
   delegate :last_modified, :etag, :download_fingerprint, to: :@data
   delegate :redirected_to, :last_error, to: :@data
 
-  attr_accessor :redirects
-
   def initialize(data = {})
     @data = OpenStruct.new(data)
-    @redirects = []
   end
 
   def error_count
@@ -42,7 +39,7 @@ class CrawlData
     @data.downloaded_at = Time.now.to_i
   end
 
-  def download_success(feed_id)
+  def download_success(feed_id, redirects: [])
     clear! unless last_error && last_error["class"] == "Feedkit::NotFeed"
     redirect = FeedCrawler::RedirectCache.new(feed_id).save(redirects)
     if redirect.present?

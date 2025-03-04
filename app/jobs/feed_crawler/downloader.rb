@@ -34,7 +34,7 @@ module FeedCrawler
 
       Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers.get(:server).last}\""
 
-      @crawl_data.download_success(@feed_id)
+      @crawl_data.download_success(@feed_id, redirects: @response.redirects)
       @crawl_data.save(@response)
 
       parse if content_changed
@@ -59,7 +59,6 @@ module FeedCrawler
 
       ConcurrencyLimit.acquire(@feed_url, timeout: 5) do
         Feedkit::Request.download(url,
-          on_redirect:   on_redirect,
           username:      parsed_url.username,
           password:      parsed_url.password,
           last_modified: @crawl_data.last_modified,
@@ -67,12 +66,6 @@ module FeedCrawler
           auto_inflate:  auto_inflate,
           user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
         )
-      end
-    end
-
-    def on_redirect
-      proc do |from, to|
-        @crawl_data.redirects.push Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
       end
     end
 
