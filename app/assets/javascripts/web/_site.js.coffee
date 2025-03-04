@@ -2731,10 +2731,6 @@ $.extend feedbin,
               console.log error
         event.preventDefault()
 
-    dialogShow: ->
-      $(window).on 'dialog:show', (event) ->
-        feedbin.faviconColors($("dialog"))
-
     openDialog: ->
       $(document).on 'click', '[data-open-dialog]', (event) ->
         id = $(@).data('open-dialog')

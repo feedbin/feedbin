@@ -70,9 +70,9 @@ export default class extends Controller {
       })
     }
 
-    this.dispatch("show")
     this.closingValue = false
     this.dialogTarget.showModal()
+    this.dispatch("show")
 
     // scroll to end of snapContainer to skip
     // blank container above, seems to only matter in Chrome

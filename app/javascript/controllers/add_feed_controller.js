@@ -73,6 +73,7 @@ export default class extends Controller {
       this.resultsBodyTarget.innerHTML = data.body
       this.resultsFooterTarget.innerHTML = data.footer
       this.expandableOutlet.toggle()
+      window.feedbin.faviconColors(window.$("dialog"));
 
       afterTransition(this.expandableOutlet.transitionContainerTarget, true, () => {
         this.countSelected()
