@@ -48,8 +48,8 @@ module SessionsHelper
     cookies.delete(:auth_token)
   end
 
-  def redirect_back_or(default, notice = nil)
-    redirect_to (clear_location || default), notice: notice
+  def redirect_back_or(default, options = {})
+    redirect_to clear_location || default, **options
   end
 
   def store_location

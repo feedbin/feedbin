@@ -2,7 +2,7 @@ $("[data-behavior~=subscriptions_list]").replaceWith("<%= j render(Settings::Sub
 feedbin.timeago();
 feedbin.faviconColors();
 <% if params[:q].present? || params[:sort].present? %>
-    window.history.replaceState({}, document.title, window.location.pathname + "?<%= j params.permit(:sort, :q).to_query %>");
+    window.history.replaceState({}, document.title, window.location.pathname + "?<%= raw params.permit(:sort, :q).to_query %>");
 <% else %>
     window.history.replaceState({}, document.title, window.location.pathname);
 <% end %>

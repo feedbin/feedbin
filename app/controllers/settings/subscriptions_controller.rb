@@ -23,7 +23,8 @@ class Settings::SubscriptionsController < ApplicationController
 
   def destroy
     destroy_subscription(params[:id])
-    redirect_back_or(settings_subscriptions_url, "You have successfully unsubscribed.")
+    flash[:notice] = "You have successfully unsubscribed."
+    @redirect = clear_location
   end
 
   def edit

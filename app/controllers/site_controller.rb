@@ -5,6 +5,7 @@ class SiteController < ApplicationController
 
   def index
     if signed_in?
+      clear_location
       logged_in
     else
       render_file_or("home/index.html", :ok) {
