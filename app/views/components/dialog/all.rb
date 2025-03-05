@@ -10,6 +10,7 @@ module Dialog
       render Dialog::Template::Placeholder.new(dialog: Dialog::EditSubscription)
       render Dialog::Template::Placeholder.new(dialog: Dialog::EditAppearance)
       render Dialog::Template::Placeholder.new(dialog: Dialog::SocialReplies)
+      render Dialog::Template::Placeholder.new(dialog: Dialog::ActionResults)
       render Dialog::Template::Placeholder.new(dialog: Dialog::EditTag, size: :sm)
       render Dialog::Template::Placeholder.new(dialog: Dialog::EditSavedSearch, size: :sm)
     end

@@ -24,6 +24,7 @@ export default class extends Controller {
     this.snapContainerTarget.addEventListener("scroll", this.boundCheckSnapScroll)
 
     this.clickOrigin = null
+    this.dialogOpen = false
   }
 
   disconnect() {
@@ -50,6 +51,10 @@ export default class extends Controller {
     let element = document.createElement("div")
     element.innerHTML = event.detail.data
 
+    if (!this.dialogOpen) {
+      return
+    }
+
     this.open(element, event.detail.dialog_id, true)
   }
 
@@ -73,6 +78,7 @@ export default class extends Controller {
     }
 
     this.closingValue = false
+    this.dialogOpen = true
     this.dialogTarget.showModal()
     this.dispatch("show")
 
@@ -94,6 +100,7 @@ export default class extends Controller {
   close(event = {}, now = false) {
     this.dispatch("willHide")
     this.closingValue = true
+    this.dialogOpen = false
 
     const callback = () => {
       this.dialogTarget.close()

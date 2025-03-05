@@ -27,11 +27,12 @@ class ExtractsController < ApplicationController
   def modal
     @user = current_user
     @url = params[:url]
-    @content_info = MercuryParser.parse(params[:url])
 
     begin
+      @content_info = MercuryParser.parse(params[:url])
       @content = ContentFormatter.format!(@content_info.content, nil, true, params[:url])
-    rescue
+    rescue => exception
+      Rails.logger.info { exception }
       @content = nil
     end
   end

@@ -11,7 +11,7 @@ module Dialog
           "dialog:open@window"            => "openWithPurpose",
           "dialog:update@window"          => "updateContent",
           "dialog:close@window"           => "close",
-          "visual-viewport:change@window" => "delayedCheckScroll"
+          "visual-viewport:change@window" => "delayedCheckScroll",
         },
         values: {
           closing: "false",
