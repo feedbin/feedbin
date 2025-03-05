@@ -1,7 +1,3 @@
 <% if @subscription %>
-if ("updateDialog" in feedbin) {
-  feedbin.updateDialog("<%= Dialog::EditSubscription.dom_id %>", "<%= j render Dialog::EditSubscription.new(subscription: @subscription, tag_editor: @tag_editor, stats: @stats, app: params[:app].present?) %>");
-} else {
-  feedbin.replaceModal("modal-purpose-edit", "<%= j render(Subscriptions::FormComponent.new(subscription: @subscription, tag_editor: @tag_editor, app: params[:app].present?)) %>");
-}
+feedbin.updateDialog("<%= Dialog::EditSubscription.dom_id %>", "<%= j render Dialog::EditSubscription.new(subscription: @subscription, tag_editor: @tag_editor, stats: @stats, app: params[:app].present?) %>");
 <% end %>
