@@ -1,7 +1,6 @@
 module SessionsHelper
   def sign_in(user, remember_me = false)
-    cookie_options = {value: user.auth_token, httponly: true, expires: 1.year.from_now, secure: Feedbin::Application.config.force_ssl}
-    cookies.signed[:auth_token] = cookie_options
+    update_auth_cookie(user)
     @current_user = user
   end
 
@@ -35,6 +34,12 @@ module SessionsHelper
         end
       end
     end
+  end
+
+  def update_auth_cookie(user)
+    return unless user
+    cookie_options = {value: user.auth_token, httponly: true, expires: 1.year.from_now, secure: Feedbin::Application.config.force_ssl}
+    cookies.signed[:auth_token] = cookie_options
   end
 
   def sign_out

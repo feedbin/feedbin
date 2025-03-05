@@ -6665,8 +6665,6 @@ Media Queries
 /*------------------------------------------------------------------------------
 Add
 ------------------------------------------------------------------------------*/
-$modal-border-radius: 8px;
-
 button.close {
   appearance: none;
   padding: 0;
@@ -6676,58 +6674,6 @@ button.close {
   color: map-get($color-contrast-400, day);
   svg * {
     @include fill($color-contrast-400);
-  }
-}
-
-.feeds-search {
-  @include background-color($color-contrast-100);
-  border-radius: $modal-border-radius;
-  position: relative;
-  display: flex;
-  input {
-    border-radius: $modal-border-radius;
-    padding-left: 16px;
-  }
-  .favicon-target {
-    position: absolute;
-    right: 24px;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    .favicon-wrap {
-      position: static;
-      margin: auto;
-    }
-    .twitter-profile-image {
-      height: 34px;
-      width: 34px;
-      img {
-        height: 30px;
-        width: 30px;
-        border-radius: 30px;
-      }
-    }
-  }
-  label {
-    @include color($color-contrast-500);
-    font-weight: bold;
-    white-space: nowrap;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    padding: 5px 0 0 24px;
-    font-size: 18px;
-    padding-top: 5px;
-  }
-  @media (max-width: $small-breakpoint) {
-    label {
-      padding-left: 16px;
-    }
-    .favicon-target {
-      right: 16px;
-    }
   }
 }
 

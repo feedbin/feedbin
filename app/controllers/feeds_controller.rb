@@ -18,6 +18,7 @@ class FeedsController < ApplicationController
   end
 
   def auto_update
+    update_auth_cookie(current_user)
     get_feeds_list
   end
 

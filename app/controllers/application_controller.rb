@@ -30,6 +30,8 @@ class ApplicationController < ActionController::Base
   def logged_in
     clear_location
     get_feeds_list
+    update_auth_cookie(current_user)
+
     subscriptions = @user.subscriptions
 
     user_titles = subscriptions.includes(:feed).each_with_object({}) { |subscription, hash|

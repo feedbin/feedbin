@@ -1,4 +1,0 @@
-<%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', novalidate: true, class: 'feeds-search modal-header-input', data: { behavior: 'feeds_search'}) do %>
-    <label for="q">+ Add</label><%= search_field_tag(:q, query, placeholder: 'Search or URL', class: error.present? ? 'error' : '', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'feeds_search_field autofocus'}) %>
-    <span data-behavior="feeds_search_favicon_target" class="favicon-target"></span>
-<% end %>
