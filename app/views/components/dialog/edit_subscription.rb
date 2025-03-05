@@ -39,10 +39,10 @@ module Dialog
           end
         end
         dialog.footer do
-          div class: "flex items-center animate-fade-in" do
+          render Dialog::Template::FooterControls.new do
             unsubscribe_link
 
-            button type: "submit", class: "button ml-auto", value: "save", form: helpers.dom_id(@subscription, :edit) do
+            button type: "submit", class: "button max-sm:button-wide sm:ml-auto", value: "save", form: helpers.dom_id(@subscription, :edit) do
               "Save"
             end
           end
@@ -60,8 +60,7 @@ module Dialog
         path = subscription_path(@subscription)
       end
 
-      link_to path, method: :delete, remote: true, class: "!text-600 button-text text-sm flex items-center gap-2", data: data do
-        render SvgComponent.new("icon-delete", class: "fill-600")
+      link_to path, method: :delete, remote: true, class: "!text-600 max-sm:button-secondary max-sm:button-wide sm:button-text", data: data do
         plain " Unsubscribe"
       end
     end

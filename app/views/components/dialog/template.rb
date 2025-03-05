@@ -72,6 +72,12 @@ module Dialog
       end
     end
 
+    class FooterControls < ApplicationComponent
+      def view_template(&)
+        div class: "flex animate-fade-in flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center", &
+      end
+    end
+
     class Wrapper < ApplicationComponent
       def initialize(dialog_id:)
         @dialog_id = dialog_id
