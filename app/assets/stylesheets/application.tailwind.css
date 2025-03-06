@@ -314,6 +314,12 @@ input[type="search"]::-webkit-search-cancel-button {
   .button-text {
     @apply !no-underline;
   }
+  .dialog-button-primary {
+    @apply button max-sm:button-wide sm:ml-auto;
+  }
+  .dialog-button-secondary {
+    @apply !text-600 max-sm:button-secondary max-sm:button-wide sm:button-text;
+  }
 }
 
 @layer utilities {

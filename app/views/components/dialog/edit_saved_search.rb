@@ -53,12 +53,12 @@ module Dialog
         dialog.footer do
           render Dialog::Template::FooterControls.new do
             if @saved_search.persisted?
-              link_to saved_search_path(@saved_search), method: :delete, remote: true, class: "!text-600 max-sm:button-secondary max-sm:button-wide sm:button-text", data: { behavior: "close_dialog",confirm: "Are you sure you want to delete this search?" } do
+              link_to saved_search_path(@saved_search), method: :delete, remote: true, class: "dialog-button-secondary", data: { behavior: "close_dialog",confirm: "Are you sure you want to delete this search?" } do
                 plain " Delete"
               end
             end
 
-            button type: "submit", class: "button max-sm:button-wide sm:ml-auto", value: "save", form: helpers.dom_id(@saved_search, @saved_search.persisted? ? :edit : :new) do
+            button type: "submit", class: "dialog-button-primary", value: "save", form: helpers.dom_id(@saved_search, @saved_search.persisted? ? :edit : :new) do
               "Save"
             end
           end

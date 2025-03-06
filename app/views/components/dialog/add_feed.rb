@@ -180,7 +180,7 @@ module Dialog
         div class: "group-data-[add-feed-open-value=false]:opacity-0 sm:group-data-[add-feed-open-value=false]:tw-hidden" do
           render Dialog::Template::FooterControls.new do
             if @basic_auth
-              button type: "submit", class: "button max-sm:button-wide sm:ml-auto", form: "add_form" do
+              button type: "submit", class: "dialog-button-primary", form: "add_form" do
                 "Continue"
               end
             else
@@ -197,7 +197,7 @@ module Dialog
                 end
               end
 
-              button type: "submit", class: "button max-sm:button-wide sm:ml-auto", disabled: "disabled", form: "add_form", data: stimulus_item(target: :subscribe_submit_button, for: STIMULUS_CONTROLLER) do
+              button type: "submit", class: "dialog-button-primary", disabled: "disabled", form: "add_form", data: stimulus_item(target: :subscribe_submit_button, for: STIMULUS_CONTROLLER) do
                 "Add"
               end
             end

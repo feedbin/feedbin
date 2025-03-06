@@ -42,7 +42,7 @@ module Dialog
           render Dialog::Template::FooterControls.new do
             unsubscribe_link
 
-            button type: "submit", class: "button max-sm:button-wide sm:ml-auto", value: "save", form: helpers.dom_id(@subscription, :edit) do
+            button type: "submit", class: "dialog-button-primary", value: "save", form: helpers.dom_id(@subscription, :edit) do
               "Save"
             end
           end
@@ -60,7 +60,7 @@ module Dialog
         path = subscription_path(@subscription)
       end
 
-      link_to path, method: :delete, remote: true, class: "!text-600 max-sm:button-secondary max-sm:button-wide sm:button-text", data: data do
+      link_to path, method: :delete, remote: true, class: "dialog-button-secondary", data: data do
         plain " Unsubscribe"
       end
     end

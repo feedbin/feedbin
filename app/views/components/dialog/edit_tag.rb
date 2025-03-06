@@ -24,11 +24,11 @@ module Dialog
         end
         dialog.footer do
           render Dialog::Template::FooterControls.new do
-            link_to tag_path(@tag), method: :delete, remote: true, class: "!text-600 max-sm:button-secondary max-sm:button-wide sm:button-text", data: { behavior: "close_dialog", confirm: "Are you sure you want to delete this tag?" } do
+            link_to tag_path(@tag), method: :delete, remote: true, class: "dialog-button-secondary", data: { behavior: "close_dialog", confirm: "Are you sure you want to delete this tag?" } do
               "Delete"
             end
 
-            button type: "submit", class: "button max-sm:button-wide sm:ml-auto", value: "save", form: helpers.dom_id(@tag, :edit) do
+            button type: "submit", class: "dialog-button-primary", value: "save", form: helpers.dom_id(@tag, :edit) do
               "Save"
             end
           end
