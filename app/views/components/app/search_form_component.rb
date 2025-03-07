@@ -26,14 +26,14 @@ module App
                 )
 
                 div class: "shrink-0 flex group ml-2 items-center w-[17px] group-data-[search-token-token-visible-value=true]:tw-hidden" do
-                  render SvgComponent.new "icon-search", class: "fill-400 pg-focus:fill-blue-600"
+                  Icon("icon-search", class: "fill-400 pg-focus:fill-blue-600")
                 end
 
                 div class: "grid items-stretch min-h-0 min-w-0 p-1 pr-0 max-w-[40%] [grid-template-columns:0fr] group-data-[search-token-token-visible-value=true]:[grid-template-columns:1fr] transition-[grid-template-columns] overflow-hidden" do
                   button class: "flex min-w-0 items-center text-left gap-2 rounded bg-100 group/token opacity-0 group-data-[search-token-token-visible-value=true]:px-2 group-data-[search-token-token-visible-value=true]:opacity-100 transition duration-200", data_action: "search-token#deleteToken:prevent", title: "Remove filter" do
                     div class: "shrink-0 w-[20px] h-[20px] rounded-[1px] flex items-center justify-center", data: stimulus_item(target: "tokenIcon", for: :search_token)
                     div class: "truncate grow", data: stimulus_item(target: "tokenText", for: :search_token)
-                    render SvgComponent.new "icon-close-small", class: "shrink-0 transition fill-400 group-hover/token:fill-600 "
+                    Icon("icon-close-small", class: "shrink-0 transition fill-400 group-hover/token:fill-600 ")
                   end
                 end
               end
@@ -42,7 +42,7 @@ module App
             div class: "absolute z-50 inset-x-0 top-full w-full origin-top-left p-1 rounded-b bg-base shadow-two focus:outline-none group-data-[search-token-autocomplete-visible-value=false]:tw-hidden" do
               render App::SearchTokenResultComponent.new do |item|
                 item.icon do
-                  render SvgComponent.new "icon-search", class: "fill-400"
+                  Icon("icon-search", class: "fill-400")
                 end
                 item.text do
                   plain "Search for "
@@ -57,7 +57,7 @@ module App
             template data_search_token_target: "resultTemplate" do
               render App::SearchTokenResultComponent.new do |item|
                 item.icon do
-                  render SvgComponent.new "favicon-tag", class: "fill-400"
+                  Icon("favicon-tag", class: "fill-400")
                 end
               end
             end
@@ -67,7 +67,7 @@ module App
             end
 
             template data_search_token_target: "tagIconTemplate" do
-              render SvgComponent.new "favicon-tag", class: "fill-400"
+              Icon("favicon-tag", class: "fill-400")
             end
           end
         end
@@ -85,7 +85,7 @@ module App
                 span data_search_form_target: "sortLabel" do
                   "Sort by date"
                 end
-                render SvgComponent.new "icon-caret-small", class: "relative bottom-[-1px]"
+                Icon("icon-caret-small", class: "relative bottom-[-1px]")
               end
               div class: "dropdown-content" do
                 ul do

@@ -8,7 +8,7 @@ class CopyableComponent < ApplicationComponent
       button class: "flex items-center gap-2 group focus-border", data: stimulus_item(actions: {click: :copy}, for: :copyable) do
         span &block
         span class: "relative flex flex-center size-[20px] rounded", title: "Copy", data: {toggle: "tooltip"} do
-          render SvgComponent.new("icon-copy", class: "fill-500 group-active:fill-700 relative top-[-0.5px] right-[-0.5px]")
+          Icon("icon-copy", class: "fill-500 group-active:fill-700 relative top-[-0.5px] right-[-0.5px]")
         end
       end
 

@@ -40,7 +40,7 @@ module Settings
                         form.select :newsletter_tag, tag_options, {}, { class: "peer", data: { behavior: "auto_submit" } }
                       end
                       input.accessory_leading do
-                        render SvgComponent.new "favicon-tag", class: "fill-500"
+                        Icon("favicon-tag", class: "fill-500")
                       end
                     end
                   end

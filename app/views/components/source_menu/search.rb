@@ -13,7 +13,7 @@ module SourceMenu
         li do
           button data: {behavior: "source_menu_unsubscribe", message: "Are you sure you want to delete this saved search?"} do
             span class: "icon-wrap" do
-              render SvgComponent.new("menu-icon-delete")
+              Icon("menu-icon-delete")
             end
             span class: "menu-text" do
               span class: "title" do

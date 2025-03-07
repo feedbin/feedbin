@@ -30,7 +30,7 @@ class Common::FeedsList < ApplicationComponent
             span class: "count-wrap" do
               span class: "count", data: { behavior: "needs_count", count_group: "byFeed", count_group_id: feed.id }
               span class: "muted-icon hide" do
-                render SvgComponent.new("menu-icon-mute")
+                Icon("menu-icon-mute")
               end
             end
             render SourceMenu::Feed.new(feed: feed, source_target: feed.id)

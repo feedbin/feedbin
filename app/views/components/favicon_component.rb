@@ -25,7 +25,7 @@ class FaviconComponent < ApplicationComponent
 
   def icon_newsletter
     span class: "favicon-wrap collection-favicon" do
-      render SvgComponent.new("favicon-newsletter")
+      Icon("favicon-newsletter")
     end
   end
 
@@ -60,7 +60,7 @@ class FaviconComponent < ApplicationComponent
 
   def icon_pages_default
     span class: "favicon-wrap collection-favicon" do
-      render SvgComponent.new("favicon-saved")
+      Icon("favicon-saved")
     end
   end
 

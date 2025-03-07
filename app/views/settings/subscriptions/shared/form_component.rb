@@ -37,7 +37,7 @@ module Settings
         def twitter_notice
           div(class: "border-t flex gap-2 p-4") do
             div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
-              render SvgComponent.new "menu-icon-skull", class: "fill-600"
+              Icon("menu-icon-skull", class: "fill-600")
             end
             div do
               p(class: "text-red-600") { "Twitter Not Supported" }
@@ -55,9 +55,9 @@ module Settings
             div(class: "flex gap-2") do
               div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
                 if @subscription.feed.discovered_feeds.present?
-                  render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600 mt-0.5"
+                  Icon("menu-icon-fix-feeds", class: "fill-600 mt-0.5")
                 else
-                  render SvgComponent.new "menu-icon-skull", class: "fill-600"
+                  Icon("menu-icon-skull", class: "fill-600")
                 end
               end
               div(class: "grow") do

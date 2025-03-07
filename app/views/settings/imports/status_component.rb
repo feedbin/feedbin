@@ -51,7 +51,7 @@ module Settings
                 div(class: "text-500 truncate") { plain @import.filename }
                 span(class: "text-500 flex gap-2 items-center") do
                   if @import.percentage == 100
-                    render SvgComponent.new "icon-check", class: "fill-green-600"
+                    Icon("icon-check", class: "fill-green-600")
                   end
                   span do
                     number_to_percentage(@import.percentage.floor, precision: 0)

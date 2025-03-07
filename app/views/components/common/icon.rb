@@ -1,6 +1,4 @@
-class SvgComponent < ApplicationComponent
-  # register_element :use
-
+class Common::Icon < ApplicationComponent
   def initialize(name, options = {})
     @name = name
     @options = options

@@ -29,7 +29,7 @@ module Settings::Newsletters::Senders
               )
             end
             text.accessory_leading do
-              render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+              Icon("icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
             end
           end
         end

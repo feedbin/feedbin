@@ -26,7 +26,7 @@ module App
                 tag.name
               end
               div class: "shrink-0" do
-                render SvgComponent.new("favicon-tag", class: "fill-400")
+                Icon("favicon-tag", class: "fill-400")
               end
             end
           end

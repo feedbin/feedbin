@@ -2,7 +2,7 @@ module SourceMenu
   class Wrapper < ApplicationComponent
     def view_template
       button class: "feed-action-button source-menu", data: { behavior: "feed_action toggle_source_menu" } do
-        render SvgComponent.new("icon-dots")
+        Icon("icon-dots")
 
         template do
           ul class: "nav" do

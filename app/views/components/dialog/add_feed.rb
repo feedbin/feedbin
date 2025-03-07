@@ -34,7 +34,7 @@ module Dialog
                     search_field_tag :q, @query, placeholder: "Search or URL", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: stimulus_item(target: :search_input, data: { behavior: "autofocus" }, for: STIMULUS_CONTROLLER)
                   end
                   text.accessory_leading do
-                    render SvgComponent.new "favicon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+                    Icon("favicon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
                   end
                   text.accessory_trailing do
                     div class: "mx-2" do

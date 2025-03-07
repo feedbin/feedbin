@@ -24,7 +24,7 @@ module Admin
               )
             end
             input.accessory_leading do
-              render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+              Icon("icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
             end
           end
         end
@@ -75,11 +75,11 @@ module Admin
 
 
             if @feed.fixable?
-              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"}
+              Icon("menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"})
             elsif @feed.dead?
-              render SvgComponent.new "menu-icon-skull", class: "fill-600", title: "#{@feed.crawl_data.error_count} #{"Error".pluralize(@feed.crawl_data.error_count)}", data: {toggle: "tooltip"}
+              Icon("menu-icon-skull", class: "fill-600", title: "#{@feed.crawl_data.error_count} #{"Error".pluralize(@feed.crawl_data.error_count)}", data: {toggle: "tooltip"})
             elsif @feed.crawl_data.error_count > 0
-              render SvgComponent.new "icon-error-message-small", title: "#{@feed.crawl_data.error_count} #{"Error".pluralize(@feed.crawl_data.error_count)}", data: {toggle: "tooltip"}
+              Icon("icon-error-message-small", title: "#{@feed.crawl_data.error_count} #{"Error".pluralize(@feed.crawl_data.error_count)}", data: {toggle: "tooltip"})
             else
               sparkline
             end

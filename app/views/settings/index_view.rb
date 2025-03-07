@@ -146,9 +146,9 @@ module Settings
 
               row.control do
                 link_to bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do
-                  render SvgComponent.new "favicon-saved", class: "fill-500"
+                  Icon("favicon-saved", class: "fill-500")
                   plain " Send to Feedbin "
-                  render SvgComponent.new "icon-grabber", class: "ml-6 fill-700"
+                  Icon("icon-grabber", class: "ml-6 fill-700")
                 end
               end
             end

@@ -32,7 +32,7 @@ module Settings
                   end
                   span class: "ml-auto flex items-center gap-4" do
                     status_icon(subscription_presenter)
-                    render SvgComponent.new "icon-caret", class: "fill-300 -rotate-90"
+                    Icon("icon-caret", class: "fill-300 -rotate-90")
                   end
                 end
               end
@@ -43,15 +43,15 @@ module Settings
         def status_icon(subscription_presenter)
           if @subscription.fixable?
             span class: "w-[16px] h-[16px] flex flex-center" do
-              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"}
+              Icon("menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"})
             end
           elsif @subscription.dead?
             span class: "w-[16px] h-[16px] flex flex-center" do
-              render SvgComponent.new "menu-icon-skull", class: "fill-600", title: "Error crawling feed", data: {toggle: "tooltip"}
+              Icon("menu-icon-skull", class: "fill-600", title: "Error crawling feed", data: {toggle: "tooltip"})
             end
           elsif @subscription.muted?
             span class: "w-[16px] h-[16px] flex flex-center" do
-              render SvgComponent.new "menu-icon-mute", class: "fill-600", title: "Muted", data: {toggle: "tooltip"}
+              Icon("menu-icon-mute", class: "fill-600", title: "Muted", data: {toggle: "tooltip"})
             end
           else
             div class: "flex flex-col gap-2 items-end" do

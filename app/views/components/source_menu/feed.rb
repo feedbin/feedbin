@@ -13,7 +13,7 @@ module SourceMenu
         li do
           button data: {behavior: "source_menu_mute", feed_id: @source_target} do
             span class: "icon-wrap" do
-              render SvgComponent.new("menu-icon-mute")
+              Icon("menu-icon-mute")
             end
             span class: "menu-text" do
               span class: "title" do
@@ -29,7 +29,7 @@ module SourceMenu
         li do
           button data: {behavior: "source_menu_unsubscribe", message: "Are you sure you want to unsubscribe?"} do
             span class: "icon-wrap" do
-              render SvgComponent.new("menu-icon-delete")
+              Icon("menu-icon-delete")
             end
             span class: "menu-text" do
               span class: "title" do

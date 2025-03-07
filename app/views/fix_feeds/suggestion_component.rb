@@ -14,7 +14,7 @@ module FixFeeds
         div class: "flex gap-4" do
           div class: "flex inset-y-0 self-stretch" do
             render Timeline.new(color: "bg-orange-600", options: {first: true}, tooltip: @source.crawl_error_message) do
-              render SvgComponent.new("icon-exclamation", class: "fill-white")
+              Icon("icon-exclamation", class: "fill-white")
             end
           end
 
@@ -63,7 +63,7 @@ module FixFeeds
             group.item do
               div class: "flex gap-4" do
                 render Timeline.new(color: "bg-green-600", options: {last: discovered_feed == discovered_feeds.last, middle: index != 0}) do
-                  render SvgComponent.new("icon-check-small", class: "fill-white")
+                  Icon("icon-check-small", class: "fill-white")
                 end
 
                 div class: "grow #{index != 0 ? "mt-[8px]" : ""}" do
