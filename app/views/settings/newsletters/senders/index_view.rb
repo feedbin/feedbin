@@ -11,7 +11,7 @@ module Settings::Newsletters::Senders
         "Newsletter Senders"
       end
 
-      form_tag helpers.settings_newsletters_senders_path, method: :get, remote: true, data: {behavior: "spinner"} do
+      form_tag settings_newsletters_senders_path, method: :get, remote: true, data: {behavior: "spinner"} do
         div class: "mb-6" do
           render Form::TextInputComponent.new do |text|
             text.input do
@@ -21,7 +21,7 @@ module Settings::Newsletters::Senders
                 placeholder: "Search Senders",
                 data_behavior: "autosubmit",
                 name: "q",
-                value: helpers.params[:q],
+                value: params[:q],
                 autocomplete: "off",
                 autocorrect: "off",
                 autocapitalize: "off",

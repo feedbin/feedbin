@@ -58,7 +58,7 @@ module Dialog
               end
             end
 
-            button type: "submit", class: "dialog-button-primary", value: "save", form: helpers.dom_id(@saved_search, @saved_search.persisted? ? :edit : :new) do
+            button type: "submit", class: "dialog-button-primary", value: "save", form: dom_id(@saved_search, @saved_search.persisted? ? :edit : :new) do
               "Save"
             end
           end

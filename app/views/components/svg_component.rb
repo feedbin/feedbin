@@ -7,7 +7,7 @@ class SvgComponent < ApplicationComponent
   end
 
   def view_template(&)
-    result = helpers.svg_options(@name, @options)
+    result = svg_options(@name, @options)
     inline = result.options.delete(:inline)
     svg(**result.options) do |s|
       if inline

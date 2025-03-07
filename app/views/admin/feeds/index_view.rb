@@ -58,7 +58,7 @@ module Admin
             div class: "grow" do
               render App::FeedComponent do |feed|
                 feed.icon do
-                  helpers.favicon_with_record(@feed.favicon, host: @feed.host, generated: true)
+                  favicon_with_record(@feed.favicon, host: @feed.host, generated: true)
                 end
                 feed.title do
                   link_to(@feed.site_url, target: :blank, class: "!text-600") do
@@ -67,7 +67,7 @@ module Admin
                 end
                 feed.subhead do
                   link_to(@feed.feed_url, class: "!text-500 truncate", target: :blank) do
-                    helpers.short_url_alt(@feed.feed_url)
+                    short_url_alt(@feed.feed_url)
                   end
                 end
               end

@@ -19,7 +19,7 @@ module Dialog
           end
 
           p do
-            plain helpers.number_to_human(@action.results.total, precision: 2).downcase
+            plain number_to_human(@action.results.total, precision: 2).downcase
             plain " match".pluralize(@action.results.total)
           end
 

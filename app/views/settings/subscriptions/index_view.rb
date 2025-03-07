@@ -9,7 +9,7 @@ module Settings
       end
 
       def view_template
-        form_tag helpers.settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
+        form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
           input type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
           render Settings::H1Component.new do
             "Subscriptions"
@@ -89,7 +89,7 @@ module Settings
                 input.input do
                   select_tag(
                     :sort,
-                    helpers.options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], @params[:sort]),
+                    options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], @params[:sort]),
                     class: "peer",
                     data: {behavior: "autosubmit"}
                   )
@@ -122,7 +122,7 @@ module Settings
                   end
                 end
 
-                link_to "Review Feeds", helpers.fix_feeds_path, class: "whitespace-nowrap shrink-0"
+                link_to "Review Feeds", fix_feeds_path, class: "whitespace-nowrap shrink-0"
               end
             end
           end

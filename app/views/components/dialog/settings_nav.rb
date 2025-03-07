@@ -9,7 +9,7 @@ module Dialog
         end
         dialog.body do
           div data_nav: "modal", class: "group" do
-            render Shared::SettingsNavView.new(user: helpers.current_user)
+            render Shared::SettingsNavView.new(user: current_user)
           end
         end
       end

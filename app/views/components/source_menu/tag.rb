@@ -8,7 +8,7 @@ module SourceMenu
     def view_template
       render(Wrapper.new) do
         render ActionMarkRead.new(source_target: @source_target)
-        render ActionEdit.new(href: helpers.edit_tag_path(@tag))
+        render ActionEdit.new(href: edit_tag_path(@tag))
 
         li do
           button data: {behavior: "source_menu_unsubscribe", message: "Are you sure you want to delete this tag?"} do
@@ -20,7 +20,7 @@ module SourceMenu
                 "Delete"
               end
             end
-            form_with url: helpers.tag_path(@tag), method: :delete, local: false do |form|
+            form_with url: tag_path(@tag), method: :delete, local: false do |form|
               form.submit type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
             end
           end

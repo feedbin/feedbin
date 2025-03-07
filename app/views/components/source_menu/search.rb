@@ -8,7 +8,7 @@ module SourceMenu
     def view_template
       render(Wrapper.new) do
         render ActionMarkRead.new(source_target: @source_target)
-        render ActionEdit.new(href: helpers.edit_saved_search_path(@saved_search))
+        render ActionEdit.new(href: edit_saved_search_path(@saved_search))
 
         li do
           button data: {behavior: "source_menu_unsubscribe", message: "Are you sure you want to delete this saved search?"} do
@@ -20,7 +20,7 @@ module SourceMenu
                 "Delete"
               end
             end
-            form_with url: helpers.saved_search_path(@saved_search), method: :delete, local: false do |form|
+            form_with url: saved_search_path(@saved_search), method: :delete, local: false do |form|
               form.submit type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
             end
           end

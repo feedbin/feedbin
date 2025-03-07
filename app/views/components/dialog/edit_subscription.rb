@@ -42,7 +42,7 @@ module Dialog
           render Dialog::Template::FooterControls.new do
             unsubscribe_link
 
-            button type: "submit", class: "dialog-button-primary", value: "save", form: helpers.dom_id(@subscription, :edit) do
+            button type: "submit", class: "dialog-button-primary", value: "save", form: dom_id(@subscription, :edit) do
               "Save"
             end
           end

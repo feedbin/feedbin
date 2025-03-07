@@ -28,7 +28,7 @@ module Dialog
               "Delete"
             end
 
-            button type: "submit", class: "dialog-button-primary", value: "save", form: helpers.dom_id(@tag, :edit) do
+            button type: "submit", class: "dialog-button-primary", value: "save", form: dom_id(@tag, :edit) do
               "Save"
             end
           end

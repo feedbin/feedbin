@@ -13,7 +13,7 @@ module FixFeeds
             "Fixable Feeds"
           end
           p(class: "text-sm text-500") do
-            plain helpers.number_with_delimiter(@count)
+            plain number_with_delimiter(@count)
             plain " alternative".pluralize(@count)
             plain " available"
           end

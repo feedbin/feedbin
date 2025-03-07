@@ -20,14 +20,14 @@ module FixFeeds
       end
 
       if @subscriptions.present?
-        render StatusComponent.new(count: @subscriptions.count, replace_path: helpers.replace_all_fix_feeds_path)
+        render StatusComponent.new(count: @subscriptions.count, replace_path: replace_all_fix_feeds_path)
       end
 
       @subscriptions.each do |subscription|
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
             div class: "border rounded-lg mb-4 px-4 pb-4" do
-              render SuggestionComponent.new(replaceable: subscription, source: subscription.feed, redirect: helpers.fix_feeds_url, include_ignore: true)
+              render SuggestionComponent.new(replaceable: subscription, source: subscription.feed, redirect: fix_feeds_url, include_ignore: true)
             end
           end
         end

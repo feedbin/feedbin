@@ -8,7 +8,7 @@ module Settings
         end
 
         def view_template
-          helpers.present @subscription do |subscription_presenter|
+          present @subscription do |subscription_presenter|
             fields_for "subscriptions[]", @subscription do |f|
               li class: "flex items-center relative border-b" do
                 div class: "shrink-0 w-[32px] self-stretch flex" do
@@ -18,7 +18,7 @@ module Settings
                   end
                 end
 
-                link_to helpers.edit_settings_subscription_path(@subscription), class: "flex grow items-center overflow-hidden gap-3 py-3 !text-600 hover:no-underline" do
+                link_to edit_settings_subscription_path(@subscription), class: "flex grow items-center overflow-hidden gap-3 py-3 !text-600 hover:no-underline" do
                   span class: "block" do
                     raw subscription_presenter.favicon(@subscription.feed)
                   end
@@ -27,7 +27,7 @@ module Settings
                       plain @subscription.title
                     end
                     span class: "block truncate !text-500 text-sm", title: @subscription.feed_url do
-                      plain helpers.display_url(@subscription.feed_url)
+                      plain display_url(@subscription.feed_url)
                     end
                   end
                   span class: "ml-auto flex items-center gap-4" do
@@ -57,8 +57,8 @@ module Settings
             div class: "flex flex-col gap-2 items-end" do
               Sparkline(sparkline: subscription_presenter.sparkline, theme: false)
               div class: "text-500 text-sm whitespace-nowrap" do
-                raw helpers.timeago(@subscription.last_published_entry, prefix: "Latest article:")
-                plain ", #{helpers.number_with_delimiter(@subscription.post_volume)}/mo"
+                raw timeago(@subscription.last_published_entry, prefix: "Latest article:")
+                plain ", #{number_with_delimiter(@subscription.post_volume)}/mo"
               end
             end
           end

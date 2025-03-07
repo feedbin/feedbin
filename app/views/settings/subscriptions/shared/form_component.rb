@@ -10,7 +10,7 @@ module Settings
         end
 
         def view_template
-          helpers.present subscription do |subscription_presenter|
+          present subscription do |subscription_presenter|
             feed_profile(subscription_presenter)
             chart(subscription_presenter)
             settings(subscription_presenter)
@@ -51,7 +51,7 @@ module Settings
         end
 
         def error_notice
-          div(class: "border-t p-4", id: helpers.dom_id(@subscription, :fixable)) do
+          div(class: "border-t p-4", id: dom_id(@subscription, :fixable)) do
             div(class: "flex gap-2") do
               div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
                 if @subscription.feed.discovered_feeds.present?
@@ -89,7 +89,7 @@ module Settings
                 end
 
                 if @subscription.feed.discovered_feeds.present?
-                  render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
+                  render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: edit_settings_subscription_url(@subscription), remote: false)
                 end
               end
             end
@@ -205,7 +205,7 @@ module Settings
                     row.title { "Website" }
 
                     row.control do
-                      a(href: subscription.feed.site_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.site_url) }
+                      a(href: subscription.feed.site_url, class: "!text-500 truncate" ) { short_url(subscription.feed.site_url) }
                     end
                   end
                 end
@@ -216,7 +216,7 @@ module Settings
                   row.title { "Source" }
 
                   row.control do
-                    a( href: subscription.feed.feed_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.feed_url) }
+                    a( href: subscription.feed.feed_url, class: "!text-500 truncate" ) { short_url(subscription.feed.feed_url) }
                   end
                 end
               end

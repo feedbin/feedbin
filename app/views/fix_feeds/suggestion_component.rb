@@ -29,7 +29,7 @@ module FixFeeds
       div class: "p-4 grow border border-transparent" do
         render App::FeedComponent do |feed|
           feed.icon do
-            helpers.favicon_with_record(@source.favicon, host: @source.host, generated: true)
+            favicon_with_record(@source.favicon, host: @source.host, generated: true)
           end
           feed.title do
             link_to(@source.site_url, target: :blank, class: "!text-600") do
@@ -40,7 +40,7 @@ module FixFeeds
           end
           feed.subhead do
             link_to(@source.feed_url, class: "!text-500 truncate", target: :blank) do
-              helpers.short_url_alt(@source.feed_url)
+              short_url_alt(@source.feed_url)
             end
           end
 
@@ -94,7 +94,7 @@ module FixFeeds
             row.content do
               render App::FeedComponent do |feed|
                 feed.icon do
-                  helpers.favicon_with_host(discovered_feed.host, generated: true)
+                  favicon_with_host(discovered_feed.host, generated: true)
                 end
                 feed.title do
                   link_to(discovered_feed.site_url, target: :blank, class: "!text-600 font-bold") do
@@ -103,7 +103,7 @@ module FixFeeds
                 end
                 feed.subhead do
                   link_to(discovered_feed.feed_url, class: "!text-500 truncate", target: :blank) do
-                    helpers.short_url_alt(discovered_feed.feed_url)
+                    short_url_alt(discovered_feed.feed_url)
                   end
                 end
               end

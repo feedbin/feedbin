@@ -6,7 +6,7 @@ module Settings
     end
 
     def view_template
-      form_for @user, remote: true, url: helpers.settings_update_user_path(@user) do |f|
+      form_for @user, remote: true, url: settings_update_user_path(@user) do |f|
         render Settings::H1Component.new do
           "Settings"
         end
@@ -145,7 +145,7 @@ module Settings
               end
 
               row.control do
-                link_to helpers.bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do
+                link_to bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do
                   render SvgComponent.new "favicon-saved", class: "fill-500"
                   plain " Send to Feedbin "
                   render SvgComponent.new "icon-grabber", class: "ml-6 fill-700"

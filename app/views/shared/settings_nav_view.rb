@@ -16,31 +16,31 @@ module Shared
         render(::SettingsNav::NavComponent.new(
           title: "Feedbin",
           subtitle: "Back to the app",
-          url: helpers.root_path,
+          url: root_path,
           icon: "menu-icon-app",
           classes: "md:hidden"
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Settings",
           subtitle: "General preferences",
-          url: helpers.settings_path,
+          url: settings_path,
           icon: "menu-icon-settings",
-          selected: helpers.is_active?("settings", "index")
+          selected: is_active?("settings", "index")
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Subscriptions",
           subtitle: "Manage feeds",
-          url: helpers.settings_subscriptions_path,
+          url: settings_subscriptions_path,
           icon: "menu-icon-subscriptions",
-          selected: helpers.is_active?(["settings/subscriptions", "fix_feeds"], %w[index edit]),
-          notification: helpers.current_user.setting_on?(:fix_feeds_available)
+          selected: is_active?(["settings/subscriptions", "fix_feeds"], %w[index edit]),
+          notification: current_user.setting_on?(:fix_feeds_available)
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Newsletters",
           subtitle: "Addresses & senders",
-          url: helpers.settings_newsletters_path,
+          url: settings_newsletters_path,
           icon: "menu-icon-newsletters",
-          selected: helpers.is_active?(["settings/newsletters", "settings/newsletters/senders", "settings/newsletters/addresses"], %w[index show new])
+          selected: is_active?(["settings/newsletters", "settings/newsletters/senders", "settings/newsletters/addresses"], %w[index show new])
         ))
       end
 
@@ -56,22 +56,22 @@ module Shared
         render(::SettingsNav::NavComponent.new(
           title: "Actions",
           subtitle: "Filters & more",
-          url: helpers.actions_path,
-          selected: helpers.is_active?(["actions"], %w[index new edit]),
+          url: actions_path,
+          selected: is_active?(["actions"], %w[index new edit]),
           icon: "menu-icon-actions"
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Share & Save",
           subtitle: "Social plugins",
-          url: helpers.sharing_services_path,
-          selected: helpers.is_active?("sharing_services", "index"),
+          url: sharing_services_path,
+          selected: is_active?("sharing_services", "index"),
           icon: "menu-icon-share-save"
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Import & Export",
           subtitle: "Bring your OPML",
-          url: helpers.settings_import_export_path,
-          selected: helpers.is_active?(["settings/imports"], %w[index show]),
+          url: settings_import_export_path,
+          selected: is_active?(["settings/imports"], %w[index show]),
           icon: "menu-icon-import-export"
         ))
       end
@@ -88,16 +88,16 @@ module Shared
         render(::SettingsNav::NavComponent.new(
           title: "Account",
           subtitle: "Update email & password",
-          url: helpers.settings_account_path,
-          selected: helpers.is_active?("settings", "account"),
+          url: settings_account_path,
+          selected: is_active?("settings", "account"),
           icon: "menu-icon-account"
         ))
         if ENV["STRIPE_API_KEY"]
           render(::SettingsNav::NavComponent.new(
             title: "Billing",
             subtitle: "Payment method & plan",
-            url: helpers.settings_billing_path,
-            selected: helpers.is_active?(["settings/billings"], %w[index edit payment_history]),
+            url: settings_billing_path,
+            selected: is_active?(["settings/billings"], %w[index edit payment_history]),
             icon: "menu-icon-billing"
           ))
         end
@@ -115,21 +115,21 @@ module Shared
           render(::SettingsNav::NavComponent.new(
             title: "Customers",
             subtitle: "Manage customers",
-            url: helpers.admin_users_path,
-            selected: helpers.is_active?("admin/users", "index"),
+            url: admin_users_path,
+            selected: is_active?("admin/users", "index"),
             icon: "menu-icon-customers"
           ))
           render(::SettingsNav::NavComponent.new(
             title: "Feeds",
             subtitle: "Feed info",
-            url: helpers.admin_feeds_path,
-            selected: helpers.is_active?("admin/feeds", "index"),
+            url: admin_feeds_path,
+            selected: is_active?("admin/feeds", "index"),
             icon: "menu-icon-feeds"
           ))
           render(::SettingsNav::NavComponent.new(
             title: "Sidekiq",
             subtitle: "Background jobs",
-            url: helpers.sidekiq_web_path,
+            url: sidekiq_web_path,
             icon: "menu-icon-sidekiq"
           ))
           render(::SettingsNav::NavComponent.new(
@@ -148,7 +148,7 @@ module Shared
       ul(class: "tw-hidden group-data-[nav=dropdown]:block") do
         render(::SettingsNav::NavComponent.new(
           title: "Sign Out",
-          url: [helpers.logout_path, { method: :delete }],
+          url: [logout_path, { method: :delete }],
           icon: "menu-icon-log-out"
         ))
       end
@@ -180,7 +180,7 @@ module Shared
           render ::SettingsNav::NavSmallComponent.new url: "https://feedbin.social/@feedbin" do
             "Mastodon"
           end
-          render ::SettingsNav::NavSmallComponent.new url: helpers.logout_path, method: "delete" do
+          render ::SettingsNav::NavSmallComponent.new url: logout_path, method: "delete" do
             "Sign Out"
           end
         end

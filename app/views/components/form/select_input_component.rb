@@ -6,7 +6,7 @@ module Form
     def view_template
       div(class: "mb-2 text-600", &@label) if label?
 
-      div data: {accessories: helpers.class_names(leading: accessory_leading?, trailing: "true")}, class: "select-wrap relative [&_select]:!pr-8 [&[data-accessories~=leading]_select]:!pl-8" do
+      div data: {accessories: class_names(leading: accessory_leading?, trailing: "true")}, class: "select-wrap relative [&_select]:!pr-8 [&[data-accessories~=leading]_select]:!pl-8" do
         if accessory_leading?
           render AccessoryComponent.new(&@accessory_leading)
         end
