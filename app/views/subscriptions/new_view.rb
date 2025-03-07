@@ -31,9 +31,9 @@ class Subscriptions::NewView < ApplicationView
   end
 
   def feed_row(feed, index, form_builder)
-    div(class: "mb-4", data: { behavior: "subscription_option" }) do
-      div(class: "flex items-center mb-2") do
-        div(class: ["self-stretch", ("hide" if @feeds.length == 1)] do
+    div class: "mb-4", data: { behavior: "subscription_option" } do
+      div class: "flex items-center mb-2" do
+        div class: ["self-stretch", ("hide" if @feeds.length == 1)] do
           form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: { behavior: "check_toggle" }
           form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
             render Form::CheckboxComponent.new
