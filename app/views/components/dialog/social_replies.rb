@@ -13,7 +13,7 @@ module Dialog
         end
         dialog.body do
           div class: "animate-fade-in" do
-            render partial: 'microposts/thread', locals: {microposts: @posts}
+            render partial('microposts/thread', microposts: @posts)
           end
         end
       end

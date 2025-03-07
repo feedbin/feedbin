@@ -2,7 +2,7 @@
   <div class="py-3 px-4">
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <%= f.label :label, "Label" %>
         <% end %>
         <% text.input do %>
@@ -13,7 +13,7 @@
 
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <%= f.label :url, "URL" %>
         <% end %>
         <% text.input do %>

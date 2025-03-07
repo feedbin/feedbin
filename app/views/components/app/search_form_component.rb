@@ -54,7 +54,7 @@ module App
               div data_search_token_target: "results"
             end
 
-            template_tag data_search_token_target: "resultTemplate" do
+            template data_search_token_target: "resultTemplate" do
               render App::SearchTokenResultComponent.new do |item|
                 item.icon do
                   render SvgComponent.new "favicon-tag", class: "fill-400"
@@ -62,11 +62,11 @@ module App
               end
             end
 
-            template_tag data_search_token_target: "headerTemplate" do
+            template data_search_token_target: "headerTemplate" do
               h2 class: "font-bold mx-2 uppercase mb-2 mt-4 text-500 text-xs", data_template: "text"
             end
 
-            template_tag data_search_token_target: "tagIconTemplate" do
+            template data_search_token_target: "tagIconTemplate" do
               render SvgComponent.new "favicon-tag", class: "fill-400"
             end
           end

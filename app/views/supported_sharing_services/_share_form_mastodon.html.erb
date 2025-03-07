@@ -3,7 +3,7 @@
 
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="mastodon_status">Status</label>
         <% end %>
         <% text.input do %>
@@ -14,7 +14,7 @@
 
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="mastodon_spoiler_text">Content Warning</label>
         <% end %>
         <% text.input do %>
@@ -25,7 +25,7 @@
 
     <div class="mb-4">
       <%= render Form::SelectInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="mastodon_visibility">Visibility</label>
         <% end %>
         <% text.input do %>

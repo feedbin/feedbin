@@ -1,5 +1,5 @@
 class TabsComponent < ApplicationComponent
-  include Phlex::DeferredRender
+  include DeferredRender
 
   def initialize
     @tabs = []
@@ -17,7 +17,7 @@ class TabsComponent < ApplicationComponent
       end
       @tabs.each_with_index do |tab, index|
         div class: "tw-hidden data-selected:block", data: tab_data(index) do
-          yield_content &tab[:block]
+          render &tab[:block]
         end
       end
     end

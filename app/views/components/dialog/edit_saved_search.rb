@@ -30,7 +30,7 @@ module Dialog
             form_for(@saved_search, remote: true, method: @saved_search.persisted? ? :patch : :post, html: {data: {behavior: "close_dialog_on_submit"}}) do |form_builder|
               div class: "mb-4" do
                 render Form::TextInputComponent.new do |text|
-                  text.label do
+                  text.label_content do
                     form_builder.label :name, "Name"
                   end
                   text.input do
@@ -40,7 +40,7 @@ module Dialog
               end
 
               render Form::TextInputComponent.new do |text|
-                text.label do
+                text.label_content do
                   form_builder.label :query, "Query"
                 end
                 text.input do

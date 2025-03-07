@@ -11,7 +11,7 @@ module Form
           render AccessoryComponent.new(&@accessory_leading)
         end
 
-        yield_content &@input
+        render &@input
 
         render AccessoryComponent.new(position: "trailing") do
           render SvgComponent.new "icon-caret", class: "fill-500 pg-focus:fill-blue-600 pg-disabled:fill-300"

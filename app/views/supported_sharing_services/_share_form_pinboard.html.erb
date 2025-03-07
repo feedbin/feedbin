@@ -3,7 +3,7 @@
     <%= hidden_field_tag :url, "", class: "url-placeholder" %>
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="pinboard_title">Title</label>
         <% end %>
         <% text.input do %>
@@ -14,7 +14,7 @@
 
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="pinboard_description">Description</label>
         <% end %>
         <% text.input do %>
@@ -25,7 +25,7 @@
 
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="pinboard_tags">Tags</label>
         <% end %>
         <% text.input do %>

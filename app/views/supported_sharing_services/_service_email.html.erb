@@ -26,7 +26,7 @@
 
         <div class="mb-4">
           <%= render Form::TextInputComponent.new do |text| %>
-            <% text.label do %>
+            <% text.label_content do %>
               <%= f.label :email_name, "Full Name"%>
             <% end %>
             <% text.input do %>
@@ -36,7 +36,7 @@
         </div>
 
         <%= render Form::TextInputComponent.new do |text| %>
-          <% text.label do %>
+          <% text.label_content do %>
             <%= f.label :email_address, "Reply-To" %>
           <% end %>
           <% text.input do %>

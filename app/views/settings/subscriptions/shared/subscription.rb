@@ -20,7 +20,7 @@ module Settings
 
                 link_to helpers.edit_settings_subscription_path(@subscription), class: "flex grow items-center overflow-hidden gap-3 py-3 !text-600 hover:no-underline" do
                   span class: "block" do
-                    plain subscription_presenter.favicon(@subscription.feed)
+                    raw subscription_presenter.favicon(@subscription.feed)
                   end
                   span class: "truncate" do
                     span class: "block truncate" do
@@ -57,7 +57,7 @@ module Settings
             div class: "flex flex-col gap-2 items-end" do
               Sparkline(sparkline: subscription_presenter.sparkline, theme: false)
               div class: "text-500 text-sm whitespace-nowrap" do
-                plain helpers.timeago(@subscription.last_published_entry, prefix: "Latest article:")
+                raw helpers.timeago(@subscription.last_published_entry, prefix: "Latest article:")
                 plain ", #{helpers.number_with_delimiter(@subscription.post_volume)}/mo"
               end
             end

@@ -76,12 +76,12 @@ module Dialog
       end
 
       def view_template
-        unsafe_raw(
+        raw(safe(
           JSON.generate({
             body: capture { body },
             footer: capture { footer },
           }, script_safe: true)
-        )
+        ))
       end
 
       def body
@@ -104,7 +104,7 @@ module Dialog
 
           div class: "mb-4" do
             render Form::TextInputComponent.new do |text|
-              text.label { label_tag :basic_username, "Username" }
+              text.label_content { label_tag :basic_username, "Username" }
               text.input do
                 text_field_tag :username, "", id: "basic_username", class: "peer text-input"
               end
@@ -112,7 +112,7 @@ module Dialog
           end
 
           render Form::TextInputComponent.new do |text|
-            text.label { label_tag :basic_password, "Password" }
+            text.label_content { label_tag :basic_password, "Password" }
             text.input do
               password_field_tag :password, "", id: "basic_password", class: "peer text-input"
             end
@@ -150,15 +150,15 @@ module Dialog
       end
 
       def feed_row(feed, index, form_builder)
-        div(class: "mb-4", data: { behavior: "subscription_option" }) do
-          div(class: "flex items-center mb-2") do
-            div(class: tokens("self-stretch", -> { @feeds.length == 1 } => "hide")) do
+        div class: "mb-4", data: { behavior: "subscription_option" } do
+          div class: "flex items-center mb-2" do
+            div class: ["self-stretch", ("hide" if @feeds.length == 1)]  do
               form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: STIMULUS_CONTROLLER)
               form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
                 render Form::CheckboxComponent.new
               end
             end
-            div(class: "grow") do
+            div class: "grow" do
               render Form::TextInputComponent.new do |input|
                 input.accessory_leading do
                   span(class: "pl-2") {render FaviconComponent.new(feed: feed)}
@@ -170,7 +170,7 @@ module Dialog
               end
             end
           end
-          div class: tokens("text-500", -> { @feeds.length > 1 } => "pl-[28px]") do
+          div class: ["text-500", ("pl-[28px]" if @feeds.length > 1)] do
             render App::FeedStatsComponent.new(feed: feed, stats: FeedStat.daily_counts(feed_ids: @feeds.map(&:id)))
           end
         end

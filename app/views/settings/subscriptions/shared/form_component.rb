@@ -20,7 +20,7 @@ module Settings
         def feed_profile(subscription_presenter)
           div(class: "border rounded-lg mb-14") do
             div(class: "flex items-center gap-2 p-4") do
-              plain subscription_presenter.favicon(subscription.feed)
+              raw subscription_presenter.favicon(subscription.feed)
               span(data_behavior: "user_title", class: "truncate text-lg mr-6") do
                 subscription.title
               end

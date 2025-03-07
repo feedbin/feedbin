@@ -14,7 +14,7 @@ module Dialog
         dialog.body do
           div(class: "action-description") do
             div(class: "content") do
-              render partial: "text_description", locals: { action: @action, summary: false }
+              render partial("text_description", action: @action, summary: false )
             end
           end
 
@@ -25,7 +25,7 @@ module Dialog
 
           if @action.results.records.present?
             div(class: "entries action-preview-entries") do
-              ul { render partial: "entries/entry", collection: @action.results.records }
+              ul { render partial("entries/entry", collection: @action.results.records) }
             end
           end
         end

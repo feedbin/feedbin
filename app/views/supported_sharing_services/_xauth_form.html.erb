@@ -5,7 +5,7 @@
 
     <div class="mb-4">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="<%= sharing_service.service_id %>_username">Username</label>
         <% end %>
         <% text.input do %>
@@ -15,7 +15,7 @@
     </div>
 
     <%= render Form::TextInputComponent.new do |text| %>
-      <% text.label do %>
+      <% text.label_content do %>
         <label for="<%= sharing_service.service_id %>_password">Password</label>
       <% end %>
       <% text.input do %>

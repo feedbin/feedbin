@@ -13,7 +13,13 @@ class Common::Sparkline < Phlex::SVG
 
       polygon(points: @sparkline.fill, fill: "url(#gradient)")
 
-      polyline(class: tokens("fill-transparent [stroke-linejoin:round] [stroke-linecap:round]", @theme ? "stroke-[rgb(var(--color-400))]" : "stroke-[rgb(var(--color-green-600))]"), points: @sparkline.line)
+      polyline(
+        class: [
+          ("fill-transparent [stroke-linejoin:round] [stroke-linecap:round]"),
+          (@theme ? "stroke-[rgb(var(--color-400))]" : "stroke-[rgb(var(--color-green-600))]")
+        ],
+        points: @sparkline.line
+      )
     end
   end
 end

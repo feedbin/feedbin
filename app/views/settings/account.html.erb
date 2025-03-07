@@ -26,7 +26,7 @@
 
   <div class="mb-4">
     <%= render Form::TextInputComponent.new do |text| %>
-      <% text.label do %>
+      <% text.label_content do %>
         <%= f.label :old_password, "Old Password" %>
       <% end %>
       <% text.input do %>
@@ -36,7 +36,7 @@
   </div>
 
   <%= render Form::TextInputComponent.new do |text| %>
-    <% text.label do %>
+    <% text.label_content do %>
       <%= f.label :password, "New Password" %>
     <% end %>
     <% text.input do %>

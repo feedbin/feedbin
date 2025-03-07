@@ -24,7 +24,7 @@ class ApplicationComponent < Phlex::HTML
   @@component_options = {}
 
   def self.slots(*items)
-    include Phlex::DeferredRender
+    include DeferredRender
     items.each do |item|
       define_method item.to_sym, -> (&block) { instance_variable_set("@#{item.to_s}", block) }
       define_method "#{item}?".to_sym, -> (&block) { instance_variable_get("@#{item.to_s}").present? }

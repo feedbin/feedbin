@@ -34,7 +34,7 @@
 
       <div class="mb-4">
         <%= render Form::TextInputComponent.new do |text| %>
-          <% text.label do %>
+          <% text.label_content do %>
             <%= f.label :email, "Email" %>
           <% end %>
           <% text.input do %>
@@ -44,7 +44,7 @@
       </div>
       <div class="mb-8">
         <%= render Form::TextInputComponent.new do |text| %>
-          <% text.label do %>
+          <% text.label_content do %>
             <%= f.label :password, "Password" %>
           <% end %>
           <% text.input do %>
