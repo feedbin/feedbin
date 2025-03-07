@@ -18,7 +18,7 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::LabelTag
   include Phlex::Rails::Helpers::CollectionCheckBoxes
   include Phlex::Rails::Helpers::PasswordFieldTag
-  
+
   register_value_helper :bookmarklet
   register_value_helper :class_names
   register_value_helper :current_user
@@ -37,14 +37,13 @@ class ApplicationComponent < Phlex::HTML
   register_value_helper :short_url
   register_value_helper :short_url_alt
   register_value_helper :starred_url
-
+  register_value_helper :distance_of_time_in_words
 
   register_output_helper :image_tag_with_fallback
   register_output_helper :timeago
   register_output_helper :will_paginate
   register_output_helper :favicon_with_host
   register_output_helper :favicon_with_record
-  
 
   include Common
 
@@ -64,6 +63,16 @@ class ApplicationComponent < Phlex::HTML
 
   def self.dom_id
     self.to_s.underscore.parameterize(separator: "_")
+  end
+
+  def timeago(time_value, prefix: nil)
+    if time_value.nil?
+      plain "N/A"
+    else
+      time datetime: time_value.utc.iso8601, title: [prefix, time_value.to_formatted_s(:feed)].compact.join(" ") do
+        [distance_of_time_in_words(time_value, Time.now, scope: 'datetime.distance_in_words.short'), time_value.future? ? "from now" : "ago"].join(" ")
+      end
+    end
   end
 
   def stimulus(controller:, actions: {}, values: {}, outlets: {}, classes: {}, data: {})

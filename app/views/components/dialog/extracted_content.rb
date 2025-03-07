@@ -8,7 +8,7 @@ module Dialog
     end
 
     def view_template
-      present current_user do |user_presenter|
+      view_context.present current_user do |user_presenter|
         render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
             TITLE

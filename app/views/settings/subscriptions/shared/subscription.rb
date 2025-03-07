@@ -8,7 +8,7 @@ module Settings
         end
 
         def view_template
-          present @subscription do |subscription_presenter|
+          view_context.present @subscription do |subscription_presenter|
             fields_for "subscriptions[]", @subscription do |f|
               li class: "flex items-center relative border-b" do
                 div class: "shrink-0 w-[32px] self-stretch flex" do
@@ -57,7 +57,7 @@ module Settings
             div class: "flex flex-col gap-2 items-end" do
               Sparkline(sparkline: subscription_presenter.sparkline, theme: false)
               div class: "text-500 text-sm whitespace-nowrap" do
-                raw timeago(@subscription.last_published_entry, prefix: "Latest article:")
+                timeago(@subscription.last_published_entry, prefix: "Latest article:")
                 plain ", #{number_with_delimiter(@subscription.post_volume)}/mo"
               end
             end

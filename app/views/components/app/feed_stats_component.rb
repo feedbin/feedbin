@@ -20,7 +20,7 @@ module App
           @feed.feed_description
         end
         p(class: "shrink-0") do
-          raw timeago(@feed.last_published_entry, prefix: "Latest article:")
+          timeago(@feed.last_published_entry, prefix: "Latest article:")
           plain ", #{number_with_delimiter(@stats[@feed.id].volume)}/mo"
         end
       end

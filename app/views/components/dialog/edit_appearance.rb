@@ -9,7 +9,7 @@ module Dialog
         end
 
         dialog.body do
-          present current_user do |user_presenter|
+          view_context.present current_user do |user_presenter|
             form_for user_presenter, remote: true, url: settings_update_user_path(current_user) do |form_builder|
               render Settings::ControlGroupComponent.new class: "mb-14" do |group|
                 group.header { " Display " }

@@ -10,7 +10,7 @@ module Settings
         end
 
         def view_template
-          present subscription do |subscription_presenter|
+          view_context.present subscription do |subscription_presenter|
             feed_profile(subscription_presenter)
             chart(subscription_presenter)
             settings(subscription_presenter)
