@@ -25,7 +25,11 @@ module Dialog
 
           if @action.results.records.present?
             div(class: "entries action-preview-entries") do
-              ul { render partial("entries/entry", collection: @action.results.records) }
+              ul do
+                @action.results.records.each do |entry|
+                  render partial("entries/entry", entry: entry)
+                end
+              end
             end
           end
         end
