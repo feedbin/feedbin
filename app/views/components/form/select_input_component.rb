@@ -1,10 +1,10 @@
 module Form
   class SelectInputComponent < ApplicationComponent
 
-    slots :input, :label, :accessory_leading
+    slots :input, :label_content, :accessory_leading
 
     def view_template
-      div(class: "mb-2 text-600", &@label) if label?
+      div(class: "mb-2 text-600", &@label_content) if label_content?
 
       div data: {accessories: class_names(leading: accessory_leading?, trailing: "true")}, class: "select-wrap relative [&_select]:!pr-8 [&[data-accessories~=leading]_select]:!pl-8" do
         if accessory_leading?
