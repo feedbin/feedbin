@@ -67,7 +67,7 @@ module Dialog
 
           div data: stimulus_item(target: :content, actions: {scroll: :check_scroll}, data: {template: "body"}, for: STIMULUS_CONTROLLER), class: "p-4 sm:px-6 overflow-y-scroll sm:overscroll-y-contain grow relative transition-[height] duration-200 ease-out", &@body
           div data: {template: "footer"}, class: "py-2 px-4 sm:p-6 shrink-0 relative text-right transition-all border-t border-transparent group-data-[dialog-footer-border-value=true]:border-200 #{footer? ? "" : "tw-hidden"}", &@footer
-          div data: stimulus_item(target: :footer_spacer, for: STIMULUS_CONTROLLER), class: "shrink-0 transition-all h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))] group-data-[dialog-footer-value=false]:tw-hidden #{footer? ? "" : "tw-hidden"}"
+          div data: stimulus_item(target: :footer_spacer, for: STIMULUS_CONTROLLER), class: "shrink-0 ease-out transition-[min-height] min-h-[max(var(--visual-viewport-offset),env(safe-area-inset-bottom))] group-data-[dialog-footer-value=false]:tw-hidden #{footer? ? "" : "tw-hidden"}"
         end
       end
     end
