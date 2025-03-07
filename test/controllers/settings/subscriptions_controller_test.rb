@@ -62,7 +62,7 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     subscription = @user.subscriptions.first
     assert_difference "Subscription.count", -1 do
       delete :destroy, params: {id: subscription}, xhr: true
-      assert_redirected_to settings_subscriptions_url
+      assert_equal assigns(:redirect), settings_subscriptions_url
     end
   end
 
