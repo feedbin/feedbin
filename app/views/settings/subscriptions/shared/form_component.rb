@@ -10,7 +10,7 @@ module Settings
         end
 
         def view_template
-          helpers.present subscription do |subscription_presenter|
+          view_context.present subscription do |subscription_presenter|
             feed_profile(subscription_presenter)
             chart(subscription_presenter)
             settings(subscription_presenter)
@@ -20,7 +20,7 @@ module Settings
         def feed_profile(subscription_presenter)
           div(class: "border rounded-lg mb-14") do
             div(class: "flex items-center gap-2 p-4") do
-              plain subscription_presenter.favicon(subscription.feed)
+              raw subscription_presenter.favicon(subscription.feed)
               span(data_behavior: "user_title", class: "truncate text-lg mr-6") do
                 subscription.title
               end
@@ -37,7 +37,7 @@ module Settings
         def twitter_notice
           div(class: "border-t flex gap-2 p-4") do
             div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
-              render SvgComponent.new "menu-icon-skull", class: "fill-600"
+              Icon("menu-icon-skull", class: "fill-600")
             end
             div do
               p(class: "text-red-600") { "Twitter Not Supported" }
@@ -51,13 +51,13 @@ module Settings
         end
 
         def error_notice
-          div(class: "border-t p-4", id: helpers.dom_id(@subscription, :fixable)) do
+          div(class: "border-t p-4", id: dom_id(@subscription, :fixable)) do
             div(class: "flex gap-2") do
               div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
                 if @subscription.feed.discovered_feeds.present?
-                  render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600 mt-0.5"
+                  Icon("menu-icon-fix-feeds", class: "fill-600 mt-0.5")
                 else
-                  render SvgComponent.new "menu-icon-skull", class: "fill-600"
+                  Icon("menu-icon-skull", class: "fill-600")
                 end
               end
               div(class: "grow") do
@@ -89,7 +89,7 @@ module Settings
                 end
 
                 if @subscription.feed.discovered_feeds.present?
-                  render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
+                  render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: edit_settings_subscription_url(@subscription), remote: false)
                 end
               end
             end
@@ -205,7 +205,7 @@ module Settings
                     row.title { "Website" }
 
                     row.control do
-                      a(href: subscription.feed.site_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.site_url) }
+                      a(href: subscription.feed.site_url, class: "!text-500 truncate" ) { short_url(subscription.feed.site_url) }
                     end
                   end
                 end
@@ -216,7 +216,7 @@ module Settings
                   row.title { "Source" }
 
                   row.control do
-                    a( href: subscription.feed.feed_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.feed_url) }
+                    a( href: subscription.feed.feed_url, class: "!text-500 truncate" ) { short_url(subscription.feed.feed_url) }
                   end
                 end
               end

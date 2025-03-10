@@ -59,7 +59,7 @@
   <div class="flex gap-4 mb-4">
     <div class="grow">
       <%= render Form::TextInputComponent.new do |text| %>
-        <% text.label do %>
+        <% text.label_content do %>
           <label for="billing_name">Name on card</label>
         <% end %>
         <% text.input do %>
@@ -69,7 +69,7 @@
     </div>
     <div class="grow max-w-[300px]">
       <%= render Form::SelectInputComponent.new do |input| %>
-        <% input.label do %>
+        <% input.label_content do %>
           <label for="billing_country">Country</label>
         <% end %>
         <% input.input do %>

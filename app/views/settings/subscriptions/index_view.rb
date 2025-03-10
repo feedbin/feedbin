@@ -9,7 +9,7 @@ module Settings
       end
 
       def view_template
-        form_tag helpers.settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
+        form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
           input type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
           render Settings::H1Component.new do
             "Subscriptions"
@@ -33,20 +33,20 @@ module Settings
                     )
                   end
                   input.accessory_leading do
-                    render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+                    Icon("icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
                   end
                 end
               end
               div class: "dropdown-wrap dropdown-right shrink-0" do
                 button class: "flex flex-center w-[40px] h-[40px]", data_behavior: "toggle_dropdown", title: "Filter by status" do
-                  render SvgComponent.new "icon-filter", class: "fill-500"
+                  Icon("icon-filter", class: "fill-500")
                 end
                 div class: "dropdown-content" do
                   ul do
                     li do
                       button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:fixable"}, for: :input_filter) do
                         span class: "icon-wrap" do
-                          render SvgComponent.new("menu-icon-fix-feeds")
+                          Icon("menu-icon-fix-feeds")
                         end
                         span class: "menu-text" do
                           span class: "title" do
@@ -58,7 +58,7 @@ module Settings
                     li do
                       button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:muted"}, for: :input_filter) do
                         span class: "icon-wrap" do
-                          render SvgComponent.new("menu-icon-mute")
+                          Icon("menu-icon-mute")
                         end
                         span class: "menu-text" do
                           span class: "title" do
@@ -70,7 +70,7 @@ module Settings
                     li do
                       button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:dead"}, for: :input_filter) do
                         span class: "icon-wrap" do
-                          render SvgComponent.new("menu-icon-skull")
+                          Icon("menu-icon-skull")
                         end
                         span class: "menu-text" do
                           span class: "title" do
@@ -89,7 +89,7 @@ module Settings
                 input.input do
                   select_tag(
                     :sort,
-                    helpers.options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], @params[:sort]),
+                    options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], @params[:sort]),
                     class: "peer",
                     data: {behavior: "autosubmit"}
                   )
@@ -108,7 +108,7 @@ module Settings
             div(class: "flex gap-4") do
               div class: "pt-1 flex flex-center shrink-0" do
                 div class: "h-[32px] w-[32px] flex flex-center rounded-full bg-orange-600" do
-                  render SvgComponent.new "menu-icon-fix-feeds", class: "fill-white"
+                  Icon("menu-icon-fix-feeds", class: "fill-white")
                 end
               end
 
@@ -122,7 +122,7 @@ module Settings
                   end
                 end
 
-                link_to "Review Feeds", helpers.fix_feeds_path, class: "whitespace-nowrap shrink-0"
+                link_to "Review Feeds", fix_feeds_path, class: "whitespace-nowrap shrink-0"
               end
             end
           end

@@ -37,10 +37,10 @@ module Settings
                   row.control do
                     render Form::SelectInputComponent.new do |input|
                       input.input do
-                        form.select :newsletter_tag, helpers.tag_options, {}, { class: "peer", data: { behavior: "auto_submit" } }
+                        form.select :newsletter_tag, tag_options, {}, { class: "peer", data: { behavior: "auto_submit" } }
                       end
                       input.accessory_leading do
-                        render SvgComponent.new "favicon-tag", class: "fill-500"
+                        Icon("favicon-tag", class: "fill-500")
                       end
                     end
                   end

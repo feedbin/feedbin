@@ -8,7 +8,7 @@ module Dialog
     end
 
     def view_template
-      helpers.present helpers.current_user do |user_presenter|
+      view_context.present current_user do |user_presenter|
         render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
           dialog.title do
             TITLE
@@ -35,7 +35,7 @@ module Dialog
               end
 
               div class: "content-styles entry-type-default pb-1", data_behavior: "view_link_markup_wrap external_links" do
-                unsafe_raw @content.html_safe
+                raw safe(@content.html_safe)
               end
             end
           end

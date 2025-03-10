@@ -31,7 +31,7 @@ module Settings::Newsletters::Addresses
                       form.text_field :token, data: {behavior: "autosubmit"}, autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: "false"
                     end
                     text.accessory_leading do
-                      render SvgComponent.new "favicon-newsletter", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+                      Icon("favicon-newsletter", class: "ml-2 fill-400 pg-focus:fill-blue-600")
                     end
                     text.accessory_trailing do
                       div class: "flex h-full", data: {behavior: "token_suffix"} do

@@ -25,24 +25,24 @@ module Settings
               div(class: "flex justify-between") do
                 strong(class: "font-bold") { "Progress" }
                 div(class: "text-500") do
-                  plain helpers.number_with_delimiter(@import.import_items.where.not(status: :pending).count)
+                  plain number_with_delimiter(@import.import_items.where.not(status: :pending).count)
                   plain " of "
-                  plain helpers.number_with_delimiter(@import.import_items.count)
+                  plain number_with_delimiter(@import.import_items.count)
                 end
               end
               div(class: "flex mt-4 mb-2 bg-100 rounded-full w-full overflow-hidden") do
                 bar_segment(
-                  title: "#{helpers.number_with_delimiter(@import.import_items.complete.count)} imported",
+                  title: "#{number_with_delimiter(@import.import_items.complete.count)} imported",
                   percent_complete: @import.percentage_complete,
                   color_class: "bg-green-600"
                 )
                 bar_segment(
-                  title: "#{helpers.number_with_delimiter(@import.import_items.fixable.count)} fixable",
+                  title: "#{number_with_delimiter(@import.import_items.fixable.count)} fixable",
                   percent_complete: @import.percentage_fixable,
                   color_class: "bg-orange-600"
                 )
                 bar_segment(
-                  title: "#{helpers.number_with_delimiter(@failed_items.count)} missing",
+                  title: "#{number_with_delimiter(@failed_items.count)} missing",
                   percent_complete: @import.percentage_failed,
                   color_class: "bg-red-600"
                 )
@@ -51,10 +51,10 @@ module Settings
                 div(class: "text-500 truncate") { plain @import.filename }
                 span(class: "text-500 flex gap-2 items-center") do
                   if @import.percentage == 100
-                    render SvgComponent.new "icon-check", class: "fill-green-600"
+                    Icon("icon-check", class: "fill-green-600")
                   end
                   span do
-                    helpers.number_to_percentage(@import.percentage.floor, precision: 0)
+                    number_to_percentage(@import.percentage.floor, precision: 0)
                   end
                 end
               end
@@ -105,7 +105,7 @@ module Settings
             "Missing Feeds"
           end
           p(class: "text-sm text-500 mb-8") do
-            plain helpers.number_with_delimiter(@failed_items.count)
+            plain number_with_delimiter(@failed_items.count)
             plain " broken"
             plain " link".pluralize(@count)
           end
@@ -118,7 +118,7 @@ module Settings
 
       def fixable
         div do
-          render FixFeeds::StatusComponent.new(count: @fixable_items.count, replace_path: helpers.replace_all_settings_import_path)
+          render FixFeeds::StatusComponent.new(count: @fixable_items.count, replace_path: replace_all_settings_import_path)
 
           p class: "text-500 mb-8 -mt-4" do
             "Feedbin was unable to import these feeds. However, it looks like there may be working alternatives available."
@@ -133,7 +133,7 @@ module Settings
       def bar_segment(title:, percent_complete:, color_class:)
         div(
           class: "h-[12px] #{color_class}",
-          style: "width: #{helpers.number_to_percentage(percent_complete)};",
+          style: "width: #{number_to_percentage(percent_complete)};",
           title: "#{title}",
           data: { toggle: "tooltip" }
         )

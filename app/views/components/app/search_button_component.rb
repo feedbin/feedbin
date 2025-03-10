@@ -10,7 +10,7 @@ module App
         toggle: "tooltip",
         html: "true"
       } do
-        render SvgComponent.new "icon-search"
+        Icon("icon-search")
       end
     end
   end

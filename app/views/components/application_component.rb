@@ -19,12 +19,38 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::CollectionCheckBoxes
   include Phlex::Rails::Helpers::PasswordFieldTag
 
+  register_value_helper :bookmarklet
+  register_value_helper :class_names
+  register_value_helper :current_user
+  register_value_helper :dom_id
+  register_value_helper :is_active?
+  register_value_helper :number_to_human
+  register_value_helper :number_to_percentage
+  register_value_helper :number_with_delimiter
+  register_value_helper :options_for_select
+  register_value_helper :params
+  register_value_helper :present
+  register_value_helper :svg_options
+  register_value_helper :tag_options
+  register_value_helper :display_url
+  register_value_helper :image_url
+  register_value_helper :short_url
+  register_value_helper :short_url_alt
+  register_value_helper :starred_url
+  register_value_helper :distance_of_time_in_words
+
+  register_output_helper :image_tag_with_fallback
+  register_output_helper :timeago
+  register_output_helper :will_paginate
+  register_output_helper :favicon_with_host
+  register_output_helper :favicon_with_record
+
   include Common
 
   @@component_options = {}
 
   def self.slots(*items)
-    include Phlex::DeferredRender
+    include DeferredRender
     items.each do |item|
       define_method item.to_sym, -> (&block) { instance_variable_set("@#{item.to_s}", block) }
       define_method "#{item}?".to_sym, -> (&block) { instance_variable_get("@#{item.to_s}").present? }
@@ -37,6 +63,16 @@ class ApplicationComponent < Phlex::HTML
 
   def self.dom_id
     self.to_s.underscore.parameterize(separator: "_")
+  end
+
+  def timeago(time_value, prefix: nil)
+    if time_value.nil?
+      plain "N/A"
+    else
+      time datetime: time_value.utc.iso8601, title: [prefix, time_value.to_formatted_s(:feed)].compact.join(" ") do
+        [distance_of_time_in_words(time_value, Time.now, scope: 'datetime.distance_in_words.short'), time_value.future? ? "from now" : "ago"].join(" ")
+      end
+    end
   end
 
   def stimulus(controller:, actions: {}, values: {}, outlets: {}, classes: {}, data: {})

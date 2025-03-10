@@ -25,14 +25,14 @@ class FaviconComponent < ApplicationComponent
 
   def icon_newsletter
     span class: "favicon-wrap collection-favicon" do
-      render SvgComponent.new("favicon-newsletter")
+      Icon("favicon-newsletter")
     end
   end
 
   def icon_twitter_user
     span class: "favicon-wrap twitter-profile-image" do
-      helpers.image_tag_with_fallback(
-        helpers.image_url("favicon-profile-default.png"),
+      image_tag_with_fallback(
+        image_url("favicon-profile-default.png"),
         RemoteFile.signed_url(@feed.twitter_user.profile_image_uri_https(:original)),
         alt: ""
       )
@@ -41,8 +41,8 @@ class FaviconComponent < ApplicationComponent
 
   def icon_feed
     span class: "favicon-wrap twitter-profile-image icon-format-#{@feed.custom_icon_format || @feed.default_icon_format}" do
-      helpers.image_tag_with_fallback(
-        helpers.image_url("favicon-profile-default.png"),
+      image_tag_with_fallback(
+        image_url("favicon-profile-default.png"),
         RemoteFile.signed_url(@feed.icon),
         alt: ""
       )
@@ -60,7 +60,7 @@ class FaviconComponent < ApplicationComponent
 
   def icon_pages_default
     span class: "favicon-wrap collection-favicon" do
-      render SvgComponent.new("favicon-saved")
+      Icon("favicon-saved")
     end
   end
 

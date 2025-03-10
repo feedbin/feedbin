@@ -23,7 +23,7 @@ module Epub
             a(href: @entry.fully_qualified_url) { @source }
           end
 
-          unsafe_raw ContentFormatter.evernote_format(@entry.content, @entry)
+          raw safe(ContentFormatter.evernote_format(@entry.content, @entry))
         end
       end
     end

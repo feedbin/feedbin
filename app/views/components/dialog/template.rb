@@ -41,7 +41,7 @@ module Dialog
 
       div data: stimulus_controller, class: "group" do
         dialog class: dialog_class, data: stimulus_item(target: :dialog, for: STIMULUS_CONTROLLER) do
-          render partial: 'shared/notification'
+          render partial('shared/notification')
           div class: "h-dvh overflow-y-scroll snap-y snap-mandatory hide-scrollbar overscroll-none sm:h-auto sm:overflow-y-visible sm:snap-none sm:overscroll-auto", data: stimulus_item(target: :snap_container, for: STIMULUS_CONTROLLER) do
             div class: "snap-start h-dvh sm:tw-hidden"
             div class: "snap-start h-dvh sm:snap-align-none sm:h-auto" do
@@ -60,7 +60,7 @@ module Dialog
           div class: "shrink-0 h-[env(safe-area-inset-top)]"
           div class: "p-4 sm:px-6 native:pt-[5px] text-base flex items-baseline shrink-0 relative border-b border-transparent group-data-[dialog-header-border-value=true]:border-200" do
             button type: "button", class: "absolute shrink-0 left-0 inset-y-0 px-4 sm:px-6 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
-              render SvgComponent.new "icon-close", class: "relative native:top-[-6px] fill-600", title: "Close"
+              Icon("icon-close", class: "relative native:top-[-6px] fill-600", title: "Close")
             end
             h2 class: "text-700 grow font-bold m-0 truncate text-center", &@title
           end
@@ -84,7 +84,7 @@ module Dialog
       end
 
       def view_template(&)
-        template_tag data: {dialog_id: @dialog_id}, &
+        template data: {dialog_id: @dialog_id}, &
       end
     end
 

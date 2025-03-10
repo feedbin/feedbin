@@ -4,7 +4,7 @@ class App::SearchTokenResultComponentPreview < Lookbook::Preview
   def default
     render App::SearchTokenResultComponent.new do |token|
       token.icon do
-        render SvgComponent.new "icon-search"
+        Icon("icon-search")
       end
       token.text do
         "text"

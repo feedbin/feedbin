@@ -29,8 +29,8 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
 require "sidekiq/testing"
 require "webmock/minitest"
-require "phlex/testing/nokogiri"
-require "phlex/testing/rails/view_helper"
+# require "phlex/testing/nokogiri"
+# require "phlex/testing/rails/view_helper"
 
 require "support/login_helper"
 require "support/factory_helper"
@@ -49,6 +49,19 @@ class ActiveSupport::TestCase
   include FactoryHelper
 
   fixtures :all
+
+  # Phlex testing helpers
+  def render(...)
+    view_context.render(...)
+  end
+
+  def view_context
+    controller.view_context
+  end
+
+  def controller
+    @controller ||= ActionView::TestCase::TestController.new
+  end
 
   def flush_redis
     Sidekiq::Worker.clear_all

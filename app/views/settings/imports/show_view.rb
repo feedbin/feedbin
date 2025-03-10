@@ -12,7 +12,7 @@ module Settings
         render SubtitleComponent.new do
           @import.created_at.to_formatted_s(:date)
         end
-        div data: @import.complete? ? {} : {content_src: helpers.settings_import_path(@import)} do
+        div data: @import.complete? ? {} : {content_src: settings_import_path(@import)} do
           render Settings::Imports::StatusComponent.new import: @import
         end
       end
