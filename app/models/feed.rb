@@ -73,7 +73,11 @@ class Feed < ApplicationRecord
 
   def icon_options
     items = {}
-    items[custom_icon] = "round"
+    if custom_icon && options.safe_dig("itunes_image")
+      items[custom_icon] = "square"
+    else
+      items[custom_icon] = "round"
+    end
     if custom_icon_format == "round"
       items[options.safe_dig("image", "url")] = "square"
     end
