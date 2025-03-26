@@ -14,6 +14,12 @@ class Admin::UsersController < ApplicationController
     UserDeleter.perform_async(@user.id)
   end
 
+  def reset_password
+    user = User.find(params[:id])
+    user.setting_on!(:password_resettable)
+    user.send_password_reset
+  end
+
   def authorize
     unless current_user.try(:admin?)
       render_404

@@ -380,7 +380,11 @@ Rails.application.routes.draw do
 
   constraints lambda { |request| AuthConstraint.admin?(request) } do
     namespace :admin do
-      resources :users
+      resources :users do
+        member do
+          post :reset_password
+        end
+      end
       resources :feeds
     end
   end

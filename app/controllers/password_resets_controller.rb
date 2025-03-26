@@ -8,7 +8,7 @@ class PasswordResetsController < ApplicationController
     success_message = "Email sent with password reset instructions."
     if user = User.find_by_email(params[:email])
       log(user: user)
-      if user.trial_plan?
+      if user.trial_plan? && !user.setting_on?(:password_resettable)
         success_message = "Email #{ENV["FROM_ADDRESS"]} to request a password reset."
       elsif user.password_reset_sent_at.nil? || user.password_reset_sent_at.before?(1.hour.ago)
         user.send_password_reset
