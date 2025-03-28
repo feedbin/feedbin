@@ -54,13 +54,19 @@ module FaviconCrawler
       homepage = download_homepage
       html = Nokogiri::HTML5(homepage)
       favicon_links = html.search(xpath)
+      favicon_links = favicon_links.reject { it["href"].blank? }
+      favicon_links = favicon_links.sort_by do |link|
+        size = link["sizes"] ? link["sizes"].scan(/\d+/).first.to_i : 0
+        is_dark = link["media"] && link["media"].include?("dark") ? 1 : 0
+        [-size, is_dark]
+      end
       if favicon_links.present?
-        favicon_url = favicon_links.first.to_s
+        favicon_url = favicon_links.first["href"]
         favicon_url = URI.parse(favicon_url)
         favicon_url.scheme = "http"
         unless favicon_url.host
           favicon_url = URI::HTTP.build(scheme: "http", host: @favicon.host)
-          favicon_url = favicon_url.merge(favicon_links.last.to_s)
+          favicon_url = favicon_url.merge(favicon_links.first["href"])
         end
       end
       favicon_url
@@ -108,7 +114,7 @@ module FaviconCrawler
     def xpath
       icon_names = ["shortcut icon", "icon", "apple-touch-icon", "apple-touch-icon-precomposed"]
       icon_names = icon_names.map { |icon_name|
-        "//link[not(@mask) and translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '#{icon_name}']/@href"
+        "//link[not(@mask) and translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '#{icon_name}']"
       }
       icon_names.join(" | ")
     end
