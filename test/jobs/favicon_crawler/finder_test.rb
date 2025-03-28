@@ -75,6 +75,33 @@ module FaviconCrawler
       assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
     end
 
+    test "should prefer larger favicon" do
+      body = <<-eot
+      <html>
+          <head>
+            <link rel="icon" type="image/png" sizes="32x32" href="/not_me_1" media="(prefers-color-scheme: light)"/>
+            <link rel="icon" type="image/png" sizes="64x64" href="/pick_me" media="(prefers-color-scheme: light)"/>
+            <link rel="icon" type="image/png" sizes="128x128" href="/not_me_2" media="(prefers-color-scheme: dark)"/>
+          </head>
+      </html>
+      eot
+
+      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
+
+      stub_request(:get, @page_url)
+        .to_return(body: body, status: 200)
+
+
+      stub_request_file("favicon.ico", "http://example.com/pick_me")
+
+      Finder.new.perform(@page_url.host)
+
+      assert_requested :get, "http://example.com/pick_me"
+
+      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+    end
+
     test "should skip blank favicon" do
       body = <<-eot
       <html>

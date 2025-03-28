@@ -54,12 +54,17 @@ module FaviconCrawler
       homepage = download_homepage
       html = Nokogiri::HTML5(homepage)
       favicon_links = html.search(xpath)
-      favicon_links = favicon_links.reject { it["href"].blank? }
-      favicon_links = favicon_links.sort_by do |link|
-        size = link["sizes"] ? link["sizes"].scan(/\d+/).first.to_i : 0
-        is_dark = link["media"] && link["media"].include?("dark") ? 1 : 0
-        [-size, is_dark]
-      end
+
+      favicon_links = favicon_links.reject {
+        it["href"].to_s.strip.empty?
+      }
+      .sort_by {
+        -(it["sizes"] ? it["sizes"].scan(/\d+/).first.to_i : 0)
+      }
+      .sort_by {
+        it["media"] && it["media"].include?("dark") ? 1 : 0
+      }
+
       if favicon_links.present?
         favicon_url = favicon_links.first["href"]
         favicon_url = URI.parse(favicon_url)
