@@ -82,6 +82,7 @@ module FaviconCrawler
             <link rel="icon" type="image/png" sizes="32x32" href="/not_me_1" media="(prefers-color-scheme: light)"/>
             <link rel="icon" type="image/png" sizes="64x64" href="/pick_me" media="(prefers-color-scheme: light)"/>
             <link rel="icon" type="image/png" sizes="128x128" href="/not_me_2" media="(prefers-color-scheme: dark)"/>
+            <link rel="apple-touch-icon" type="image/png" sizes="128x128" href="/not_me_3" media="(prefers-color-scheme: light)"/>
           </head>
       </html>
       eot
