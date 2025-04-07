@@ -27,6 +27,7 @@ class FeedFixer
     hosts = Set.new
     urls.each do |url|
       next unless option = validate_option(url)
+      next if option.feed_url == @feed.feed_url
 
       discovery = DiscoveredFeed.find_or_create_by(
         site_url: @feed.site_url,

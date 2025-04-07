@@ -32,6 +32,19 @@ class FeedFixerTest < ActiveSupport::TestCase
     assert(@user.reload.setting_on?(:fix_feeds_available))
   end
 
+  test "should skip same feed url" do
+    feed_url = @subscription.feed.feed_url
+
+    stub_request(:get, @subscription.feed.site_url)
+      .to_return(body: %(<link rel="alternate" type="application/atom+xml" href="#{feed_url}"/>))
+
+    stub_request_file("atom.xml", feed_url)
+
+    assert_no_difference -> { DiscoveredFeed.count } do
+      FeedFixer.new.perform(@subscription.feed.id)
+    end
+  end
+
   test "should not change status of ignored subscription" do
     @subscription.fix_suggestion_ignored!
     FeedFixer.new.perform(@subscription.feed.id)
