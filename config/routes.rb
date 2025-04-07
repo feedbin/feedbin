@@ -60,6 +60,9 @@ Rails.application.routes.draw do
     end
   end
   resources :fix_feeds, path: "settings/subscriptions/fix" do
+    member do
+      delete :destroy_subscription
+    end
     collection do
       post :replace_all
     end

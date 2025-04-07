@@ -111,6 +111,10 @@ class Subscription < ApplicationRecord
     Rails.application.routes.url_helpers.fix_feed_path(self)
   end
 
+  def destroyable_path
+    Rails.application.routes.url_helpers.destroy_subscription_fix_feed_path(self)
+  end
+
   private
 
   def refresh_favicon

@@ -297,7 +297,7 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply bg-100 border-400;
   }
   .button-tertiary {
-    @apply border-transparent bg-transparent !text-700 px-2;
+    @apply border-transparent bg-transparent !text-700 px-0;
   }
   .button-tertiary:hover {
     @apply shadow-none;

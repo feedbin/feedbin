@@ -75,6 +75,10 @@ module FixFeeds
         end
 
         div(class: "flex gap-4 pt-4 justify-end") do
+          if @replaceable.respond_to?(:destroyable_path)
+            link_to "Unsubscribe", @replaceable.destroyable_path, method: :delete, remote: true, class: "button-tertiary mr-auto", data: stimulus_item(actions: {click: :toggle}, for: :expandable)
+          end
+
           if @include_ignore
             link_to "Ignore", @replaceable.replaceable_path, method: :delete, remote: true, class: "button-tertiary", data: stimulus_item(actions: {click: :toggle}, for: :expandable)
           end

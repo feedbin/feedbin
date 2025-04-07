@@ -45,6 +45,15 @@ class FixFeedsControllerTest < ActionController::TestCase
     assert_response :ok
   end
 
+  test "unsubscribe" do
+    login_as @user
+    @subscription = @user.subscriptions.first
+    assert_difference -> {Subscription.count}, -1 do
+      patch :destroy_subscription, params: {id: @subscription }, xhr: true
+    end
+    assert_response :ok
+  end
+
   test "replace all" do
     login_as @user
     @subscription = @user.subscriptions.first

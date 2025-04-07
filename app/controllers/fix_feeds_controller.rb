@@ -1,5 +1,5 @@
 class FixFeedsController < ApplicationController
-  before_action :set_subscription, only: [:update, :destroy]
+  before_action :set_subscription, only: [:update, :destroy, :destroy_subscription]
 
   def index
     @user = current_user
@@ -37,6 +37,11 @@ class FixFeedsController < ApplicationController
 
   def destroy
     @subscription.fix_suggestion_ignored!
+    @subscriptions = current_user.subscriptions.fix_suggestion_present
+  end
+
+  def destroy_subscription
+    @subscription.destroy
     @subscriptions = current_user.subscriptions.fix_suggestion_present
   end
 
