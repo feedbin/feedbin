@@ -69,9 +69,9 @@
                             <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
                           <% end %>
                         <% end %>
-                        <%= render App::EntryBasementContainer.new(target: "mute_panel") do %>
-                          <%= render App::MuteForm.new %>
-                        <% end %>
+                    <% end %>
+                    <%= render App::EntryBasementContainer.new(target: "mute_panel") do %>
+                      <%= render App::MuteForm.new %>
                     <% end %>
                 </div>
                 <div class="entry-meta" data-behavior="entry_meta_target" data-toolbar-target="toolbar"></div>
