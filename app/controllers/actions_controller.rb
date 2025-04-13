@@ -4,7 +4,8 @@ class ActionsController < ApplicationController
   before_action :set_action, only: [:edit, :update, :destroy]
 
   def index
-    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier]).natural_sort_by { |action| action.title }
+    @actions = @user.actions.standard.natural_sort_by { |action| action.title }
+    @mutes = @user.actions.mute.natural_sort_by { |action| action.title }
     push_data
   end
 

@@ -53,6 +53,7 @@ Rails.application.routes.draw do
   resources :password_resets
   resources :sharing_services, path: "settings/sharing", only: [:index, :create, :update, :destroy]
   resources :actions, path: "settings/actions", only: [:index, :create, :new, :update, :destroy, :edit]
+  resources :mutes, only: [:index, :create, :destroy]
   resources :devices, only: [:create]
   resources :account_migrations, path: "settings/account_migrations" do
     member do

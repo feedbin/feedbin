@@ -108,6 +108,7 @@ class UserPresenter < BasePresenter
         array << "entries-image-#{entries_image}"
         array << "entries-display-#{entries_display}"
         array << "setting-view-link-#{view_links_in_app}"
+        array << "mute-filter-available-#{user.mute_filter_available}"
       end.flatten.join(" ")
     end
   end

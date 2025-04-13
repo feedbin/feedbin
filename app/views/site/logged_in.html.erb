@@ -65,13 +65,12 @@
                 <div class="entry-basement">
                     <% @user.supported_sharing_services.each do |service| %>
                         <% if service.has_share_sheet? %>
-                            <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
-                                <div class="py-6 px-8">
-                                  <div class="max-w-[620px] mx-auto" data-behavior="share_form">
-                                    <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
-                                  </div>
-                                </div>
-                            </div>
+                          <%= render App::EntryBasementContainer.new(target: "#{service.service_id}_share_panel") do %>
+                            <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                          <% end %>
+                        <% end %>
+                        <%= render App::EntryBasementContainer.new(target: "mute_panel") do %>
+                          <%= render App::MuteForm.new %>
                         <% end %>
                     <% end %>
                 </div>

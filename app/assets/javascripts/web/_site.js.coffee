@@ -1179,6 +1179,9 @@ $.extend feedbin,
     title = $('.entry-header h1').first().text()
     $('[data-behavior~=share_form] .title-placeholder').val(title)
 
+    feedId = feedbin.selectedEntryData.feed_id
+    $('[data-behavior~=share_form] input[name=feed_id]').val(feedId)
+
     url = $('#source_link').attr('href')
     $('[data-behavior~=share_form] .url-placeholder').val(url)
 
@@ -1225,13 +1228,16 @@ $.extend feedbin,
     ), timeout
 
     $('body').removeClass('has-entry-basement')
+    $('body').removeClass('has-entry-basement-share')
+    $('body').removeClass('has-entry-basement-mute')
     $('.entry-basement').removeClass('foreground')
     $('.entry-content').each ->
       @.style.removeProperty("top")
 
     clearTimeout(feedbin.openEntryBasementTimeount)
 
-  openEntryBasement: (selectedPanel) ->
+  openEntryBasement: (selectedPanel, panelName) ->
+
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
       $('.field-cluster input, .field-cluster textarea', selectedPanel).first().select()
@@ -1248,7 +1254,14 @@ $.extend feedbin,
     $('.entry-content').css
       "top": "#{newTop}px"
     selectedPanel.prop('scrollTop', 0)
+
     $('body').addClass('has-entry-basement')
+
+    openClass = "has-entry-basement-share"
+    if panelName == "mute_panel"
+      openClass = "has-entry-basement-mute"
+    $('body').addClass(openClass)
+
     window.dispatchEvent(new CustomEvent("open-entry-basement"))
 
   applyStarred: (entryId) ->
@@ -2095,12 +2108,12 @@ $.extend feedbin,
           if selectedPanel.hasClass('hide')
             # There is another panel open, transition to the clicked on panel
             feedbin.closeEntryBasement()
-            feedbin.openEntryBasement(selectedPanel)
+            feedbin.openEntryBasement(selectedPanel, panelName)
           else
             # The clicked on panel is alread open, close it
             feedbin.closeEntryBasement()
         else
-          feedbin.openEntryBasement(selectedPanel)
+          feedbin.openEntryBasement(selectedPanel, panelName)
 
         event.preventDefault()
         return
@@ -2110,8 +2123,9 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-      $(document).on 'submit', '[data-behavior~=share_form] form', (event, xhr) ->
-        feedbin.closeEntryBasement()
+      $(document).on 'submit', '[data-behavior~=share_form] form', (event) ->
+        if event.originalEvent.submitter.getAttribute("name") != "preview"
+          feedbin.closeEntryBasement()
         return
 
     supportedSharing: ->

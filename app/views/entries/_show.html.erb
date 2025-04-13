@@ -16,6 +16,7 @@
             </div>
             <div class="entry-buttons">
                 <%= render partial: "entries/delete_button", locals: {entry: entry} %>
+                <%= render partial: "shared/mute_button" %>
                 <%= render partial: "sharing_services/sharing_service_button" %>
                 <%= render partial: "entries/toggle_content", locals: {extract: extract, entry: entry} %>
                 <%= render partial: "starred_entries/form", locals: {entry: entry} %>

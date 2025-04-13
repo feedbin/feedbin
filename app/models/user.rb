@@ -55,7 +55,8 @@ class User < ApplicationRecord
     :addresses_available,
     :floaty,
     :feed_search,
-    :password_resettable
+    :password_resettable,
+    :mute_filter_available
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

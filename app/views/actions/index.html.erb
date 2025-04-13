@@ -33,3 +33,13 @@
     <% end %>
   <% end %>
 <% end %>
+
+<% if @mutes.present? %>
+  <%= render Settings::ControlGroupComponent.new class: "group", data: {capsule: "true"} do |group| %>
+    <% group.header do %>
+      Mutes
+    <% end %>
+  <% end %>
+  <%= render Actions::MutesComponent.new(mutes: @mutes, user: current_user) %>
+<% end %>
+

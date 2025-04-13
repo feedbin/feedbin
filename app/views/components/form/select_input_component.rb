@@ -26,7 +26,7 @@ module Form
       end
 
       def view_template(&block)
-        div data: {position: @position}, class: "group pointer-events-none absolute inset-y-0 flex items-center z-10 data-[position=leading]:left-0 data-[position=leading]:pl-2 data-[position=leading]:pl-2 data-[position=trailing]:pr-2 data-[position=trailing]:right-0" do
+        div data: {position: @position}, class: "group pointer-events-none absolute inset-y-0 flex items-center z-1 data-[position=leading]:left-0 data-[position=leading]:pl-2 data-[position=leading]:pl-2 data-[position=trailing]:pr-2 data-[position=trailing]:right-0" do
           yield
         end
       end
