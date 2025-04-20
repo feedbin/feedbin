@@ -1763,7 +1763,7 @@ li.selected > a .favicon-wrap,
     transform: translateY($search-height * 2);
     padding-bottom: $search-height * 2;
   }
-  ul {
+  .entries-target {
     margin: 0;
     padding: 0 0 17px 0;
     list-style: none;
