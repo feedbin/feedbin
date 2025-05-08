@@ -20,7 +20,7 @@ module Settings
             div class: "mb-14" do
               render Form::TextInputComponent.new do |text|
                 text.input do
-                  form.text_field :description, placeholder: "Description", class: "peer text-input", data: {behavior: "autosubmit"}
+                  form.text_field :description, placeholder: "Description", class: "peer text-input", data: {behavior: "auto_submit_throttled"}
                 end
               end
             end

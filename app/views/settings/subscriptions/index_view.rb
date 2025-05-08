@@ -26,10 +26,9 @@ module Settings
                       type: "search",
                       class: "feed-search peer text-input",
                       placeholder: "Search Feeds",
-                      data_behavior: "autosubmit",
                       name: "q",
                       value: @params[:q],
-                      data: stimulus_item(target: "input", data: {behavior: "autosubmit"}, for: :input_filter)
+                      data: stimulus_item(target: "input", data: {behavior: "auto_submit_throttled"}, for: :input_filter)
                     )
                   end
                   input.accessory_leading do
@@ -91,7 +90,7 @@ module Settings
                     :sort,
                     options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], @params[:sort]),
                     class: "peer",
-                    data: {behavior: "autosubmit"}
+                    data: {behavior: "auto_submit"}
                   )
                 end
               end

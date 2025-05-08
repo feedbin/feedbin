@@ -37,7 +37,7 @@ module Actions
           end
         end
       else
-        div class: "text-500 text-center" do
+        div class: "text-500 text-center sm:py-8" do
           "No mutes"
         end
       end

@@ -80,7 +80,7 @@ export default class extends Controller {
     this.closingValue = false
     this.dialogOpen = true
     this.dialogTarget.showModal()
-    this.dispatch("show")
+    this.dispatch("show", { detail: { id: id } })
 
     // scroll to end of snapContainer to skip
     // blank container above, seems to only matter in Chrome
@@ -93,7 +93,7 @@ export default class extends Controller {
     })
 
     afterAnimation(this.dialogTarget, true, () => {
-      this.dispatch("shown")
+      this.dispatch("shown", { detail: { id: id } })
     })
   }
 

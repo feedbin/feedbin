@@ -1,1 +1,6 @@
+<% if @preview %>
+  $("[data-behavior~=new_mute_message_target]").html("<%= j render Dialog::NewMute::Message.new(action: @action) %>");
+<% elsif @action.valid? %>
+  feedbin.closeDialog()
+<% end %>
 <%= render partial: 'shared/message_flash', locals: {flash: flash} %>

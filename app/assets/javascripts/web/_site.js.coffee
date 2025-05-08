@@ -511,6 +511,11 @@ $.extend feedbin,
       if feedbin.animateScroll()
         feedbin.scrollToPanel('.entry-column')
 
+  sanitize: (text) ->
+    decoded = document.createElement('textarea')
+    decoded.innerHTML = text
+    decoded.value
+
   hideNotification: (animated = true) ->
     container = $('[data-behavior~=notification_container]')
     if animated
@@ -526,6 +531,7 @@ $.extend feedbin,
 
   showNotification: (text, error = false, url = null) ->
     clearTimeout(feedbin.notificationTimeout)
+    text = feedbin.sanitize(text)
 
     container = $('[data-behavior~=notification_container]')
     content = $('[data-behavior~=notification_content]')
@@ -2410,12 +2416,6 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=selected_category]', (event) ->
         $(@).find('[data-behavior~=categories]').toggleClass('hide')
 
-    settingsCheckbox: ->
-      callback = (event) ->
-        $(@).parents("form").submit()
-
-      $(document).on 'change', '[data-behavior~=auto_submit]', callback
-
     toggleContent: ->
       $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
         $(@).parents("form").submit()
@@ -2497,12 +2497,13 @@ $.extend feedbin,
         event.preventDefault()
 
     autoSubmit: ->
-      throttled = _.throttle((item)->
-        item.closest('form').submit();
-      400);
+      callback = (event) ->
+        $(@).parents("form").submit()
 
-      $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
-        throttled($(@))
+      throttled = _.throttle(callback, 400);
+
+      $(document).on 'input', '[data-behavior~=auto_submit]', callback
+      $(document).on 'input', '[data-behavior~=auto_submit_throttled]', throttled
 
     loadIframe: ->
       $(document).on 'click', '[data-behavior~=iframe_placeholder]', (event) ->
@@ -2749,6 +2750,11 @@ $.extend feedbin,
       $(document).on 'click', '[data-open-dialog]', (event) ->
         id = $(@).data('open-dialog')
         feedbin.showDialog(id)
+
+    newMuteDialog: ->
+      $(window).on 'dialog:show', (event) ->
+        if event?.detail?.id == "dialog_new_mute"
+          $('[data-behavior~=new_mute_feed_id]').val(feedbin.selectedEntryData.feed_id)
 
     delegateAjax: ->
       # forward jquery ajax events to dom events for stimulus

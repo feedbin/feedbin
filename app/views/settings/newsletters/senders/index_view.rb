@@ -19,7 +19,7 @@ module Settings::Newsletters::Senders
                 type: "search",
                 class: "peer text-input",
                 placeholder: "Search Senders",
-                data_behavior: "autosubmit",
+                data_behavior: "auto_submit_throttled",
                 name: "q",
                 value: params[:q],
                 autocomplete: "off",

@@ -1,5 +1,5 @@
 module Dialog
-  class Mutes < ApplicationComponent
+  class ManageMutes < ApplicationComponent
     TITLE = "Manage Mutes"
 
     def initialize(mutes:)

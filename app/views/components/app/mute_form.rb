@@ -22,7 +22,7 @@ module App
             end
           end
           render Settings::ButtonRowComponent.new do
-            a href: mutes_path, class: "mr-auto", data: {remote: "true", open_dialog: Dialog::Mutes.dom_id}  do
+            a href: mutes_path, class: "mr-auto", data: {remote: "true", open_dialog: Dialog::ManageMutes.dom_id}  do
               "Manage Mutes"
             end
 

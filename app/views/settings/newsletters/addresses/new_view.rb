@@ -28,7 +28,7 @@ module Settings::Newsletters::Addresses
                 div class: "pb-4" do
                   render Form::TextInputComponent.new do |text|
                     text.input do
-                      form.text_field :token, data: {behavior: "autosubmit"}, autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: "false"
+                      form.text_field :token, data: {behavior: "auto_submit_throttled"}, autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: "false"
                     end
                     text.accessory_leading do
                       Icon("favicon-newsletter", class: "ml-2 fill-400 pg-focus:fill-blue-600")

@@ -8,6 +8,7 @@ class MutesController < ApplicationController
   end
 
   def create
+    @user = current_user
     @action = @user.actions.new(
       query: params[:query],
       all_feeds: params[:all_feeds] == "true" ? true : false,
@@ -16,13 +17,14 @@ class MutesController < ApplicationController
       actions: ["mark_read"],
       apply_action: "1"
     )
-
-    if @action.save
-      flash[:notice] = "Mute was successfully created."
+    if params[:button_action] == "save"
+      if !@action.save
+        flash[:error] = @action.errors.full_messages.join(". ")
+      end
+      flash.discard
     else
-      flash[:error] = @action.errors.full_messages.join(". ")
+      @preview = true
     end
-    flash.discard
   end
 
   def destroy
