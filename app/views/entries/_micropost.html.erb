@@ -7,33 +7,61 @@
             <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), RemoteFile.signed_url(micropost.micropost.author_avatar), size: "47x47", alt: "") %>
           <% end %>
         </div>
-        <div class="profile-info">
-          <h1>
-            <a href="<%= micropost.fully_qualified_url %>" target="_blank" class="link" id="source_link">
-              <strong><%= micropost.micropost.author_name %></strong>
-              <%= micropost.micropost.author_display_username %>
-            </a>
-            <% if micropost.micropost.microblog? %>
-              <span class="tweet-actions">
-                <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {open_dialog: Dialog::SocialReplies.dom_id} do %>
-                  <%= svg_tag "icon-micro-blog" %>
+        <div class="grow flex gap-4 space-between items-last-baseline">
+          <div class="grow">
+            <div class="profile-info">
+              <h1>
+                <a href="<%= micropost.fully_qualified_url %>" target="_blank" class="link" id="source_link">
+                  <strong><%= micropost.micropost.author_name %></strong>
+                  <%= micropost.micropost.author_display_username %>
+                </a>
+              </h1>
+              <p class="post-meta">
+                <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>
+                  <time datetime="<%= micropost.published.iso8601 %>">
+                    <%= micropost.published.to_formatted_s(:full_human) %>
+                  </time>
                 <% end %>
-              </span>
-            <% elsif micropost.micropost.instagram? %>
-              <span class="tweet-actions">
-                <%= link_to micropost.fully_qualified_url, class: "twitter-conversation-link", title: "View on Instagram" do %>
-                  <%= svg_tag "icon-instagram" %>
-                <% end %>
-              </span>
-            <% end %>
-          </h1>
-          <p class="post-meta">
-            <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>
-              <time datetime="<%= micropost.published.iso8601 %>">
-                <%= micropost.published.to_formatted_s(:full_human) %>
-              </time>
-            <% end %>
-          </p>
+              </p>
+            </div>
+          </div>
+          <div class="context-menu">
+            <%=
+              render Common::DropdownMenu.new do |menu|
+                menu.item(
+                  icon: "menu-icon-block",
+                  title: "Create Mute Filter",
+                  attributes: {
+                    data: { open_dialog: Dialog::NewMute.dom_id }
+                  }
+                )
+                if micropost.micropost.microblog?
+                  menu.item(
+                    type: :a,
+                    icon: "icon-micro-blog",
+                    title: "View Replies",
+                    attributes: {
+                      href: thread_micropost_path(micropost),
+                      data: {
+                        open_dialog: Dialog::SocialReplies.dom_id,
+                        remote: "true"
+                      }
+                    }
+                  )
+                end
+                if micropost.micropost.instagram?
+                  menu.item(
+                    icon: "icon-instagram",
+                    title: "View on Instagram",
+                    attributes: {
+                      href: micropost.fully_qualified_url,
+                      data: { open_dialog: Dialog::NewMute.dom_id },
+                    }
+                  )
+                end
+              end
+            %>
+          </div>
         </div>
       </div>
     </header>

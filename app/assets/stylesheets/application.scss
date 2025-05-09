@@ -2984,7 +2984,7 @@ $feed-title-width: 115px;
         .menu-text {
           display: flex;
           flex-direction: column;
-          line-height: 1.25;
+          line-height: 1;
           .title {
             @include font-size(14);
           }
@@ -2995,7 +2995,6 @@ $feed-title-width: 115px;
         }
         .icon-wrap {
           width: 16px;
-          height: 17px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -3003,6 +3002,8 @@ $feed-title-width: 115px;
           margin-right: base-units(1);
           svg {
             @include fill($color-icons);
+            max-width: 16px;
+            max-height: 16px;
           }
         }
         &:hover {
@@ -4537,6 +4538,9 @@ dialog {
   .twitter-conversation-link {
     display: none;
   }
+  .context-menu {
+    display: none;
+  }
   .tweet-body {
     padding-left: 57px;
     @media (max-width: $small-breakpoint) {
@@ -4836,7 +4840,6 @@ Settings
   }
   .icon-wrap {
     width: 16px;
-    height: 17px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4855,6 +4858,7 @@ Settings
     text-align: left;
     padding: base-units(1);
     border-radius: 4px;
+    align-items: center;
     @include color($color-contrast-700);
     &:hover {
       text-decoration: none;
@@ -6960,6 +6964,6 @@ $tooltip-arrow-height: 6px;
   margin-left: base-units(1);
 }
 
-.mute-filter-available-true .mute-filter-button {
+.mute-filter-available-true .article-context-menu {
   display: block !important;
 }

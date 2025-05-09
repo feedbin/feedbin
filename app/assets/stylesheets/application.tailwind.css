@@ -342,4 +342,7 @@ input[type="search"]::-webkit-search-cancel-button {
   .flex-center {
     @apply items-center justify-center;
   }
+  .items-last-baseline {
+    align-items: last baseline;
+  }
 }

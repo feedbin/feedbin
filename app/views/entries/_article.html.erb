@@ -3,17 +3,30 @@
         <%= link_to entry.fully_qualified_url, target: '_blank', rel: 'noopener noreferrer', id: 'source_link' do  %>
             <h1><%= entry_presenter.entry_view_title %></h1>
         <% end %>
-        <p class="post-meta">
-            <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
-            <% unless entry.feed.newsletter? %>
-                <%= entry_presenter.author %>
+        <div class="flex gap-4 space-between items-last-baseline">
+          <div class="grow">
+            <p class="post-meta">
+              <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+              <% unless entry.feed.newsletter? %>
+                  <%= entry_presenter.author %>
+              <% end %>
+            </p>
+            <% if entry_presenter.newsletter_from? %>
+                <p class="post-meta"><%= entry_presenter.newsletter_from.name %> <% if entry_presenter.newsletter_from.address.present? %><span class="faded">&lt;<%= entry_presenter.newsletter_from.address %>&gt;</span><% end %></p>
+            <% else %>
+                <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
             <% end %>
-        </p>
-        <% if entry_presenter.newsletter_from? %>
-            <p class="post-meta"><%= entry_presenter.newsletter_from.name %> <% if entry_presenter.newsletter_from.address.present? %><span class="faded">&lt;<%= entry_presenter.newsletter_from.address %>&gt;</span><% end %></p>
-        <% else %>
-            <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
-        <% end %>
+          </div>
+          <%=
+            render Common::DropdownMenu.new do |menu|
+              menu.item(
+                icon: "menu-icon-block",
+                title: "Create Mute Filter",
+                attributes: { data: { open_dialog: Dialog::NewMute.dom_id } }
+              )
+            end
+          %>
+        </div>
     </header>
     <div data-behavior="entry_content_wrap external_links" class="content-styles <%= entry_presenter.entry_type_class %>">
         <%= render partial: "article_content", locals: {entry: entry} %>
