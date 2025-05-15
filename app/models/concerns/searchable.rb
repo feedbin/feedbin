@@ -114,21 +114,20 @@ module Searchable
       end
 
       if query
-        query = query.gsub(TAG_ID_REGEX) { |s|
+        query = query.gsub(TAG_ID_REGEX) {
           tag_id = Regexp.last_match[1]
-          feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
-          id_string = feed_ids.join(" OR ")
+          id_string = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
+          id_string = id_string.join(" OR ")
           "feed_id:(#{id_string})"
         }
 
-        query = query.gsub(TAG_GROUP_REGEX) { |s|
+        query = query.gsub(TAG_GROUP_REGEX) {
           tag_group = Regexp.last_match[1]
           tag_ids = tag_group.split(" OR ")
-          feed_ids = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
-          id_string = feed_ids.join(" OR ")
+          id_string = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
+          id_string = id_string.join(" OR ")
           "feed_id:(#{id_string})"
         }
-
       end
 
       query = escape_search(query)
