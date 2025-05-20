@@ -60,9 +60,9 @@ module Dialog
             if @action.valid?
               render partial("actions/text_description", action: @action, summary: false )
 
-              plain " Currently "
+              plain " Approximately "
               strong { number_to_human(@action.results.total, precision: 2).downcase }
-              plain " #{"article".pluralize(@action.results.total)} #{@action.results.total == 1 ? "matches" : "match"}."
+              plain " existing #{"article".pluralize(@action.results.total)} #{@action.results.total == 1 ? "matches" : "match"}."
             else
               plain @action.errors.full_messages.join('. ')
             end
