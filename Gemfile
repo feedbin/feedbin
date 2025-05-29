@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://gems.ruby-china.com"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
 gem "rails", "7.2.2.1"

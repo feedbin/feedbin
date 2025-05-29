@@ -10,7 +10,13 @@ class TabsComponent < ApplicationComponent
       div class: "flex gap-8 border-b border-300 items-baseline mb-8 relative" do
         @tabs.each_with_index do |tab, index|
           button class: "inline-flex border-0 leading-[42px] text-500 data-selected:text-700", data: button_data(index) do
-            tab[:title]
+            if tab[:is_title]
+              render Settings::H1TitleComponent.new do
+                tab[:title]
+              end
+            else
+              tab[:title]
+            end
           end
         end
         div data: stimulus_item(target: :indicator, for: :tabs), style: "left: 0; width: 0", class: "absolute bottom-[-1px] h-[4px] w-3 bg-blue-600 transition-position duration-200 ease-in-out"
@@ -23,10 +29,11 @@ class TabsComponent < ApplicationComponent
     end
   end
 
-  def tab(title:, &block)
+  def tab(title:,is_title: false, &block)
     @tabs.push({
       title: title,
-      block: block
+      block: block,
+      is_title: is_title,
     })
   end
 
