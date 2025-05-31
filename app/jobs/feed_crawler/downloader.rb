@@ -57,16 +57,14 @@ module FeedCrawler
       url = @crawl_data.redirected_to ? @crawl_data.redirected_to : parsed_url.url
       Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@crawl_data.redirected_to} id=#{@feed_id}" if @crawl_data.redirected_to
 
-      ConcurrencyLimit.acquire(@feed_url, timeout: 5) do
-        Feedkit::Request.download(url,
-          username:      parsed_url.username,
-          password:      parsed_url.password,
-          last_modified: @crawl_data.last_modified,
-          etag:          @crawl_data.etag,
-          auto_inflate:  auto_inflate,
-          user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
-        )
-      end
+      Feedkit::Request.download(url,
+        username:      parsed_url.username,
+        password:      parsed_url.password,
+        last_modified: @crawl_data.last_modified,
+        etag:          @crawl_data.etag,
+        auto_inflate:  auto_inflate,
+        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+      )
     end
 
     def parse
