@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: f2dd72ae9993f68a9945d0bbbe0067f6bff10830
+  revision: 4593ccb47e6e8f9d7d573b6f30ff88869fb4f336
   branch: master
   specs:
     feedkit (0.1.0)
@@ -555,7 +555,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     raindrops (0.20.1)
-    rake (13.2.1)
+    rake (13.3.0)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
