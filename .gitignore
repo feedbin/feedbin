@@ -29,5 +29,6 @@ coverage
 !/app/assets/builds/.keep
 .nova
 .zed
+.idea/
 
 /config/master.key

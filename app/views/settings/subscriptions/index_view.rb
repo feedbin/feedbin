@@ -134,52 +134,6 @@ module Settings
                   end
                 end
               end
-              div class: "dropdown-wrap dropdown-right shrink-0" do
-                button class: "flex flex-center w-[40px] h-[40px]", data_behavior: "toggle_dropdown", title: "Filter by status" do
-                  Icon("icon-filter", class: "fill-500")
-                end
-                div class: "dropdown-content" do
-                  ul do
-                    li do
-                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:fixable"}, for: :input_filter) do
-                        span class: "icon-wrap" do
-                          Icon("menu-icon-fix-feeds")
-                        end
-                        span class: "menu-text" do
-                          span class: "title" do
-                            "Fixable"
-                          end
-                        end
-                      end
-                    end
-                    li do
-                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:muted"}, for: :input_filter) do
-                        span class: "icon-wrap" do
-                          Icon("menu-icon-mute")
-                        end
-                        span class: "menu-text" do
-                          span class: "title" do
-                            "Muted"
-                          end
-                        end
-                      end
-                    end
-                    li do
-                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:dead"}, for: :input_filter) do
-                        span class: "icon-wrap" do
-                          Icon("menu-icon-skull")
-                        end
-                        span class: "menu-text" do
-                          span class: "title" do
-                            "Dead"
-                          end
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-
             end
             div class: "md:max-w-[250px]" do
               render Form::SelectInputComponent.new do |input|
@@ -195,6 +149,8 @@ module Settings
             end
           end
         end
+
+        render Shared::FeedList.new(feeds: Feed.all)
       end
 
       def fix_feeds_notice
