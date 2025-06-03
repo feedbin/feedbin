@@ -9,11 +9,19 @@ module Settings
       end
 
       def view_template
+        render TabsComponent.new do |tabs|
+          tabs.tab(title: "Subscriptions", is_title: true) do
+            render_subscriptions_tab
+          end
+          tabs.tab(title: "Subscription Source", is_title: true) do
+            render_subscription_source_tab
+          end
+        end
+      end
+
+      def render_subscriptions_tab
         form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
           input type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
-          render Settings::H1Component.new do
-            "Subscriptions"
-          end
 
           fix_feeds_notice
 
@@ -99,6 +107,50 @@ module Settings
         end
 
         render Shared::List.new(subscriptions: @subscriptions, params: @params)
+      end
+
+      def render_subscription_source_tab
+        form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
+          input type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
+
+          fix_feeds_notice
+
+          div class: "flex flex-col md:flex-row justify-between mb-6 gap-2" do
+            div data: stimulus(controller: :input_filter), class: "flex items-center md:max-w-[250px]" do
+              div class: "grow" do
+                render Form::TextInputComponent.new do |input|
+                  input.input do
+                    input(
+                      type: "search",
+                      class: "feed-search peer text-input",
+                      placeholder: "Search Feeds",
+                      name: "q",
+                      value: @params[:q],
+                      data: stimulus_item(target: "input", data: {behavior: "auto_submit_throttled"}, for: :input_filter)
+                    )
+                  end
+                  input.accessory_leading do
+                    Icon("icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
+                  end
+                end
+              end
+            end
+            div class: "md:max-w-[250px]" do
+              render Form::SelectInputComponent.new do |input|
+                input.input do
+                  select_tag(
+                    :sort,
+                    options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], @params[:sort]),
+                    class: "peer",
+                    data: {behavior: "auto_submit"}
+                  )
+                end
+              end
+            end
+          end
+        end
+
+        render Shared::FeedList.new(feeds: Feed.all)
       end
 
       def fix_feeds_notice
