@@ -492,21 +492,21 @@ $.extend feedbin,
     feedbin.panel = panel
     if panel == 1
       if state && feedbin.mobileView()
-        window.history.pushState({panel: 1});
+        window.history.pushState({panel: 1}, "");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.animateScroll()
         feedbin.scrollToPanel('.feeds-column')
 
     else if panel == 2
       if state && feedbin.mobileView()
-        window.history.pushState({panel: 2});
+        window.history.pushState({panel: 2}, "");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.animateScroll()
         feedbin.scrollToPanel('.entries-column')
 
     else if panel == 3
       if state && feedbin.mobileView()
-        window.history.pushState({panel: 3});
+        window.history.pushState({panel: 3}, "");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.animateScroll()
         feedbin.scrollToPanel('.entry-column')
