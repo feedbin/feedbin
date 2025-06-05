@@ -481,12 +481,11 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.9)
-    phlex (2.3.1)
+    phlex (2.2.1)
       zeitwerk (~> 2.7)
-    phlex-rails (2.3.0)
-      phlex (~> 2.3.0)
+    phlex-rails (2.2.0)
+      phlex (~> 2.2.1)
       railties (>= 7.1, < 9)
-      zeitwerk (~> 2.7)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -780,7 +779,7 @@ DEPENDENCIES
   oauth2
   ostruct
   pg
-  phlex-rails
+  phlex-rails (= 2.2.0)
   postmark-rails
   premailer-rails
   pry
