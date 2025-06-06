@@ -1,5 +1,5 @@
 module FeedCrawler
-  class ScheduleAll
+  class Schedule
     include Sidekiq::Worker
     include SidekiqHelper
     sidekiq_options queue: :utility_critical

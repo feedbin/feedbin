@@ -21,7 +21,7 @@ end
 
 every(1.minutes, "clockwork.frequent") do
   if RedisLock.acquire("clockwork:feed:refresher:scheduler:v2")
-    FeedCrawler::ScheduleAll.perform_async
+    FeedCrawler::Schedule.perform_async
   end
 
   if RedisLock.acquire("clockwork:harvest:embed:data")
