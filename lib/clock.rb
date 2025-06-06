@@ -47,4 +47,7 @@ every(1.week, "clockwork.weekly", at: "Sunday 16:00", tz: "UTC") do
   if RedisLock.acquire("clockwork:feed_fixer_scheduler")
     FeedFixerScheduler.perform_async
   end
+  if RedisLock.acquire("clockwork:reindex_feeds")
+    Search::ReindexFeeds.perform_async
+  end
 end
