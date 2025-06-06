@@ -31,7 +31,7 @@ class CrawlDataTest < ActiveSupport::TestCase
   end
 
   def test_retry_after_number
-    retry_after = 1000
+    retry_after = 10_000
     time = Time.now.to_i + retry_after
 
     exception = http_exception_mock(retry_after)
@@ -39,7 +39,7 @@ class CrawlDataTest < ActiveSupport::TestCase
     feed = CrawlData.new
     feed.download_error(exception)
 
-    assert_equal(time, feed.last_error["retry_after"])
+    assert_equal(time, feed.retry_after)
   end
 
   def test_retry_after_date
@@ -50,7 +50,7 @@ class CrawlDataTest < ActiveSupport::TestCase
 
     feed.download_error(exception)
 
-    assert_equal(retry_after.to_i, feed.last_error["retry_after"])
+    assert_equal(retry_after.to_i, feed.retry_after)
   end
 
   def test_retry_after_max
@@ -63,7 +63,7 @@ class CrawlDataTest < ActiveSupport::TestCase
 
     feed.download_error(exception)
 
-    assert_equal(max_time.to_i, feed.last_error["retry_after"])
+    assert_equal(max_time.to_i, feed.retry_after)
   end
 
   def http_exception_mock(retry_after)

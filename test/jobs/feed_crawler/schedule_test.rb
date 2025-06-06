@@ -29,7 +29,8 @@ module FeedCrawler
       ENV["THROTTLED_HOSTS"] = hosts.map {"#{it}=1"}.join(" ")
 
       Feed.all.each do |feed|
-        feed.crawl_data.log_download
+        response = OpenStruct.new(etag: "1", last_modified: "2", download_fingerprint: "3", url: feed.feed_url)
+        feed.crawl_data.save(response)
         feed.save!
       end
 

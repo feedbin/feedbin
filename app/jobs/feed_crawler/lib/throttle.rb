@@ -3,22 +3,17 @@ module FeedCrawler
 
     TIMEOUT = 60 * 30
 
-    def initialize(feed_url, last_download)
+    def initialize(feed_url)
       @feed_url = feed_url
-      @last_download = last_download
     end
 
-    def self.throttled?(*args)
-      new(*args).throttled?
+    def self.retry_after(...)
+      new(...).retry_after
     end
 
-    def throttled?
-      throttled_hosts.include?(host) && downloaded_recently?
-    end
-
-    def downloaded_recently?
-      return false if @last_download.nil?
-      (Time.now.to_i - @last_download) < random_timeout
+    def retry_after
+      return nil unless throttled_hosts.include?(host)
+      Time.now.to_i + random_timeout
     end
 
     def random_timeout

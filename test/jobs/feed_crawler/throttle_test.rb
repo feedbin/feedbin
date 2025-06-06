@@ -9,11 +9,13 @@ module FeedCrawler
 
     def test_throttled
       ENV["THROTTLED_HOSTS"] = "example.com"
-      assert     Throttle.throttled?("https://www.example.com", Time.now.to_i)
-      assert_equal(false, Throttle.throttled?("https://www.example.com", Time.now.to_i - (Throttle::TIMEOUT * 2)))
-      assert_equal(false, Throttle.throttled?("https://www.example.com", nil))
-      assert_equal(false, Throttle.throttled?("https://www.not-example.com", Time.now.to_i))
-      assert_equal(false, Throttle.throttled?(nil, nil))
+      assert_not_nil Throttle.retry_after("https://www.example.com")
+      difference = Throttle.retry_after("https://www.example.com") - Time.now.to_i
+      assert difference > FeedCrawler::Throttle::TIMEOUT
+
+      assert Throttle.retry_after("https://www.example.com") > Time.now.to_i
+      assert_equal(nil, Throttle.retry_after("https://www.not-example.com"))
+      assert_equal(nil, Throttle.retry_after(nil))
     end
   end
 end

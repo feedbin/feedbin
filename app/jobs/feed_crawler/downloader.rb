@@ -32,20 +32,19 @@ module FeedCrawler
 
       content_changed = !@response.not_modified?(@crawl_data.download_fingerprint)
 
-      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers.get(:server).last}\""
-
       @crawl_data.download_success(@feed_id, redirects: @response.redirects)
       @crawl_data.save(@response)
 
+      message = "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers.get(:server).last}\""
+      if @crawl_data.relative_retry_after > 0
+        message = "#{message} throttled_next_retry=#{@crawl_data.relative_retry_after}"
+      end
+      Sidekiq.logger.info message
+
       parse if content_changed
-    rescue ConcurrencyLimit::TimeoutError => exception
-      Sidekiq.logger.info "Download timed out url=#{@feed_url} exception=#{exception.inspect}"
     rescue Feedkit::Error => exception
       @crawl_data.download_error(exception)
-      message = "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
-      if exception.respond_to?(:response) && exception.response.headers[:retry_after].present?
-        message = "#{message} retry_after=#{exception.response.headers[:retry_after]}"
-      end
+      message = "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url} next_retry=#{@crawl_data.relative_retry_after}"
       if exception.respond_to?(:response)
         message = "#{message} server=#{exception.response.headers[:server]}"
       end

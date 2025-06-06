@@ -15,12 +15,7 @@ class CrawlData
   end
 
   def ok?(feed_url)
-    return false if throttled?(feed_url)
-    Time.now.to_i > next_retry
-  end
-
-  def throttled?(feed_url)
-    FeedCrawler::Throttle.throttled?(feed_url, downloaded_at)
+    Time.now.to_i > retry_after
   end
 
   def downloaded_ago
@@ -33,6 +28,14 @@ class CrawlData
 
   def downloaded_at
     @data.downloaded_at.to_i
+  end
+
+  def retry_after
+    @data.retry_after.to_i
+  end
+
+  def relative_retry_after
+    @data.retry_after.to_i - Time.now.to_i
   end
 
   def log_download
@@ -49,20 +52,31 @@ class CrawlData
 
   def download_error(exception)
     @data.error_count = error_count + 1
-    @data.failed_at = Time.now.to_i
-    @data.last_error = error_data(exception)
+    @data.failed_at   = Time.now.to_i
+    @data.last_error  = error_data(exception)
+    @data.retry_after = next_retry(exception)
   end
 
-  def clear!
-    @data.failed_at = nil
-    @data.last_error = nil
-    @data.error_count = nil
+  def next_retry(exception)
+    header = retry_after_header(exception).to_i
+    default = @data.failed_at + backoff
+    retry_after = [header, default].max
   end
 
   def save(response)
     @data.etag                 = response.etag
     @data.last_modified        = response.last_modified
     @data.download_fingerprint = response.checksum
+    if retry_after = FeedCrawler::Throttle.retry_after(response.url)
+      @data.retry_after = retry_after
+    end
+  end
+
+  def clear!
+    @data.failed_at   = nil
+    @data.last_error  = nil
+    @data.error_count = nil
+    @data.retry_after  = nil
   end
 
   def ==(other)
@@ -73,23 +87,18 @@ class CrawlData
     @data.to_h
   end
 
-  def next_retry
-    failed_at + backoff
-  end
-
   private
 
   def error_data(exception)
     {
-      "date"        => Time.now.to_i,
-      "class"       => exception.class.name,
-      "message"     => exception.message,
-      "status"      => exception.try(:response).try(:status).try(:code),
-      "retry_after" => parse_retry_after(exception).to_i
+      "date"    => Time.now.to_i,
+      "class"   => exception.class.name,
+      "message" => exception.message,
+      "status"  => exception.try(:response).try(:status).try(:code)
     }
   end
 
-  def parse_retry_after(exception)
+  def retry_after_header(exception)
     return unless exception.respond_to?(:response)
     retry_after = exception.response.headers[:retry_after]
     return if retry_after.nil?
@@ -101,7 +110,9 @@ class CrawlData
       Time.at(Time.now.to_i + retry_after.to_i)
     end
 
-    [retry_after, 8.hours.from_now].min
+    retry_after = [retry_after, 8.hours.from_now].min
+
+    retry_after
   rescue
     nil
   end
