@@ -2,9 +2,9 @@ module Searchable
   extend ActiveSupport::Concern
 
   included do
-    UNREAD_REGEX = /(?<=\s|^)is:\s*unread(?=\s|$)/
+    UNREAD_REGEX = /(?<=\s|^)(?:(?<boolean>AND|OR|NOT)\s+)?is:\s*unread(?=\s|$)/
     READ_REGEX = /(?<=\s|^)is:\s*read(?=\s|$)/
-    STARRED_REGEX = /(?<=\s|^)is:\s*starred(?=\s|$)/
+    STARRED_REGEX = /(?<=\s|^)(?:(?<boolean>AND|OR|NOT)\s+)?is:\s*starred(?=\s|$)/
     UNSTARRED_REGEX = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
     TAG_ID_REGEX = /tag_id:\s*(\d+)/
@@ -29,7 +29,7 @@ module Searchable
     end
 
     def self.build_multi_search(user, saved_searches)
-      saved_searches.map { |saved_search|
+      saved_searches.filter_map { |saved_search|
         query_string = saved_search.query
 
         next if READ_REGEX.match?(query_string)
@@ -38,11 +38,11 @@ module Searchable
         query  = build_query(user: user, query: "#{query_string} is:unread", size: 50)
         query = query.slice(:query, :from, :size)
         OpenStruct.new({id: saved_search.id, query: query})
-      }.compact
+      }
     end
 
     def self.scoped_search(params, user)
-      data = params.clone
+      data     = params.clone
       per_page = data.delete(:per_page) || WillPaginate.per_page
       page     = data.delete(:page) || 1
       query    = build_query(user: user, query: data[:query], feed_ids: data[:feed_ids])
@@ -73,11 +73,11 @@ module Searchable
         escape = '\ '.sub(" ", "")
         query = query.gsub(special_characters_regex) { |character| escape + character }
 
-        query = query.gsub("title_exact:", "title.exact:")
+        query = query.gsub("title_exact:",   "title.exact:")
         query = query.gsub("content_exact:", "content.exact:")
-        query = query.gsub("body:", "content:")
-        query = query.gsub("emoji:", "")
-        query = query.gsub("_missing_:", "NOT _exists_:")
+        query = query.gsub("body:",          "content:")
+        query = query.gsub("emoji:",         "")
+        query = query.gsub("_missing_:",     "NOT _exists_:")
 
         colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link|type|category):(?=.*)/
         query = query.gsub(colon_regex, '\:')
@@ -86,144 +86,116 @@ module Searchable
       end
     end
 
+    def self.term_string(term:, ids:)
+      ids = ids.join(" OR ")
+      "#{term}:(#{ids})"
+    end
+
     def self.build_query(user:, query:, feed_ids: nil, size: nil)
-      read             = nil
-      starred          = nil
-      sort             = nil
-      extracted_fields = []
+      query ||= ""
 
-      if UNREAD_REGEX.match?(query)
-        query = query.gsub(UNREAD_REGEX, "")
-        read = false
-      elsif READ_REGEX.match?(query)
-        query = query.gsub(READ_REGEX, "")
-        read = true
-      end
+      {}.tap do |request|
+        request[:fields] = ["id"]
 
-      if STARRED_REGEX.match?(query)
-        query = query.gsub(STARRED_REGEX, "")
-        starred = true
-      elsif UNSTARRED_REGEX.match?(query)
-        query = query.gsub(UNSTARRED_REGEX, "")
-        starred = false
-      end
+        if size
+          request[:from] = 0
+          request[:size] = size
+        end
 
-      if SORT_REGEX.match?(query)
-        sort = query.match(SORT_REGEX)[1].downcase
-        query = query.gsub(SORT_REGEX, "")
-      end
+        sort = if matches = SORT_REGEX.match(query)
+          query = query.gsub(SORT_REGEX, "")
+          matches[1].downcase
+        else
+          "desc"
+        end
 
-      if query
+        unless sort == "relevance"
+          request[:sort] = [{
+            published: sort
+          }]
+        end
+
+        tag_replacer = proc do |ids|
+          ids = [*ids]
+          string = user.taggings.where(tag_id: ids).pluck("DISTINCT feed_id").join(" OR ")
+          if ids.length == 1
+            "feed_id:#{string}"
+          else
+            "feed_id:(#{string})"
+          end
+        end
+
         query = query.gsub(TAG_ID_REGEX) {
           tag_id = Regexp.last_match[1]
-          id_string = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
-          id_string = id_string.join(" OR ")
-          "feed_id:(#{id_string})"
+          tag_replacer.call(tag_id)
         }
 
         query = query.gsub(TAG_GROUP_REGEX) {
           tag_group = Regexp.last_match[1]
           tag_ids = tag_group.split(" OR ")
-          id_string = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
-          id_string = id_string.join(" OR ")
-          "feed_id:(#{id_string})"
+          tag_replacer.call(tag_ids)
         }
-      end
 
-      query = escape_search(query)
-
-      options = {
-        query: query,
-        sort: "desc",
-        starred_ids: [],
-        ids: [],
-        not_ids: [],
-        feed_ids: []
-      }
-
-      if sort && %w[desc asc relevance].include?(sort)
-        options[:sort] = sort
-      end
-
-      if read == false
-        ids = [0]
-        ids.concat(user.unread_entries.pluck(:entry_id))
-        options[:ids].push(ids)
-      elsif read == true
-        options[:not_ids].push(user.unread_entries.pluck(:entry_id))
-      end
-
-      if starred == true
-        ids = [0]
-        ids.concat(user.starred_entries.pluck(:entry_id))
-        options[:ids].push(ids)
-      elsif starred == false
-        options[:not_ids].push(user.starred_entries.pluck(:entry_id))
-      end
-
-      subscribed_ids = user.subscriptions.pluck(:feed_id)
-      if feed_ids.present?
-        options[:feed_ids] = (feed_ids & subscribed_ids)
-      else
-        options[:feed_ids] = subscribed_ids
-        options[:starred_ids] = user.starred_entries.pluck(:entry_id)
-      end
-
-      if options[:ids].present?
-        options[:ids] = options[:ids].inject(:&)
-      end
-
-      if options[:not_ids].present?
-        options[:not_ids] = options[:not_ids].flatten.uniq
-      end
-
-      {}.tap do |hash|
-        hash[:fields] = ["id"]
-        if options[:sort]
-          if %w[desc asc].include?(options[:sort])
-            hash[:sort] = [{published: options[:sort]}]
-          end
-        else
-          hash[:sort] = [{published: "desc"}]
+        starred_ids = user.starred_entries.pluck(:entry_id)
+        allowed_feed_ids = user.subscriptions.pluck(:feed_id)
+        if feed_ids.present?
+          allowed_feed_ids = (feed_ids & allowed_feed_ids)
         end
 
-        if size
-          hash[:from] = 0
-          hash[:size] = size
-        end
-
-        hash[:query] = {
+        request[:query] = {
           bool: {
             filter: {
               bool: {
                 should: [
-                  {terms: {feed_id: options[:feed_ids]}},
-                  {ids: {values: options[:starred_ids]}}
+                  {terms: {feed_id: allowed_feed_ids}},
+                  {ids: {values: starred_ids}}
                 ]
               }
-            }
+            },
+            should: [],
+            must: [],
+            must_not: []
           }
         }
-        if options[:query].present?
-          hash[:query][:bool][:must] = {
+
+        query = query.gsub(READ_REGEX,      "NOT is:unread")
+        query = query.gsub(UNSTARRED_REGEX, "NOT is:starred")
+
+        states = [
+          [STARRED_REGEX, -> { starred_ids }],
+          [UNREAD_REGEX, -> { user.unread_entries.pluck(:entry_id) }]
+        ]
+        states.each do |regex, id_source|
+          if matches = regex.match(query)
+            query = query.gsub(regex, "")
+            boolean = { ids: { values: id_source.call } }
+
+            case matches[:boolean]
+            when "OR"
+              request[:query][:bool][:should].push(boolean)
+            when "NOT"
+              request[:query][:bool][:must_not].push(boolean)
+            else # AND + nil
+              request[:query][:bool][:must].push(boolean)
+            end
+          end
+        end
+
+        query = escape_search(query)
+        if query.present?
+          request[:query][:bool][:should].push({
             query_string: {
               fields: ["title", "title.*", "content", "content.*", "author", "url", "link"],
               quote_field_suffix: ".exact",
               default_operator: "AND",
               allow_leading_wildcard: false,
-              query: options[:query]
+              query: query
             }
-          }
+          })
         end
-        if options[:ids].present?
-          hash[:query][:bool][:filter][:bool][:must] = {
-            ids: {values: options[:ids]}
-          }
-        end
-        if options[:not_ids].present?
-          hash[:query][:bool][:filter][:bool][:must_not] = {
-            ids: {values: options[:not_ids]}
-          }
+
+        if request[:query][:bool][:should].present?
+          request[:query][:bool][:minimum_should_match] = 1
         end
       end
     end

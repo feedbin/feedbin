@@ -240,7 +240,13 @@ end
 
 unless Rails.env.production?
   ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
-    Rails.logger.info(search: "request", method: payload.safe_dig(:response).request.verb, path: payload.safe_dig(:response).request.uri.to_s, payload: payload.safe_dig(:response)&.request&.body&.source)
-    Rails.logger.info(search: "response", path: payload.safe_dig(:response).request.uri.to_s, payload: payload.safe_dig(:response)&.parse)
+    Rails.logger.info(search: "request", method: payload.safe_dig(:response).request.verb, path: payload.safe_dig(:response).request.uri.to_s)
+    json = JSON.pretty_generate(JSON.parse(payload.safe_dig(:response)&.request&.body&.source)) rescue nil
+    Rails.logger.info(json)
+
+    Rails.logger.info(search: "response", path: payload.safe_dig(:response).request.uri.to_s)
+
+    json = JSON.pretty_generate(payload.safe_dig(:response)&.parse) rescue nil
+    Rails.logger.info(json)
   end
 end
