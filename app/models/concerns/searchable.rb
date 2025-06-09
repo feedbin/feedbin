@@ -89,8 +89,9 @@ module Searchable
     def self.replace_tag_ids(query, user)
       tag_replacer = proc do |ids|
         ids = [*ids]
-        string = user.taggings.where(tag_id: ids).pluck("DISTINCT feed_id").join(" OR ")
-        if ids.length == 1
+        feed_ids = user.taggings.where(tag_id: ids).pluck("DISTINCT feed_id")
+        string = feed_ids.join(" OR ")
+        if feed_ids.length == 1
           "feed_id:#{string}"
         else
           "feed_id:(#{string})"
