@@ -45,7 +45,7 @@ gem "oauth"
 gem "oauth2"
 gem "ostruct"
 gem "pg"
-gem "phlex-rails", "= 2.2.0"
+gem "phlex-rails"
 gem "postmark-rails"
 gem "premailer-rails"
 gem "rack", "< 3" # Unicorn is not yet compatible with rack 3

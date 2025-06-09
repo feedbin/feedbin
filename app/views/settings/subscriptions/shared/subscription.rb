@@ -12,7 +12,7 @@ module Settings
             fields_for "subscriptions[]", @subscription do |f|
               li class: "flex items-center relative border-b" do
                 div class: "shrink-0 w-[32px] self-stretch flex" do
-                  input type: "checkbox", name: "subscription_ids[]", value: @subscription.id.to_s, id: "subscription_checkbox_#{@subscription.id}", class: "peer", data: {action: "toggle-checkboxes#toggleActions", toggle_checkboxes_target: "checkbox"}
+                  check_box_tag "subscription_ids[]", @subscription.id, false, id: "subscription_checkbox_#{@subscription.id}", class: "peer", data: {action: "toggle-checkboxes#toggleActions", toggle_checkboxes_target: "checkbox"}
                   label class: "group w-full h-full flex items-center", for: "subscription_checkbox_#{@subscription.id}" do
                     render Form::CheckboxComponent.new
                   end
