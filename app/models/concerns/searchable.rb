@@ -86,62 +86,52 @@ module Searchable
       end
     end
 
-    def self.term_string(term:, ids:)
-      ids = ids.join(" OR ")
-      "#{term}:(#{ids})"
+    def self.replace_tag_ids(query, user)
+      tag_replacer = proc do |ids|
+        ids = [*ids]
+        string = user.taggings.where(tag_id: ids).pluck("DISTINCT feed_id").join(" OR ")
+        if ids.length == 1
+          "feed_id:#{string}"
+        else
+          "feed_id:(#{string})"
+        end
+      end
+
+      query = query.gsub(TAG_ID_REGEX) {
+        tag_id = Regexp.last_match[1]
+        tag_replacer.call(tag_id)
+      }
+
+      query = query.gsub(TAG_GROUP_REGEX) {
+        tag_group = Regexp.last_match[1]
+        tag_ids = tag_group.split(" OR ")
+        tag_replacer.call(tag_ids)
+      }
+
+      query
     end
 
     def self.build_query(user:, query:, feed_ids: nil, size: nil)
       query ||= ""
+      query = replace_tag_ids(query, user)
+      query = query.gsub(READ_REGEX,      "NOT is:unread")
+      query = query.gsub(UNSTARRED_REGEX, "NOT is:starred")
+      min_should =
+
+      starred_ids = user.starred_entries.pluck(:entry_id)
+      allowed_feed_ids = user.subscriptions.pluck(:feed_id)
+      if feed_ids.present?
+        allowed_feed_ids = (feed_ids & allowed_feed_ids)
+      end
+
+      sort = if matches = SORT_REGEX.match(query)
+        query = query.gsub(SORT_REGEX, "")
+        matches[1].downcase
+      else
+        "desc"
+      end
 
       {}.tap do |request|
-        request[:fields] = ["id"]
-
-        if size
-          request[:from] = 0
-          request[:size] = size
-        end
-
-        sort = if matches = SORT_REGEX.match(query)
-          query = query.gsub(SORT_REGEX, "")
-          matches[1].downcase
-        else
-          "desc"
-        end
-
-        unless sort == "relevance"
-          request[:sort] = [{
-            published: sort
-          }]
-        end
-
-        tag_replacer = proc do |ids|
-          ids = [*ids]
-          string = user.taggings.where(tag_id: ids).pluck("DISTINCT feed_id").join(" OR ")
-          if ids.length == 1
-            "feed_id:#{string}"
-          else
-            "feed_id:(#{string})"
-          end
-        end
-
-        query = query.gsub(TAG_ID_REGEX) {
-          tag_id = Regexp.last_match[1]
-          tag_replacer.call(tag_id)
-        }
-
-        query = query.gsub(TAG_GROUP_REGEX) {
-          tag_group = Regexp.last_match[1]
-          tag_ids = tag_group.split(" OR ")
-          tag_replacer.call(tag_ids)
-        }
-
-        starred_ids = user.starred_entries.pluck(:entry_id)
-        allowed_feed_ids = user.subscriptions.pluck(:feed_id)
-        if feed_ids.present?
-          allowed_feed_ids = (feed_ids & allowed_feed_ids)
-        end
-
         request[:query] = {
           bool: {
             filter: {
@@ -158,13 +148,30 @@ module Searchable
           }
         }
 
-        query = query.gsub(READ_REGEX,      "NOT is:unread")
-        query = query.gsub(UNSTARRED_REGEX, "NOT is:starred")
+        request[:fields] = ["id"]
+
+        if size
+          request[:from] = 0
+          request[:size] = size
+        end
+
+        unless sort == "relevance"
+          request[:sort] = [{
+            published: sort
+          }]
+        end
 
         states = [
           [STARRED_REGEX, -> { starred_ids }],
           [UNREAD_REGEX, -> { user.unread_entries.pluck(:entry_id) }]
         ]
+
+        # handles the case of `is:starred OR is:unread`
+        or_found = states.any? do |regex, id_source|
+          match = regex.match(query)
+          match[:boolean] == "OR" if match
+        end
+
         states.each do |regex, id_source|
           if matches = regex.match(query)
             query = query.gsub(regex, "")
@@ -176,7 +183,8 @@ module Searchable
             when "NOT"
               request[:query][:bool][:must_not].push(boolean)
             else # AND + nil
-              request[:query][:bool][:must].push(boolean)
+              target = or_found ? :should : :must
+              request[:query][:bool][target].push(boolean)
             end
           end
         end
