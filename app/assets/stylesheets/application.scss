@@ -129,7 +129,6 @@ $color-contrast-600: (
   dusk: $theme-color-dusk-600,
   midnight: $theme-color-midnight-600,
 );
-$color-icons: $color-contrast-600;
 
 $color-contrast-700: (
   debug: color-contrast-700,
@@ -138,6 +137,7 @@ $color-contrast-700: (
   dusk: $theme-color-dusk-700,
   midnight: $theme-color-midnight-700,
 );
+$color-icons: $color-contrast-700;
 
 $color-borders: (
   debug: color-borders,
@@ -1243,7 +1243,7 @@ $hamburger-dot: 4px;
           opacity: 0;
         }
         .icon-caret {
-          @include fill($color-contrast-500);
+          @include fill($color-icons);
           transform: rotate(-90deg);
           position: relative;
           left: -3px;
@@ -2789,12 +2789,12 @@ $feed-title-width: 115px;
   }
   .button-toggle-read {
     .circle {
-      border: 2px solid transparent;
+      border: 1px solid transparent;
       @include border-color(map-get($color-selected, day));
       @include background-color(map-get($color-selected, day));
-      height: 16px;
-      width: 16px;
-      border-radius: 16px;
+      height: 14px;
+      width: 14px;
+      border-radius: 100%;
       .read & {
         @include border-color($color-icons);
         background-color: transparent !important;
@@ -2853,10 +2853,6 @@ $feed-title-width: 115px;
     ) {
       z-index: 10;
       visibility: hidden;
-    }
-    svg {
-      height: 16px;
-      width: 16px;
     }
     .dropdown-content {
       margin-left: -108px;
@@ -3227,23 +3223,23 @@ $feed-title-width: 115px;
 }
 
 .link-actions {
-  display: inline-block;
+  display: inline-flex;
   content: "";
   height: 16px;
-  width: 28px;
+  width: 20px;
   border-radius: 8px;
   cursor: pointer;
   background-size: 80% 80%;
   opacity: 1;
   transition: opacity 0.15s ease;
   @include background-color($color-contrast-500);
+  align-items: center;
+  justify-content: center;
+
   &:not([x-placement]) {
     display: none !important;
   }
   > svg {
-    position: absolute;
-    top: 6px;
-    left: 6px;
     @include fill($color-base);
     pointer-events: none;
   }
