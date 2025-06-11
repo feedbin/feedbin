@@ -2737,8 +2737,6 @@ $feed-title-width: 115px;
     .icon-next,
     .icon-previous {
       display: inline-block;
-      width: 7.6px;
-      height: 14px;
       svg * {
         @include fill($color-icons);
       }

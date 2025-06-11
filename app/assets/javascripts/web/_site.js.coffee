@@ -2705,7 +2705,7 @@ $.extend feedbin,
     navigatorShare: ->
       $(document).on 'click', '[data-behavior~=navigator_share]', (event) ->
         data =
-          title: feedbin.selectedEntryData.title,
+          title: feedbin.sanitize(feedbin.selectedEntryData.title),
           url: feedbin.selectedEntryData.url,
 
         selection = feedbin.getSelectedText()
