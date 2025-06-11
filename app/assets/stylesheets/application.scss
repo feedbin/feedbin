@@ -137,7 +137,6 @@ $color-contrast-700: (
   dusk: $theme-color-dusk-700,
   midnight: $theme-color-midnight-700,
 );
-$color-icons: $color-contrast-700;
 
 $color-borders: (
   debug: color-borders,
@@ -210,6 +209,7 @@ $image-spinners: (
   midnight: image-url("spinner-night.svg"),
 );
 
+$color-icons: $color-contrast-700;
 $color-arrow-shadow: $color-borders;
 $selected: #0867e2;
 $inset-bg-color: #f4f6f8;
@@ -1163,7 +1163,7 @@ $hamburger-dot: 4px;
         padding: 0;
         margin: 0;
         overflow: visible;
-        width: 35px;
+        width: 30px;
         position: absolute;
         right: 0;
         top: 0;
@@ -1515,7 +1515,6 @@ $hamburger-dot: 4px;
   border-radius: 2px;
   flex: 0 0 auto;
   .favicon,
-  svg,
   img {
     background-repeat: no-repeat;
     background-position: center center;
@@ -2792,6 +2791,9 @@ $feed-title-width: 115px;
     .icon-read {
       display: none;
     }
+    .icon-unread * {
+      fill: $color-accent-blue-600;
+    }
     .read & {
       .icon-read {
         display: block;
@@ -2818,6 +2820,12 @@ $feed-title-width: 115px;
     }
   }
   .button-toggle-content {
+    svg {
+      transform: scaleX(1);
+    }
+    .icon-full-content-on {
+      display: none;
+    }
     width: 46px;
     &.loading {
       @keyframes flip {
@@ -2825,18 +2833,6 @@ $feed-title-width: 115px;
           transform: scaleX(-1);
         }
       }
-      @keyframes pulse {
-        0% {
-          opacity: 0.8;
-        }
-        50% {
-          opacity: 0.4;
-        }
-        100% {
-          opacity: 0.8;
-        }
-      }
-      animation: pulse 2s linear infinite;
       svg {
         animation: flip 1s step-start 0s infinite;
       }
@@ -2862,8 +2858,17 @@ $feed-title-width: 115px;
   }
 }
 
-.button-toggle-content.active * {
-   fill: $color-accent-green-600 !important;
+.button-toggle-content.active {
+  .icon-full-content-on {
+    display: block;
+
+  }
+  .icon-full-content-on * {
+    fill: $color-accent-green-600 !important;
+  }
+  .icon-full-content {
+    display: none;
+  }
 }
 
 .has-entry-basement-share .button-toggle-share-menu {
@@ -3226,7 +3231,7 @@ $feed-title-width: 115px;
   display: inline-flex;
   content: "";
   height: 16px;
-  width: 20px;
+  width: 24px;
   border-radius: 8px;
   cursor: pointer;
   background-size: 80% 80%;
@@ -5864,7 +5869,7 @@ Media Players
       bottom: 0;
     }
     svg {
-      @include fill($color-icons);
+      @include fill($color-contrast-500);
     }
   }
   .audio-text {
