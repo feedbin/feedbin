@@ -2788,16 +2788,15 @@ $feed-title-width: 115px;
     margin: 0;
   }
   .button-toggle-read {
-    .circle {
-      border: 1px solid transparent;
-      @include border-color(map-get($color-selected, day));
-      @include background-color(map-get($color-selected, day));
-      height: 14px;
-      width: 14px;
-      border-radius: 100%;
-      .read & {
-        @include border-color($color-icons);
-        background-color: transparent !important;
+    .icon-read {
+      display: none;
+    }
+    .read & {
+      .icon-read {
+        display: block;
+      }
+      .icon-unread {
+        display: none;
       }
     }
   }

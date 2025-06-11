@@ -25,43 +25,6 @@
               </p>
             </div>
           </div>
-          <div class="context-menu">
-            <%=
-              render Common::DropdownMenu.new do |menu|
-                menu.item(
-                  icon: "menu-icon-block",
-                  title: "Create Mute Filter",
-                  attributes: {
-                    data: { open_dialog: Dialog::NewMute.dom_id }
-                  }
-                )
-                if micropost.micropost.microblog?
-                  menu.item(
-                    type: :a,
-                    icon: "icon-micro-blog",
-                    title: "View Replies",
-                    attributes: {
-                      href: thread_micropost_path(micropost),
-                      data: {
-                        open_dialog: Dialog::SocialReplies.dom_id,
-                        remote: "true"
-                      }
-                    }
-                  )
-                end
-                if micropost.micropost.instagram?
-                  menu.item(
-                    icon: "icon-instagram",
-                    title: "View on Instagram",
-                    attributes: {
-                      href: micropost.fully_qualified_url,
-                      data: { open_dialog: Dialog::NewMute.dom_id },
-                    }
-                  )
-                end
-              end
-            %>
-          </div>
         </div>
       </div>
     </header>
