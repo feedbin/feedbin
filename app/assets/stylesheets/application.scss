@@ -2328,11 +2328,11 @@ $feed-title-width: 115px;
   .control {
     margin: 0 16px;
   }
-  $size: 40px;
+  $size: 34px;
   .theme-options {
     margin: 0 16px;
     display: flex;
-    justify-content: space-between;
+    gap: 16px;
     .swatch-wrap {
       display: flex;
       flex-direction: column;
@@ -2341,19 +2341,19 @@ $feed-title-width: 115px;
       width: $size;
       @include font-size(12);
       overflow: visible;
+      cursor: pointer;
       .swatch {
         height: $size;
         width: $size;
-        border-radius: 50%;
+        border-radius: 8px;
         @include border($color-contrast-400);
-        margin-bottom: 8px;
         &:after {
           display: block;
           content: "";
-          width: 46px;
-          height: 46px;
+          width: $size + 6px;
+          height: $size + 6px;
           border: 2px solid transparent;
-          border-radius: 50%;
+          border-radius: 10px;
           position: relative;
           top: -4px;
           left: -4px;
@@ -2390,10 +2390,10 @@ $feed-title-width: 115px;
       right: 0;
       top: 0;
       position: absolute;
-      border-top-right-radius: $size * 2;
-      border-bottom-right-radius: $size * 2;
-      width: 19px;
-      height: 38px;
+      border-top-right-radius: 7px;
+      border-bottom-right-radius: 7px;
+      width: 16px;
+      height: 32px;
       background-color: $theme-color-dusk-base;
       content: "";
       display: block;
@@ -2458,11 +2458,10 @@ $feed-title-width: 115px;
   }
   .font-size {
     display: flex;
-    @include border-bottom($color-borders);
-    @include border-top($color-borders);
+    @include border($color-borders);
+    border-radius: 8px;
     button {
-      @include font-size(14);
-      padding: 16px;
+      padding: 11px;
       align-items: center;
       justify-content: center;
       flex: 1;
@@ -2774,6 +2773,8 @@ $feed-title-width: 115px;
 .fluid .entry-inner,
 .fluid-1 .entry-inner {
   max-width: 100%;
+  padding-left: 8%;
+  padding-right: 8%;
 }
 
 .entry-buttons {

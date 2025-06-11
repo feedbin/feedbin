@@ -6,20 +6,20 @@
             <%= f.hidden_field :feeds_width, data: {behavior: "feeds_width"} %>
             <%= f.hidden_field :entries_width, data: {behavior: "entries_width"} %>
 
-            <h3>Theme</h3>
+            <div class="leading-[17px] my-4 mx-[16px] text-700">Theme</div>
+
             <div class="theme-options">
                 <%= f.collection_radio_buttons(:theme, Feedbin::Application.config.themes, :slug, :name) do |b| %>
                     <div class="option">
                         <%= b.radio_button data: {behavior: "auto_submit switch_theme"} %>
                         <%= b.label class: "swatch-wrap" do %>
                             <span class="swatch"></span>
-                            <%= b.text %>
                         <% end %>
                     </div>
                 <% end %>
             </div>
 
-            <h3 style="margin-bottom: 8px;">Typeface</h3>
+            <div class="leading-[17px] mt-8 mb-2 mx-[16px] text-700">Typeface</div>
 
             <div class="control" style="margin-bottom: 16px;">
                 <div class="font-options">
@@ -36,14 +36,14 @@
             </div>
 
             <div class="control">
-                <span class="font-size">
+                <span class="font-size text-sm">
                     <button class="reset" data-behavior="decrease_font">Smaller</button>
                     <button class="reset" data-behavior="increase_font">Larger</button>
                 </span>
             </div>
 
             <div class="mobile-hide">
-              <h3>Display</h3>
+              <div class="leading-[17px] mt-8 mb-4 mx-[16px] text-700">Display</div>
               <div class="control">
                 <%= render Settings::ControlGroupComponent.new class: "mb-4" do |group| %>
                   <% group.item do %>
@@ -52,7 +52,7 @@
                       <%= render Settings::ControlRowComponent.new do |row| %>
                         <% row.title do %>
                           <span class="flex items-center text-sm">
-                            Full screen <span class="ml-auto text-500 text-sm">shift&nbsp;&nbsp;F</span>
+                            Full Screen <span class="ml-auto text-500 text-sm">⇧&nbsp;&nbsp;F</span>
                           </span>
                         <% end %>
                         <% row.control { render Form::SwitchComponent.new } %>
@@ -65,7 +65,7 @@
                     <%= f.label :entry_width, class: "group" do %>
                       <%= render Settings::ControlRowComponent.new do |row| %>
                         <% row.title do %>
-                          <span class="text-sm">Fluid width</span>
+                          <span class="text-sm">Fluid Width</span>
                         <% end %>
                         <% row.control { render Form::SwitchComponent.new } %>
                       <% end %>
@@ -78,7 +78,6 @@
             <div style="text-align: center; margin-top: 8px; font-size: 13px;">
               <%= link_to "Advanced", settings_appearance_path, remote: true, data: {open_dialog: Dialog::EditAppearance.dom_id} %>
             </div>
-
 
         <% end %>
     </div>
