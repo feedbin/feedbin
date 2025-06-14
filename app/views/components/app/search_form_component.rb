@@ -81,11 +81,11 @@ module App
         div class: "min-h-0" do
           div class: "border-b flex gap-2 text-sm p-1 items-stretch" do
             div class: "dropdown-wrap" do
-              button class: "flex gap-1 fill-500 items-center p-2 border rounded", data_behavior: "toggle_dropdown" do
+              button class: "flex gap-2 fill-500 items-center p-2 border rounded", data_behavior: "toggle_dropdown" do
                 span data_search_form_target: "sortLabel" do
                   "Sort by date"
                 end
-                Icon("icon-caret-small", class: "relative bottom-[-1px]")
+                Icon("icon-caret", class: "relative bottom-[-1px]")
               end
               div class: "dropdown-content" do
                 ul do
