@@ -6,7 +6,7 @@
                     <% if entry_presenter.media_image %>
                         <%= image_tag entry_presenter.media_image %>
                     <% else %>
-                        <%= svg_tag 'icon-podcast', size: '10x17' %>
+                        <%= svg_tag 'icon-podcast' %>
                     <% end %>
                 </div>
                 <div class="audio-text">
@@ -23,8 +23,10 @@
                         <%= svg_tag('icon-download', size: "14x15") %>
                     </a>
                     <button class="button-text button-empty play-button" data-behavior="audio_launch_player audio_play_<%= entry.id %>" data-entry-id="<%= entry.id %>" title="Play/Pause">
-                        <%= svg_tag('icon-play', size: "12x16") %>
-                        <%= svg_tag('icon-pause', size: "12x16") %>
+                      <span class="h-[16px] w-[16px] flex flex-center">
+                        <%= svg_tag('icon-play') %>
+                        <%= svg_tag('icon-pause') %>
+                      </span>
                     </button>
                 </div>
             </div>

@@ -129,7 +129,6 @@ $color-contrast-600: (
   dusk: $theme-color-dusk-600,
   midnight: $theme-color-midnight-600,
 );
-$color-icons: $color-contrast-600;
 
 $color-contrast-700: (
   debug: color-contrast-700,
@@ -210,6 +209,7 @@ $image-spinners: (
   midnight: image-url("spinner-night.svg"),
 );
 
+$color-icons: $color-contrast-700;
 $color-arrow-shadow: $color-borders;
 $selected: #0867e2;
 $inset-bg-color: #f4f6f8;
@@ -1163,7 +1163,7 @@ $hamburger-dot: 4px;
         padding: 0;
         margin: 0;
         overflow: visible;
-        width: 35px;
+        width: 30px;
         position: absolute;
         right: 0;
         top: 0;
@@ -1243,7 +1243,7 @@ $hamburger-dot: 4px;
           opacity: 0;
         }
         .icon-caret {
-          @include fill($color-contrast-500);
+          @include fill($color-icons);
           transform: rotate(-90deg);
           position: relative;
           left: -3px;
@@ -1515,7 +1515,6 @@ $hamburger-dot: 4px;
   border-radius: 2px;
   flex: 0 0 auto;
   .favicon,
-  svg,
   img {
     background-repeat: no-repeat;
     background-position: center center;
@@ -2738,8 +2737,6 @@ $feed-title-width: 115px;
     .icon-next,
     .icon-previous {
       display: inline-block;
-      width: 7.6px;
-      height: 14px;
       svg * {
         @include fill($color-icons);
       }
@@ -2789,16 +2786,18 @@ $feed-title-width: 115px;
     margin: 0;
   }
   .button-toggle-read {
-    .circle {
-      border: 2px solid transparent;
-      @include border-color(map-get($color-selected, day));
-      @include background-color(map-get($color-selected, day));
-      height: 16px;
-      width: 16px;
-      border-radius: 16px;
-      .read & {
-        @include border-color($color-icons);
-        background-color: transparent !important;
+    .icon-read {
+      display: none;
+    }
+    .icon-unread * {
+      fill: $color-accent-blue-600;
+    }
+    .read & {
+      .icon-read {
+        display: block;
+      }
+      .icon-unread {
+        display: none;
       }
     }
   }
@@ -2819,6 +2818,12 @@ $feed-title-width: 115px;
     }
   }
   .button-toggle-content {
+    svg {
+      transform: scaleX(1);
+    }
+    .icon-full-content-on {
+      display: none;
+    }
     width: 46px;
     &.loading {
       @keyframes flip {
@@ -2826,18 +2831,6 @@ $feed-title-width: 115px;
           transform: scaleX(-1);
         }
       }
-      @keyframes pulse {
-        0% {
-          opacity: 0.8;
-        }
-        50% {
-          opacity: 0.4;
-        }
-        100% {
-          opacity: 0.8;
-        }
-      }
-      animation: pulse 2s linear infinite;
       svg {
         animation: flip 1s step-start 0s infinite;
       }
@@ -2855,10 +2848,6 @@ $feed-title-width: 115px;
       z-index: 10;
       visibility: hidden;
     }
-    svg {
-      height: 16px;
-      width: 16px;
-    }
     .dropdown-content {
       margin-left: -108px;
       left: 50%;
@@ -2867,8 +2856,17 @@ $feed-title-width: 115px;
   }
 }
 
-.button-toggle-content.active * {
-   fill: $color-accent-green-600 !important;
+.button-toggle-content.active {
+  .icon-full-content-on {
+    display: block;
+
+  }
+  .icon-full-content-on * {
+    fill: $color-accent-green-600 !important;
+  }
+  .icon-full-content {
+    display: none;
+  }
 }
 
 .has-entry-basement-share .button-toggle-share-menu {
@@ -3228,23 +3226,23 @@ $feed-title-width: 115px;
 }
 
 .link-actions {
-  display: inline-block;
+  display: inline-flex;
   content: "";
   height: 16px;
-  width: 28px;
+  width: 24px;
   border-radius: 8px;
   cursor: pointer;
   background-size: 80% 80%;
   opacity: 1;
   transition: opacity 0.15s ease;
   @include background-color($color-contrast-500);
+  align-items: center;
+  justify-content: center;
+
   &:not([x-placement]) {
     display: none !important;
   }
   > svg {
-    position: absolute;
-    top: 6px;
-    left: 6px;
     @include fill($color-base);
     pointer-events: none;
   }
@@ -5869,7 +5867,7 @@ Media Players
       bottom: 0;
     }
     svg {
-      @include fill($color-icons);
+      @include fill($color-contrast-500);
     }
   }
   .audio-text {

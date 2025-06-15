@@ -63,7 +63,7 @@ module FixFeeds
             group.item do
               div class: "flex gap-4" do
                 render Timeline.new(color: "bg-green-600", options: {last: discovered_feed == discovered_feeds.last, middle: index != 0}) do
-                  Icon("icon-check-small", class: "fill-white")
+                  Icon("icon-check", class: "fill-white")
                 end
 
                 div class: "grow #{index != 0 ? "mt-[8px]" : ""}" do

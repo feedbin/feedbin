@@ -4,7 +4,6 @@ class ExtractsController < ApplicationController
     @entry = Entry.find params[:id]
 
     @extract = params[:extract] == "true"
-
     begin
       if @extract
         url = @entry.fully_qualified_url
