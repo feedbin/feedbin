@@ -10,7 +10,7 @@
           <label for="email">Email</label>
         <% end %>
         <% text.input do %>
-          <%= email_field_tag :email, params[:email], autofocus: true, tabindex: "1", class: "peer text-input" %>
+          <%= email_field_tag :email, params[:email], autofocus: true, tabindex: "1", class: "peer text-input dark:[color-scheme:dark]" %>
         <% end %>
       <% end %>
     </div>
@@ -23,7 +23,7 @@
           </div>
         <% end %>
         <% text.input do %>
-          <%= password_field_tag :password, nil, tabindex: "2", class: "text-input" %>
+          <%= password_field_tag :password, nil, tabindex: "2", class: "text-input dark:[color-scheme:dark]" %>
         <% end %>
       <% end %>
     </div>
