@@ -59,7 +59,7 @@ class MercuryParser
       digest = OpenSSL::Digest.new("sha1")
       signature = OpenSSL::HMAC.hexdigest(digest, ENV["EXTRACT_SECRET"], url)
       base64_url = Base64.urlsafe_encode64(url).delete("\n")
-      URI::HTTPS.build({
+      URI::HTTP.build({
         host: ENV["EXTRACT_HOST"],
         path: "/parser/#{@user}/#{signature}",
         query: "base64_url=#{base64_url}"
@@ -69,7 +69,10 @@ class MercuryParser
 
   def result
     @result ||= begin
-      response = HTTP.timeout(write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
+      response = HTTP.timeout(write: 5, connect: 5, read: 5)
+        .use(:auto_inflate)
+        .headers("Accept-Encoding" => "gzip", "Host" => ENV["EXTRACT_HOST_HEADER"])
+        .get(service_url)
       response.parse
     end
   end
