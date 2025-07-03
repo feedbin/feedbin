@@ -2524,6 +2524,7 @@ $feed-title-width: 115px;
   will-change: transform;
   .toolbar-wrap {
     flex: 1;
+    min-width: 0;
   }
   .has-content & {
     display: flex;
