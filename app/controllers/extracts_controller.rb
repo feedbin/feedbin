@@ -12,7 +12,9 @@ class ExtractsController < ApplicationController
       else
         @content = @entry.content
       end
-    rescue => e
+    rescue => exception
+      Rails.logger.error exception.message
+      Rails.logger.error exception.backtrace.join("\n")
       @content = nil
     end
 
