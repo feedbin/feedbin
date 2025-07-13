@@ -18,6 +18,20 @@ class SavePageTest < ActiveSupport::TestCase
     entry = Entry.find_by_url url
   end
 
+  test "should create page with html" do
+    stub_request_file("parsed_page.json", /extract\.example\.com/, {headers: {"Content-Type" => "application/json; charset=utf-8"}}, :post)
+    url = "http://example.com/saved_page"
+    Sidekiq::Worker.clear_all
+    file = Tempfile.new
+    file.close
+    assert_difference "Feed.count", +1 do
+      assert_difference "Entry.count", +1 do
+        SavePage.new.perform(@user.id, url, "Title", file.path)
+      end
+    end
+    file.unlink
+  end
+
   test "should save tweet" do
     tweet_entry = create_tweet_entry(@user.feeds.first)
     stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})

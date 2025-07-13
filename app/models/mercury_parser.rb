@@ -1,15 +1,22 @@
 class MercuryParser
   attr_reader :url
 
-  def initialize(url, data = nil, user = ENV["EXTRACT_USER"])
+  def initialize(url, data: nil, html: nil)
     @url = url
-    @user = user
+    @html = html
     load_data(data) if data
   end
 
-  def self.parse(*args)
+  def self.parse(...)
     Librato.increment "readability.first_parse"
-    instance = new(*args)
+    instance = new(...)
+    instance.result
+    instance
+  end
+
+  def self.parse_with_html(...)
+    Librato.increment "readability.first_parse"
+    instance = new(...)
     instance.result
     instance
   end
@@ -60,7 +67,7 @@ class MercuryParser
       signature = OpenSSL::HMAC.hexdigest(digest, ENV["EXTRACT_SECRET"], url)
       base64_url = Base64.urlsafe_encode64(url).delete("\n")
       URI.parse(ENV["EXTRACT_HOST"]).tap do
-        it.path  = "/parser/#{@user}/#{signature}"
+        it.path  = "/parser/#{ENV["EXTRACT_USER"]}/#{signature}"
         it.query = "base64_url=#{base64_url}"
       end.to_s
     end
@@ -71,7 +78,13 @@ class MercuryParser
       response = HTTP.timeout(write: 5, connect: 5, read: 5)
         .use(:auto_inflate)
         .headers("Accept-Encoding" => "gzip")
-        .get(service_url)
+
+      response = if @html
+        response.post(service_url, json: {body: @html})
+      else
+        response.get(service_url)
+      end
+
       response.parse
     end
   end

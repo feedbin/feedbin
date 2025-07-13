@@ -256,7 +256,7 @@ class EntryPresenter < BasePresenter
   def saved_page(url)
     if entry.data && entry.data["saved_pages"] && page = entry.data["saved_pages"][url]
       if page["result"]
-        MercuryParser.new(nil, page)
+        MercuryParser.new(nil, data: page)
       end
     end
   end
@@ -300,7 +300,7 @@ class EntryPresenter < BasePresenter
     if entry.data && entry.data["saved_pages"]
       entry.data["saved_pages"].each do |url, page|
         if page["result"]
-          parsed = MercuryParser.new(nil, page)
+          parsed = MercuryParser.new(nil, data: page)
           content = ContentFormatter.api_format(parsed.content, nil)
           data = {
             url: url,

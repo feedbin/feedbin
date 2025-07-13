@@ -12,7 +12,7 @@ class HarvestLinks
     end
 
     if url = urls&.first
-      page = MercuryParser.parse(url, nil, ENV["EXTRACT_USER_ALT"])
+      page = MercuryParser.parse(url)
       @entry.data["saved_pages"] = {url => page.to_h}
       @entry.data["urls"] = urls
       @entry.save!

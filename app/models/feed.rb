@@ -116,6 +116,10 @@ class Feed < ApplicationRecord
     Feedkit::Request.download(feed_url)
   end
 
+  def volume
+    FeedStat.daily_counts(feed_ids: [id])
+  end
+
   def self.include_user_title
     feeds = select("feeds.*, subscriptions.title AS user_title")
     feeds.map do |feed|

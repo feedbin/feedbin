@@ -265,6 +265,16 @@ Rails.application.routes.draw do
   match "pages",          to: "pages#fallback",        via: :get
   match "pages_internal", to: "pages_internal#create", via: :post
 
+  namespace :extension do
+    namespace :v1 do
+      match "authentication",       to: "authentication#index", via: :post
+      match "pages",                to: "pages#create",         via: :post
+      match "subscriptions/new",    to: "subscriptions#new",    via: :post
+      match "subscriptions/create", to: "subscriptions#create", via: :post
+      match "*path",                to: "api#options",          via: :options
+    end
+  end
+
   constraints subdomain: "api" do
     namespace :api, path: nil do
       namespace :v1 do

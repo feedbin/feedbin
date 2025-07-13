@@ -1,6 +1,7 @@
 require_relative "boot"
 
 require "rails/all"
+require_relative "../lib/compressed_request"
 require_relative "../lib/basic_authentication"
 require_relative "../lib/conditional_sass_compressor"
 
@@ -27,6 +28,8 @@ module Feedbin
     config.action_mailer.default_options   = { from: ENV["FROM_ADDRESS"] }
 
     config.action_view.sanitized_allowed_tags = "table", "tr", "td", "th", "thead", "tbody"
+
+    config.middleware.use CompressedRequest
 
     config.middleware.use Rack::ContentLength
 

@@ -109,9 +109,9 @@ class ActiveSupport::TestCase
   end
 
 
-  def stub_request_file(file, url, response_options = {})
+  def stub_request_file(file, url, response_options = {}, method = :get)
     options = {body: File.new(support_file(file)), status: 200}.merge(response_options)
-    stub_request(:get, url)
+    stub_request(method, url)
       .to_return(options)
   end
 

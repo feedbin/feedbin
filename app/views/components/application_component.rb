@@ -39,6 +39,7 @@ class ApplicationComponent < Phlex::HTML
   register_value_helper :short_url_alt
   register_value_helper :starred_url
   register_value_helper :distance_of_time_in_words
+  register_value_helper :timeago_text
 
   register_output_helper :image_tag_with_fallback
   register_output_helper :timeago
@@ -71,7 +72,7 @@ class ApplicationComponent < Phlex::HTML
       plain "N/A"
     else
       time datetime: time_value.utc.iso8601, title: [prefix, time_value.to_formatted_s(:feed)].compact.join(" ") do
-        [distance_of_time_in_words(time_value, Time.now, scope: 'datetime.distance_in_words.short'), time_value.future? ? "from now" : "ago"].join(" ")
+        timeago_text(time_value)
       end
     end
   end

@@ -10,12 +10,14 @@ class SavePage
   include Sidekiq::Worker
   sidekiq_options queue: :default_critical
 
-  attr_reader :user, :url, :title
+  attr_reader :user, :url, :title, :path
 
-  def perform(user_id, url, title)
+  def perform(user_id, url, title, path = nil)
     @user = User.find(user_id)
     @url = url
     @title = title
+    @path = path
+
     entry = create_webpage_entry
 
     ImageSaver.perform_async(entry.id)
@@ -56,8 +58,13 @@ class SavePage
 
   def parsed_result
     return @parsed_result if defined?(@parsed_result)
+
     @parsed_result = begin
-      MercuryParser.parse(url)
+      if path
+        MercuryParser.parse(url, html: File.read(path))
+      else
+        MercuryParser.parse(url)
+      end
     rescue
       nil
     end

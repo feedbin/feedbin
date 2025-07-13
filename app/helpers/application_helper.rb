@@ -51,6 +51,10 @@ module ApplicationHelper
     current_user.try(:unread_entries).try(:order, "created_at DESC").try(:first).try(:created_at).try(:iso8601, 6)
   end
 
+  def timeago_text(time_value)
+    [distance_of_time_in_words(time_value, Time.now, scope: 'datetime.distance_in_words.short'), time_value.future? ? "from now" : "ago"].join(" ")
+  end
+
   def get_icon(name)
     name = name.sub(".svg", "")
     icon = Feedbin::Application.config.icons[name]
