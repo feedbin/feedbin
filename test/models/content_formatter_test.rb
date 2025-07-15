@@ -61,7 +61,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
     <math>
       <annotation-xml></annotation-xml>
     </math>
-    <div>Hello</div>
+    <span>Hello</span>
     EOD
     assert_equal expected, ContentFormatter.format!(content)
   end

@@ -20,6 +20,8 @@ module ContentFilters
       Loofah::Scrubber.new do |node|
         if DASHED_ELEMENT_PARENTS.include?(node.name)
           Loofah::Scrubber::STOP
+        elsif node.name.include?("-")
+          node.name = "span"
         end
       end
     end
