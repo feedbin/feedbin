@@ -8,7 +8,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "should format content" do
-    expected = %(<p><a href="http://kottke.org/link"><img src="" data-camo-src="https://example.com/e3b56842cc257f75872facfb7febe44968bddf6a/687474703a2f2f6b6f74746b652e6f72672f696d672e706e67" data-canonical-src="http://kottke.org/img.png"></a></p>)
+    expected = %(<p><a href="http://kottke.org/link"><img data-camo-src="https://example.com/e3b56842cc257f75872facfb7febe44968bddf6a/687474703a2f2f6b6f74746b652e6f72672f696d672e706e67" data-canonical-src="http://kottke.org/img.png"></a></p>)
     assert_equal expected, ContentFormatter.format!(@entry.content, @entry)
   end
 

@@ -736,6 +736,12 @@ $.extend feedbin,
         else
           src = 'canonical-poster'
         $(@).attr("poster", $(@).data(src))
+      content.find("img[data-camo-srcset][data-canonical-srcset]").each ->
+        if feedbin.data.proxy_images
+          src = 'camo-srcset'
+        else
+          src = 'canonical-srcset'
+        $(@).attr("srcset", $(@).data(src))
       content.find("img[data-camo-src][data-canonical-src]").each ->
         if feedbin.data.proxy_images
           src = 'camo-src'
@@ -923,6 +929,17 @@ $.extend feedbin,
       if actualSrc?
         video.attr("poster", actualSrc)
 
+    $("[data-camo-srcset]", context).each ->
+      img = $(@)
+
+      srcset = if feedbin.data.proxy_images
+        'camo-srcset'
+      else
+        'canonical-srcset'
+
+      actualSrcset = img.data(srcset)
+      if actualSrcset?
+        img.attr("srcset", actualSrcset)
 
     $("img[data-camo-src]", context).each ->
       img = $(@)
