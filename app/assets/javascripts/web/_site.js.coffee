@@ -905,8 +905,9 @@ $.extend feedbin,
 
   fullWidthImage: (img) ->
     load = ->
+      containerWidth = img.closest($('.entry-content')).width()
       width = img.get(0).naturalWidth
-      if width > 528 && img.parents(".system-content").length == 0 && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
+      if width >= containerWidth && img.parents(".system-content").length == 0 && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
         img.addClass("full-width")
       img.addClass("show")
 
