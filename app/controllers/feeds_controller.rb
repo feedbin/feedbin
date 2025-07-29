@@ -25,7 +25,7 @@ class FeedsController < ApplicationController
   def search
     @user = current_user
     @query = params[:q].strip
-    @feeds = if @query.start_with?("http") || (@query.include?(".") && !@query.include?(" "))
+    @feeds = if looks_like_url?(@query)
       FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
     else
       @search = true

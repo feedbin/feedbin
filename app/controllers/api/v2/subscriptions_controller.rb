@@ -50,10 +50,18 @@ module Api
 
       def create
         @user = current_user
-        feeds = FeedFinder.feeds(params[:feed_url])
+
+        search = false
+        feeds = if looks_like_url?(params[:feed_url])
+          FeedFinder.feeds(params[:feed_url])
+        else
+          search = true
+          Feed.search(params[:feed_url])
+        end
+
         if feeds.length == 0
           status_not_found
-        elsif feeds.length == 1
+        elsif feeds.length == 1 && !search
           feed = feeds.first
           status = @user.subscribed_to?(feed) ? :found : :created
           @subscription = @user.subscriptions.find_or_create_by(feed: feed)
