@@ -67,7 +67,7 @@ module Api
           @subscription = @user.subscriptions.find_or_create_by(feed: feed)
           render status: status, location: api_v2_subscription_url(@subscription, format: :json)
         else
-          @options = feeds
+          @options = search ? feeds.limit(3) : feeds
           render status: :multiple_choices
         end
       rescue => exception
