@@ -134,21 +134,29 @@ module Settings
 
           group.item do
             render Settings::ControlRowComponent.new do |row|
-              row.title { "Bookmarklet" }
+              row.title { "Extension" }
 
               row.description do
-                plain "Drag this to your bookmarks bar. Use it to "
+                plain "You can "
                 a(href: "/blog/2019/08/20/save-webpages-to-read-later/") do
                   "save articles from the web"
                 end
-                plain " to Feedbin."
+                plain " to read later in Feedbin. Install the Feedbin browser extension to get started. "
               end
 
               row.control do
-                link_to bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do
-                  Icon("favicon-saved", class: "fill-500")
-                  plain " Send to Feedbin "
-                  Icon("icon-grabber", class: "ml-6 fill-700")
+                div class: "whitespace-nowrap" do
+                  a href: "https://apps.apple.com/us/app/feedbin/id1444961766" do
+                    "Safari"
+                  end
+                  plain ", "
+                  a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/" do
+                    "Firefox"
+                  end
+                  plain ", "
+                  a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco" do
+                    "Chrome"
+                  end
                 end
               end
             end
