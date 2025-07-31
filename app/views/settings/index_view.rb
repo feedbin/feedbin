@@ -129,7 +129,7 @@ module Settings
           end
         end
 
-        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+        render Settings::ControlGroupComponent.new class: "mb-14", id: "pages_options" do |group|
           group.header { "Pages" }
 
           group.item do
@@ -157,6 +157,23 @@ module Settings
                   a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco" do
                     "Chrome"
                   end
+                end
+              end
+            end
+          end
+          group.item do
+            render Settings::ControlRowComponent.new do |row|
+              row.title { "Bookmarklet" }
+
+              row.description do
+                plain "If the extension is not an option, there's also a bookmarklet. Drag this to your bookmarks bar."
+              end
+
+              row.control do
+                link_to bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do
+                  Icon("favicon-saved", class: "fill-500")
+                  plain " Send to Feedbin "
+                  Icon("icon-grabber", class: "ml-6 fill-700")
                 end
               end
             end
