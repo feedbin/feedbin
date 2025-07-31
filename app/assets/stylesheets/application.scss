@@ -5766,10 +5766,11 @@ Print
   @page {
     margin: 1in;
   }
-  body {
-    font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
+  body, html {
     font-weight: 400;
     font-style: normal;
+    overflow: visible !important;
+    height: auto !important;
   }
   h1,
   h2,
@@ -5777,7 +5778,7 @@ Print
   h4,
   h5,
   h6 {
-    font-family: $font-stack;
+    font-family: $font-stack !important;
   }
   hr {
     background: none;
@@ -5797,14 +5798,21 @@ Print
   table {
     font-size: 12pt;
   }
+  .content-option {
+    font-family: ui-serif, Georgia, serif !important;
+  }
   .app .bar,
   .app .feeds-column,
   .app .entries-column,
-  .app .entry-toolbar {
+  .app .entry-toolbar,
+  .app .entry-meta,
+  .app .splash {
     display: none !important;
   }
   .app .content,
-  .app .entry-content {
+  .app .entry-content,
+  .app .entry-inner-column,
+  .app .inner-column {
     position: static;
   }
   .app .entry-inner {
