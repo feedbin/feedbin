@@ -25,5 +25,6 @@
   </div>
   <%= render partial: "shared/svg" %>
   <%= render Dialog::All.new %>
+  <button class="hide" data-behavior="show_subscribe" data-open-dialog="<%= Dialog::AddFeed.dom_id %>"></button>
 <% end %>
 <%= render template: "layouts/application" %>

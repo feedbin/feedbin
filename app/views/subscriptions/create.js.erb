@@ -1,5 +1,5 @@
-<%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.showNotification('You have subscribed.');
+<%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.hideSubscribe();
 <% @subscriptions.each do |subscription| %>
     <% if subscription.title.present? %>

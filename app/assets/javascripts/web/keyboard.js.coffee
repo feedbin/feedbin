@@ -131,6 +131,15 @@ class feedbin.Keyboard
       @selectItem()
 
   bindKeys: ->
+
+    # Add subscription
+    Mousetrap.bind 'a', (event, combo) =>
+      $('body').removeClass('full-screen')
+      $('[data-behavior~=show_subscribe]')[0]?.click()
+      event.preventDefault()
+
+    # app only shortcuts below
+    # ----------------------------------------------------------
     if $('body.app').length == 0
       return
 
@@ -199,12 +208,6 @@ class feedbin.Keyboard
       @alternateEntryCandidates.push currentEntry.prev() if currentEntry.prev().length
 
       $('[data-behavior~=mark_all_as_read]').first()[0]?.click()
-      event.preventDefault()
-
-    # Add subscription
-    Mousetrap.bind 'a', (event, combo) =>
-      $('body').removeClass('full-screen')
-      $('[data-behavior~=show_subscribe]')[0]?.click()
       event.preventDefault()
 
     # Show Keyboard shortcuts

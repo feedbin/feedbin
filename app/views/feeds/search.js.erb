@@ -5,7 +5,9 @@
     }
   }))
 
-  window.history.replaceState({}, document.title, "/");
+  if (window.location.pathname === "/" && window.location.search.length !== 0) {
+    window.history.replaceState({}, document.title, "/");
+  }
 <% else %>
   window.dispatchEvent(new CustomEvent("add-feed:clearResults", {detail: {error: true}}))
   feedbin.showNotification('No feed found.', true);
