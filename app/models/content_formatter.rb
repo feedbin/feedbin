@@ -134,6 +134,8 @@ class ContentFormatter
       filters.unshift(ContentFilters::Substack)
     end
 
+    filters.unshift(ContentFilters::FigureControls)
+
     filters.unshift(HTML::Pipeline::LazyLoadFilter)
 
     pipeline = HTML::Pipeline.new filters, context
