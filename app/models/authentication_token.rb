@@ -36,7 +36,11 @@ class AuthenticationToken < ApplicationRecord
     SecureRandom.hex(length)
   end
 
-  def self.token_custom(prefix)
+  def self.generate_alpha_token
+    AuthenticationToken.newsletters.new.generate_token
+  end
+
+  def self.generate_custom_token(prefix)
     token = nil
     count = AuthenticationToken.newsletters.where("token LIKE :query", query: "#{prefix}.%").count
     length = count > 900 ? 4 : 3

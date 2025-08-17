@@ -1,0 +1,1 @@
+json.partial! "extension/v1/addresses/new"

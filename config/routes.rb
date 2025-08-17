@@ -271,6 +271,8 @@ Rails.application.routes.draw do
       match "pages",                to: "pages#create",         via: :post
       match "subscriptions/new",    to: "subscriptions#new",    via: :post
       match "subscriptions/create", to: "subscriptions#create", via: :post
+      match "addresses/new",        to: "addresses#new",    via: :post
+      match "addresses/create",     to: "addresses#create", via: :post
       match "*path",                to: "api#options",          via: :options
     end
   end

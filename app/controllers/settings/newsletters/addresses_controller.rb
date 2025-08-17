@@ -46,7 +46,7 @@ class Settings::Newsletters::AddressesController < ApplicationController
       if params[:authentication_token][:type] == "random"
         @random = true
       elsif clean_token.present?
-        @token = AuthenticationToken.newsletters.token_custom(clean_token)
+        @token = AuthenticationToken.newsletters.generate_custom_token(clean_token)
         @numbers = @token.split(".").last
         @message = Rails.application.message_verifier(:address_token).generate(@token)
       end
