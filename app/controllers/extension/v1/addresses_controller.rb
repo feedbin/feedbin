@@ -22,7 +22,7 @@ module Extension
             @verified_token = Rails.application.message_verifier(:address_token).generate(@token)
             @numbers = @token.split(".").last
           else
-            render json: {error: true} and return
+            render json: {error: true}, status: 400 and return
           end
         end
       end
