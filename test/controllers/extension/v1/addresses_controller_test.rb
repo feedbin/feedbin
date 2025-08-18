@@ -85,7 +85,7 @@ class Extension::V1::AddressesControllerTest < ActionController::TestCase
       page_token: @user.page_token
     }, format: :json
 
-    assert_response :success
+    assert_response :bad_request
 
     json = JSON.parse(@response.body)
     assert json["error"]
@@ -98,7 +98,7 @@ class Extension::V1::AddressesControllerTest < ActionController::TestCase
       page_token: @user.page_token
     }, format: :json
 
-    assert_response :success
+    assert_response :bad_request
 
     json = JSON.parse(@response.body)
     assert json["error"]
