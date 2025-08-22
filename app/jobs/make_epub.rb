@@ -173,6 +173,7 @@ class MakeEpub
   def download(src)
     file = Download.new(src, @image_path)
     file.download
+    return nil unless file.content_type =~ /image/i
     file
   rescue
     nil
