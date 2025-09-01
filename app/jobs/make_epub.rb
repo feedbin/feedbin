@@ -55,7 +55,7 @@ class MakeEpub
     )
 
     mimetype = "mimetype"
-    ::Zip::File.open(epub_path, ::Zip::File::CREATE) do |zip_file|
+    ::Zip::File.open(epub_path, create: true) do |zip_file|
       # mimetype goes first, uncompressed
       zip_file.add_stored(mimetype, File.join(@directory, mimetype))
       Dir[File.join(@directory, "**", "**")].each do |file|

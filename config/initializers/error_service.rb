@@ -1,9 +1,9 @@
 class ErrorService
   def self.notify(exception, options = {})
     if exception.is_a?(Exception)
-      Honeybadger.notify(exception, options)
-    else
       Honeybadger.notify(exception)
+    else
+      Honeybadger.notify(**exception)
       Rails.logger.error exception
       exception = exception.respond_to?(:safe_dig) && exception.safe_dig(:parameters, :exception)
     end
