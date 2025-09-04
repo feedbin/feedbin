@@ -40,6 +40,7 @@ class ApplicationComponent < Phlex::HTML
   register_value_helper :starred_url
   register_value_helper :distance_of_time_in_words
   register_value_helper :timeago_text
+  register_value_helper :camo_link
 
   register_output_helper :image_tag_with_fallback
   register_output_helper :timeago

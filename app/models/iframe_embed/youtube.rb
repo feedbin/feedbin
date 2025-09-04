@@ -29,9 +29,10 @@ class IframeEmbed::Youtube < IframeEmbed
 
   def iframe_params
     {
-      "autoplay" => "1",
-      "rel" => "0",
-      "showinfo" => "0"
+      autoplay: "1",
+      rel: "0",
+      showinfo: "0",
+      enablejsapi: "1"
     }
   end
 
@@ -61,6 +62,14 @@ class IframeEmbed::Youtube < IframeEmbed
 
   def cache_key
     video && "youtube_embed_#{video.updated_at.to_i}" || super
+  end
+
+  def chapters
+    video && video.chapters
+  end
+
+  def youtube?
+    true
   end
 
   private

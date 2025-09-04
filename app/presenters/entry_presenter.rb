@@ -173,7 +173,7 @@ class EntryPresenter < BasePresenter
         ContentFormatter.text_email(entry.content)
       elsif youtube?
         @template.capture do
-          @template.concat @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true)
+          @template.concat @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true, width: 1280, height: 720)
           @template.concat ContentFormatter.text_email(entry.content)&.html_safe
         end
       else

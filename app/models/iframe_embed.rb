@@ -32,6 +32,7 @@ class IframeEmbed
   def channel_name; end
   def duration; end
   def profile_image; end
+  def chapters; end
 
   def iframe_src
     url = embed_url.dup
@@ -78,6 +79,10 @@ class IframeEmbed
 
   def oembed_params
     {}
+  end
+
+  def youtube?
+    false
   end
 
   def self.recognize_url?(src_url)
