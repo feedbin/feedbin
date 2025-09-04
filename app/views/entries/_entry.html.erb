@@ -15,7 +15,7 @@
                     <%= entry_presenter.summary %>
                     <%= entry_presenter.quoted_tweet %>
                     <% if entry.processed_image? %>
-                        <%= entry_presenter.attached_image %>
+                        <%= render App::EntryImageComponent.new(entry) %>
                     <% elsif (entry.tweet? && entry.tweet.link_preview?) || (entry.micropost? && entry.micropost.link_preview?) %>
                         <div class="link-preview">
                             <%= entry_presenter.image entry.link_image, entry.link_image_placeholder_color %>

@@ -32,6 +32,7 @@ class Embed < ApplicationRecord
   end
 
   def chapters
-    @chapters ||= TextToChapters.call(data.safe_dig("snippet", "description") || "")
+    text = data.safe_dig("snippet", "description") || ""
+    @chapters ||= TextToChapters.call(text, duration_in_seconds)
   end
 end

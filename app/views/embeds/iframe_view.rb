@@ -45,7 +45,7 @@ module Embeds
             Icon("icon-play", class: "fill-white")
           end
           div class: "bg-black/40 py-1 px-2 rounded-lg font-bold backdrop-blur bottom-2 right-2 absolute text-midnight-700" do
-            @media.duration
+            seconds_to_timestamp(@media.duration)
           end
         end
 
@@ -132,7 +132,7 @@ module Embeds
             end
           end
           div class: "shrink-0 tabular-nums font-bold" do
-            @chapter[:timestamp]
+            seconds_to_timestamp(@chapter[:duration])
           end
         end
       end

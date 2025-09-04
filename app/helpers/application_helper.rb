@@ -255,4 +255,18 @@ module ApplicationHelper
   def xml_format(content, entry)
     raw(ContentFormatter.absolute_source(content, entry))
   end
+
+  def seconds_to_timestamp(seconds)
+    return unless seconds
+
+    hours   = seconds / 3600
+    minutes = (seconds % 3600) / 60
+    seconds = seconds % 60
+
+    if hours > 0
+      "#{hours}:#{minutes.to_s.rjust(2, '0')}:#{seconds.to_s.rjust(2, '0')}"
+    else
+      "#{minutes}:#{seconds.to_s.rjust(2, '0')}"
+    end
+  end
 end

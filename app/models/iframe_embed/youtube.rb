@@ -45,15 +45,8 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   def duration
-    return unless seconds = video && video.duration_in_seconds
-
-    hours = seconds / (60 * 60)
-    minutes = (seconds / 60) % 60
-    seconds = seconds % 60
-
-    parts = [minutes, seconds]
-    parts.unshift(hours) unless hours == 0
-    parts.map {|part| part.to_s.rjust(2, "0") }.join(":")
+    return unless video && video.duration_in_seconds
+    video.duration_in_seconds
   end
 
   def profile_image
