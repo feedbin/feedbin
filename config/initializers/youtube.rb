@@ -1,6 +1,7 @@
 Feedbin::Application.config.youtube_embed_urls = [
   %r{.*?//(?:www|m)\.youtube-nocookie\.com/embed/(.*?)(\?|$)},
   %r{.*?//(?:www|m)\.youtube\.com/embed/(.*?)(\?|$)},
+  %r{.*?//(?:www|m)\.youtube\.com/shorts/(.*?)(\?|$)},
   %r{.*?//(?:www|m)\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b},
   %r{.*?//(?:www|m)\.youtube\.com/v/(.*?)(#|\?|$)},
   %r{.*?//(?:www|m)\.youtube\.com/watch\?(?:.*?&)?v=([^&#]*)(?:&|#|$)},

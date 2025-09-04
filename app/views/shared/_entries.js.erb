@@ -2,7 +2,7 @@ var callback = function() {
     <% if @entries.length == 0 %>
         var entries = "<%= j render partial: "entries/no_entry" %>";
     <% else %>
-        var entries = "<%= j render partial: "entries/entry", collection: @entries, cached: -> (entry) { [entry, entry.feed.custom_icon, entry.feed.favicon, "v4"] } %>";
+        var entries = "<%= j render partial: "entries/entry", collection: @entries, cached: -> (entry) { [entry, entry.feed.custom_icon, entry.feed.favicon, "v5"] } %>";
     <% end %>
 
     <% if @append %>
