@@ -8,12 +8,12 @@ module Epub
     def view_template
       html do
         head do
-          title { @entry.title.to_plain_text }
+          title { @entry.plain_title_with_default }
           link rel: "stylesheet", type: "text/css", href: "css.css"
         end
 
         body do
-          h1 { @entry.title.to_plain_text }
+          h1 { @entry.plain_title_with_default }
 
           p do
             plain @entry.published&.to_formatted_s(:full_human)

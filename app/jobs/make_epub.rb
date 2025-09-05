@@ -65,7 +65,7 @@ class MakeEpub
       end
     end
 
-    UserMailer.kindle(@address, @content.title.to_plain_text, epub_path).deliver_now
+    UserMailer.kindle(@address, @content.plain_title_with_default, epub_path).deliver_now
   ensure
     FileUtils.remove_entry(@directory)
     FileUtils.remove_entry(epub_path) rescue Errno::ENOENT
@@ -124,7 +124,7 @@ class MakeEpub
 
     margin = 120
     title_text = text_layer(
-      format_text(@content.title, 120),
+      format_text(@content.plain_title_with_default, 120),
       width: canvas.width - (margin * 2),
       opacity: 0.8,
       font: "Helvetica Bold 16"

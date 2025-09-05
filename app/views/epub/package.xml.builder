@@ -1,7 +1,7 @@
 xml.instruct!
 xml.package "xmlns" => "http://www.idpf.org/2007/opf", "version" => "3.0", "unique-identifier" => "pub-id" do
   xml.metadata "xmlns:dc" => "http://purl.org/dc/elements/1.1/" do
-    xml.dc :title, entry.title.to_plain_text
+    xml.dc :title, entry.plain_title_with_default
     xml.dc :creator, entry.author ? "#{entry.author}, #{feed_title}" : feed_title
     xml.dc :language, "en"
     xml.dc :identifier, "en"
