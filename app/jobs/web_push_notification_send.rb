@@ -119,7 +119,7 @@ class WebPushNotificationSend
       message[:payload][:icon] = entry.processed_image
     end
 
-    response = WebPush.payload_send(
+    WebPush.payload_send(
       endpoint: device.data["endpoint"],
       message: JSON.generate(message),
       p256dh: device.data["keys"]["p256dh"],
@@ -132,8 +132,17 @@ class WebPushNotificationSend
       }
     )
 
-  rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription, WebPush::Unauthorized, WebPush::ExpiredSubscription
+  rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription, WebPush::Unauthorized => exception
     device.destroy
+    ErrorService.notify(
+      error_class: exception.to_s,
+      error_message: exception.message,
+      context: {
+        response: exception.response,
+        host: exception.host,
+        user: device.user_id
+      }
+    )
   rescue => exception
     ErrorService.notify(exception)
     raise unless Rails.env.production?
