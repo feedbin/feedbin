@@ -42,7 +42,7 @@ class FeedFixer
       subscriptions = @feed.subscriptions.fix_suggestion_none
 
       new_subscriptions = subscriptions - existing
-      new_subscriptions.map { _1.user.setting_on!(:fix_feeds_available) }
+      new_subscriptions.map { _1.user&.setting_on!(:fix_feeds_available) }
 
       subscriptions.update_all(
         fix_status: Subscription.fix_statuses[:present],

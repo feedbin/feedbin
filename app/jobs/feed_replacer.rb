@@ -14,6 +14,11 @@ class FeedReplacer
       subscription.feed.discovered_feeds.order(created_at: :asc).take
     end
 
+    if !discovered_feed
+      subscription.fix_suggestion_none!
+      return
+    end
+
     new_feed = FeedFinder.feeds(discovered_feed.feed_url)&.first
     old_feed = subscription.feed
 
