@@ -2,6 +2,8 @@ class CrawlData
   delegate :last_modified, :etag, :download_fingerprint, to: :@data
   delegate :redirected_to, :last_error, to: :@data
 
+  attr_reader :data
+
   def initialize(data = {})
     @data = OpenStruct.new(data)
   end
