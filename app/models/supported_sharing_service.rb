@@ -5,7 +5,8 @@ class SupportedSharingService < ApplicationRecord
       label: "Pocket",
       requires_auth: true,
       service_type: "oauth",
-      klass: "Share::Pocket"
+      klass: "Share::Pocket",
+      active: false
     }),
     OpenStruct.new({
       service_id: "readability",
