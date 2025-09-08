@@ -16,7 +16,7 @@ module Settings
                 input type: "checkbox", class: "peer", data_action: "toggle-checkboxes#toggle", id: "select_all_feeds"
                 label for: "select_all_feeds", class: "group flex gap-2 items-center" do
                   render Form::CheckboxComponent.new
-                  plain " Select all "
+                  plain " Select All "
                 end
                 div class: "max-w-[250px]" do
                   render Form::SelectInputComponent.new do |input|

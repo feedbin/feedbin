@@ -15,12 +15,27 @@ class FeedReplacer
     end
 
     if !discovered_feed
-      subscription.fix_suggestion_none!
-      return
+      subscription.fix_suggestion_ignored!
+      return subscription
     end
 
     new_feed = FeedFinder.feeds(discovered_feed.feed_url)&.first
     old_feed = subscription.feed
+
+    if new_feed == old_feed
+      ErrorService.notify(
+        error_class: "FeedReplacer",
+        error_message: "same feed",
+        context: {
+          user_id: user_id,
+          subscription_id: subscription_id,
+          discovered_feed_id: discovered_feed_id,
+        }
+      )
+
+      subscription.fix_suggestion_ignored!
+      return subscription
+    end
 
     return unless new_feed && discovered_feed
 
