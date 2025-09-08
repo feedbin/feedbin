@@ -2989,6 +2989,7 @@ $feed-title-width: 115px;
             @include font-size(14);
           }
           .subtitle {
+            margin-top: 0.25rem;
             @include font-size(12);
             @include color($color-contrast-500);
           }
@@ -2996,12 +2997,12 @@ $feed-title-width: 115px;
         .icon-wrap {
           width: 16px;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
           flex-shrink: 0;
           margin-right: base-units(1);
           svg {
-            @include fill($color-icons);
+            @include fill($color-contrast-500);
             max-width: 16px;
             max-height: 16px;
           }
