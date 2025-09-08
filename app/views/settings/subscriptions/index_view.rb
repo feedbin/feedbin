@@ -102,7 +102,7 @@ module Settings
       end
 
       def fix_feeds_notice
-        if @user.subscriptions.where(fix_status: :present).exists?
+        if @user.subscriptions.fix_suggestion_present.includes(feed: [:discovered_feeds]).reject {_1.feed.discovered_feeds.empty?}.present?
           div(class: "border rounded-lg flex gap-6 p-4 mb-8 bg-100") do
             div(class: "flex gap-4") do
               div class: "pt-1 flex flex-center shrink-0" do

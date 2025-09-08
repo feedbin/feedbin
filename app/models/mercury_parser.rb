@@ -25,6 +25,11 @@ class MercuryParser
     result["title"]
   end
 
+  # for compatibility with Entry
+  def plain_title_with_default
+    result["title"]
+  end
+
   def content
     result["content"]
   end

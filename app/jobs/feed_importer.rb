@@ -52,6 +52,7 @@ class FeedImporter
 
     discovered_feeds = urls.each_with_object([]) do |url, array|
       next unless option = FeedFixer.new.validate_option(url)
+      next if option.feed_url == @import_item.feed_url
 
       discovery = DiscoveredFeed.find_or_create_by(
         site_url: @import_item.site_url,
