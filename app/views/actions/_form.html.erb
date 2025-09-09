@@ -50,8 +50,6 @@
       <label class="group flex items-center gap-2" for="include_all_feeds">
         <%= render Form::CheckboxComponent.new %> Include all
       </label>
-
-
       <div class="max-w-[150px] ml-auto">
         <%= render Form::TextInputComponent.new do |text| %>
           <% text.input do %>
@@ -60,11 +58,11 @@
         <% end %>
       </div>
     </div>
-    <ul class="border-y max-h-[240px] overflow-scroll resize-y" data-behavior="search_results">
+    <ul class="border-b max-h-[240px] overflow-scroll resize-y" data-behavior="search_results">
       <%= form.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |builder| %>
-        <li class="group" data-sort-name="<%= builder.text.downcase %>">
+        <li class="group border-t" data-sort-name="<%= builder.text.downcase %>">
           <%= builder.check_box feed_checkbox_options(form).merge(class: "peer") %>
-          <%= builder.label title: builder.object.feed_url, class: "group flex gap-2 items-center py-3 border-b group-last:border-b-0" do %>
+          <%= builder.label title: builder.object.feed_url, class: "group flex gap-2 items-center py-3" do %>
             <%= render Form::CheckboxComponent.new %>
             <%= builder.text %>
           <% end %>

@@ -2342,6 +2342,11 @@ $.extend feedbin,
       $(document).on 'keyup', '[data-behavior~=feed_search]', ->
         suggestions = []
         query = $(@).val()
+
+        $.each feeds, (i, feed) ->
+          feed.classList.remove("visually-hidden")
+          feed.classList.add("border-t")
+
         if query.length < 1
           suggestions = feeds
         else
@@ -2350,9 +2355,14 @@ $.extend feedbin,
             if feed && sortName && query && typeof(query) == "string" && typeof(sortName) == "string"
               feed.score = sortName.score(query)
             else
-              feed.score = 0
-            if feed.score > 0
-              suggestions.push(feed);
+              feed.score = 1
+
+            if feed.score == 0
+              feed.classList.add("visually-hidden")
+              feed.classList.remove("border-t")
+
+            suggestions.push(feed);
+
           if suggestions.length > 0
             suggestions = _.sortBy suggestions, (suggestion) ->
               -(suggestion.score)
