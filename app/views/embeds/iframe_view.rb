@@ -120,7 +120,7 @@ module Embeds
       end
 
       def view_template
-        button data: stimulus_item(target: :chapter_button, actions: {"click" => "selectChapter"}, params: {seconds: @chapter[:seconds]}, for: STIMULUS_CONTROLLER, data: {selected: "false"}), class: " group/chapter-row grow flex flex-center text-left px-3 sm:px-4 rounded py-1 pointer-fine:hover:text-midnight-700 pointer-fine:hover:bg-midnight-200 data-[selected=true]:text-midnight-700 data-[selected=true]:bg-midnight-200" do
+        button data: stimulus_item(target: :chapter_button, actions: {"click" => "selectChapter"}, params: {seconds: @chapter[:seconds], duration: seconds_to_timestamp(@chapter[:duration])}, for: STIMULUS_CONTROLLER, data: {selected: "false"}), class: " group/chapter-row grow flex flex-center text-left px-3 sm:px-4 rounded py-1 pointer-fine:hover:text-midnight-700 pointer-fine:hover:bg-midnight-200 data-[selected=true]:text-midnight-700 data-[selected=true]:bg-midnight-200" do
           div class: "flex items-center grow min-w-0" do
             div class: "grid overflow-hidden shrink-0 min-w-0 [grid-template-columns:0fr] transition-[grid-template-columns] group-data-[selected=true]/chapter-row:[grid-template-columns:1fr]" do
               div class: "min-w-0 transition opacity-0 group-data-[selected=true]/chapter-row:opacity-100" do
@@ -131,7 +131,7 @@ module Embeds
               @chapter[:title]
             end
           end
-          div class: "shrink-0 tabular-nums font-bold" do
+          div class: "shrink-0 tabular-nums font-bold", data: {embed_player_duration: true} do
             seconds_to_timestamp(@chapter[:duration])
           end
         end
