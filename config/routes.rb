@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   constraints lambda { |request| Rails.env.development? } do
     get :auto_sign_in, to: "site#auto_sign_in"
+    get :onboarding, to: "onboarding#show"
   end
 
   get :health_check, to: proc { |env| [200, {}, ["OK"]] }

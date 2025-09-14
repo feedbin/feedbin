@@ -19,6 +19,7 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::CollectionCheckBoxes
   include Phlex::Rails::Helpers::PasswordFieldTag
   include Phlex::Rails::Helpers::Truncate
+  include Phlex::Rails::Helpers::ImageTag
 
   register_value_helper :bookmarklet
   register_value_helper :class_names

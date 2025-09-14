@@ -169,5 +169,12 @@ module.exports = {
     plugin(({ addVariant }) => {
       addVariant(`native`, [`.native &`, `&.native`]);
     }),
+    plugin(({ addVariant }) => {
+      addVariant(`theme-auto`,     [`.theme-auto &`, `&.theme-auto`]);
+      addVariant(`theme-day`,      [`.theme-day &`, `&.theme-day`]);
+      addVariant(`theme-sunset`,   [`.theme-sunset &`, `&.theme-sunset`]);
+      addVariant(`theme-dusk`,     [`.theme-dusk &`, `&.theme-dusk`]);
+      addVariant(`theme-midnight`, [`.theme-midnight &`, `&.theme-midnight`]);
+    }),
   ],
 };

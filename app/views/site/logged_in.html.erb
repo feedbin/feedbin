@@ -16,7 +16,6 @@
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="<%= @user.theme == "auto" ? Colors.fetch("day") : Colors.fetch(@user.theme) %>">
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="<%= @user.theme == "auto" ? Colors.fetch("dusk") : Colors.fetch(@user.theme) %>">
     <% end %>
-    <%= render partial: 'shared/svg' %>
     <%= render partial: 'shared/notification' %>
     <div class="loading-app">
         <%= svg_tag "logo", inline: true %>
