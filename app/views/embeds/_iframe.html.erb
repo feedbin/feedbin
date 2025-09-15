@@ -1,3 +1,3 @@
-<% cache [Digest::SHA1.hexdigest(media.iframe_src), media.cache_key, "v3"] do %>
+<% cache [Digest::SHA1.hexdigest(media.iframe_src), media.cache_key, "v4"] do %>
   <%= render Embeds::IframeView.new(media: media, width: params[:width], height: params[:height]) %>
 <% end %>
