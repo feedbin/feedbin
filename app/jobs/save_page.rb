@@ -34,7 +34,12 @@ class SavePage
         embed = Embed.where(provider_id: match[1]).take
       end
       if embed.present?
-        entry.update(content: embed.data.safe_dig("snippet", "description"), title: embed.data.safe_dig("snippet", "title"), author: embed.data.safe_dig("snippet", "channelTitle"))
+        entry.update(
+          content: embed.data.safe_dig("snippet", "description"),
+          title: embed.data.safe_dig("snippet", "title"),
+          author: embed.data.safe_dig("snippet", "channelTitle"),
+          embed_duration: embed.duration_in_seconds
+        )
       end
     end
 
