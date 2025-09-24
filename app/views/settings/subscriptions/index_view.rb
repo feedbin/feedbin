@@ -36,9 +36,10 @@ module Settings
                   end
                 end
               end
-              div class: "dropdown-wrap dropdown-right shrink-0" do
+              div class: "group dropdown-wrap dropdown-right shrink-0" do
                 button class: "flex flex-center w-[40px] h-[40px]", data_behavior: "toggle_dropdown", title: "Filter by status" do
-                  Icon("icon-filter", class: "fill-500")
+                  Icon("icon-filter", class: "fill-500 group-[.open]:tw-hidden")
+                  Icon("icon-filter-filled", class: "fill-blue-600 tw-hidden group-[.open]:block")
                 end
                 div class: "dropdown-content" do
                   ul do
@@ -83,7 +84,10 @@ module Settings
               end
 
             end
-            div class: "md:max-w-[250px]" do
+            div class: "md:max-w-[315px] flex gap-4" do
+              button class: "button button-secondary", data: { behavior: "show_subscribe", open_dialog: Dialog::AddFeed.dom_id } do
+                "Add Feed"
+              end
               render Form::SelectInputComponent.new do |input|
                 input.input do
                   select_tag(

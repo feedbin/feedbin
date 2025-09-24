@@ -1,4 +1,8 @@
 feedbin.showNotification('You have subscribed.');
+
+<%# for refreshing settings/subscriptions %>
+$("form.feed-settings").submit()
+
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.hideSubscribe();
 <% @subscriptions.each do |subscription| %>
