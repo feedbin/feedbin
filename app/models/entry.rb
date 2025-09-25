@@ -3,7 +3,7 @@ class Entry < ApplicationRecord
 
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread, :skip_recent_post_check
 
-  store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration], coder: JSON
+  store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration, :newsletter_to, :newsletter_token], coder: JSON
 
   enum :provider, [:twitter, :youtube, :favicon, :entry_icon], prefix: true
 
