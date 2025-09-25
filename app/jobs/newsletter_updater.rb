@@ -1,4 +1,5 @@
 class NewsletterUpdater
+  include Sidekiq::Worker
   sidekiq_options queue: :utility
 
   TOKEN_REGEX = /
