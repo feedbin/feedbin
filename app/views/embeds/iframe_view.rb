@@ -7,13 +7,14 @@ module Embeds
       @media = media
       @width = width
       @height = height
+      @expandable_selector = "expandable_#{SecureRandom.hex}"
     end
 
     def view_template
       controller = stimulus(
         controller: STIMULUS_CONTROLLER,
         outlets: {
-          expandable: "[data-embed-player-expandable]",
+          expandable: "[data-#{@expandable_selector.dasherize}]",
         },
         values: {
           source_url: @media.iframe_src,
@@ -97,7 +98,7 @@ module Embeds
 
     def chapters
       if @media.chapters.present?
-        render App::ExpandableContainerComponent.new(selector: "embed_player_expandable") do |expandable|
+        render App::ExpandableContainerComponent.new(selector: @expandable_selector) do |expandable|
           expandable.content do
             div class: "flex flex-col gap-1 p-3 sm:p-4 text-midnight-600" do
               div class: "px-3 sm:px-4 font-bold text-midnight-700" do
