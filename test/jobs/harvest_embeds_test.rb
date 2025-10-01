@@ -4,7 +4,8 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   setup do
     flush_redis
     @user = users(:ben)
-    @entry = create_entry(@user.feeds.first)
+    @feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=channel_id")
+    @entry = create_entry(@feed)
   end
 
   test "should harvest from iframe" do
@@ -30,11 +31,17 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
 
     Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api
-    assert_difference "Embed.count", +2 do
-      HarvestEmbeds.new.perform(nil, true)
+
+    Sidekiq::Testing.inline! do
+      assert_difference "Embed.count", +2 do
+        HarvestEmbeds.new.perform(nil, true)
+      end
     end
 
     assert_equal("channel_id", @entry.reload.provider_parent_id)
+    assert_equal(9743, @entry.reload.embed_duration)
+    assert_equal("image_url", @feed.reload.custom_icon)
+    pp
   end
 
   test "should add provider_parent_id from existing embed" do
@@ -54,7 +61,10 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
         {
           id: "video_id",
           snippet: {
-            channelId: "channel_id"
+            channelId: "channel_id",
+          },
+          contentDetails: {
+            duration: "PT2H42M23S",
           }
         }
       ]
@@ -65,7 +75,14 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     channels = {
       items: [
         {
-          id: "channel_id"
+          id: "channel_id",
+          snippet: {
+            thumbnails: {
+              default: {
+                url: "image_url"
+              }
+            }
+          },
         }
       ]
     }

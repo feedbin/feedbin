@@ -1,5 +1,5 @@
 class Embed < ApplicationRecord
-  belongs_to :parent, class_name: "Embed", foreign_key: "parent_id"
+  belongs_to :parent, class_name: "Embed", foreign_key: :parent_id, primary_key: :provider_id
   enum :source, {youtube_video: 0, youtube_channel: 1}
 
   def channel
