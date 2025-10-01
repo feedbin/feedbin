@@ -44,8 +44,7 @@ class SavePage
     return if match.blank?
     embed = Embed.youtube_video.where(provider_id: match[1]).take
     if embed.blank?
-      HarvestEmbeds.new.add_missing_to_queue([match[1]])
-      HarvestEmbeds.new.perform(nil, true)
+      HarvestEmbeds::Download.new.perform([match[1]])
       embed = Embed.youtube_video.where(provider_id: match[1]).take
     end
     embed
