@@ -97,6 +97,29 @@ class HarvestEmbeds
           entry.update(provider_parent_id: embed.parent_id, embed_duration: embed.duration_in_seconds)
         end
       end
+
+      requeue_live_videos(videos)
+    end
+
+    def requeue_live_videos(videos)
+      videos.each do |video|
+        if redownload?(video)
+          delay = if video.scheduled_time > Time.now
+            video.scheduled_time + 1.hour - Time.now
+          else
+            1.hour
+          end
+          Sidekiq.logger.info "HarvestEmbeds redownload id=#{video.provider_id} delay=#{delay}"
+          # Download.perform_in(delay, [video.provider_id])
+        end
+      end
+    end
+
+    def redownload?(video)
+      return false if video.live_broadcast_content == "none"
+      return false if !video.scheduled_time
+      return false if video.scheduled_time < 24.hours.ago
+      true
     end
 
     def youtube_api(type:, ids:, parts:)

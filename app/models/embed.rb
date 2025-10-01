@@ -35,4 +35,16 @@ class Embed < ApplicationRecord
     text = data.safe_dig("snippet", "description") || ""
     @chapters ||= TextToChapters.call(text, duration_in_seconds)
   end
+
+  def live_broadcast_content
+    data.safe_dig("snippet", "liveBroadcastContent")
+  end
+
+  def scheduled_start_time
+    data.safe_dig("liveStreamingDetails", "scheduledStartTime")
+  end
+
+  def scheduled_time
+    Time.parse(scheduled_start_time) if scheduled_start_time
+  end
 end
