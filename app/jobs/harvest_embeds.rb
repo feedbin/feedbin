@@ -110,7 +110,7 @@ class HarvestEmbeds
             1.hour
           end
           Sidekiq.logger.info "HarvestEmbeds redownload id=#{video.provider_id} delay=#{delay}"
-          # Download.perform_in(delay, [video.provider_id])
+          Redownload.perform_in(delay, video.provider_id)
         end
       end
     end
@@ -134,5 +134,14 @@ class HarvestEmbeds
       JSON.parse(response)
     end
 
+
+    class Redownload
+      include Sidekiq::Worker
+      include SidekiqHelper
+
+      def perform(id)
+        add_to_queue(SET_NAME, [*id])
+      end
+    end
   end
 end
