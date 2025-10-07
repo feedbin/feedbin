@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: eb85dd4614309566c74c12da379f018914b86c49
+  revision: 30978809243e4857addafc18c81134cc187c4e90
   branch: master
   specs:
     feedkit (0.1.0)
@@ -335,7 +335,7 @@ GEM
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http-2 (1.1.1)
-    http-cookie (1.0.8)
+    http-cookie (1.1.0)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
