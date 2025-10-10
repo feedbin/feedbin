@@ -136,7 +136,9 @@ module Onboarding
         div class: "text-xl font-bold" do
           "Get the Extension"
         end
-        image_tag("extension-promo", class: "rounded")
+
+        img src: asset_path("extension-promo"), class: "rounded"
+
         div class: "font-bold" do
           "Subscribe to feeds, newsletters, and save pages to Feedbin"
         end
