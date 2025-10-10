@@ -5,7 +5,7 @@ module App
     end
 
     def view_template
-      span class: "relative block" do
+      span class: "relative block entry-image-wrap" do
         if @entry.embed_duration.present?
           span class: "bg-black/40 py-1 px-2 rounded-lg font-bold backdrop-blur absolute z-[2] bottom-2 right-2 absolute text-midnight-700" do
             seconds_to_timestamp(@entry.embed_duration)
