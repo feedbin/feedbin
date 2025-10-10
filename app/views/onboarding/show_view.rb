@@ -161,16 +161,25 @@ module Onboarding
     end
 
     def import
-      div class: "w-full h-full border rounded-xl border-dashed flex flex-col gap-4 flex-center" do
-        Icon("icon-cloud", class: "fill-600")
-        div class: "" do
-          "Drag & Drop OPML Here"
-        end
-        div class: "font-bold" do
-          "OR"
-        end
-        button class: "button button-secondary" do
-          "Choose File"
+      controller = :upload
+      div data: stimulus(controller: controller), class: "w-full h-full" do
+        div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border border-200 rounded-xl border-dashed flex flex-col gap-4 flex-center transition-colors" do
+          Icon("icon-cloud", class: "fill-600")
+          div class: "" do
+            "Drag & Drop OPML Here"
+          end
+          div class: "font-bold" do
+            "OR"
+          end
+          button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary" do
+            "Choose File"
+          end
+          input(
+            type: "file",
+            accept: ".opml,.xml",
+            class: "hidden",
+            data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
+          )
         end
       end
 
