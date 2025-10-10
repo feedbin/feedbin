@@ -1,5 +1,5 @@
 class Embed < ApplicationRecord
-  belongs_to :parent, class_name: "Embed", foreign_key: "parent_id"
+  belongs_to :parent, class_name: "Embed", foreign_key: :parent_id, primary_key: :provider_id
   enum :source, {youtube_video: 0, youtube_channel: 1}
 
   def channel
@@ -34,5 +34,17 @@ class Embed < ApplicationRecord
   def chapters
     text = data.safe_dig("snippet", "description") || ""
     @chapters ||= TextToChapters.call(text, duration_in_seconds)
+  end
+
+  def live_broadcast_content
+    data.safe_dig("snippet", "liveBroadcastContent")
+  end
+
+  def scheduled_start_time
+    data.safe_dig("liveStreamingDetails", "scheduledStartTime")
+  end
+
+  def scheduled_time
+    Time.parse(scheduled_start_time) if scheduled_start_time
   end
 end

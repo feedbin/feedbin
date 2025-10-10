@@ -141,21 +141,31 @@ module Settings
                 a(href: "/blog/2019/08/20/save-webpages-to-read-later/") do
                   "save articles from the web"
                 end
-                plain " to read later in Feedbin. Install the Feedbin browser extension to get started. "
+                plain " to read later in Feedbin. Install the Feedbin browser extension to get started. Available for "
+
+                a href: "https://apps.apple.com/us/app/feedbin/id1444961766" do
+                  "Safari"
+                end
+                plain ", "
+                a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/" do
+                  "Firefox"
+                end
+                plain ", and "
+                a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco" do
+                  "Chrome"
+                end
               end
 
               row.control do
-                div class: "whitespace-nowrap" do
-                  a href: "https://apps.apple.com/us/app/feedbin/id1444961766" do
-                    "Safari"
+                div class: "group", data: stimulus(controller: :extension_link, values: {browser: "chrome"}) do
+                  a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco", class: "button button-secondary tw-hidden group-data-[extension-link-browser-value=chrome]:block" do
+                    "Get for Chrome"
                   end
-                  plain ", "
-                  a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/" do
-                    "Firefox"
+                  a href: "https://apps.apple.com/us/app/feedbin/id1444961766", class: "button button-secondary tw-hidden group-data-[extension-link-browser-value=safari]:block" do
+                    "Get for Safari"
                   end
-                  plain ", "
-                  a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco" do
-                    "Chrome"
+                  a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/", class: "button button-secondary tw-hidden group-data-[extension-link-browser-value=firefox]:block" do
+                    "Get for Firefox"
                   end
                 end
               end

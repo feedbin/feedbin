@@ -18,72 +18,9 @@ module Settings
           fix_feeds_notice
 
           div class: "flex flex-col md:flex-row justify-between mb-6 gap-2" do
-            div data: stimulus(controller: :input_filter), class: "flex items-center md:max-w-[250px]" do
-              div class: "grow" do
-                render Form::TextInputComponent.new do |input|
-                  input.input do
-                    input(
-                      type: "search",
-                      class: "feed-search peer text-input",
-                      placeholder: "Search Feeds",
-                      name: "q",
-                      value: @params[:q],
-                      data: stimulus_item(target: "input", data: {behavior: "auto_submit_throttled"}, for: :input_filter)
-                    )
-                  end
-                  input.accessory_leading do
-                    Icon("icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
-                  end
-                end
-              end
-              div class: "dropdown-wrap dropdown-right shrink-0" do
-                button class: "flex flex-center w-[40px] h-[40px]", data_behavior: "toggle_dropdown", title: "Filter by status" do
-                  Icon("icon-filter", class: "fill-500")
-                end
-                div class: "dropdown-content" do
-                  ul do
-                    li do
-                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:fixable"}, for: :input_filter) do
-                        span class: "icon-wrap" do
-                          Icon("menu-icon-fix-feeds")
-                        end
-                        span class: "menu-text" do
-                          span class: "title" do
-                            "Fixable"
-                          end
-                        end
-                      end
-                    end
-                    li do
-                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:muted"}, for: :input_filter) do
-                        span class: "icon-wrap" do
-                          Icon("menu-icon-mute")
-                        end
-                        span class: "menu-text" do
-                          span class: "title" do
-                            "Muted"
-                          end
-                        end
-                      end
-                    end
-                    li do
-                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:dead"}, for: :input_filter) do
-                        span class: "icon-wrap" do
-                          Icon("menu-icon-skull")
-                        end
-                        span class: "menu-text" do
-                          span class: "title" do
-                            "Dead"
-                          end
-                        end
-                      end
-                    end
-                  end
-                end
-              end
+            div class: "grow flex gap-4" do
+              search_field
 
-            end
-            div class: "md:max-w-[250px]" do
               render Form::SelectInputComponent.new do |input|
                 input.input do
                   select_tag(
@@ -95,10 +32,90 @@ module Settings
                 end
               end
             end
+
+            div do
+              button class: "button button-secondary", data: { behavior: "show_subscribe", open_dialog: Dialog::AddFeed.dom_id } do
+                "Add Feed"
+              end
+            end
           end
         end
 
         render Shared::List.new(subscriptions: @subscriptions, params: @params)
+      end
+
+      def search_field
+        div data: stimulus(controller: :input_filter), class: "flex items-center" do
+          div class: "grow" do
+            render Form::TextInputComponent.new do |input|
+              input.input do
+                input(
+                  type: "search",
+                  class: "feed-search peer text-input",
+                  placeholder: "Search Feeds",
+                  name: "q",
+                  value: @params[:q],
+                  data: stimulus_item(target: "input", data: {behavior: "auto_submit_throttled"}, for: :input_filter)
+                )
+              end
+              input.accessory_leading do
+                Icon("icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600")
+              end
+              input.accessory_trailing(interactive: true) do
+                filter
+              end
+            end
+          end
+        end
+      end
+
+      def filter
+        div class: "group dropdown-wrap dropdown-right shrink-0" do
+          button class: "flex flex-center w-[40px] h-[40px]", data_behavior: "toggle_dropdown", title: "Filter by status" do
+            Icon("icon-filter", class: "fill-500 group-[.open]:tw-hidden")
+            Icon("icon-filter-filled", class: "fill-blue-600 tw-hidden group-[.open]:block")
+          end
+          div class: "dropdown-content" do
+            ul do
+              li do
+                button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:fixable"}, for: :input_filter) do
+                  span class: "icon-wrap" do
+                    Icon("menu-icon-fix-feeds")
+                  end
+                  span class: "menu-text" do
+                    span class: "title" do
+                      "Fixable"
+                    end
+                  end
+                end
+              end
+              li do
+                button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:muted"}, for: :input_filter) do
+                  span class: "icon-wrap" do
+                    Icon("menu-icon-mute")
+                  end
+                  span class: "menu-text" do
+                    span class: "title" do
+                      "Muted"
+                    end
+                  end
+                end
+              end
+              li do
+                button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:dead"}, for: :input_filter) do
+                  span class: "icon-wrap" do
+                    Icon("menu-icon-skull")
+                  end
+                  span class: "menu-text" do
+                    span class: "title" do
+                      "Dead"
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
       end
 
       def fix_feeds_notice

@@ -56,7 +56,7 @@ class SavePageTest < ActiveSupport::TestCase
       items: [
         {
           id: youtube_video_id,
-          snippet: {title: "Title", description: "Description", channelTitle: "Author"}
+          snippet: {title: "Title", description: "Description", channelTitle: "Author", channelId: "channel_id"}
         }
       ]
     }

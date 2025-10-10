@@ -39,58 +39,109 @@ class HarvestEmbeds
   def cache_embeds
     entry_ids = dequeue_ids(SET_NAME)
     entry_ids&.each_slice(50) do |ids|
-      download_data(ids)
+      Download.perform_async(ids)
     end
   end
 
-  def download_data(ids)
-    items = []
+  class Download
+    include Sidekiq::Worker
 
-    videos = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails"])
-    items.concat(videos.safe_dig("items")&.map { |item, array|
-      Embed.new(data: item, provider_id: item.safe_dig("id"), parent_id: item.safe_dig("snippet", "channelId"), source: :youtube_video)
-    })
+    def perform(ids)
+      items = []
 
-    channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
-    channels = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
-    items.concat(channels.safe_dig("items")&.map { |item|
-      Embed.new(data: item, provider_id: item.safe_dig("id"), source: :youtube_channel)
-    })
+      videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
+      channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
+      channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
 
-    Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if items.present?
+      video_embeds = videos.safe_dig("items")&.map do
+        Embed.new(
+          data: it,
+          provider_id: it.safe_dig("id"),
+          parent_id: it.safe_dig("snippet", "channelId"),
+          source: :youtube_video
+        )
+      end
 
-    update_feed_icons(ids)
-    update_entry_channels(ids)
-  end
+      channel_embeds = channels.safe_dig("items")&.map do
+        Embed.new(
+          data: it,
+          provider_id: it.safe_dig("id"),
+          source: :youtube_channel
+        )
+      end
 
-  def update_feed_icons(ids)
-    channel_ids = Embed.youtube_video.where(provider_id: ids).pluck(:parent_id)
-    channels = Embed.youtube_channel.where(provider_id: channel_ids).distinct
-    channels.each do |channel|
-      if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
-        feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
+      items.concat(video_embeds)
+
+      items.concat(channel_embeds)
+
+      if items.present?
+        Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]})
+      end
+
+      update_related_records(ids)
+    end
+
+    def update_related_records(ids)
+      videos    = Embed.youtube_video.where(provider_id: ids).includes(:parent)
+      channels  = videos.map(&:parent).uniq
+      video_map = videos.index_by(&:provider_id)
+
+      channels.each do |channel|
+        if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
+          feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
+        end
+      end
+
+      Entry.provider_youtube.where(provider_id: ids).each do |entry|
+        if embed = video_map[entry.provider_id]
+          entry.update(provider_parent_id: embed.parent_id, embed_duration: embed.duration_in_seconds)
+        end
+      end
+
+      requeue_live_videos(videos)
+    end
+
+    def requeue_live_videos(videos)
+      videos.each do |video|
+        if redownload?(video)
+          delay = if video.scheduled_time > Time.now
+            video.scheduled_time + 1.hour - Time.now
+          else
+            1.hour
+          end
+          Sidekiq.logger.info "HarvestEmbeds redownload id=#{video.provider_id} delay=#{delay}"
+          Redownload.perform_in(delay, video.provider_id)
+        end
       end
     end
-  end
 
-  def update_entry_channels(ids)
-    channel_map = Embed.youtube_video.where(provider_id: ids).pluck(:provider_id, :parent_id).to_h
-    Entry.provider_youtube.where(provider_id: ids).each do |entry|
-      if channel_id = channel_map[entry.provider_id]
-        entry.update(provider_parent_id: channel_id)
-      end
+    def redownload?(video)
+      return false if video.live_broadcast_content == "none"
+      return false if !video.scheduled_time
+      return false if video.scheduled_time < 24.hours.ago
+      true
     end
-  end
 
-  def youtube_api(type:, ids:, parts:)
-    options = {
-      params: {
-        key: ENV["YOUTUBE_KEY"],
-        part: parts.join(","),
-        id: ids.join(",")
+    def youtube_api(type:, ids:, parts:)
+      options = {
+        params: {
+          key: ENV["YOUTUBE_KEY"],
+          part: parts.join(","),
+          id: ids.join(",")
+        }
       }
-    }
-    response = UrlCache.new("https://www.googleapis.com/youtube/v3/#{type}", options).body
-    JSON.parse(response)
+      response = UrlCache.new("https://www.googleapis.com/youtube/v3/#{type}", options).body
+      JSON.parse(response)
+    end
+
+
+    class Redownload
+      include Sidekiq::Worker
+      include SidekiqHelper
+
+      def perform(id)
+        add_to_queue(SET_NAME, [*id])
+      end
+    end
   end
 end

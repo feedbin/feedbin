@@ -18,7 +18,16 @@ class SavePage
     @title = title
     @path = path
 
+    embed = find_embed
     entry = create_webpage_entry
+    if embed.present?
+      entry.update(
+        content: embed.data.safe_dig("snippet", "description"),
+        title: embed.data.safe_dig("snippet", "title"),
+        author: embed.data.safe_dig("snippet", "channelTitle"),
+        embed_duration: embed.duration_in_seconds
+      )
+    end
 
     ImageSaver.perform_async(entry.id)
     FaviconCrawler::Finder.perform_async(host)
@@ -27,18 +36,20 @@ class SavePage
       raise MissingPage.new("Missing page, retrying", entry)
     end
 
-    if match = IframeEmbed::Youtube.recognize_url?(url)
-      embed = Embed.where(provider_id: match[1]).take
-      unless embed.present?
-        HarvestEmbeds.new.perform(entry.id, true)
-        embed = Embed.where(provider_id: match[1]).take
-      end
-      if embed.present?
-        entry.update(content: embed.data.safe_dig("snippet", "description"), title: embed.data.safe_dig("snippet", "title"), author: embed.data.safe_dig("snippet", "channelTitle"))
-      end
-    end
-
     entry
+  end
+
+  def find_embed
+    match = IframeEmbed::Youtube.recognize_url?(url)
+    return if match.blank?
+    embed = Embed.youtube_video.where(provider_id: match[1]).take
+    if embed.blank?
+      HarvestEmbeds::Download.new.perform([match[1]])
+      embed = Embed.youtube_video.where(provider_id: match[1]).take
+    end
+    embed
+  rescue
+    nil
   end
 
   def create_webpage_entry
