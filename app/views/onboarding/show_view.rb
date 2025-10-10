@@ -1,12 +1,86 @@
 module Onboarding
   class ShowView < ApplicationView
+
+    SITES = [
+      {
+        title: "Ars Technica",
+        host: "arstechnica.com",
+        image: "suggested-arstechnica.png"
+      },
+      {
+        title: "Daring Fireball",
+        host: "daringfireball.net",
+        image: "suggested-daringfireball.png",
+      },
+      {
+        title: "Feedbin",
+        host: "feedbin.com",
+        image: "suggested-feedbin.png",
+      },
+      {
+        title: "Kottke",
+        host: "kottke.org",
+        image: "suggested-kottke.png",
+      },
+      {
+        title: "MacStories",
+        host: "www.macstories.net",
+        image: "suggested-macstories.png",
+      },
+      {
+        title: "Marques Brownlee",
+        host: "@mkbhd",
+        image: "suggested-mkbhd.png",
+      },
+      {
+        title: "Polygon",
+        host: "www.polygon.com",
+        image: "suggested-polygon.png",
+      },
+      {
+        title: "Six Colors",
+        host: "sixcolors.com",
+        image: "suggested-sixcolors.png",
+      },
+      {
+        title: "Spyglass",
+        host: "spyglass.org",
+        image: "suggested-spyglass.png",
+      },
+      {
+        title: "Stratechery",
+        host: "stratechery.com",
+        image: "suggested-stratechery.png",
+      },
+      {
+        title: "The Oatmeal",
+        host: "theoatmeal.com",
+        image: "suggested-theoatmeal.png",
+      },
+      {
+        title: "The Verge",
+        host: "www.theverge.com",
+        image: "suggested-theverge.png",
+      },
+      {
+        title: "Wirecutter",
+        host: "www.nytimes.com",
+        image: "suggested-wirecutter.png",
+      },
+      {
+        title: "xkcd.com",
+        host: "xkcd.com",
+        image: "suggested-xkcd.png",
+      }
+    ]
+
     def initialize()
     end
 
     def view_template
-      div class: "flex flex-wrap gap-4 p-2" do
+      div class: "flex flex-wrap gap-4 p-2 min-h-0" do
         [:welcome, :add, :import, :extension].each do |page|
-          div class: "border rounded-xl w-[550px] h-[564px] p-6" do
+          div class: "border rounded-xl w-[550px] h-[564px] p-6 overflow-hidden" do
             send(page)
           end
         end
@@ -39,17 +113,19 @@ module Onboarding
     end
 
     def add
-      div class: "flex gap-4 justify-between items-baseline w-full mb-4" do
-        div class: "text-xl font-bold" do
-          "Add Content"
+      div class: "flex flex-col h-full" do
+        div class: "flex gap-4 justify-between items-baseline w-full mb-4 shrink-0" do
+          div class: "text-xl font-bold" do
+            "Add Content"
+          end
+          button class: "text-500" do
+            "Clear All (2)"
+          end
         end
-        button class: "text-500" do
-          "Clear All (2)"
-        end
-      end
-      div class: "grid grid-cols-2 sm:grid-cols-3 gap-4" do
-        9.times do
-          tile(title: "Daring Fireball", subtitle: "daringfireball.net")
+        div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto min-h-0" do
+          SITES.shuffle.each do
+            tile(title: it[:title], subtitle: it[:host], image: it[:image])
+          end
         end
       end
     end
@@ -98,9 +174,9 @@ module Onboarding
 
     end
 
-    def tile(title:, subtitle:)
+    def tile(title:, subtitle:, image:)
       button class: "block rounded-lg border ring-0 border-200 p-3 hover:border-300 transition cursor-pointer text-sm text-left" do
-        div class: "aspect-[16/9] bg-200 rounded mb-2"
+        img src: asset_path("suggested-sites/#{image}"), class: "border rounded mb-2"
         div class: "font-medium truncate" do
           title
         end
