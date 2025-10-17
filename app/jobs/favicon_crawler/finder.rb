@@ -14,12 +14,16 @@ module FaviconCrawler
     private
 
     def update
-      new_favicon = all_favicon_urls.each do |url|
+      new_favicon = nil
+      all_favicon_urls.each do |url|
         response = download_favicon(url)
         next if response.blank?
         resized = Image.resize(response.path)
         next if resized.blank?
-        break {resized: resized, original: response.path, response: response}
+
+        new_favicon = {resized: resized, original: response.path, response: response}
+
+        break
       end
 
       return unless new_favicon.present?
