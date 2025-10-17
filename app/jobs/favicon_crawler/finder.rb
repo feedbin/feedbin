@@ -14,50 +14,41 @@ module FaviconCrawler
     private
 
     def update
-      favicon_found = false
-      response = nil
-
-      favicon_url = find_meta_links
-      if favicon_url
-        response = download_favicon(favicon_url)
-        favicon_found = true unless response.nil?
+      new_favicon = all_favicon_urls.each do |url|
+        response = download_favicon(url)
+        next if response.blank?
+        resized = Image.resize(response.path)
+        next if resized.blank?
+        break {resized: resized, original: response.path, response: response}
       end
 
-      unless favicon_found
-        favicon_url = default_favicon_location
-        response = download_favicon(favicon_url)
-      end
+      return unless new_favicon.present?
 
-      if response
-        processor = Processor.new(response.path, @favicon.host)
-        if @force || @favicon.data["favicon_hash"] != processor.favicon_hash
-          processor.process
-          return if processor.favicon_url.nil?
-          @favicon.favicon = processor.encoded_favicon
-          @favicon.url = processor.favicon_url
-          @favicon.data = {
-            "favicon_hash"  => processor.favicon_hash,
-            "Etag"          => response.etag,
-            "Last-Modified" => response.last_modified
-          }
-          Librato.increment("favicon.updated")
-        end
+      processor = Processor.new(new_favicon, @favicon.host)
+      if @force || @favicon.data["favicon_hash"] != processor.favicon_hash
+        processor.call
+        return if processor.favicon_url.nil?
+        @favicon.favicon = processor.encoded_favicon
+        @favicon.url = processor.favicon_url
+        @favicon.data = {
+          "favicon_hash"  => processor.favicon_hash,
+          "Etag"          => new_favicon[:response].etag,
+          "Last-Modified" => new_favicon[:response].last_modified
+        }
+        Librato.increment("favicon.updated")
       end
 
       @favicon.save
     ensure
-      if response.respond_to?(:path)
-        File.unlink(response.path) rescue Errno::ENOENT
-      end
+      File.unlink(favicon[:original]) rescue Errno::ENOENT
+      File.unlink(favicon[:resized]) rescue Errno::ENOENT
     end
 
-    def find_meta_links
-      favicon_url = nil
+    def all_favicon_urls
       homepage = download_homepage
-      html = Nokogiri::HTML5(homepage)
-      favicon_links = html.search(xpath)
+      links = Nokogiri::HTML5(homepage.to_s).search(xpath)
 
-      favicon_links = favicon_links.reject {
+      links = links.reject {
         it["href"].to_s.strip.empty?
       }
       .sort_by {
@@ -72,16 +63,11 @@ module FaviconCrawler
         index.nil? ? ICON_NAMES.length : index
       }
 
-      if favicon_links.present?
-        favicon_url = favicon_links.first["href"]
-        favicon_url = URI.parse(favicon_url)
-        favicon_url.scheme = "http"
-        unless favicon_url.host
-          favicon_url = URI::HTTP.build(scheme: "http", host: @favicon.host)
-          favicon_url = favicon_url.merge(favicon_links.first["href"])
-        end
+      urls = links.map do |link|
+        Addressable::URI.join(homepage.uri, link["href"])
       end
-      favicon_url
+
+      urls.push(default_favicon_location)
     rescue => exception
       Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@favicon.host}"
       nil
@@ -93,11 +79,7 @@ module FaviconCrawler
 
     def download_homepage
       url = URI::HTTP.build(host: @favicon.host)
-      response = HTTP
-        .timeout(write: 5, connect: 5, read: 5)
-        .follow
-        .get(url)
-        .to_s
+      HTTP.timeout(write: 5, connect: 5, read: 5).follow.get(url)
     end
 
     def download_favicon(url)
