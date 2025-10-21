@@ -15,6 +15,13 @@ module ApplicationHelper
     request.user_agent&.include?("TurbolinksFeedbin")
   end
 
+  def native_platform
+    results = request.user_agent&.match(/platform=(\w+)/)
+    if results
+      results[1]
+    end
+  end
+
   def is_active?(controller, action)
     controller = [*controller]
     action = [*action]

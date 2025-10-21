@@ -613,6 +613,13 @@ $search-height: 47px;
     flex: 1;
     padding-top: env(safe-area-inset-top);
   }
+  .native.native-platform-mac & {
+    padding-top: 0;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+
+  }
   .feeds-column,
   .entries-column {
     flex-grow: 0;

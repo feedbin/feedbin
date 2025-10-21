@@ -49,7 +49,7 @@
     <%= csrf_meta_tags %>
     <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
 </head>
-<%= tag.body(class: [@class, "group/body", { native: native?, "standalone-navigator" => native? }], data: { behavior: @behavior, controller: "visual-viewport", visual_viewport_offset_value: 0 }) do %>
+<%= tag.body(class: [@class, "group/body", { native: native?, "standalone-navigator" => native?, "native-platform-#{native_platform}" => native_platform }], data: { behavior: @behavior, controller: "visual-viewport", visual_viewport_offset_value: 0 }) do %>
     <%= content_for?(:content) ? yield(:content) : yield %>
     <%= render partial: "shared/theme_colors" %>
 <% end %>
