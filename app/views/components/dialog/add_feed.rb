@@ -154,12 +154,8 @@ module Dialog
         (index == 0 && !subscribed?(feed)) ? true : false
       end
 
-      def disabled?(feed)
-
-      end
-
       def subscribed?(feed)
-        @subscriptions.include?(feed.id)
+        @subscriptions.include?(feed.id) || @subscriptions.include?(feed.feed_url)
       end
 
       def feed_row(feed, index, form_builder)
