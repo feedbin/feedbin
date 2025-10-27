@@ -66,13 +66,14 @@ module Dialog
     class ResultsData < ApplicationComponent
       component_options skip_comment: true
 
-      def initialize(query:, feeds:, tag_editor:, search:, basic_auth:, auth_attempted:)
+      def initialize(query:, feeds:, tag_editor:, search:, basic_auth:, auth_attempted:, subscriptions:)
         @query = query
         @feeds = feeds
         @tag_editor = tag_editor
         @search = search
         @basic_auth = basic_auth
         @auth_attempted = auth_attempted
+        @subscriptions = subscriptions
       end
 
       def view_template
@@ -149,11 +150,23 @@ module Dialog
         end
       end
 
+      def checked?(feed, index)
+        (index == 0 && !subscribed?(feed)) ? true : false
+      end
+
+      def disabled?(feed)
+
+      end
+
+      def subscribed?(feed)
+        @subscriptions.include?(feed.id)
+      end
+
       def feed_row(feed, index, form_builder)
         div class: "mb-4", data: { behavior: "subscription_option" } do
           div class: "flex items-center mb-2" do
             div class: ["self-stretch", ("hide" if @feeds.length == 1)]  do
-              form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: STIMULUS_CONTROLLER)
+              form_builder.check_box :subscribe, checked: checked?(feed, index), disabled: subscribed?(feed), class: "peer", data: stimulus_item(target: :checkbox, actions: {change: :count_selected}, for: STIMULUS_CONTROLLER)
               form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
                 render Form::CheckboxComponent.new
               end
@@ -165,7 +178,17 @@ module Dialog
                 end
 
                 input.input do
-                  form_builder.text_field :title, placeholder: feed.title, class: "peer text-input"
+                  form_builder.text_field :title, placeholder: feed.title, disabled: subscribed?(feed), class: "peer text-input"
+                end
+
+                if subscribed?(feed)
+                  input.accessory_trailing do
+                    span(class: "pr-2") do
+                      span class: "text-green-600 text-xs" do
+                        "✓ Already Subscribed"
+                      end
+                    end
+                  end
                 end
               end
             end
