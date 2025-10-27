@@ -48,8 +48,14 @@ class CrawlData
     clear! unless last_error && last_error["class"] == "Feedkit::NotFeed"
     redirect = FeedCrawler::RedirectCache.new(feed_id).save(redirects)
     if redirect.present?
+      @redirect_changed = (@data.redirected_to != redirect)
       @data.redirected_to = redirect
     end
+  end
+
+  def redirect_changed?
+    return @redirect_changed if defined?(@redirect_changed)
+    false
   end
 
   def download_error(exception)
