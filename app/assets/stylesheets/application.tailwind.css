@@ -53,12 +53,12 @@
   /* accents */
   --color-blue-400:     38%   62%    93%;
   --color-blue-600:      3%   40%    89%;
-  --color-blue-700:      3%    33%   73%;
-  --color-green-600:     3%   67%   28%;
-  --color-green-700:     2%   55%   23%;
-  --color-red-200:      97%   91%   92%;
-  --color-red-600:      73%    4%   18%;
-  --color-orange-600:   91%   42%    5%;
+  --color-blue-700:      3%   33%    73%;
+  --color-green-600:     3%   67%    28%;
+  --color-green-700:     2%   55%    23%;
+  --color-red-200:      97%   91%    92%;
+  --color-red-600:      73%    4%    18%;
+  --color-orange-600:   91%   42%     5%;
 
   /* dark accents */
   --color-blue-600-dark-mode:   4%   45%  100%;
@@ -235,7 +235,7 @@ input[type="search"]::-webkit-search-cancel-button {
   .input {
     @apply leading-[42px] bg-transparent w-full text-sm text-600 ring-base block grow appearance-none
     placeholder:text-500
-    disabled:bg-100 disabled:text-400
+    disabled:bg-100 disabled:text-500
     data-[focused]:text-700 data-[focused]:border-blue-600 data-[focused]:shadow-selected;
   }
   .select-wrap,
