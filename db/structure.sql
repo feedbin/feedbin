@@ -644,7 +644,8 @@ CREATE TABLE public.feeds (
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
-    crawl_data jsonb
+    crawl_data jsonb,
+    redirected_to text
 );
 
 
@@ -2423,6 +2424,13 @@ CREATE INDEX index_feeds_on_push_expiration ON public.feeds USING btree (push_ex
 
 
 --
+-- Name: index_feeds_on_redirected_to; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feeds_on_redirected_to ON public.feeds USING btree (redirected_to) WHERE (redirected_to IS NOT NULL);
+
+
+--
 -- Name: index_feeds_on_standalone_request_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3032,6 +3040,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251027170411'),
 ('20250117094633'),
 ('20240502090914'),
 ('20240226114227'),

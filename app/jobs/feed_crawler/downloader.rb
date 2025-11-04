@@ -34,6 +34,7 @@ module FeedCrawler
 
       @crawl_data.download_success(@feed_id, redirects: @response.redirects)
       @crawl_data.save(@response)
+      UpdateRedirect.perform_async(@feed_id, @crawl_data.redirected_to) if @crawl_data.redirect_changed?
 
       message = "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers.get(:server).last}\""
       if @crawl_data.relative_retry_after > 0

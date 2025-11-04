@@ -32,6 +32,9 @@ class FeedsController < ApplicationController
       Feed.search(@query)
     end
     @feeds.map { |feed| feed.priority_refresh(@user) }
+
+    @subscriptions = @user.existing_subscriptions(@feeds)
+
     taggings = TagEditor.taggings(@user)
     @tag_editor = TagEditor.new(taggings: taggings, user: @user, feed: nil)
   rescue Feedkit::Unauthorized => exception

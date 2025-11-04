@@ -4,6 +4,7 @@ module Extension
       def new
         @user = current_user
         @feeds = FeedFinder.feeds(params[:url])
+        @subscriptions = @user.existing_subscriptions(@feeds)
       end
 
       def create

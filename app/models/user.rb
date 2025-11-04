@@ -649,4 +649,13 @@ class User < ApplicationRecord
       hash[item.entry_id] = {progress: progress, duration: item.duration}
     end
   end
+
+  def existing_subscriptions(feeds_to_search)
+    return [] if feeds_to_search.blank?
+    @existing ||= begin
+      redirected_feeds = feeds.where(redirected_to: feeds_to_search.map(&:feed_url)).pluck(:redirected_to)
+      subscribed_feeds = subscriptions.where(feed_id: feeds_to_search.map(&:id)).pluck(:feed_id)
+      redirected_feeds + subscribed_feeds
+    end
+  end
 end

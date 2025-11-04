@@ -215,6 +215,7 @@ module FeedCrawler
       end
 
       assert_equal(last_url.to_s, @feed.reload.crawl_data.redirected_to)
+      assert_equal(last_url.to_s, @feed.reload.redirected_to)
     end
   end
 end

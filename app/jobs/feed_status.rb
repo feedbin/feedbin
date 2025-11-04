@@ -14,7 +14,7 @@ class FeedStatus
   def update(feed_id)
     feed = Feed.find(feed_id)
     cache = FeedbinUtils.shared_cache(feed.redirect_key)
-    feed.update(current_feed_url: cache[:to])
+    feed.update(redirected_to: cache[:to], current_feed_url: cache[:to])
   end
 
   def build

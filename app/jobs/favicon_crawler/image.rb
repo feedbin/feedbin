@@ -1,7 +1,12 @@
 module FaviconCrawler
   class Image
 
-    INVALID_COLORS = ["00000000", "ffffffff", nil]
+    INVALID_COLORS = [
+      -> (color) { color.nil? },
+      -> (color) { color == "00000000" },        # opacity bit matters for black
+      -> (color) { color.start_with?("ffffff") } # ignore opacity bit for white because the result is white
+    ]
+
 
     def self.resize(*args)
       new(*args).resize
@@ -28,10 +33,12 @@ module FaviconCrawler
 
     def best_layer
       (0..4)
-        .filter_map { load_layer(_1) }
-        .uniq       { _1.size }
-        .sort_by    { _1.size.first * -1 }
-        .find       { !INVALID_COLORS.include?(color(_1)) }
+        .filter_map { load_layer(it) }
+        .uniq       { it.size }
+        .sort_by    { it.size.first * -1 }
+        .find       { |layer|
+          !INVALID_COLORS.any? { |proc| proc.call(color(layer)) }
+        }
     end
 
     def load_layer(page)
@@ -51,7 +58,7 @@ module FaviconCrawler
         .resize_to_fill(1, 1, sharpen: false)
         .custom { |image|
           image.tap do |data|
-            hex = data.getpoint(0, 0).map { "%02x" % _1 }.join
+            hex = data.getpoint(0, 0).first(3).map { "%02x" % it }.join
           end
         }
         .call

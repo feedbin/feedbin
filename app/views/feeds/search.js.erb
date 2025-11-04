@@ -1,7 +1,7 @@
 <% if @basic_auth.present? || @feeds.present?%>
   window.dispatchEvent(new CustomEvent("add-feed:updateContent", {
     detail: {
-      data: "<%= j render Dialog::AddFeed::ResultsData.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search, basic_auth: @basic_auth, auth_attempted: @auth_attempted) %>"
+      data: "<%= j render Dialog::AddFeed::ResultsData.new(query: @query, feeds: @feeds, tag_editor: @tag_editor, search: @search, basic_auth: @basic_auth, auth_attempted: @auth_attempted, subscriptions: @subscriptions) %>"
     }
   }))
 

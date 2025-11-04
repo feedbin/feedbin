@@ -4,28 +4,25 @@ module FaviconCrawler
 
     AWS_S3_BUCKET_FAVICONS = ENV["AWS_S3_BUCKET_FAVICONS"] || ENV["AWS_S3_BUCKET"]
 
-    def initialize(path, host)
-      @path = path
+    def initialize(favicon, host)
+      @favicon = favicon
       @host = host
     end
 
     def favicon_hash
-      @favicon_hash ||= Digest::SHA1.hexdigest(File.read(@path))
+      @favicon_hash ||= Digest::SHA1.hexdigest(File.read(@favicon[:original]))
     end
 
-    def process
-      @resized_path = Image.resize(@path)
-      return if @resized_path.blank?
+    def call
       @favicon_url = upload
       @encoded_favicon = encoded
-      File.unlink(@resized_path) rescue Errno::ENOENT
       self
     end
 
     private
 
     def upload
-      File.open(@resized_path) do |file|
+      File.open(@favicon[:resized]) do |file|
         response = Fog::Storage.new(STORAGE).put_object(AWS_S3_BUCKET_FAVICONS, File.join(favicon_hash[0..2], "#{favicon_hash}.png"), file, s3_options)
         URI::HTTPS.build(
           host: response.data[:host],
@@ -35,7 +32,7 @@ module FaviconCrawler
     end
 
     def encoded
-      Base64.encode64(File.read(@resized_path)).delete("\n")
+      Base64.encode64(File.read(@favicon[:resized])).delete("\n")
     end
 
     def s3_options
