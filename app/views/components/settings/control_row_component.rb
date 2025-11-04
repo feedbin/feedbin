@@ -4,7 +4,7 @@ module Settings
     slots :icon, :title, :description, :control, :content
 
     def view_template
-      div class: "py-4 flex items-center gap-4 group group-data-[capsule=true]:px-4 group-data-[item-capsule=true]:px-4 group-data-[item-capsule=true]:rounded-lg transition-[border,box_shadow] duration-200 group-data-[item-capsule=true]:border group-data-[item-capsule=true]:pg-checked:border-blue-600 group-data-[item-capsule=true]:pg-checked:shadow-selected" do
+      div class: "py-3 flex items-center gap-4 group group-data-[capsule=true]:px-4 group-data-[item-capsule=true]:px-4 group-data-[item-capsule=true]:rounded-lg transition-[border,box_shadow] duration-200 group-data-[item-capsule=true]:border group-data-[item-capsule=true]:pg-checked:border-blue-600 group-data-[item-capsule=true]:pg-checked:shadow-selected" do
         if content?
           render &@content
         else

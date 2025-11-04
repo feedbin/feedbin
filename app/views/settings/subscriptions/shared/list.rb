@@ -12,7 +12,7 @@ module Settings
           div data_behavior: "subscriptions_list" do
             form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: "off", class: "group", data: {controller: "toggle-checkboxes", toggle_checkboxes_include_all_visible_value: "false"} do |update_form|
               hidden_field_tag :q, @params[:q]
-              div class: "py-4 flex border-y items-center justify-between" do
+              div class: "py-3 flex border-y items-center justify-between" do
                 input type: "checkbox", class: "peer", data_action: "toggle-checkboxes#toggle", id: "select_all_feeds"
                 label for: "select_all_feeds", class: "group flex gap-2 items-center" do
                   render Form::CheckboxComponent.new
