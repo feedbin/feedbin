@@ -17,6 +17,7 @@ module FaviconCrawler
       new_favicon = nil
       all_favicon_urls.each do |url|
         response = download_favicon(url)
+        break if response.not_modified?
         next if response.blank?
         resized = Image.resize(response.path)
         next if resized.blank?
@@ -89,10 +90,10 @@ module FaviconCrawler
     def download_favicon(url)
       options = {}.tap do |hash|
         hash[:user_agent] = "Mozilla/5.0"
-        unless @force
-          hash[:etag]          = @favicon.data["Etag"]
-          hash[:last_modified] = @favicon.data["Last-Modified"]
-        end
+        # unless @force
+        #   hash[:etag]          = @favicon.data["Etag"]
+        #   hash[:last_modified] = @favicon.data["Last-Modified"]
+        # end
       end
       Feedkit::Request.download(url.to_s, **options)
     rescue Feedkit::Error => exception
