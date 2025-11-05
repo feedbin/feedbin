@@ -74,11 +74,13 @@ module Onboarding
       }
     ]
 
+    STIMULUS_CONTROLLER = :onboarding__main
+
     def initialize()
     end
 
     def view_template
-      div class: "flex flex-wrap gap-4 p-2 min-h-0" do
+      div data: stimulus(controller: STIMULUS_CONTROLLER), class: "flex flex-wrap gap-4 p-2 min-h-0" do
         [:welcome, :add, :import, :extension].each do |page|
           div class: "border rounded-xl w-[550px] h-[564px] p-6 overflow-hidden" do
             send(page)
@@ -162,8 +164,8 @@ module Onboarding
 
     def import
       controller = :upload
-      div data: stimulus(controller: controller), class: "w-full h-full" do
-        div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border border-200 rounded-xl border-dashed flex flex-col gap-4 flex-center transition-colors" do
+      form_with model: Import.new, url: helpers.settings_imports_path, data: stimulus(controller: controller, target: :form, values: {dragging: false, dropped: false}, data: {remote: true}), class: "w-full h-full group" do
+        div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-col gap-4 flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-[rgb(var(--color-blue-400)/0.1)]" do
           Icon("icon-cloud", class: "fill-600")
           div class: "" do
             "Drag & Drop OPML Here"
@@ -186,7 +188,7 @@ module Onboarding
     end
 
     def tile(title:, subtitle:, image:)
-      button class: "block rounded-lg border ring-0 border-200 p-3 hover:border-300 transition cursor-pointer text-sm text-left" do
+      button class: "block rounded-lg border ring-0 border p-3 hover:border-300 transition cursor-pointer text-sm text-left" do
         img src: asset_path("suggested-sites/#{image}"), class: "border rounded mb-2"
         div class: "font-medium truncate" do
           title
