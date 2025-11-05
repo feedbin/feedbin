@@ -41,7 +41,12 @@ export default class extends Controller {
 
     this.draggingValue = false
 
-    const files = event.dataTransfer.files
+    console.log("event.dataTransfer", event.dataTransfer.items);
+
+    window.Afiles = event.dataTransfer.items
+    window.Aitems = event.dataTransfer.items
+
+    const files = event.dataTransfer.items
     if (files.length > 0) {
       this.handleFiles(files)
     }
@@ -60,33 +65,31 @@ export default class extends Controller {
     }
   }
 
-  async handleFiles(files) {
+  handleFiles(items) {
     this.droppedValue = true
-    this.fileInputTarget.files = files
+    // this.fileInputTarget.files = files
+    const files = [];
+    for (const item of items) {
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file) files.push(file);
+      }
+    }
+
+    if (files.length > 0) {
+      // Use DataTransfer to create a FileList
+      const dt = new DataTransfer();
+      files.forEach((file) => dt.items.add(file));
+
+      // Assign to hidden input
+      this.fileInputTarget.files = dt.files;
+
+      console.log(this.fileInputTarget);
+
+      // (optional) show a preview / confirmation
+      // dropzone.textContent = `Attached: ${files.map(f => f.name).join(', ')}`;
+    }
     window.$(this.formTarget).submit()
-    // this.formTarget.submit()
-    //
-    // try {
-    //   const response = await fetch(this.formTarget.action, {
-    //     method: "POST",
-    //     body: formData,
-    //     headers: {
-    //       "X-CSRF-Token": csrfToken,
-    //       "Accept": "text/javascript"
-    //     }
-    //   })
-    //
-    //   if (response.ok) {
-    //     const script = await response.text()
-    //     eval(script)
-    //   } else {
-    //     console.error("Upload failed:", response.statusText)
-    //   }
-    // } catch (error) {
-    //   console.error("Upload error:", error)
-    // } finally {
-    //   this.droppedValue = false
-    // }
   }
 
 }
