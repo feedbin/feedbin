@@ -15,14 +15,12 @@ export default class extends Controller {
   }
 
   dragStart(event) {
-    console.log("dragStart", event);
   }
 
   dragOver(event) {
     event.preventDefault()
     event.stopPropagation()
     event.dataTransfer.dropEffect = "copy";
-    console.log("dragOver", event.dataTransfer.items);
     this.draggingValue = true
   }
 
@@ -49,25 +47,46 @@ export default class extends Controller {
     }
   }
 
-  chooseFile(event) {
-    if (this.hasFileInputTarget) {
-      this.fileInputTarget.click()
-    }
-  }
-
   fileSelected(event) {
-    console.log("selected", event);
     const files = event.target.files
     if (files.length > 0) {
       this.handleFiles(files)
     }
   }
 
-  handleFiles(files) {
-    console.log(this.formTarget);
-    const formData = new FormData()
-    formData.append("file", files[0])
-    this.formTarget.requestSubmit()
+  chooseFile(event) {
+    if (this.hasFileInputTarget) {
+      this.fileInputTarget.click()
+    }
+  }
+
+  async handleFiles(files) {
+    this.droppedValue = true
+    this.fileInputTarget.files = files
+    window.$(this.formTarget).submit()
+    // this.formTarget.submit()
+    //
+    // try {
+    //   const response = await fetch(this.formTarget.action, {
+    //     method: "POST",
+    //     body: formData,
+    //     headers: {
+    //       "X-CSRF-Token": csrfToken,
+    //       "Accept": "text/javascript"
+    //     }
+    //   })
+    //
+    //   if (response.ok) {
+    //     const script = await response.text()
+    //     eval(script)
+    //   } else {
+    //     console.error("Upload failed:", response.statusText)
+    //   }
+    // } catch (error) {
+    //   console.error("Upload error:", error)
+    // } finally {
+    //   this.droppedValue = false
+    // }
   }
 
 }

@@ -199,6 +199,9 @@ Rails.application.routes.draw do
       member do
         post :replace_all
       end
+      collection do
+        post :create_remote
+      end
     end
 
     resources :import_items, only: [:update]

@@ -48,6 +48,34 @@ class Settings::ImportsController < ApplicationController
     end
   end
 
+  def create_remote
+    if rate_limited?(6, 4.hours)
+      @error = "Too many upload requests."
+      render "error", formats: :js
+      return
+    end
+
+    upload = params.dig(:import, :upload)
+    if !upload.respond_to?(:tempfile)
+      @error = "No file uploaded."
+      render "error", formats: :js
+      return
+    elsif upload.tempfile.size > 500.kilobytes
+      @error = "Import must be less than 500kb."
+      render "error", formats: :js
+      return
+    end
+
+    @import = @user.imports.new(filename: upload.original_filename, xml: upload.tempfile.read)
+
+    if @import.save
+      render "success", formats: :js
+    else
+      @error = @import.errors.full_messages.join(", ")
+      render "error", formats: :js
+    end
+  end
+
   def replace_all
     @user = current_user
     @import = @user.imports.find(params[:id])
