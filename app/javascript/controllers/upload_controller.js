@@ -41,13 +41,14 @@ export default class extends Controller {
 
     this.draggingValue = false
 
-    console.log("event.dataTransfer", event.dataTransfer.items);
+    const items = event.dataTransfer.items
+    if (items && items.length > 0) {
+      this.handleFiles(items)
+      return
+    }
 
-    window.Afiles = event.dataTransfer.items
-    window.Aitems = event.dataTransfer.items
-
-    const files = event.dataTransfer.items
-    if (files.length > 0) {
+    const files = event.dataTransfer.files
+    if (files && files.length > 0) {
       this.handleFiles(files)
     }
   }
@@ -67,29 +68,53 @@ export default class extends Controller {
 
   handleFiles(items) {
     this.droppedValue = true
-    // this.fileInputTarget.files = files
-    const files = [];
-    for (const item of items) {
-      if (item.kind === 'file') {
-        const file = item.getAsFile();
-        if (file) files.push(file);
-      }
-    }
+
+    const files = this.extractFiles(items)
 
     if (files.length > 0) {
-      // Use DataTransfer to create a FileList
-      const dt = new DataTransfer();
-      files.forEach((file) => dt.items.add(file));
-
-      // Assign to hidden input
-      this.fileInputTarget.files = dt.files;
-
-      console.log(this.fileInputTarget);
-
-      // (optional) show a preview / confirmation
-      // dropzone.textContent = `Attached: ${files.map(f => f.name).join(', ')}`;
+      this.assignFiles(items, files)
+      this.submitForm()
     }
-    window.$(this.formTarget).submit()
   }
 
+  extractFiles(items) {
+    if (!items) return []
+
+    const files = []
+
+    Array.from(items).forEach((item) => {
+      if (item instanceof File) {
+        files.push(item)
+        return
+      }
+
+      if (item && item.kind === "file" && typeof item.getAsFile === "function") {
+        const file = item.getAsFile()
+        if (file) files.push(file)
+      }
+    })
+
+    return files
+  }
+
+  assignFiles(source, files) {
+    if (!this.hasFileInputTarget) return
+
+    if (typeof FileList !== "undefined" && source instanceof FileList) {
+      this.fileInputTarget.files = source
+      return
+    }
+
+    if (typeof DataTransfer === "undefined") return
+
+    const dt = new DataTransfer()
+    files.forEach((file) => dt.items.add(file))
+
+    this.fileInputTarget.files = dt.files
+  }
+
+  submitForm() {
+    console.log(this.formTarget);
+    // window.$(this.formTarget).submit()
+  }
 }
