@@ -41,22 +41,9 @@ export default class extends Controller {
 
     this.draggingValue = false
 
-    const items = event.dataTransfer.items
-    if (items && items.length > 0) {
-      this.handleFiles(items)
-      return
-    }
-
     const files = event.dataTransfer.files
     if (files && files.length > 0) {
-      this.handleFiles(files)
-    }
-  }
-
-  fileSelected(event) {
-    const files = event.target.files
-    if (files.length > 0) {
-      this.handleFiles(files)
+      this.handleFiles(files[0])
     }
   }
 
@@ -66,55 +53,21 @@ export default class extends Controller {
     }
   }
 
-  handleFiles(items) {
-    this.droppedValue = true
-
-    const files = this.extractFiles(items)
-
+  fileSelected(event) {
+    const files = event.target.files
     if (files.length > 0) {
-      this.assignFiles(items, files)
-      this.submitForm()
+      this.handleFiles(files[0])
     }
   }
 
-  extractFiles(items) {
-    if (!items) return []
-
-    const files = []
-
-    Array.from(items).forEach((item) => {
-      if (item instanceof File) {
-        files.push(item)
-        return
-      }
-
-      if (item && item.kind === "file" && typeof item.getAsFile === "function") {
-        const file = item.getAsFile()
-        if (file) files.push(file)
-      }
-    })
-
-    return files
-  }
-
-  assignFiles(source, files) {
-    if (!this.hasFileInputTarget) return
-
-    if (typeof FileList !== "undefined" && source instanceof FileList) {
-      this.fileInputTarget.files = source
-      return
+  handleFiles(file) {
+    this.droppedValue = true
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result
+      console.log("text", text);
     }
-
-    if (typeof DataTransfer === "undefined") return
-
-    const dt = new DataTransfer()
-    files.forEach((file) => dt.items.add(file))
-
-    this.fileInputTarget.files = dt.files
+    reader.readAsText(file);
   }
 
-  submitForm() {
-    console.log(this.formTarget);
-    // window.$(this.formTarget).submit()
-  }
 }
