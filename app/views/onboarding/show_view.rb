@@ -80,7 +80,7 @@ module Onboarding
     end
 
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER), class: "flex flex-wrap gap-4 p-2 min-h-0" do
+      div data: stimulus(controller: STIMULUS_CONTROLLER), class: "flex flex-wrap gap-4 p-2 min-h-0 select-none" do
         [:welcome, :add, :import, :extension].each do |page|
           div class: "border rounded-xl w-[550px] h-[564px] p-6 overflow-hidden" do
             send(page)
@@ -115,18 +115,21 @@ module Onboarding
     end
 
     def add
-      div class: "flex flex-col h-full" do
+      controller = :onboarding__subscriptions
+      div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full" do
         div class: "flex gap-4 justify-between items-baseline w-full mb-4 shrink-0" do
           div class: "text-xl font-bold" do
             "Add Content"
           end
-          button class: "text-500" do
-            "Clear All (2)"
+          button data: stimulus_item(actions: {click: :clear_all} , for: controller), class: "text-500 group-data-[onboarding--subscriptions-selected-count-value=0]:tw-hidden" do
+            plain "Clear All ("
+            span data: stimulus_item(target: :count, for: controller)
+            plain ")"
           end
         end
-        div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto min-h-0" do
+        div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-x-visible overflow-y-scroll min-h-0 p-[2px]" do
           SITES.shuffle.each do
-            tile(title: it[:title], subtitle: it[:host], image: it[:image])
+            tile(title: it[:title], subtitle: it[:host], image: it[:image], controller: controller)
           end
         end
       end
@@ -196,8 +199,9 @@ module Onboarding
       end
     end
 
-    def tile(title:, subtitle:, image:)
-      button class: "block rounded-lg border ring-0 border p-3 hover:border-300 transition cursor-pointer text-sm text-left" do
+    def tile(title:, subtitle:, image:, controller:)
+      label class: "block rounded-lg border border p-3 hover:border-300 min-w-0 transition cursor-pointer text-sm text-left outline outline-2 outline-transparent transition-[outline-color] [&:has(:checked)]:border-blue-600 [&:has(:checked)]:outline-blue-600" do
+        input type: "checkbox", data: stimulus_item(target: :feed, actions: {change: :update_selection}, for: controller)
         img src: asset_path("suggested-sites/#{image}"), class: "border rounded mb-2"
         div class: "font-medium truncate" do
           title
