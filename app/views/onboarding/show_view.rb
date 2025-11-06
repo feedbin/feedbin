@@ -164,29 +164,32 @@ module Onboarding
 
     def import
       controller = :upload
-      form_with class: "w-full h-full group", model: Import.new, url: helpers.create_remote_settings_imports_path, method: :post, data: stimulus(controller: controller, target: :form, values: {dragging: false, dropped: false}, data: {remote: true}) do
-        div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-col gap-4 flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-[rgb(var(--color-blue-400)/0.1)]" do
-          Icon("icon-cloud", class: "fill-600")
-          div class: "" do
-            "Drag & Drop OPML Here"
+      div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false}) do
+        input(
+          type: "file",
+          accept: ".opml,.xml",
+          class: "hidden",
+          name: "import[upload]",
+          data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
+        )
+        form_with class: "w-full h-full group", model: Import.new, url: helpers.create_remote_settings_imports_path, method: :post, data: stimulus_item(target: :form, data: {remote: true}, for: controller) do |form|
+          form.hidden_field :filename, data: stimulus_item(target: :filename_field, for: controller)
+          form.hidden_field :xml, data: stimulus_item(target: :xml_field, for: controller)
+          div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-col gap-4 flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-[rgb(var(--color-blue-400)/0.1)]" do
+            Icon("icon-cloud", class: "fill-600")
+            div class: "" do
+              "Drag & Drop OPML Here"
+            end
+            div class: "font-bold" do
+              "OR"
+            end
+            button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary" do
+              "Choose File"
+            end
+            input type: "submit"
           end
-          div class: "font-bold" do
-            "OR"
-          end
-          button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary" do
-            "Choose File"
-          end
-          input(
-            type: "file",
-            accept: ".opml,.xml",
-            class: "hidden",
-            name: "import[upload]",
-            data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
-          )
-          input type: "submit"
         end
       end
-
     end
 
     def tile(title:, subtitle:, image:)

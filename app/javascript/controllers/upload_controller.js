@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="upload"
 export default class extends Controller {
-  static targets = ["dropzone", "fileInput", "form"]
+  static targets = ["dropzone", "fileInput", "form", "filenameField", "xmlField"]
   static values = {
     dragging: Boolean,
     dropped: Boolean
@@ -61,11 +61,14 @@ export default class extends Controller {
   }
 
   handleFiles(file) {
+    console.log(file);
     this.droppedValue = true
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target.result
-      console.log("text", text);
+      this.filenameFieldTarget.value = file.name
+      this.xmlFieldTarget.value = text
+      window.$(this.formTarget).submit()
     }
     reader.readAsText(file);
   }
