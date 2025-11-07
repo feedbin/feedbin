@@ -40,6 +40,16 @@ $.extend feedbin,
       data.event.target.dispatchEvent(delegatedEvent)
     $(document).on(eventName, handler)
 
+  updateContent: ->
+    $('[data-content-src]').each ->
+      element = $(@)
+      src = element.data('content-src')
+
+      callback = ->
+        $.get(src)
+
+      feedbin.remoteContentIntervals[src] = setInterval callback, 3000
+
   closeDialog: ->
     window.dispatchEvent new CustomEvent('dialog:close')
 
@@ -2747,14 +2757,7 @@ $.extend feedbin,
         event.stopPropagation()
 
     updateContent: ->
-      $('[data-content-src]').each ->
-        element = $(@)
-        src = element.data('content-src')
-
-        callback = ->
-          $.get(src)
-
-        feedbin.remoteContentIntervals[src] = setInterval callback, 3000
+      feedbin.updateContent()
 
     # workaround for app showing another panel on launch
     showFirstPanel: ->

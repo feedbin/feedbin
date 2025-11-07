@@ -281,6 +281,12 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :onboarding do
+    resources :imports, only: [:create]
+
+  end
+
+
   constraints subdomain: "api" do
     namespace :api, path: nil do
       namespace :v1 do

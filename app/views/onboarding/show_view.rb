@@ -81,7 +81,7 @@ module Onboarding
 
     def view_template
       div data: stimulus(controller: STIMULUS_CONTROLLER), class: "flex flex-wrap gap-4 p-2 min-h-0 select-none" do
-        [:welcome, :add, :import, :extension].each do |page|
+        [:import, :welcome, :add, :extension].each do |page|
           div class: "border rounded-xl w-[550px] h-[564px] p-6 overflow-hidden" do
             send(page)
           end
@@ -167,32 +167,34 @@ module Onboarding
 
     def import
       controller = :upload
-      div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false}) do
-        input(
-          type: "file",
-          accept: ".opml,.xml",
-          class: "hidden",
-          name: "import[upload]",
-          data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
-        )
-        form_with class: "w-full h-full group", model: Import.new, url: helpers.create_remote_settings_imports_path, method: :post, data: stimulus_item(target: :form, data: {remote: true}, for: controller) do |form|
-          form.hidden_field :filename, data: stimulus_item(target: :filename_field, for: controller)
-          form.hidden_field :xml, data: stimulus_item(target: :xml_field, for: controller)
-          div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-[rgb(var(--color-blue-400)/0.1)] group-data-[upload-error-value=true]:border-red-600 group-data-[upload-error-value=true]:bg-[rgb(var(--color-red-600)/0.1)]" do
-            div class: "flex flex-col gap-4 flex-center group-data-[upload-error-value=true]:tw-hidden" do
-              Icon("icon-cloud", class: "fill-600")
-              div class: "" do
-                "Drag & Drop OPML Here"
+      div class: "w-full h-full", data: {behavior: "onboarding_import"} do
+        div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false}, actions: { "upload:serverError@window" => "serverError"}) do
+          input(
+            type: "file",
+            accept: ".opml,.xml",
+            class: "hidden",
+            name: "import[upload]",
+            data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
+          )
+          form_with class: "w-full h-full group", model: Import.new, url: helpers.onboarding_imports_path, method: :post, data: stimulus_item(target: :form, data: {remote: true}, for: controller) do |form|
+            form.hidden_field :filename, data: stimulus_item(target: :filename_field, for: controller)
+            form.hidden_field :xml, data: stimulus_item(target: :xml_field, for: controller)
+            div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-[rgb(var(--color-blue-400)/0.1)] group-data-[upload-error-value=true]:border-red-600 group-data-[upload-error-value=true]:bg-[rgb(var(--color-red-600)/0.1)]" do
+              div class: "flex flex-col gap-4 flex-center group-data-[upload-error-value=true]:tw-hidden" do
+                Icon("icon-cloud", class: "fill-600")
+                div class: "" do
+                  "Drag & Drop OPML Here"
+                end
+                div class: "font-bold" do
+                  "OR"
+                end
+                button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary" do
+                  "Choose File"
+                end
               end
-              div class: "font-bold" do
-                "OR"
+              div class: "flex-col gap-4 tw-hidden flex-center group-data-[upload-error-value=true]:flex" do
+                div data: stimulus_item(target: :error_message, for: controller)
               end
-              button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary" do
-                "Choose File"
-              end
-            end
-            div class: "flex-col gap-4 tw-hidden flex-center group-data-[upload-error-value=true]:flex" do
-              div data: stimulus_item(target: :error_message, for: controller)
             end
           end
         end

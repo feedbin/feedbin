@@ -61,12 +61,16 @@ export default class extends Controller {
     }
   }
 
+  serverError(event) {
+    this.error(event.detail.error)
+  }
+
   error(message) {
     this.errorValue = true
     this.errorMessageTarget.textContent = message
     setTimeout(() => {
       this.errorValue = false
-    }, 2500)
+    }, 2000)
   }
 
   handleFiles(file) {
