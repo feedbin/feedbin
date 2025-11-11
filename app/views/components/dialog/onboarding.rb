@@ -1,6 +1,6 @@
-module Onboarding
-  class ShowView < ApplicationView
-
+module Dialog
+  class Onboarding < ApplicationComponent
+    TITLE = "Get Started"
     SITES = [
       {
         title: "Ars Technica",
@@ -76,14 +76,23 @@ module Onboarding
 
     STIMULUS_CONTROLLER = :onboarding__main
 
-    def initialize()
+    def initialize
     end
 
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER), class: "flex flex-wrap gap-4 p-2 min-h-0 select-none" do
-        [:import, :welcome, :add, :extension].each do |page|
-          div class: "border rounded-xl w-[550px] h-[564px] p-6 overflow-hidden" do
-            send(page)
+      render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
+        dialog.title do
+          TITLE
+        end
+        dialog.body do
+          div data: stimulus(controller: STIMULUS_CONTROLLER), class: "flex w-full gap-2 h-[564px] select-none overflow-x-auto overflow-y-hidden snap-x snap-mandatory hide-scrollbar" do
+            [:welcome, :add, :import, :extension].each do |page|
+              div class: "snap-start w-full h-full shrink-0 overflow-hidden relative" do
+                div class: "absolute inset-0" do
+                  send(page)
+                end
+              end
+            end
           end
         end
       end
@@ -116,8 +125,8 @@ module Onboarding
 
     def add
       controller = :onboarding__subscriptions
-      div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full" do
-        div class: "flex gap-4 justify-between items-baseline w-full mb-4 shrink-0" do
+      div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full overflow-y-auto min-h-0 hide-scrollbar" do
+        div class: "flex gap-4 justify-between items-baseline w-full pb-4 shrink-0 bg-base sticky top-0" do
           div class: "text-xl font-bold" do
             "Add Content"
           end
@@ -127,7 +136,7 @@ module Onboarding
             plain ")"
           end
         end
-        div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-x-visible overflow-y-scroll min-h-0 p-[2px]" do
+        div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 min-h-0 p-[2px] flex-1" do
           SITES.shuffle.each do
             tile(title: it[:title], subtitle: it[:host], image: it[:image], controller: controller)
           end
@@ -159,7 +168,7 @@ module Onboarding
           end
         end
         button class: "button button-secondary" do
-          "Choose File"
+          "Get for Safari"
         end
 
       end
@@ -167,7 +176,7 @@ module Onboarding
 
     def import
       controller = :upload
-      div class: "w-full h-full", data: {behavior: "onboarding_import"} do
+      div class: "w-full h-full overflow-y-auto hide-scrollbar", data: {behavior: "onboarding_import"} do
         div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false}, actions: { "upload:serverError@window" => "serverError"}) do
           input(
             type: "file",
@@ -232,10 +241,7 @@ module Onboarding
         div class: "w-[30px] flex flex-center shrink-0" do
           Icon("icon-caret", class: "fill-500 -rotate-90")
         end
-
-
       end
-
     end
 
   end

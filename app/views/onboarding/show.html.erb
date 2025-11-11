@@ -1,0 +1,27 @@
+<%# Minimal page to render the onboarding modal and auto-open it %>
+<%= render Dialog::Template.new %>
+<%= render Dialog::Onboarding.new %>
+
+<script>
+  (function() {
+    function openDialog() {
+      if (window.feedbin && typeof feedbin.showDialog === 'function') {
+        feedbin.showDialog("<%= Dialog::Onboarding.dom_id %>")
+      }
+    }
+    function kickoff() {
+      if (window.requestAnimationFrame) {
+        requestAnimationFrame(openDialog)
+      } else {
+        setTimeout(openDialog, 0)
+      }
+      // Additional delay to ensure Stimulus controllers have connected
+      setTimeout(openDialog, 100)
+    }
+    // Fire now (script executes after assets are loaded in head)
+    kickoff()
+    // And on DOM ready just in case
+    document.addEventListener("DOMContentLoaded", kickoff)
+    window.addEventListener("load", kickoff)
+  })();
+</script>
