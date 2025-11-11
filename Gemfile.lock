@@ -14,7 +14,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: 0c7b2b2c6647c25ecc0406f77c9ea273628d511b
+  revision: b8181f58ae7cad26e033a4d379a52dafe9bc2436
   branch: f2
   specs:
     feedjira (2.1.2)
