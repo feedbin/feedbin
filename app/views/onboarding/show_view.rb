@@ -1,5 +1,5 @@
-module Dialog
-  class Onboarding < ApplicationComponent
+module Onboarding
+  class ShowView < ApplicationComponent
     TITLE = "Get Started"
     SITES = [
       {
@@ -80,28 +80,31 @@ module Dialog
     end
 
     def view_template
-      render Dialog::Template::Content.new(dialog_id: self.class.dom_id) do |dialog|
-        dialog.title do
-          TITLE
+      div data: stimulus(controller: STIMULUS_CONTROLLER), class: "border rounded-xl w-[456px] max-h-[356px] flex flex-col" do
+        div class: "p-4 sm:px-6 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
+          "Title"
         end
-        dialog.body do
-          div data: stimulus(controller: STIMULUS_CONTROLLER), class: "relative w-full h-80 overflow-hidden rounded-xl bg-white shadow-lg focus:outline-none" do
-            div class: "flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] will-change-transform" do
-              [:welcome, :add, :import, :extension].each do |page|
-                div class: "flex-none w-full min-w-full h-full bg-blue-100" do
-                  div class: "h-full box-border p-6 overflow-y-auto" do
-                    send(page)
-                  end
+        div class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
+          div class: "flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] will-change-transform" do
+            [:welcome, :add, :import, :extension].each do |page|
+              div class: "flex-none w-full min-w-full h-full" do
+                div class: "h-full box-border p-6 overflow-y-auto" do
+                  send(page)
                 end
               end
             end
+          end
+        end
+        div class: "p-4 sm:px-6 native:pt-[5px] flex items-baseline shrink-0 relative border-t" do
+          button class: "button" do
+            "Continue"
           end
         end
       end
     end
 
     def welcome
-      div class: "h-full flex flex-center flex-col" do
+      div class: "flex flex-center flex-col" do
         Icon("logo-dynamic", class: "w-[54px] h-auto mb-4")
         div class: "text-2xl text-700 font-bold mb-10" do
           "Welcome to Feedbin"
