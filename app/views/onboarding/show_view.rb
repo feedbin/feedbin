@@ -80,9 +80,17 @@ module Onboarding
     end
 
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER), class: "border rounded-xl w-[456px] max-h-[356px] flex flex-col" do
+      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome}), class: "group border rounded-xl w-[456px] h-[700px] flex flex-col" do
         div class: "p-4 sm:px-6 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
-          "Title"
+          button class: "shrink-0" do
+            "Back"
+          end
+          div class: "text-700 grow font-bold m-0 truncate text-center" do
+            "Get Started"
+          end
+          button type: "button", class: "absolute shrink-0 right-0 inset-y-0 px-4 sm:px-6 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
+            Icon("icon-close", class: "relative native:top-[-6px] fill-600", title: "Close")
+          end
         end
         div class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
           div class: "flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] will-change-transform" do
@@ -95,16 +103,23 @@ module Onboarding
             end
           end
         end
-        div class: "p-4 sm:px-6 native:pt-[5px] flex items-baseline shrink-0 relative border-t" do
-          button class: "button" do
-            "Continue"
+        div class: "px-4 sm:px-6 h-[77px] flex items-center shrink-0 relative border-t" do
+          div class: "tw-hidden group-data-[onboarding--main-step-value=welcome]:flex grow flex-center" do
+            button class: "text-blue-600" do
+              "Skip"
+            end
+          end
+          div class: "block group-data-[onboarding--main-step-value=welcome]:tw-hidden" do
+            button class: "ml-auto button" do
+              "Continue"
+            end
           end
         end
       end
     end
 
     def welcome
-      div class: "flex flex-center flex-col" do
+      div class: "flex flex-center flex-col h-full" do
         Icon("logo-dynamic", class: "w-[54px] h-auto mb-4")
         div class: "text-2xl text-700 font-bold mb-10" do
           "Welcome to Feedbin"
@@ -121,9 +136,6 @@ module Onboarding
             subtitle: "Choose feeds to add ",
             icon: "icon-search"
           )
-          button class: "text-blue-600" do
-            "Skip"
-          end
         end
       end
     end
@@ -229,7 +241,7 @@ module Onboarding
     end
 
     def big_button(title:, subtitle:, icon:)
-      button class: "border rounded-xl flex items-center gap-4 p-4 grow" do
+      button class: "border rounded-xl flex items-center gap-4 p-4 grow text-left" do
         div class: "w-[30px] flex flex-center shrink-0" do
           Icon(icon, class: "fill-500")
         end
