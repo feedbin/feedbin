@@ -1,17 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
+import { afterTransition } from "helpers"
 
 // Connects to data-controller="onboarding--main"
 export default class extends Controller {
   static targets = ["panel", "viewport", "scrollTrack"]
 
   static values = {
-    step: String
+    step: String,
+    animate: Boolean
   }
 
   connect() {
     this.boundResize = this.goToPanel.bind(this)
     window.visualViewport.addEventListener("resize", () => {
-      this.boundResize(this.stepValue, true)
+      this.boundResize(this.stepValue, false)
     })
   }
 
@@ -25,24 +27,18 @@ export default class extends Controller {
   }
 
   goToPanel(panelName, animate = true) {
-    console.log({panelName, animate});
+    if (!animate) {
+      this.animateValue = false
+    }
+
     this.stepValue = panelName
-
-    console.log(this.stepValue);
-
     const panelIndex = this.panelTargets.findIndex(element => element.dataset.panel === panelName);
     const panelElement = this.panelTargets[panelIndex]
-    const viewport = this.viewportTarget
-
-    const panelElementRect = panelElement.getBoundingClientRect()
-    const viewportRect = viewport.getBoundingClientRect()
-    const offset = (panelElementRect.left - viewportRect.left) * -1
-
+    const offset = -panelElement.offsetLeft
     this.scrollTrackTarget.style.transform = `translateX(${offset}px)`;
 
-
-    console.log(offset);
-
-    console.log(panelElement);
+    afterTransition(this.scrollTrackTarget, true, () => {
+      this.animateValue = true
+    })
   }
 }

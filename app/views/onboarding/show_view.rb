@@ -81,7 +81,7 @@ module Onboarding
     end
 
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome}), class: "group h-full w-full flex flex-center" do
+      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, animate: true}), class: "group h-full w-full flex flex-center" do
         div class: "md:border rounded-xl md:w-[456px] h-full md:max-h-[700px] flex flex-col min-w-0 " do
           div class: "p-4 sm:px-4 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
             button class: "shrink-0" do
@@ -95,7 +95,7 @@ module Onboarding
             end
           end
           div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
-            div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 will-change-transform ease-[cubic-bezier(0.22,0.61,0.36,1)]" do
+            div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-[cubic-bezier(0.22,0.61,0.36,1)]" do
               [:welcome, :add, :import, :extension].each do |panel|
                 send(panel)
               end
