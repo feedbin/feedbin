@@ -84,7 +84,7 @@ module Onboarding
       div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, animate: true}), class: "group h-full w-full flex flex-center" do
         div class: "md:border rounded-xl md:w-[456px] h-full md:max-h-[700px] flex flex-col min-w-0 " do
           div class: "p-4 sm:px-4 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
-            button class: "shrink-0" do
+            button class: "shrink-0", data: stimulus_item(actions: {click: :back}, for: STIMULUS_CONTROLLER) do
               "Back"
             end
             div class: "text-700 grow font-bold m-0 truncate text-center" do

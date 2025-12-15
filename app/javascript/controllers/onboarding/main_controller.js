@@ -26,6 +26,18 @@ export default class extends Controller {
     this.goToPanel(panelName)
   }
 
+  back() {
+    const currentIndex = this.panelTargets.findIndex(element => element.dataset.panel === this.stepValue)
+
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      const panel = this.panelTargets[i]
+      if (getComputedStyle(panel).display !== 'none') {
+        this.goToPanel(panel.dataset.panel)
+        return
+      }
+    }
+  }
+
   goToPanel(panelName, animate = true) {
     if (!animate) {
       this.animateValue = false
