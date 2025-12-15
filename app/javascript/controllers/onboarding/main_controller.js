@@ -9,12 +9,26 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("onboarding--main connected");
+    this.boundResize = this.goToPanel.bind(this)
+    window.visualViewport.addEventListener("resize", () => {
+      this.boundResize(this.stepValue, true)
+    })
   }
 
-  selectPanel(event) {
+  disconnect() {
+    window.visualViewport.removeEventListener("resize", this.boundResize)
+  }
+
+  panelSelected(event) {
     const panelName = event.params.panel
+    this.goToPanel(panelName)
+  }
+
+  goToPanel(panelName, animate = true) {
+    console.log({panelName, animate});
     this.stepValue = panelName
+
+    console.log(this.stepValue);
 
     const panelIndex = this.panelTargets.findIndex(element => element.dataset.panel === panelName);
     const panelElement = this.panelTargets[panelIndex]

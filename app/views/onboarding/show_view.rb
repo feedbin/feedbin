@@ -206,9 +206,9 @@ module Onboarding
         div class: "w-full h-full", data: {behavior: "onboarding_import"} do
           div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false}, actions: { "upload:serverError@window" => "serverError"}) do
             input(
-            type: "file",
-            accept: ".opml,.xml",
-            class: "hidden",
+              type: "file",
+              accept: ".opml,.xml",
+              class: "hidden",
               name: "import[upload]",
               data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
             )
@@ -252,7 +252,7 @@ module Onboarding
     end
 
     def big_button(title:, subtitle:, icon:, panel:)
-      button data: stimulus_item(actions: {click: :selectPanel}, params: {panel: panel}, for: STIMULUS_CONTROLLER), class: "border rounded-xl flex items-center gap-4 p-4 grow text-left" do
+      button data: stimulus_item(actions: {click: :panel_selected}, params: {panel: panel}, for: STIMULUS_CONTROLLER), class: "border rounded-xl flex items-center gap-4 p-4 grow text-left" do
         div class: "w-[30px] flex flex-center shrink-0" do
           Icon(icon, class: "fill-500")
         end
