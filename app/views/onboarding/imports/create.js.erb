@@ -1,6 +1,6 @@
 <% if @error %>
   window.dispatchEvent(new CustomEvent("upload:serverError", {detail: {error: "<%= j @error %>"}}))
 <% else %>
-  $("[data-behavior~=onboarding_import]").html("<%= j render(Settings::Imports::ShowView.new(import: @import)) %>")
+  $("[data-behavior~=onboarding_import]").html("<%= j render(Onboarding::Imports::CreateView.new(import: @import)) %>")
   feedbin.updateContent()
 <% end %>

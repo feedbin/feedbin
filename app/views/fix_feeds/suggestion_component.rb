@@ -39,7 +39,7 @@ module FixFeeds
             end
           end
           feed.subhead do
-            link_to(@source.feed_url, class: "!text-500 truncate", target: :blank) do
+            link_to(@source.feed_url, target: :blank, class: "!text-500 truncate") do
               short_url_alt(@source.feed_url)
             end
           end

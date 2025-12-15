@@ -1,6 +1,7 @@
 module Onboarding
   class ShowView < ApplicationComponent
     TITLE = "Get Started"
+
     SITES = [
       {
         title: "Ars Technica",
@@ -81,15 +82,15 @@ module Onboarding
 
     def view_template
       div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome}), class: "group h-full w-full flex flex-center" do
-        div class: "border rounded-xl w-[456px] h-[700px] flex flex-col" do
-          div class: "p-4 sm:px-6 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
+        div class: "md:border rounded-xl md:w-[456px] h-full md:max-h-[700px] flex flex-col min-w-0 " do
+          div class: "p-4 sm:px-4 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
             button class: "shrink-0" do
               "Back"
             end
             div class: "text-700 grow font-bold m-0 truncate text-center" do
               "Get Started"
             end
-            button type: "button", class: "absolute shrink-0 right-0 inset-y-0 px-4 sm:px-6 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
+            button type: "button", class: "absolute shrink-0 right-0 inset-y-0 px-4 sm:px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
               Icon("icon-close", class: "relative native:top-[-6px] fill-600", title: "Close")
             end
           end
@@ -100,7 +101,7 @@ module Onboarding
               end
             end
           end
-          div class: "px-4 sm:px-6 h-[77px] flex items-center shrink-0 relative border-t" do
+          div class: "px-4 sm:px-4 h-[77px] flex items-center shrink-0 relative border-t" do
             div class: "tw-hidden group-data-[onboarding--main-step-value=welcome]:flex grow flex-center" do
               button class: "text-blue-600" do
                 "Skip"
@@ -141,11 +142,12 @@ module Onboarding
         end
       end
     end
+
     def add
       controller = :onboarding__subscriptions
       render PanelView.new(panel: :add, padding: false, attributes: {class: "tw-hidden group-data-[onboarding--main-step-value=add]:block"}) do
         div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full min-h-0" do
-          div class: "flex gap-4 justify-between items-baseline w-full p-6 pb-4 shrink-0 bg-base sticky top-0" do
+          div class: "flex gap-4 justify-between items-baseline w-full p-4 pb-4 shrink-0 bg-base sticky top-0" do
             div class: "text-xl font-bold" do
               "Add Content"
             end
@@ -155,8 +157,8 @@ module Onboarding
               plain ")"
             end
           end
-          div class: "min-h-0 flex-1 px-6" do
-            div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 pb-6" do
+          div class: "min-h-0 flex-1 px-4 pt-1" do
+            div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 pb-4" do
               SITES.shuffle.each do
                 tile(title: it[:title], subtitle: it[:host], image: it[:image], controller: controller)
               end
@@ -279,13 +281,11 @@ module Onboarding
 
       def view_template
         div data: stimulus_item(target: :panel, for: STIMULUS_CONTROLLER, data: {panel: @panel}), **mix({ class: "flex-none w-full min-w-full h-full" }, @attributes) do
-          div class: "h-full box-border overflow-y-auto #{@padding ? "p-6" : ""}" do
+          div class: "h-full box-border overflow-y-auto #{@padding ? "p-4" : ""}" do
             yield
           end
         end
       end
     end
-
-
   end
 end

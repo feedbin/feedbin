@@ -22,7 +22,7 @@ module Settings
                       link_to @import_item.details[:title] || "Untitled", @import_item.details[:html_url], target: "_blank", class: "!text-600"
                     end
                     feed.subhead do
-                      a(href: @import_item.details[:xml_url], class: "!text-500 truncate" ) do
+                      a(href: @import_item.details[:xml_url], class: "!text-500 truncate", target: :blank) do
                         short_url(@import_item.details[:xml_url])
                       end
                     end
