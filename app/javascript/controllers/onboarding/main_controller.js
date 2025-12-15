@@ -31,23 +31,26 @@ export default class extends Controller {
 
     for (let i = currentIndex - 1; i >= 0; i--) {
       const panel = this.panelTargets[i]
-      if (getComputedStyle(panel).display !== 'none') {
-        this.goToPanel(panel.dataset.panel)
+      if (getComputedStyle(panel).display !== "none") {
+        this.goToPanel(panel.dataset.panel, true, true)
         return
       }
     }
   }
 
-  goToPanel(panelName, animate = true) {
+  goToPanel(panelName, animate = true, back = false) {
     if (!animate) {
       this.animateValue = false
     }
 
-    this.stepValue = panelName
-    const panelIndex = this.panelTargets.findIndex(element => element.dataset.panel === panelName);
+    afterTransition(this.scrollTrackTarget, back, () => {
+      this.stepValue = panelName
+    })
+
+    const panelIndex = this.panelTargets.findIndex(element => element.dataset.panel === panelName)
     const panelElement = this.panelTargets[panelIndex]
     const offset = -panelElement.offsetLeft
-    this.scrollTrackTarget.style.transform = `translateX(${offset}px)`;
+    this.scrollTrackTarget.style.transform = `translateX(${offset}px)`
 
     afterTransition(this.scrollTrackTarget, true, () => {
       this.animateValue = true

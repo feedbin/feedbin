@@ -3,7 +3,13 @@ export function afterTransition(element, condition, callback) {
   if (condition) {
     timeout = parseFloat(getComputedStyle(element).transitionDuration) * 1000
   }
-  setTimeout(callback, timeout)
+
+  if (timeout === 0) {
+    callback()
+  } else {
+    setTimeout(callback, timeout)
+  }
+
 }
 
 export function afterAnimation(element, condition, callback) {
