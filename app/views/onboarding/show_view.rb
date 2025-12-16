@@ -81,7 +81,7 @@ module Onboarding
     end
 
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, animate: true}), class: "group h-full w-full flex flex-center" do
+      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, path: nil, animate: true}), class: "group h-full w-full flex flex-center" do
         div class: "md:border rounded-xl md:w-[456px] h-full md:max-h-[700px] flex flex-col min-w-0 " do
           div class: "p-4 sm:px-4 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
             button class: "shrink-0", data: stimulus_item(actions: {click: :back}, for: STIMULUS_CONTROLLER) do
@@ -108,7 +108,7 @@ module Onboarding
               end
             end
             div class: "block group-data-[onboarding--main-step-value=welcome]:tw-hidden" do
-              button class: "ml-auto button" do
+              button class: "ml-auto button", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
                 "Continue"
               end
             end
@@ -145,7 +145,7 @@ module Onboarding
 
     def add
       controller = :onboarding__subscriptions
-      render PanelView.new(panel: :add, padding: false, attributes: {class: "tw-hidden group-data-[onboarding--main-step-value=add]:block"}) do
+      render PanelView.new(panel: :add, padding: false, attributes: {class: "tw-hidden group-data-[onboarding--main-path-value=add]:block"}) do
         div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full min-h-0" do
           div class: "flex gap-4 justify-between items-baseline w-full p-4 pb-4 shrink-0 bg-base sticky top-0" do
             div class: "text-xl font-bold" do
@@ -202,7 +202,7 @@ module Onboarding
 
     def import
       controller = :upload
-      render PanelView.new(panel: :import, attributes: {class: "tw-hidden group-data-[onboarding--main-step-value=import]:block"}) do
+      render PanelView.new(panel: :import, attributes: {class: "tw-hidden group-data-[onboarding--main-path-value=import]:block"}) do
         div class: "w-full h-full", data: {behavior: "onboarding_import"} do
           div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false}, actions: { "upload:serverError@window" => "serverError"}) do
             input(
@@ -252,7 +252,7 @@ module Onboarding
     end
 
     def big_button(title:, subtitle:, icon:, panel:)
-      button data: stimulus_item(actions: {click: :panel_selected}, params: {panel: panel}, for: STIMULUS_CONTROLLER), class: "border rounded-xl flex items-center gap-4 p-4 grow text-left" do
+      button data: stimulus_item(actions: {click: :panel_selected}, params: {panel: panel, set_path: "true"}, for: STIMULUS_CONTROLLER), class: "border rounded-xl flex items-center gap-4 p-4 grow text-left" do
         div class: "w-[30px] flex flex-center shrink-0" do
           Icon(icon, class: "fill-500")
         end

@@ -7,7 +7,8 @@ export default class extends Controller {
 
   static values = {
     step: String,
-    animate: Boolean
+    animate: Boolean,
+    path: String, // path can either be `add` or `import`
   }
 
   connect() {
@@ -23,19 +24,37 @@ export default class extends Controller {
 
   panelSelected(event) {
     const panelName = event.params.panel
+    if (event.params.setPath) {
+      this.pathValue = event.params.panel
+    }
     this.goToPanel(panelName)
   }
 
   back() {
-    const currentIndex = this.panelTargets.findIndex(element => element.dataset.panel === this.stepValue)
+    this.navigate(-1)
+  }
 
-    for (let i = currentIndex - 1; i >= 0; i--) {
+  continue() {
+    this.navigate(1)
+  }
+
+  navigate(direction) {
+    const currentIndex = this.panelTargets.findIndex(element => element.dataset.panel === this.stepValue)
+    const start = direction > 0 ? currentIndex + 1 : currentIndex - 1
+    const end = direction > 0 ? this.panelTargets.length : -1
+    const step = direction > 0 ? 1 : -1
+
+    for (let i = start; direction > 0 ? i < end : i > end; i += step) {
       const panel = this.panelTargets[i]
       if (getComputedStyle(panel).display !== "none") {
-        this.goToPanel(panel.dataset.panel, true, true)
+        this.goToPanel(panel.dataset.panel, true, direction < 0)
         return
       }
     }
+  }
+
+  setPath(event) {
+    console.log({"this.pathValue": this.pathValue});
   }
 
   goToPanel(panelName, animate = true, back = false) {
@@ -51,6 +70,8 @@ export default class extends Controller {
     const panelElement = this.panelTargets[panelIndex]
     const offset = -panelElement.offsetLeft
     this.scrollTrackTarget.style.transform = `translateX(${offset}px)`
+
+    console.log({offset});
 
     afterTransition(this.scrollTrackTarget, true, () => {
       this.animateValue = true
