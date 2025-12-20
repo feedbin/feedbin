@@ -1,87 +1,10 @@
 module Onboarding
   class ShowView < ApplicationComponent
-    TITLE = "Get Started"
-
-    SITES = [
-      {
-        title: "Ars Technica",
-        host: "arstechnica.com",
-        image: "suggested-arstechnica.png"
-      },
-      {
-        title: "Daring Fireball",
-        host: "daringfireball.net",
-        image: "suggested-daringfireball.png",
-      },
-      {
-        title: "Feedbin",
-        host: "feedbin.com",
-        image: "suggested-feedbin.png",
-      },
-      {
-        title: "Kottke",
-        host: "kottke.org",
-        image: "suggested-kottke.png",
-      },
-      {
-        title: "MacStories",
-        host: "www.macstories.net",
-        image: "suggested-macstories.png",
-      },
-      {
-        title: "Marques Brownlee",
-        host: "@mkbhd",
-        image: "suggested-mkbhd.png",
-      },
-      {
-        title: "Polygon",
-        host: "www.polygon.com",
-        image: "suggested-polygon.png",
-      },
-      {
-        title: "Six Colors",
-        host: "sixcolors.com",
-        image: "suggested-sixcolors.png",
-      },
-      {
-        title: "Spyglass",
-        host: "spyglass.org",
-        image: "suggested-spyglass.png",
-      },
-      {
-        title: "Stratechery",
-        host: "stratechery.com",
-        image: "suggested-stratechery.png",
-      },
-      {
-        title: "The Oatmeal",
-        host: "theoatmeal.com",
-        image: "suggested-theoatmeal.png",
-      },
-      {
-        title: "The Verge",
-        host: "www.theverge.com",
-        image: "suggested-theverge.png",
-      },
-      {
-        title: "Wirecutter",
-        host: "www.nytimes.com",
-        image: "suggested-wirecutter.png",
-      },
-      {
-        title: "xkcd.com",
-        host: "xkcd.com",
-        image: "suggested-xkcd.png",
-      }
-    ]
 
     STIMULUS_CONTROLLER = :onboarding__main
 
-    def initialize
-    end
-
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, path: nil, animate: true}), class: "group h-full w-full flex flex-center" do
+      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, path: nil, animate: true}), class: "select-none group h-full w-full flex flex-center" do
         div class: "h-full flex flex-col min-w-0 md:w-[456px] md:max-h-[750px]" do
           div class: "py-6 flex flex-center shrink-0 relative" do
             div class: "text-700 text-xl font-bold" do
@@ -164,7 +87,7 @@ module Onboarding
           end
           div class: "min-h-0 flex-1 px-4 pt-1" do
             div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 pb-4" do
-              SITES.shuffle.each do
+              Feedbin::Application.config.onboarding_feeds.shuffle.each do
                 tile(title: it[:title], subtitle: it[:host], image: it[:image], controller: controller)
               end
             end
