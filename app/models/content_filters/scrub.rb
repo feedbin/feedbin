@@ -10,6 +10,7 @@ module ContentFilters
         .scrub!(:prune)
         .scrub!(video)
         .scrub!(links)
+        .scrub!(iframe)
       if context[:scrub_mode] == :newsletter
         doc.scrub!(newsletter_elements)
       end
@@ -41,6 +42,14 @@ module ContentFilters
       Loofah::Scrubber.new do |node|
         if node.name == "video"
           node["preload"] = "none"
+        end
+      end
+    end
+
+    def iframe
+      Loofah::Scrubber.new do |node|
+        if node.name == "iframe"
+          node["referrerpolicy"] = "strict-origin-when-cross-origin"
         end
       end
     end

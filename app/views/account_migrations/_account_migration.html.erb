@@ -4,7 +4,7 @@
     <%= button_tag "Begin Migration", type: "submit", class: "button button-huge" %>
   <% end %>
 <% elsif @migration.failed? %>
-  <%= render "shared/error_message" do %>
+  <%= render Common::ErrorMessage.new do %>
     <%= @migration.message %>
   <% end %>
 <% elsif @migration.started? || @migration.processing? || @migration.complete? %>

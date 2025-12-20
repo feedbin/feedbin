@@ -3,7 +3,7 @@
 <% end %>
 
 <% if @action.error_hint.present? %>
-  <%= render "shared/error_message" do %>
+  <%= render Common::ErrorMessage.new do %>
     <%= @action.error_hint %>
   <% end %>
 <% end %>
