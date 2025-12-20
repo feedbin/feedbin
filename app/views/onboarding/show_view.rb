@@ -4,7 +4,20 @@ module Onboarding
     STIMULUS_CONTROLLER = :onboarding__main
 
     def view_template
-      div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, path: nil, animate: true}), class: "select-none group h-full w-full flex flex-center" do
+      stimulus_controller = stimulus(
+        controller: STIMULUS_CONTROLLER,
+        values: {
+          step: :welcome,
+          path: nil,
+          animate: "true",
+          import_started: "false"
+        },
+        actions: {
+          "upload:uploaded@window" => "importStarted",
+        },
+      )
+
+      div data: stimulus_controller, class: "select-none group h-full w-full flex flex-center" do
         div class: "h-full flex flex-col min-w-0 md:w-[456px] md:max-h-[750px]" do
           div class: "py-6 flex flex-center shrink-0 relative" do
             div class: "text-700 text-xl font-bold" do
@@ -25,7 +38,7 @@ module Onboarding
                 "Back"
               end
 
-              button class: "ml-auto button group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-step-value=import]:tw-hidden", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+              button class: "ml-auto button group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-import-started-value=false]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
                 "Continue"
               end
 

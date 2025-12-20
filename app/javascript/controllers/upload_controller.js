@@ -92,6 +92,7 @@ export default class extends Controller {
       this.filenameFieldTarget.value = file.name
       this.xmlFieldTarget.value = text
       window.$(this.formTarget).submit()
+      this.dispatch("uploaded")
     }
 
     reader.onerror = (event) => {

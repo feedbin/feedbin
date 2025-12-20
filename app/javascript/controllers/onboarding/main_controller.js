@@ -3,12 +3,13 @@ import { afterTransition } from "helpers"
 
 // Connects to data-controller="onboarding--main"
 export default class extends Controller {
-  static targets = ["panel", "viewport", "scrollTrack"]
+  static targets = ["panel", "viewport", "scrollTrack", "continueButton"]
 
   static values = {
     step: String,
     animate: Boolean,
     path: String, // path can either be `add` or `import`
+    importStarted: Boolean,
   }
 
   connect() {
@@ -57,6 +58,10 @@ export default class extends Controller {
     console.log({"this.pathValue": this.pathValue});
   }
 
+  importStarted(event) {
+    this.importStartedValue = true
+  }
+
   goToPanel(panelName, animate = true, back = false) {
     if (!animate) {
       this.animateValue = false
@@ -68,8 +73,6 @@ export default class extends Controller {
     const panelElement = this.panelTargets[panelIndex]
     const offset = -panelElement.offsetLeft
     this.scrollTrackTarget.style.transform = `translateX(${offset}px)`
-
-    console.log({offset});
 
     afterTransition(this.scrollTrackTarget, true, () => {
       this.animateValue = true
