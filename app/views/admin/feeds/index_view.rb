@@ -39,8 +39,8 @@ module Admin
       end
 
       def not_found
-        render "shared/error_message" do
-          plain "No matches."
+        ErrorMessage() do
+          "No matches."
         end
       end
     end
