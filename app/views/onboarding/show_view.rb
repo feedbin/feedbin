@@ -82,37 +82,42 @@ module Onboarding
 
     def view_template
       div data: stimulus(controller: STIMULUS_CONTROLLER, values: {step: :welcome, path: nil, animate: true}), class: "group h-full w-full flex flex-center" do
-        div class: "md:border rounded-xl md:w-[456px] h-full md:max-h-[700px] flex flex-col min-w-0 " do
-          div class: "p-4 sm:px-4 native:pt-[5px] flex items-baseline shrink-0 relative border-b" do
-            button class: "shrink-0", data: stimulus_item(actions: {click: :back}, for: STIMULUS_CONTROLLER) do
-              "Back"
-            end
-            div class: "text-700 grow font-bold m-0 truncate text-center" do
+        div class: "h-full flex flex-col min-w-0 md:w-[456px] md:max-h-[750px]" do
+          div class: "py-6 flex flex-center shrink-0 relative" do
+            div class: "text-700 text-xl font-bold" do
               "Get Started"
             end
-            button type: "button", class: "absolute shrink-0 right-0 inset-y-0 px-4 sm:px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
-              Icon("icon-close", class: "relative native:top-[-6px] fill-600", title: "Close")
-            end
           end
-          div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
-            div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-[cubic-bezier(0.22,0.61,0.36,1)]" do
-              [:welcome, :add, :import, :extension].each do |panel|
-                send(panel)
+
+          div class: "border-y md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full" do
+            div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
+              div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-in-out" do
+                [:welcome, :add, :import, :extension].each do |panel|
+                  send(panel)
+                end
               end
             end
-          end
-          div class: "px-4 sm:px-4 h-[77px] flex items-center shrink-0 relative border-t" do
-            div class: "tw-hidden group-data-[onboarding--main-step-value=welcome]:flex grow flex-center" do
-              button class: "text-blue-600" do
-                "Skip"
+            div class: "px-4 sm:px-4 h-[77px] flex items-center shrink-0 relative border-t group-data-[onboarding--main-step-value=welcome]:opacity-0" do
+              button class: "button button-secondary shrink-0", data: stimulus_item(actions: {click: :back}, for: STIMULUS_CONTROLLER) do
+                "Back"
               end
-            end
-            div class: "block group-data-[onboarding--main-step-value=welcome]:tw-hidden" do
-              button class: "ml-auto button", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+
+              button class: "ml-auto button group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-step-value=import]:tw-hidden", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
                 "Continue"
               end
+
+              button class: "ml-auto button tw-hidden group-data-[onboarding--main-step-value=extension]:block", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+                "Done"
+              end
             end
           end
+
+          div class: "py-6 flex flex-center shrink-0 relative" do
+            button class: "text-blue-600" do
+              "Skip"
+            end
+          end
+
         end
       end
     end
@@ -147,7 +152,7 @@ module Onboarding
       controller = :onboarding__subscriptions
       render PanelView.new(panel: :add, padding: false, attributes: {class: "tw-hidden group-data-[onboarding--main-path-value=add]:block"}) do
         div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full min-h-0" do
-          div class: "flex gap-4 justify-between items-baseline w-full p-4 pb-4 shrink-0 bg-base sticky top-0" do
+          div class: "flex gap-4 justify-between items-baseline w-full p-4 pb-4 shrink-0 bg-base rounded-t-xl sticky top-0" do
             div class: "text-xl font-bold" do
               "Add Content"
             end

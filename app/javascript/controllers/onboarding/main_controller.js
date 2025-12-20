@@ -62,9 +62,7 @@ export default class extends Controller {
       this.animateValue = false
     }
 
-    afterTransition(this.scrollTrackTarget, back, () => {
-      this.stepValue = panelName
-    })
+    this.stepValue = panelName
 
     const panelIndex = this.panelTargets.findIndex(element => element.dataset.panel === panelName)
     const panelElement = this.panelTargets[panelIndex]
