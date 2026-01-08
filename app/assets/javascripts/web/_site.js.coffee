@@ -2788,6 +2788,13 @@ $.extend feedbin,
       # forward jquery ajax events to dom events for stimulus
       feedbin.delegate('ajax:complete', parameters: ['event', 'response', 'status'])
 
+    subscribe: ->
+      subscription = feedbin.queryString 'subscribe'
+      if subscription
+        requestAnimationFrame ->
+          addButton = document.querySelector '[data-behavior~=show_subscribe]'
+          addButton.click()
+
 $.each feedbin.preInit, (i, item) ->
   item()
 
