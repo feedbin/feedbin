@@ -94,17 +94,6 @@ export default class extends Controller {
     }
   }
 
-  // subscribe via query string support ?subscribe=http://example.com
-  static afterLoad(identifier, application) {
-    const subscription = window.feedbin.queryString('subscribe')
-    if (subscription) {
-      requestAnimationFrame(() => {
-        const addButton = document.querySelector("[data-behavior~=show_subscribe]")
-        addButton.click()
-      })
-    }
-  }
-
   subscribeByQueryString() {
     const subscription = window.feedbin.queryString('subscribe')
     if (subscription) {
