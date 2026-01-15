@@ -135,7 +135,6 @@ class Entry < ApplicationRecord
       host = ENV["ENTRY_IMAGE_HOST"]
       url = URI(image_url)
       url.host = host if host
-      url.scheme = "https"
       url.to_s
     end
   end

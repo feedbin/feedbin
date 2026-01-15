@@ -22,10 +22,17 @@ module ImageCrawler
           options = STORAGE.dup
           options = options.merge(region: @image.preset.region) unless @image.preset.region.nil?
           response = Fog::Storage.new(options).put_object(@image.bucket, @image.image_name, file, @image.storage_options)
-          URI::HTTPS.build(
+          uri = URI::HTTP.build(
+            scheme: response.data[:scheme],
             host: response.data[:host],
             path: response.data[:path]
-          ).to_s
+          )
+
+          if response.data[:port] != 80
+            uri.port = response.data[:port]
+          end
+
+          uri.to_s
         end
       end
     end
