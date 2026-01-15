@@ -38,7 +38,13 @@ module Onboarding
                 "Back"
               end
 
-              button class: "ml-auto button group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-import-started-value=false]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+              # only shown for import
+              button class: "ml-auto button group-data-[onboarding--main-path-value=add]:tw-hidden group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-import-started-value=false]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+                "Continue"
+              end
+
+              # only shown for add
+              button class: "ml-auto button group-data-[onboarding--main-path-value=import]:tw-hidden group-data-[onboarding--main-step-value=extension]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
                 "Continue"
               end
 
