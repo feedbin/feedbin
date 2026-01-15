@@ -3,67 +3,67 @@
 @tailwind utilities;
 
 :root {
-  --color-black:   0%   0%   0%;
-  --color-white: 100% 100% 100%;
+  --color-black: #000000;
+  --color-white: #ffffff;
 
   /* day theme */
-  --day-color-base: 100%  100%  100%;
-  --day-color-100:   96%   96%   97%;
-  --day-color-200:   91%   91%   92%;
-  --day-color-300:   74%   75%   76%;
-  --day-color-400:   57%   58%   61%;
-  --day-color-500:   44%   46%   50%;
-  --day-color-600:   22%   25%   29%;
-  --day-color-700:    5%    9%   14%;
+  --day-color-base:   #ffffff;
+  --day-color-100:    #f5f5f7;
+  --day-color-200:    #e9e9eb;
+  --day-color-300:    #bdbfc3;
+  --day-color-400:    #91959b;
+  --day-color-500:    #707680;
+  --day-color-600:    #39404b;
+  --day-color-700:    #0d1623;
   --day-border-color: var(--day-color-200);
 
   /* sunset theme */
-  --sunset-color-base:  96%   95%   92%;
-  --sunset-color-100:   92%   91%   89%;
-  --sunset-color-200:   87%   86%   84%;
-  --sunset-color-300:   72%   71%   69%;
-  --sunset-color-400:   56%   55%   53%;
-  --sunset-color-500:   43%   43%   41%;
-  --sunset-color-600:   23%   23%   22%;
-  --sunset-color-700:   10%    9%    9%;
+  --sunset-color-base:   #f5f2eb;
+  --sunset-color-100:    #ebe8e2;
+  --sunset-color-200:    #dfdcd6;
+  --sunset-color-300:    #b8b6b0;
+  --sunset-color-400:    #8e8c88;
+  --sunset-color-500:    #6e6d69;
+  --sunset-color-600:    #3b3a38;
+  --sunset-color-700:    #191818;
   --sunset-border-color: var(--sunset-color-200);
 
   /* dusk theme */
-  --dusk-color-base:   15%   15%   15%;
-  --dusk-color-100:    18%   18%   18%;
-  --dusk-color-200:    21%   21%   21%;
-  --dusk-color-300:    30%   30%   30%;
-  --dusk-color-400:    44%   44%   44%;
-  --dusk-color-500:    55%   55%   55%;
-  --dusk-color-600:    83%   83%   83%;
-  --dusk-color-700:    96%   96%   96%;
-  --dusk-border-color:  0%    0%    0%;
+  --dusk-color-base:   #262626;
+  --dusk-color-100:    #2d2d2d;
+  --dusk-color-200:    #353535;
+  --dusk-color-300:    #4d4d4d;
+  --dusk-color-400:    #707070;
+  --dusk-color-500:    #8c8c8c;
+  --dusk-color-600:    #d4d4d4;
+  --dusk-color-700:    #f6f6f6;
+  --dusk-border-color: #000000;
 
   /* midnight theme */
-  --midnight-color-base:  0%    0%    0%;
-  --midnight-color-100:   8%    8%    8%;
-  --midnight-color-200:  14%   14%   14%;
-  --midnight-color-300:  23%   23%   23%;
-  --midnight-color-400:  35%   35%   35%;
-  --midnight-color-500:  46%   46%   46%;
-  --midnight-color-600:  73%   73%   73%;
-  --midnight-color-700:  96%   96%   96%;
+  --midnight-color-base:   #000000;
+  --midnight-color-100:    #141414;
+  --midnight-color-200:    #242424;
+  --midnight-color-300:    #3b3b3b;
+  --midnight-color-400:    #595959;
+  --midnight-color-500:    #757575;
+  --midnight-color-600:    #bababa;
+  --midnight-color-700:    #f5f5f5;
   --midnight-border-color: var(--midnight-color-200);
 
   /* accents */
-  --color-blue-400:     38%   62%    93%;
-  --color-blue-600:      3%   40%    89%;
-  --color-blue-700:      3%   33%    73%;
-  --color-green-600:     3%   67%    28%;
-  --color-green-700:     2%   55%    23%;
-  --color-red-200:      97%   91%    92%;
-  --color-red-600:      73%    4%    18%;
-  --color-orange-600:   91%   42%     5%;
+  --color-blue-400:   #619eec;
+  --color-blue-600:   #0867e2;
+  --color-blue-700:   #0755B9;
+  --color-green-600:  #07AC47;
+  --color-green-700:  #068D3B;
+  --color-red-200:    #F8E7EA;
+  --color-red-600:    #BB0B2F;
+  --color-orange-600: #E96A0E;
 
   /* dark accents */
-  --color-blue-600-dark-mode:   4%   45%  100%;
-  --color-green-600-dark-mode:  3%   77%   32%;
-  --color-red-600-dark-mode:   83%    5%   21%;
+  --color-blue-600-dark-mode:  #0974FF;
+  --color-green-600-dark-mode: #08C451;
+  --color-red-600-dark-mode:   #D40C35;
 }
 
 :root, .theme-day {
@@ -118,14 +118,14 @@
   --color-light-100:  var(--color-100);
   --color-sidebar:    var(--color-100);
   --color-link:       var(--color-blue-600);
-  --color-shadow-100: rgb(var(--color-black) / 0.1);
+  --color-shadow-100: rgba(0, 0, 0, 0.1);
 }
 
 .theme-dusk, .theme-midnight {
   --color-light-100:  var(--color-600);
   --color-sidebar:    var(--color-base);
   --color-link:       var(--color-white);
-  --color-shadow-100: rgb(var(--color-black) /0.5);
+  --color-shadow-100: rgba(0, 0, 0, 0.5);
 
   --color-blue-600:  var(--color-blue-600-dark-mode);
   --color-green-600: var(--color-green-600-dark-mode);
@@ -151,7 +151,7 @@ a flash of the default theme before prefers-dark class is applied
     --color-light-100:  var(--color-600);
     --color-sidebar:    var(--color-base);
     --color-link:       var(--color-white);
-    --color-shadow-100: rgb(var(--color-black) / 0.5);
+    --color-shadow-100: rgba(0, 0, 0, 0.5);
 
     --color-blue-600:  var(--color-blue-600-dark-mode);
     --color-green-600: var(--color-green-600-dark-mode);
@@ -276,7 +276,7 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply bg-base text-700;
   }
   button {
-    tap-highlight-color: rgb(var(--color-black) / 0));
+    tap-highlight-color: rgba(0,0,0,0);
   }
   .button, .button-secondary, .button-tertiary, .button-huge {
     @apply text-sm font-medium relative inline-flex items-center justify-center gap-2 border border-blue-600 whitespace-nowrap leading-[42px] px-6 rounded-md !text-white bg-blue-600 transition transition-[box_shadow]
@@ -352,7 +352,7 @@ input[type="search"]::-webkit-search-cancel-button {
     display: none;
   }
   .input-shadow {
-    box-shadow: 0 1px 1px 0 rgb(var(--color-black) / 0.1), 0 1px 1px 0 transparent;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.1), 0 1px 1px 0 transparent;
   }
   .flex-center {
     @apply items-center justify-center;
