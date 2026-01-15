@@ -51,12 +51,15 @@
   --midnight-border-color: var(--midnight-color-200);
 
   /* accents */
+  --color-blue-300:   #B5D1F6;
   --color-blue-400:   #619eec;
   --color-blue-600:   #0867e2;
   --color-blue-700:   #0755B9;
+  --color-green-300:  #C2EECD;
   --color-green-600:  #07AC47;
   --color-green-700:  #068D3B;
   --color-red-200:    #F8E7EA;
+  --color-red-300:    #EBB6C1;
   --color-red-600:    #BB0B2F;
   --color-orange-600: #E96A0E;
 
@@ -64,6 +67,10 @@
   --color-blue-600-dark-mode:  #0974FF;
   --color-green-600-dark-mode: #08C451;
   --color-red-600-dark-mode:   #D40C35;
+
+  --color-blue-300-dark-mode:  #03224A;
+  --color-green-300-dark-mode: #023818;
+  --color-red-300-dark-mode:   #4B0413;
 }
 
 :root, .theme-day {
@@ -130,6 +137,10 @@
   --color-blue-600:  var(--color-blue-600-dark-mode);
   --color-green-600: var(--color-green-600-dark-mode);
   --color-red-600:   var(--color-red-600-dark-mode);
+
+  --color-blue-300:  var(--color-blue-300-dark-mode);
+  --color-green-300: var(--color-green-300-dark-mode);
+  --color-red-300:   var(--color-red-300-dark-mode);
 }
 
 /*
@@ -156,6 +167,10 @@ a flash of the default theme before prefers-dark class is applied
     --color-blue-600:  var(--color-blue-600-dark-mode);
     --color-green-600: var(--color-green-600-dark-mode);
     --color-red-600:   var(--color-red-600-dark-mode);
+
+    --color-blue-300:  var(--color-blue-300-dark-mode);
+    --color-green-300: var(--color-green-300-dark-mode);
+    --color-red-300:   var(--color-red-300-dark-mode);
   }
 }
 

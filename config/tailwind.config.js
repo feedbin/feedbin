@@ -47,6 +47,7 @@ module.exports = {
           100: "var(--color-light-100)",
         },
         blue: {
+          300: "var(--color-blue-300)",
           400: "var(--color-blue-400)",
           600: "var(--color-blue-600)",
           700: "var(--color-blue-700)",
@@ -55,11 +56,13 @@ module.exports = {
           600: "var(--color-orange-600)",
         },
         green: {
+          300: "var(--color-green-300)",
           600: "var(--color-green-600)",
           700: "var(--color-green-700)",
         },
         red: {
           200: "var(--color-red-200)",
+          300: "var(--color-red-300)",
           600: "var(--color-red-600)",
         },
         day: {
