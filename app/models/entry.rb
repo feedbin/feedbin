@@ -134,7 +134,9 @@ class Entry < ApplicationRecord
       image_url = image["processed_url"]
       host = ENV["ENTRY_IMAGE_HOST"]
       url = URI(image_url)
-      url.scheme = "https"
+      if Rails.env.production?
+        url.scheme = "https"
+      end
       url.host = host if host
       url.to_s
     end

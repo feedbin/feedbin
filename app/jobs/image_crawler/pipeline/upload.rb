@@ -28,7 +28,7 @@ module ImageCrawler
             path: response.data[:path]
           )
 
-          if response.data[:port] != 80
+          unless [80, 443].include?(response.data[:port])
             uri.port = response.data[:port]
           end
 
