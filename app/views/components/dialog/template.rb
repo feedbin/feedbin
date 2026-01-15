@@ -31,7 +31,7 @@ module Dialog
 
         sm:max-w-[550px] h-fit sm:w-[calc(100%-32px)]
 
-        backdrop:bg-[rgb(var(--dusk-color-100)/0.4)] backdrop:animate-fade-in
+        backdrop:bg-[rgba(45,45,45,0.4)] backdrop:animate-fade-in
 
         group-data-[dialog-closing-value=true]:animate-slide-out
         sm:group-data-[dialog-closing-value=true]:animate-slide-out-top
