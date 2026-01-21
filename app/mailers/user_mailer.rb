@@ -59,4 +59,9 @@ class UserMailer < ApplicationMailer
     attachments["subscriptions.xml"] = opml
     mail to: @user.email, subject: "[Feedbin] Account Closed"
   end
+
+  def onboarding_health_alert(unhealthy_feeds)
+    @unhealthy_feeds = unhealthy_feeds
+    mail to: ENV["ADMIN_EMAIL"], subject: "[Feedbin] Onboarding Feed Health Alert"
+  end
 end

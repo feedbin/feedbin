@@ -1,0 +1,10 @@
+Onboarding Feed Health Alert
+
+The following onboarding feeds have error counts greater than 5:
+
+<% @unhealthy_feeds.each do |feed| %>
+- <%= feed[:title] %> (<%= feed[:feed_url] %>)
+  Error count: <%= feed[:error_count] %>
+
+<% end %>
+Please investigate and resolve these feed issues.
