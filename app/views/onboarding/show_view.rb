@@ -18,7 +18,7 @@ module Onboarding
       )
 
       div data: stimulus_controller, class: "select-none group h-full w-full flex flex-center" do
-        div class: "h-full flex flex-col min-w-0 md:w-[456px] md:max-h-[750px]" do
+        div class: "h-full flex flex-col min-w-0 md:w-[550px] md:max-h-[750px]" do
           div class: "py-6 flex flex-center shrink-0 relative" do
             div class: "text-700 text-xl font-bold" do
               "Get Started"
@@ -194,7 +194,7 @@ module Onboarding
           feed[:title]
         end
         div class: "text-500 text-xs truncate" do
-          feed[:subtitle]
+          feed[:host]
         end
       end
     end

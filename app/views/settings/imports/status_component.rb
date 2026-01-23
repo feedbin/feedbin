@@ -25,27 +25,12 @@ module Settings
             div(class: "py-3 px-4") do
               div(class: "flex justify-between") do
                 strong(class: "font-bold") { "Progress" }
-                div(class: "text-500") do
-                  plain number_with_delimiter(@import.import_items.where.not(status: :pending).count)
-                  plain " of "
-                  plain number_with_delimiter(@import.import_items.count)
-                end
               end
               div(class: "flex mt-4 mb-2 bg-100 rounded-full w-full overflow-hidden") do
                 bar_segment(
                   title: "#{number_with_delimiter(@import.import_items.complete.count)} imported",
-                  percent_complete: @import.percentage_complete,
+                  percent_complete: @import.percentage,
                   color_class: "bg-green-600"
-                )
-                bar_segment(
-                  title: "#{number_with_delimiter(@import.import_items.fixable.count)} fixable",
-                  percent_complete: @import.percentage_fixable,
-                  color_class: "bg-orange-600"
-                )
-                bar_segment(
-                  title: "#{number_with_delimiter(@failed_items.count)} missing",
-                  percent_complete: @import.percentage_failed,
-                  color_class: "bg-red-600"
                 )
               end
               div(class: "flex justify-between gap-4") do
