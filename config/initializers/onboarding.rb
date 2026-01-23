@@ -75,7 +75,7 @@ Feedbin::Application.config.onboarding_feeds = [
     title: "Wirecutter",
     host: "nytimes.com",
     image: "suggested-wirecutter.png",
-    feed_url: "http://feeds.feedburner.com/TheWirecutter"
+    feed_url: "http://feeds.feedburner.com/thesweethome/NpUt"
   },
   {
     title: "xkcd.com",

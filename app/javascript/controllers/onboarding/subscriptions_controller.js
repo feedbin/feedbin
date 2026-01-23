@@ -7,18 +7,21 @@ export default class extends Controller {
     selectedCount: Number
   }
 
-  connect() {
-    console.log("onboarding--subscriptions connected");
-  }
-
   updateSelection(event) {
     const count = this.feedTargets.filter((input) => input.checked).length
     this.selectedCountValue = count
     this.countTarget.textContent = count
+    this.submitForm()
   }
 
   clearAll(event) {
     this.feedTargets.map((input) => input.checked = false)
-    this.updateSelection()
+    this.selectedCountValue = 0
+    this.countTarget.textContent = 0
+    this.submitForm()
+  }
+
+  submitForm() {
+    this.element.requestSubmit()
   }
 }

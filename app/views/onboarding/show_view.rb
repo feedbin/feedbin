@@ -93,7 +93,7 @@ module Onboarding
     def add
       controller = :onboarding__subscriptions
       render PanelView.new(panel: :add, padding: false, attributes: {class: "tw-hidden group-data-[onboarding--main-path-value=add]:block"}) do
-        form_with url: onboarding_subscriptions_path, data: stimulus(controller: controller, values: {selected_count: 0}, data: {remote: true}), class: "group flex flex-col h-full min-h-0" do
+        form_with url: onboarding_subscriptions_path, method: :patch, data: stimulus(controller: controller, values: {selected_count: 0}, data: {remote: true}), class: "group flex flex-col h-full min-h-0" do
           div class: "flex gap-4 justify-between items-baseline w-full p-4 pb-4 shrink-0 bg-base rounded-t-xl sticky top-0" do
             div class: "text-xl font-bold" do
               "Add Content"
