@@ -93,7 +93,7 @@ module Onboarding
     def add
       controller = :onboarding__subscriptions
       render PanelView.new(panel: :add, padding: false, attributes: {class: "tw-hidden group-data-[onboarding--main-path-value=add]:block"}) do
-        div data: stimulus(controller: controller, values: {selected_count: 0}), class: "group flex flex-col h-full min-h-0" do
+        form_with url: onboarding_subscriptions_path, data: stimulus(controller: controller, values: {selected_count: 0}, data: {remote: true}), class: "group flex flex-col h-full min-h-0" do
           div class: "flex gap-4 justify-between items-baseline w-full p-4 pb-4 shrink-0 bg-base rounded-t-xl sticky top-0" do
             div class: "text-xl font-bold" do
               "Add Content"
@@ -106,8 +106,8 @@ module Onboarding
           end
           div class: "min-h-0 flex-1 px-4 pt-1" do
             div class: "grid grid-cols-2 sm:grid-cols-3 gap-4 pb-4" do
-              Feedbin::Application.config.onboarding_feeds.shuffle.each do
-                tile(title: it[:title], subtitle: it[:host], image: it[:image], controller: controller)
+              Feedbin::Application.config.onboarding_feeds.shuffle.each do |feed|
+                tile(feed: feed, controller: controller)
               end
             end
           end
@@ -185,15 +185,16 @@ module Onboarding
       end
     end
 
-    def tile(title:, subtitle:, image:, controller:)
+    def tile(feed:, controller:)
       label class: "block rounded-lg border border p-3 hover:border-300 min-w-0 transition cursor-pointer text-sm text-left outline outline-2 outline-transparent transition-[outline-color] [&:has(:checked)]:border-blue-600 [&:has(:checked)]:outline-blue-600" do
-        input type: "checkbox", data: stimulus_item(target: :feed, actions: {change: :update_selection}, for: controller)
-        img src: asset_path("suggested-sites/#{image}"), class: "border rounded mb-2"
+        input type: "hidden", name: "feed_url[#{feed[:feed_url]}]", value: "0"
+        input type: "checkbox", name: "feed_url[#{feed[:feed_url]}]", value: feed[:feed_url], data: stimulus_item(target: :feed, actions: {change: :update_selection}, for: controller)
+        img src: asset_path("suggested-sites/#{feed[:image]}"), class: "border rounded mb-2"
         div class: "font-medium truncate" do
-          title
+          feed[:title]
         end
         div class: "text-500 text-xs truncate" do
-          subtitle
+          feed[:subtitle]
         end
       end
     end
