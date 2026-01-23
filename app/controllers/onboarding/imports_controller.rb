@@ -18,6 +18,11 @@ class Onboarding::ImportsController < ApplicationController
     end
   end
 
+  def show
+    @user = current_user
+    @import = @user.imports.find(params[:id])
+  end
+
   private
 
   def import_params

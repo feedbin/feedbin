@@ -1,0 +1,6 @@
+$("[data-content-src='<%= j onboarding_import_path(@import) %>']").html("<%= j render Settings::Imports::StatusComponent.new(import: @import, onboarding: true) %>");
+
+feedbin.faviconColors()
+<% if @import.complete? %>
+clearInterval(feedbin.remoteContentIntervals["<%= j request.path_info %>"]);
+<% end %>

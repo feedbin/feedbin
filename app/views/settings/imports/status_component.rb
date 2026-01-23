@@ -2,8 +2,9 @@ module Settings
   module Imports
     class StatusComponent < ApplicationComponent
 
-      def initialize(import:)
+      def initialize(import:, onboarding: false)
         @import = import
+        @onboarding = onboarding
 
         @failed_items = @import
           .import_items
@@ -63,7 +64,24 @@ module Settings
         end
 
         if @import.complete?
-          tabs
+          if @onboarding
+            details(class: "group flex flex-col") do
+              summary(class: "button button-secondary mx-auto block") do
+                span class: "group-open:tw-hidden" do
+                  "View Report"
+                end
+                span class: "tw-hidden group-open:inline" do
+                  "Hide Report"
+                end
+              end
+
+              div(class: "mt-2 w-full") do
+                tabs
+              end
+            end
+          else
+            tabs
+          end
         else
           div class: "flex flex-center w-full mb-2" do
             div class: "spinner large"
@@ -107,7 +125,7 @@ module Settings
           p(class: "text-sm text-500 mb-8") do
             plain number_with_delimiter(@failed_items.count)
             plain " broken"
-            plain " link".pluralize(@count)
+            plain " link".pluralize(@failed_items.count)
           end
 
           @failed_items.each do |import_item|
@@ -118,7 +136,7 @@ module Settings
 
       def fixable
         div do
-          render FixFeeds::StatusComponent.new(count: @fixable_items.count, replace_path: replace_all_settings_import_path)
+          render FixFeeds::StatusComponent.new(count: @fixable_items.count, replace_path: replace_all_settings_import_path(@import), remote: @onboarding)
 
           p class: "text-500 mb-8 -mt-4" do
             "Feedbin was unable to import these feeds. However, it looks like there may be working alternatives available."

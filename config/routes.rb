@@ -282,8 +282,7 @@ Rails.application.routes.draw do
   end
 
   namespace :onboarding do
-    resources :imports, only: [:create]
-
+    resources :imports, only: [:show, :create]
   end
 
 

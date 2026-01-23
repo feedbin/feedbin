@@ -4,8 +4,10 @@ module Settings
 
       slots :header
 
-      def initialize(import:)
+      def initialize(import:, content_src:, onboarding: false)
         @import = import
+        @onboarding = onboarding
+        @content_src = content_src
       end
 
       def view_template
@@ -20,8 +22,8 @@ module Settings
           end
         end
 
-        div data: @import.complete? ? {} : {content_src: settings_import_path(@import)} do
-          render Settings::Imports::StatusComponent.new import: @import
+        div data: @import.complete? ? {} : {content_src: @content_src} do
+          render Settings::Imports::StatusComponent.new import: @import, onboarding: @onboarding
         end
       end
     end
