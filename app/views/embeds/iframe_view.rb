@@ -26,7 +26,7 @@ module Embeds
           youtube: @media.youtube?.to_s
         }
       )
-      div class: "group system-content text-[14px] text-midnight-500 other", data: controller do
+      div class: "group system-content text-[14px] text-midnight-500 other mb-[1.1em]", data: controller do
         image
 
         div class: "bg-midnight-100 rounded-b-lg group-data-[embed-player-has-image-value=false]:rounded-lg" do
