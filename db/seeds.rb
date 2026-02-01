@@ -29,45 +29,53 @@ if Rails.env.development?
   u.mute_filter_available = true
   u.save
 
-  # feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")
-  # feed2 = Feed.create!(title: "Example 2", feed_url: "https://example.com/index.xml?2", site_url: "https://example.com/")
-  #
-  # token = u.authentication_tokens.newsletters.create!
-  #
-  # token.newsletter_senders.create!(feed: feed, full_token: "full_token", email: "hello@blanccreatives.com", name: "Blanc Creatives")
-  # token.newsletter_senders.create!(feed: feed2, full_token: "full_token", email: "news@changelog.com", name: "Changelog News")
-  #
-  # u2 = User.new(email: "components", password: "components", password_confirmation: "components", admin: true)
-  # u2.plan = plan
-  # u2.update_auth_token = true
-  # u2.save
-  #
-  # feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
-  # subscription = u2.subscriptions.create(feed: feed)
-  #
-  # DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
-  # DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
+  feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")
+  feed2 = Feed.create!(title: "Example 2", feed_url: "https://example.com/index.xml?2", site_url: "https://example.com/")
 
+  token = u.authentication_tokens.newsletters.create!
 
-  # migration = u.account_migrations.create!(api_token: "asdf")
-  # migration.account_migration_items.create!(data: {
-  #   title: "Daring Fireball",
-  #   feed_id: 290,
-  #   feed_url: "http://daringfireball.net/index.xml"
-  # })
-  # migration.account_migration_items.failed.create!(
-  # message: "404 Not Found",
-  # data: {
-  #   title: "Daring Fireball",
-  #   feed_id: 290,
-  #   feed_url: "http://daringfireball.net/index.xml"
-  # })
-  # migration.account_migration_items.complete.create!(
-  # message: "Feed imported. Matched 3 of 3 unread articles.",
-  # data: {
-  #   title: "Daring Fireball",
-  #   feed_id: 290,
-  #   feed_url: "http://daringfireball.net/index.xml"
-  # })
+  token.newsletter_senders.create!(feed: feed, full_token: "full_token", email: "hello@blanccreatives.com", name: "Blanc Creatives")
+  token.newsletter_senders.create!(feed: feed2, full_token: "full_token", email: "news@changelog.com", name: "Changelog News")
+
+  u2 = User.new(email: "components", password: "components", password_confirmation: "components", admin: true)
+  u2.plan = plan
+  u2.update_auth_token = true
+  u2.save
+
+  feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
+  subscription = u2.subscriptions.create(feed: feed)
+
+  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
+  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
+
+  feed = Feed.create!(title: "Kottke", feed_url: "https://kottke.org/index.xml", site_url: "https://kottke.org/")
+  subscription = u2.subscriptions.create(feed: feed)
+
+  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://kottke.org/two.xml")
+  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://kottke.org/three.xml")
+
+  Feed.all.each {it.update(crawl_data: {error_count: 30}) }
+  Subscription.all.each {it.fix_suggestion_present!}
+
+  migration = u.account_migrations.create!(api_token: "asdf")
+  migration.account_migration_items.create!(data: {
+    title: "Daring Fireball",
+    feed_id: 290,
+    feed_url: "http://daringfireball.net/index.xml"
+  })
+  migration.account_migration_items.failed.create!(
+  message: "404 Not Found",
+  data: {
+    title: "Daring Fireball",
+    feed_id: 290,
+    feed_url: "http://daringfireball.net/index.xml"
+  })
+  migration.account_migration_items.complete.create!(
+  message: "Feed imported. Matched 3 of 3 unread articles.",
+  data: {
+    title: "Daring Fireball",
+    feed_id: 290,
+    feed_url: "http://daringfireball.net/index.xml"
+  })
 
 end
