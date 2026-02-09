@@ -19,6 +19,14 @@ class Source::KnownPattern < Source
     {
       template: "https://vimeo.com/%s/videos/rss".freeze,
       regex: Regexp.new(/https:\/\/vimeo\.com\/([^\/#\?]*)/)
+    },
+    {
+      template: "https://github.com/%s.atom".freeze,
+      regex: Regexp.new(/https:\/\/github\.com\/(orgs\/[^\/#\?]+\/discussions)/)
+    },
+    {
+      template: "https://github.com/%s.atom".freeze,
+      regex: Regexp.new(/https:\/\/github\.com\/([^\/#\?]+\/[^\/#\?]+\/discussions)/)
     }
   ]
 
