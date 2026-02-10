@@ -372,7 +372,7 @@ Rails.application.routes.draw do
           end
         end
 
-        resources :pages, only: [:create]
+        resources :pages, only: [:create, :destroy]
 
         get :authentication, to: "authentication#index"
 
