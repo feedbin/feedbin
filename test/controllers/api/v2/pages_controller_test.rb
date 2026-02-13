@@ -33,8 +33,6 @@ class Api::V2::PagesControllerTest < ApiControllerTestCase
 
     result = JSON.load(response.body)
 
-    pp result
-
     assert_difference -> { Entry.count }, -1 do
       delete :destroy, params: { id: result["id"] }
     end
