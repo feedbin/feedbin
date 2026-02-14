@@ -8,14 +8,14 @@ module FeedCrawler
     LAST_REFRESH_KEY = "feed_refresher_scheduler:last_refresh".freeze
 
     def perform
-      queues = [Downloader, Parser, Receiver]
+      queues = [Downloader, Receiver]
       unless queues.all? { queue_empty?(it.get_sidekiq_options["queue"]) }
         Sidekiq.logger.info "skipping, crawl still processing"
         return
       end
 
       unless last_refresh.before?(15.minutes.ago)
-        Sidekiq.logger.info "skipping, last crawl too recent"
+        Sidekiq.logger.info "skipping, last crawl too recent: #{last_refresh}"
         return
       end
 
