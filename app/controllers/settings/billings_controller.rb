@@ -59,7 +59,7 @@ class Settings::BillingsController < ApplicationController
       end
     else
       redirect_to edit_settings_billing_url, alert: "There was a problem updating your card. Please try again."
-      Librato.increment("billing.token_missing")
+      Honeybadger.increment_counter("billing.token_missing")
     end
   rescue Stripe::CardError => exception
     redirect_to edit_settings_billing_url, alert: exception.message

@@ -8,6 +8,6 @@ end
 
 Autotuner.metrics_reporter = proc do |metrics|
   metrics.each do |key, value|
-    Librato.measure "autotuner.#{key}", value
+    Honeybadger.gauge "autotuner.#{key}", -> { value }
   end
 end

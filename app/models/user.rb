@@ -462,9 +462,9 @@ class User < ApplicationRecord
 
   def record_stats
     if plan.stripe_id == "trial"
-      Librato.increment("user.trial.cancel")
+      Honeybadger.increment_counter("user.trial.cancel")
     else
-      Librato.increment("user.paid.cancel")
+      Honeybadger.increment_counter("user.paid.cancel")
     end
   end
 

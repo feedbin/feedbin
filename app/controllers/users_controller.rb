@@ -13,7 +13,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params).with_params(user_params)
     if @user.save
       log(@user.email)
-      Librato.increment("user.trial.signup")
+      Honeybadger.increment_counter("user.trial.signup")
       flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers")
       sign_in @user
       if session[:feed_wrangler_token].present?
@@ -38,7 +38,7 @@ class UsersController < ApplicationController
     if @user.save
       new_plan_name = @user.plan.stripe_id
       if old_plan_name == "trial" && new_plan_name != "trial"
-        Librato.increment("user.paid.signup")
+        Honeybadger.increment_counter("user.paid.signup")
       end
       sign_in @user
       if params[:redirect_to]

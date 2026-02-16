@@ -8,7 +8,7 @@ class YjitStats
   ensure
     if RubyVM::YJIT.enabled? && Random.rand(100) == 0
       RubyVM::YJIT.runtime_stats.each do |name, value|
-        Librato.measure "yjit.web.#{name}", value, source: Socket.gethostname
+        Honeybadger.gauge "yjit.web.#{name}", -> { value }, source: Socket.gethostname
       end
     end
   end

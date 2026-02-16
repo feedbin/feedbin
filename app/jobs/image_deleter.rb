@@ -9,7 +9,7 @@ class ImageDeleter
     paths.each_slice(999) do |slice|
       client.delete_multiple_objects(BUCKET, slice, {quiet: true})
     end
-    Librato.increment "entry_image.delete", by: image_urls.length
+    Honeybadger.increment_counter "entry_image.delete", image_urls.length
   end
 
   def extract_paths(image_urls)

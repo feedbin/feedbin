@@ -40,7 +40,7 @@ module FaviconCrawler
           "Etag"          => new_favicon[:response].etag,
           "Last-Modified" => new_favicon[:response].last_modified
         }
-        Librato.increment("favicon.updated")
+        Honeybadger.increment_counter("favicon.updated")
       end
 
       @favicon.save

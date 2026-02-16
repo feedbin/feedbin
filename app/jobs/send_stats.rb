@@ -5,34 +5,32 @@ class SendStats
   MEGABYTE = 1024.0 * 1024.0
 
   def perform
-    if ENV["LIBRATO_TOKEN"]
-      redis_stats
-      postgres_stats
-      plan_count
-      active_users_count
-      queue_depth
-      clear_empty_jobs
-      sidekiq_queue_depth
-      sidekiq_latency
-      # yjit_stats
-    end
+    redis_stats
+    postgres_stats
+    plan_count
+    active_users_count
+    queue_depth
+    clear_empty_jobs
+    sidekiq_queue_depth
+    sidekiq_latency
+    # yjit_stats
   end
 
   def yjit_stats
     RubyVM::YJIT.runtime_stats.each do |name, value|
-      Librato.measure "yjit.jobs.#{name}", value, source: Socket.gethostname
+      Honeybadger.gauge "yjit.jobs.#{name}", -> { value }, source: Socket.gethostname
     end
   end
 
   def sidekiq_queue_depth
     Sidekiq::Queue.all.each do |queue|
-      Librato.measure "sidekiq.queue_depth.#{queue.name}", queue.size
+      Honeybadger.gauge "sidekiq.queue_depth.#{queue.name}", -> { queue.size }
     end
   end
 
   def sidekiq_latency
     Sidekiq::ProcessSet.new.each do |process|
-      Librato.measure "sidekiq.latency", process["rtt_us"], source: process["tag"]
+      Honeybadger.gauge "sidekiq.latency", -> { process["rtt_us"] }, source: process["tag"]
     end
   end
 
@@ -46,31 +44,30 @@ class SendStats
     if socket && File.exist?(socket)
       result = Raindrops::Linux.unix_listener_stats([socket])
       stats = result.values.first
-      Librato.measure "server_queue_depth.active", stats.active, source: Socket.gethostname
-      Librato.measure "server_queue_depth.queued", stats.queued, source: Socket.gethostname
+      Honeybadger.gauge "server_queue_depth.active", -> { stats.active }, source: Socket.gethostname
+      Honeybadger.gauge "server_queue_depth.queued", -> { stats.queued }, source: Socket.gethostname
     end
   end
 
   def active_users_count
     count = User.where(plan: Plan.where.not(price: 0), suspended: false).count
-    Librato.measure("active_users_count", count)
+    Honeybadger.gauge("active_users_count", -> { count })
   end
 
   def plan_count
     counts = User.where(suspended: false).group(:plan_id).count
     plans = Plan.all.index_by(&:id)
     counts.each do |plan_id, count|
-      Librato.measure("plan_count", (plans[plan_id].price * count).to_i, source: plans[plan_id].stripe_id)
+      value = (plans[plan_id].price * count).to_i
+      Honeybadger.gauge("plan_count", -> { value }, source: plans[plan_id].stripe_id)
     end
   end
 
   def redis_stats
     redis_info = Sidekiq.redis { _1.info }
-    Librato.group "redis" do |group|
-      group.measure("connected_clients", redis_info["connected_clients"].to_f)
-      group.measure("used_memory", redis_info["used_memory"].to_f / MEGABYTE)
-      group.measure("operations", redis_info["instantaneous_ops_per_sec"].to_f)
-    end
+    Honeybadger.gauge("redis.connected_clients", -> { redis_info["connected_clients"].to_f })
+    Honeybadger.gauge("redis.used_memory", -> { redis_info["used_memory"].to_f / MEGABYTE })
+    Honeybadger.gauge("redis.operations", -> { redis_info["instantaneous_ops_per_sec"].to_f })
   end
 
   def postgres_stats
@@ -80,7 +77,7 @@ class SendStats
     stats.concat(database_size)
     stats.concat(table_size)
     stats.each do |stat|
-      Librato.measure("postgres.#{stat[:name]}", stat[:value], source: stat[:source])
+      Honeybadger.gauge("postgres.#{stat[:name]}", -> { stat[:value] }, source: stat[:source])
     end
   end
 

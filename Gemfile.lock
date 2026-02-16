@@ -192,7 +192,6 @@ GEM
       tzinfo (~> 2.0, >= 2.0.5)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    aggregate (0.2.4)
     apnotic (1.7.2)
       connection_pool (~> 2)
       net-http2 (>= 0.18.3, < 2)
@@ -331,7 +330,6 @@ GEM
       minitest (>= 3.0)
     hashdiff (1.2.1)
     hashie (5.0.0)
-    hetchy (1.0.0)
     honeybadger (6.1.3)
       logger
       ostruct
@@ -373,17 +371,6 @@ GEM
       base64
     kgio (2.11.4)
     language_server-protocol (3.17.0.5)
-    librato-metrics (1.6.2)
-      aggregate (~> 0.2.2)
-      faraday (>= 0.7, < 2.0)
-      multi_json
-    librato-rack (1.1.1)
-      hetchy (~> 1.0)
-      librato-metrics (~> 1.6)
-    librato-rails (1.4.2)
-      activesupport (>= 3.0)
-      librato-rack (~> 1.1.0)
-      railties (>= 3.0)
     lint_roller (1.1.0)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
@@ -775,7 +762,6 @@ DEPENDENCIES
   jbuilder
   jquery-rails
   jwt
-  librato-rails (~> 1.4.2)
   listen
   lograge
   lookbook

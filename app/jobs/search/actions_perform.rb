@@ -40,7 +40,7 @@ module Search
             WebPushNotificationSend.perform_in(1.minute, user_ids, entry_id, true)
           end
         end
-        Librato.increment "actions_performed", by: 1
+        Honeybadger.increment_counter "actions_performed"
       end
     end
 

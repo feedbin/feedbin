@@ -39,7 +39,7 @@ class DevicePushNotificationSend
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
-          Librato.increment("apns.ios.sent", source: response.status)
+          Honeybadger.increment_counter("apns.ios.sent", source: response.status)
           if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
             apns_id = response.headers["apns-id"]
             token = notifications[apns_id].token

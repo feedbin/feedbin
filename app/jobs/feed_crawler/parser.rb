@@ -62,11 +62,11 @@ module FeedCrawler
 
       Sidekiq.logger.info "Parser: stats=#{filter.stats} check_for_changes=#{check_for_changes?} url=#{@feed.feed_url} feed_id=#{@feed.id}"
       filter.stats.each do |stat, count|
-        Librato.increment("feed.parser", source: stat, by: count)
+        Honeybadger.increment_counter("feed.parser", count, source: stat)
       end
 
       post_id_count = parsed.entries.count { _1.entry.respond_to?(:post_id) && _1.entry.post_id.present? }
-      Librato.increment("feed.post_id", by: post_id_count)
+      Honeybadger.increment_counter("feed.post_id", post_id_count)
     ensure
       File.unlink(path) rescue Errno::ENOENT
     end

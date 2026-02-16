@@ -45,7 +45,7 @@ class EntryDeleter
       StarredEntry.where(entry_id: entry_ids).delete_all
       Entry.where(id: entry_ids).delete_all
 
-      Librato.increment("entry.destroy", by: entry_ids.count)
+      Honeybadger.increment_counter("entry.destroy", entry_ids.count)
     end
   end
 end
