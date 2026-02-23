@@ -1,0 +1,14 @@
+<% content_for :head do %>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad" async defer></script>
+  <script>
+    function onTurnstileLoad() {
+      document.dispatchEvent(new CustomEvent("turnstileReady"));
+    }
+  </script>
+<% end %>
+
+<% content_for :form_content do %>
+  <%= yield %>
+<% end %>
+
+<%= render template: "layouts/form_page" %>

@@ -16,6 +16,15 @@ module Api
         @entry = exception.entry
         render status: :created
       end
+
+      def destroy
+        @user = current_user
+        @entry = @user.entries.find(params[:id])
+        if @entry.feed.pages?
+          EntryDeleter.new.delete_entries(@entry.feed_id, @entry.id)
+        end
+        head :no_content
+      end
     end
   end
 end

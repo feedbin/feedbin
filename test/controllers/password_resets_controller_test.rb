@@ -43,6 +43,73 @@ class PasswordResetsControllerTest < ActionController::TestCase
     assert_redirected_to login_url
   end
 
+  test "trial user without turnstile env sees email message" do
+    user = users(:ann)
+    ENV.delete("TURNSTILE_SITE_KEY")
+    ENV.delete("TURNSTILE_SECRET_KEY")
+    post :create, params: {email: user.email}
+    assert_redirected_to login_url
+    assert_match /Email.*to request a password reset/, flash[:notice]
+  ensure
+    ENV["TURNSTILE_SITE_KEY"] = "test-site-key"
+    ENV["TURNSTILE_SECRET_KEY"] = "test-secret-key"
+  end
+
+  test "trial user with turnstile env and no token sees challenge" do
+    user = users(:ann)
+    post :create, params: {email: user.email}
+    assert_response :success
+    assert_match /Checking/, response.body
+  end
+
+  test "trial user with valid turnstile token sends password reset" do
+    user = users(:ann)
+    stub_request(:post, Turnstile::VERIFY_URL).to_return(
+      body: {success: true}.to_json,
+      headers: {"Content-Type" => "application/json"}
+    )
+    assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        post :create, params: {email: user.email, "cf-turnstile-response" => "valid-token"}
+      end
+    end
+    assert_redirected_to login_url
+    assert_equal "Email sent with password reset instructions.", flash[:notice]
+  end
+
+  test "trial user with failed turnstile verification sees email message" do
+    user = users(:ann)
+    stub_request(:post, Turnstile::VERIFY_URL).to_return(
+      body: {success: false}.to_json,
+      headers: {"Content-Type" => "application/json"}
+    )
+    assert_no_difference "ActionMailer::Base.deliveries.count" do
+      Sidekiq::Testing.inline! do
+        post :create, params: {email: user.email, "cf-turnstile-response" => "bad-token"}
+      end
+    end
+    assert_redirected_to login_url
+    assert_match /Email.*to request a password reset/, flash[:notice]
+  end
+
+  test "non-trial user bypasses turnstile entirely" do
+    assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        post :create, params: {email: @user.email}
+      end
+    end
+    assert_redirected_to login_url
+    assert_equal "Email sent with password reset instructions.", flash[:notice]
+  end
+
+  test "unknown email bypasses turnstile entirely" do
+    assert_no_difference "ActionMailer::Base.deliveries.count" do
+      post :create, params: {email: "unknown@example.com"}
+    end
+    assert_redirected_to login_url
+    assert_equal "Email sent with password reset instructions.", flash[:notice]
+  end
+
   test "shouldn't update password with expired token" do
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.password_reset_sent_at = 3.hours.ago

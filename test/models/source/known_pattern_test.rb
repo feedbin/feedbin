@@ -7,7 +7,12 @@ class KnownPatternTest < ActiveSupport::TestCase
       "https://www.youtube.com/user/abc"          => "https://www.youtube.com/feeds/videos.xml?user=abc",
       "https://www.youtube.com/playlist?list=abc" => "https://www.youtube.com/feeds/videos.xml?playlist_id=abc",
       "https://www.reddit.com/r/abc"              => "https://www.reddit.com/r/abc.rss",
-      "https://vimeo.com/abc"                     => "https://vimeo.com/abc/videos/rss"
+      "https://vimeo.com/abc"                     => "https://vimeo.com/abc/videos/rss",
+      "https://github.com/orgs/community/discussions"                               => "https://github.com/orgs/community/discussions.atom",
+      "https://github.com/orgs/other-org/discussions/31"                            => "https://github.com/orgs/other-org/discussions.atom",
+      "https://github.com/orgs/another-org/discussions/31#discussioncomment-4048867" => "https://github.com/orgs/another-org/discussions.atom",
+      "https://github.com/feedbin/feedbin/discussions"                               => "https://github.com/feedbin/feedbin/discussions.atom",
+      "https://github.com/rails/rails/discussions/42"                                => "https://github.com/rails/rails/discussions.atom"
     }
     urls.each do |known_pattern, destination|
       stub_request_file("index.html", known_pattern)
