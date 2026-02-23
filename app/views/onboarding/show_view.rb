@@ -17,49 +17,53 @@ module Onboarding
         },
       )
 
-      div data: stimulus_controller, class: "select-none group h-full w-full flex flex-center" do
-        div class: "h-full flex flex-col min-w-0 md:w-[550px] md:max-h-[750px]" do
-          div class: "py-6 flex flex-center shrink-0 relative" do
-            div class: "text-700 text-xl font-bold" do
-              "Get Started"
-            end
-          end
+      div data: stimulus_controller, class: "select-none group h-full w-full flex flex-col" do
 
-          div class: "border-y md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full" do
-            div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
-              div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-in-out" do
-                [:welcome, :add, :import, :extension].each do |panel|
-                  send(panel)
+        div class: "flex shrink-0 flex-center p-3 relative" do
+          div class: "text-700 text-[15px] font-bold" do
+            "Get Started"
+          end
+          button type: "button", class: "absolute shrink-0 right-0 inset-y-0 px-4 text-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
+            Icon("icon-close", class: "relative fill-600", title: "Close")
+          end
+        end
+        div class: "flex flex-center grow bg-100 border-t" do
+          div class: "h-full flex flex-col min-w-0 md:w-[550px] md:max-h-[750px]" do
+            div class: "border-y bg-base md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full" do
+              div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
+                div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-in-out" do
+                  [:welcome, :add, :import, :extension].each do |panel|
+                    send(panel)
+                  end
+                end
+              end
+              div class: "px-4 sm:px-4 h-[77px] flex items-center shrink-0 relative border-t group-data-[onboarding--main-step-value=welcome]:opacity-0" do
+                button class: "button button-secondary shrink-0", data: stimulus_item(actions: {click: :back}, for: STIMULUS_CONTROLLER) do
+                  "Back"
+                end
+
+                # only shown for import
+                button class: "ml-auto button group-data-[onboarding--main-path-value=add]:tw-hidden group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-import-started-value=false]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+                  "Continue"
+                end
+
+                # only shown for add
+                button class: "ml-auto button group-data-[onboarding--main-path-value=import]:tw-hidden group-data-[onboarding--main-step-value=extension]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+                  "Continue"
+                end
+
+                button class: "ml-auto button tw-hidden group-data-[onboarding--main-step-value=extension]:block", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+                  "Done"
                 end
               end
             end
-            div class: "px-4 sm:px-4 h-[77px] flex items-center shrink-0 relative border-t group-data-[onboarding--main-step-value=welcome]:opacity-0" do
-              button class: "button button-secondary shrink-0", data: stimulus_item(actions: {click: :back}, for: STIMULUS_CONTROLLER) do
-                "Back"
-              end
 
-              # only shown for import
-              button class: "ml-auto button group-data-[onboarding--main-path-value=add]:tw-hidden group-data-[onboarding--main-step-value=extension]:tw-hidden group-data-[onboarding--main-import-started-value=false]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
-                "Continue"
-              end
-
-              # only shown for add
-              button class: "ml-auto button group-data-[onboarding--main-path-value=import]:tw-hidden group-data-[onboarding--main-step-value=extension]:tw-hidden", data: stimulus_item(target: :continue_button, actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
-                "Continue"
-              end
-
-              button class: "ml-auto button tw-hidden group-data-[onboarding--main-step-value=extension]:block", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
-                "Done"
+            div class: "py-6 flex flex-center shrink-0 relative" do
+              button class: "text-blue-600" do
+                "Skip"
               end
             end
           end
-
-          div class: "py-6 flex flex-center shrink-0 relative" do
-            button class: "text-blue-600" do
-              "Skip"
-            end
-          end
-
         end
       end
     end
