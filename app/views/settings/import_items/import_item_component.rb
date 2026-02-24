@@ -2,14 +2,15 @@ module Settings
   module ImportItems
     class ImportItemComponent < ApplicationComponent
 
-      def initialize(import_item:)
+      def initialize(import_item:, index:)
         @import_item = import_item
+        @index = index
       end
 
       def view_template
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
-            div class: "border rounded-lg mb-4 px-4 pb-4" do
+            div class: "mb-8 pb-8 #{@index != 0 ? "" : "border-b"}" do
               if @import_item.discovered_feeds.present?
                 render FixFeeds::SuggestionComponent.new(replaceable: @import_item, source: @import_item, redirect: fix_feeds_url)
               else

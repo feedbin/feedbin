@@ -113,8 +113,8 @@ module Settings
             plain " link".pluralize(@failed_items.count)
           end
 
-          @failed_items.each do |import_item|
-            render ImportItems::ImportItemComponent.new(import_item: import_item)
+          @failed_items.each_with_index do |import_item, index|
+            render ImportItems::ImportItemComponent.new(import_item: import_item, index: index)
           end
         end
       end
@@ -127,8 +127,8 @@ module Settings
             "Feedbin was unable to import these feeds. However, it looks like there may be working alternatives available."
           end
 
-          @fixable_items.each do |import_item|
-            render ImportItems::ImportItemComponent.new(import_item: import_item)
+          @fixable_items.each_with_index do |import_item, index|
+            render ImportItems::ImportItemComponent.new(import_item: import_item, index: index)
           end
         end
       end
