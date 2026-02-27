@@ -317,11 +317,17 @@ input[type="search"]::-webkit-search-cancel-button {
   .button-tertiary {
     @apply border-transparent bg-transparent !text-700 px-0;
   }
-  .button-tertiary:hover {
-    @apply shadow-none;
+  .button-tertiary:hover, .button-bold:hover {
+    @apply shadow-none no-underline;
   }
   .button-tertiary:active  {
     @apply bg-transparent border-transparent;
+  }
+  .button-bold {
+    @apply font-bold border-transparent bg-transparent !text-blue-600 px-0;
+  }
+  .button-bold:active  {
+    @apply bg-transparent border-transparent !text-blue-700;
   }
   .button-huge {
     @apply border border-400 border-dashed bg-transparent !text-700 w-full;

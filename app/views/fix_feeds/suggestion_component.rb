@@ -73,7 +73,7 @@ module FixFeeds
             link_to "Ignore", @replaceable.replaceable_path, method: :delete, remote: true, class: "button-tertiary", data: stimulus_item(actions: {click: :toggle}, for: :expandable)
           end
 
-          button class: "button-secondary", type: "submit", data: stimulus_item(actions: {click: :toggle}, for: :expandable) do
+          button class: "button button-bold", type: "submit", data: stimulus_item(actions: {click: :toggle}, for: :expandable) do
             "Replace Feed"
           end
         end
