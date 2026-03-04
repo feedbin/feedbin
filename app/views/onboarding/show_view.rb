@@ -18,7 +18,6 @@ module Onboarding
       )
 
       div data: stimulus_controller, class: "select-none group h-full w-full flex flex-col" do
-
         div class: "flex shrink-0 flex-center p-3 relative" do
           div class: "text-700 text-[15px] font-bold" do
             "Get Started"
@@ -27,11 +26,11 @@ module Onboarding
             Icon("icon-close", class: "relative fill-600", title: "Close")
           end
         end
-        div class: "flex flex-center grow bg-100 border-t" do
-          div class: "h-full flex flex-col min-w-0 md:w-[550px] md:max-h-[750px]" do
-            div class: "bg-base md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full" do
+        div class: "flex flex-center grow bg-100 border-t min-h-0" do
+          div class: "h-full flex flex-col min-w-0 md:w-[550px] md:max-h-[750px] min-h-0" do
+            div class: "bg-base md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full min-h-0" do
               div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
-                div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-in-out" do
+                div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full min-h-0 transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-in-out" do
                   [:welcome, :add, :import, :extension].each do |panel|
                     send(panel)
                   end
@@ -232,7 +231,7 @@ module Onboarding
 
       def view_template
         div data: stimulus_item(target: :panel, for: STIMULUS_CONTROLLER, data: {panel: @panel}), **mix({ class: "flex-none w-full min-w-full h-full" }, @attributes) do
-          div class: "h-full box-border overflow-y-auto #{@padding ? "p-4" : ""}" do
+          div class: "h-full overflow-y-auto #{@padding ? "p-4" : ""}" do
             yield
           end
         end
