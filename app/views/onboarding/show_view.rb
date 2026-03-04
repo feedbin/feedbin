@@ -29,7 +29,7 @@ module Onboarding
         end
         div class: "flex flex-center grow bg-100 border-t" do
           div class: "h-full flex flex-col min-w-0 md:w-[550px] md:max-h-[750px]" do
-            div class: "border-y bg-base md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full" do
+            div class: "bg-base md:border md:rounded-xl min-w-0 flex flex-col min-h-0 grow h-full" do
               div data: stimulus_item(target: :viewport, for: STIMULUS_CONTROLLER), class: "relative grow min-h-0 w-full h-full overflow-hidden focus:outline-none" do
                 div data: stimulus_item(target: :scroll_track, for: STIMULUS_CONTROLLER), class: "flex h-full transition-transform duration-300 group-data-[onboarding--main-animate-value=false]:duration-0 will-change-transform ease-in-out" do
                   [:welcome, :add, :import, :extension].each do |panel|
@@ -55,12 +55,6 @@ module Onboarding
                 button class: "ml-auto button tw-hidden group-data-[onboarding--main-step-value=extension]:block", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
                   "Done"
                 end
-              end
-            end
-
-            div class: "py-6 flex flex-center shrink-0 relative" do
-              button class: "text-blue-600" do
-                "Skip"
               end
             end
           end
@@ -89,6 +83,11 @@ module Onboarding
               icon: "icon-search",
               panel: :add
             )
+            div class: "pt-6 flex flex-center shrink-0 relative" do
+              button class: "text-blue-600" do
+                "Skip"
+              end
+            end
           end
         end
       end
