@@ -1,12 +1,12 @@
 ---
 api_key: <%= ENV['HONEYBADGER_API_KEY'] %>
 insights:
-  enabled: true
+  enabled: false
 rails:
   insights:
-    metrics: true
+    metrics: false
 sidekiq:
   insights:
-    metrics: true
+    metrics: false
 development:
   report_data: true
