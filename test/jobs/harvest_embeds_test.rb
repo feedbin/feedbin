@@ -131,6 +131,22 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal 0, HarvestEmbeds::Download.jobs.size
   end
 
+  test "should requeue ids on api error" do
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
+      .to_return body: {error: {code: 403, message: "forbidden"}}.to_json, headers: {content_type: "application/json"}
+
+    HarvestEmbeds.new.perform(nil, true)
+    job = HarvestEmbeds::Download.jobs.shift
+    HarvestEmbeds::Download.new.perform(*job["args"])
+
+    count = Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) }
+    assert_equal 1, count
+    member = Sidekiq.redis { _1.smembers(HarvestEmbeds::SET_NAME) }
+    assert_equal ["video_id"], member
+  end
+
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)
     video_item = {
       id: "video_id",

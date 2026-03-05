@@ -45,11 +45,20 @@ class HarvestEmbeds
 
   class Download
     include Sidekiq::Worker
+    include SidekiqHelper
 
     def perform(ids)
       items = []
 
-      videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
+      videos = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
+
+      # if there is an error add the ids back into the queue
+      if code = videos.safe_dig("error", "code")
+        add_to_queue(SET_NAME, [*ids])
+        Sidekiq.logger.info "YouTube api error code=#{code} retrying=#{ids}"
+        return
+      end
+
       channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
       channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
 
