@@ -54,7 +54,7 @@ class ArticleTest < ApplicationSystemTestCase
     sleep 1
     wait_for_ajax
 
-    assert_selector ".embed-title", text: "Samsung Galaxy Note 9 Impressions: Underrated!"
+    assert_text "Samsung Galaxy Note 9 Impressions: Underrated!"
   end
 
   test "twitter embed" do

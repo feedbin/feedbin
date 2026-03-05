@@ -20,5 +20,8 @@ class CacheEntryViewsTest < ActiveSupport::TestCase
     cache = CacheEntryViews.new
     cache.perform(@entry.id)
     CacheEntryViews.new.perform(nil, true)
+
+    remaining_ids = CacheEntryViews.new.dequeue_ids(CacheEntryViews::SET_NAME)
+    assert_nil remaining_ids, "Queue should be empty after processing"
   end
 end

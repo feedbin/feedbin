@@ -8,11 +8,11 @@ class SubscribeTest < ApplicationSystemTestCase
     user = users(:ben)
     login_as(user)
 
-    visit root_path(subscribe: feed_url)
+    find("[data-behavior~=show_subscribe]").click
 
-    within(".modal-purpose-subscribe") do
-      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=feeds_search]').submit()")
-      wait_for_ajax
+    within("dialog") do
+      fill_in "q", with: feed_url
+      page.execute_script("$('dialog [data-behavior~=spinner]').submit()")
       find("[data-behavior~=subscription_options]")
       click_button "Add"
     end
@@ -33,9 +33,9 @@ class SubscribeTest < ApplicationSystemTestCase
 
     find("[data-behavior~=show_subscribe]").click
 
-    within(".modal-purpose-subscribe") do
+    within("dialog") do
       fill_in "q", with: feed_url
-      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=feeds_search]').submit()")
+      page.execute_script("$('dialog [data-behavior~=spinner]').submit()")
       find("[data-behavior~=subscription_options]")
       click_button "Add"
     end
@@ -62,21 +62,21 @@ class SubscribeTest < ApplicationSystemTestCase
 
     find("[data-behavior~=show_subscribe]").click
 
-    within(".modal-purpose-subscribe") do
+    within("dialog") do
       fill_in "q", with: feed_url
-      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=feeds_search]').submit()")
-      wait_for_ajax
-      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=submit_add]').submit()")
-      wait_for_ajax
-    end
+      page.execute_script("$('dialog [data-behavior~=spinner]').submit()")
+      find("#add_form")
 
-    assert_selector "[data-behavior~=notification_container]", text: "Incorrect username or password."
+      fill_in "basic_username", with: "wrong"
+      fill_in "basic_password", with: "wrong"
+      page.execute_script("$('dialog #add_form').submit()")
 
-    within(".modal-purpose-subscribe") do
-      fill_in "username", with: username
-      fill_in "password", with: password
-      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=submit_add]').submit()")
-      wait_for_ajax
+      assert_selector ".text-red-600", text: "Invalid username or password."
+
+      fill_in "basic_username", with: username
+      fill_in "basic_password", with: password
+      page.execute_script("$('dialog #add_form').submit()")
+
       assert_selector "p", text: "A fast, simple RSS feed reader that delivers a great reading"
     end
 
