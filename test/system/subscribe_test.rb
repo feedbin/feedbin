@@ -8,9 +8,11 @@ class SubscribeTest < ApplicationSystemTestCase
     user = users(:ben)
     login_as(user)
 
-    visit root_path(subscribe: feed_url)
+    find("[data-behavior~=show_subscribe]").click
 
     within("dialog") do
+      fill_in "q", with: feed_url
+      page.execute_script("$('dialog [data-behavior~=spinner]').submit()")
       find("[data-behavior~=subscription_options]")
       click_button "Add"
     end
