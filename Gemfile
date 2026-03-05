@@ -95,7 +95,7 @@ group :development, :test do
   gem "minitest-stub_any_instance"
   gem "puma"
   gem "rails-controller-testing"
-  gem "selenium-webdriver"
+  gem "cuprite"
   gem "standard"
   gem "webmock"
   # gem "phlex-testing-nokogiri"

@@ -1,7 +1,14 @@
 require "test_helper"
+require "capybara/cuprite"
+
+Capybara.default_max_wait_time = 5
+
+Capybara.register_driver(:cuprite) do |app|
+  Capybara::Cuprite::Driver.new(app, window_size: [1400, 1400], process_timeout: 30)
+end
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400]
+  driven_by :cuprite
 
   def login_as(user)
     visit login_path
