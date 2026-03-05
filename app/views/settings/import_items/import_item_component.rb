@@ -10,7 +10,7 @@ module Settings
       def view_template
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
-            div class: "mb-8 pb-8 #{@index != 0 ? "" : "border-b"}" do
+            div class: (@index > 0 ? "mt-8 pt-8 border-t" : "") do
               if @import_item.discovered_feeds.present?
                 render FixFeeds::SuggestionComponent.new(replaceable: @import_item, source: @import_item, redirect: fix_feeds_url)
               else

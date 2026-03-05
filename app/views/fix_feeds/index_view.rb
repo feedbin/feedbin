@@ -26,7 +26,7 @@ module FixFeeds
       @subscriptions.each_with_index do |subscription, index|
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
-            div class: "mb-8 pb-8 #{index != 0 ? "" : "border-b"}" do
+            div class: (index > 0 ? "mt-8 pt-8 border-t" : "") do
               render SuggestionComponent.new(replaceable: subscription, source: subscription.feed, redirect: fix_feeds_url, include_ignore: true)
             end
           end

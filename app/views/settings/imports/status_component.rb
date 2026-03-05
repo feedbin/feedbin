@@ -23,62 +23,63 @@ module Settings
         render Settings::ControlGroupComponent.new class: "group mb-8", data: { capsule: "true" } do |group|
           group.item do
             div(class: "py-3 px-4") do
-              div(class: "flex justify-between") do
-                strong(class: "font-bold") { "Progress" }
-              end
-              div(class: "flex mt-4 mb-2 bg-100 rounded-full w-full overflow-hidden") do
-                bar_segment(
-                  title: "#{number_with_delimiter(@import.import_items.complete.count)} imported",
-                  percent_complete: @import.percentage,
-                  color_class: "bg-green-600"
-                )
-              end
-              div(class: "flex justify-between gap-4") do
-                div(class: "text-500 truncate") { plain @import.filename }
-                span(class: "text-500 flex gap-2 items-center") do
-                  if @import.percentage == 100
-                    Icon("icon-check", class: "fill-green-600")
-                  end
-                  span do
-                    number_to_percentage(@import.percentage.floor, precision: 0)
+              div class: "border-b py-3 mb-3" do
+                div(class: "flex justify-between") do
+                  strong(class: "font-bold") { "Progress" }
+                end
+                div(class: "flex mt-4 mb-2 bg-100 rounded-full w-full overflow-hidden") do
+                  bar_segment(
+                    title: "#{number_with_delimiter(@import.import_items.complete.count)} imported",
+                    percent_complete: @import.percentage,
+                    color_class: "bg-green-600"
+                  )
+                end
+                div(class: "flex justify-between gap-4") do
+                  div(class: "text-500 truncate") { plain @import.filename }
+                  span(class: "text-500 flex gap-2 items-center") do
+                    if @import.percentage == 100
+                      Icon("icon-check", class: "fill-green-600")
+                    end
+                    span do
+                      number_to_percentage(@import.percentage.floor, precision: 0)
+                    end
                   end
                 end
               end
+
+              if @import.complete?
+                details(class: "group flex flex-col") do
+                  summary(class: "flex cursor-pointer items-center text-blue-600 gap-2 list-none [&::-webkit-details-marker]:hidden") do
+                    Icon("icon-caret", class: "transition -rotate-90 group-open:rotate-0 fill-blue-600")
+                    span class: "group-open:tw-hidden" do
+                      "View Report"
+                    end
+                    span class: "tw-hidden group-open:inline" do
+                      "Hide Report"
+                    end
+                  end
+
+                  div(class: "mt-2 w-full") do
+                    tabs
+                  end
+                end
+              else
+                div class: "flex items-center gap-2" do
+                  div class: "spinner"
+                  span class: "text-700" do
+                    "Import in progress"
+                  end
+                  span class: "text-500" do
+                    "- A report will be available upon completion"
+                  end
+                end
+
+              end
+
             end
           end
         end
 
-        if @import.complete?
-          if @onboarding
-            details(class: "group flex flex-col") do
-              summary(class: "button button-secondary mx-auto block") do
-                span class: "group-open:tw-hidden" do
-                  "View Report"
-                end
-                span class: "tw-hidden group-open:inline" do
-                  "Hide Report"
-                end
-              end
-
-              div(class: "mt-2 w-full") do
-                tabs
-              end
-            end
-          else
-            tabs
-          end
-        else
-          div class: "flex flex-center w-full mb-2" do
-            div class: "spinner large"
-          end
-
-          h3(class: "text-700 text-center") do
-            "Import in progress"
-          end
-          p(class: "text-500 text-center") do
-            "A detailed report will be available when the import completes."
-          end
-        end
       end
 
       def tabs

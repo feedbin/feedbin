@@ -15,7 +15,7 @@ module FixFeeds
           end
           render Count.new(count: @count)
         end
-        link_to "Replace All", @replace_path, class: "button", method: :post, remote: @remote
+        link_to "Replace All", @replace_path, class: "button button-bold", method: :post, remote: @remote
       end
     end
 

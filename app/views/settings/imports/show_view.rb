@@ -22,7 +22,7 @@ module Settings
           end
         end
 
-        div data: @import.complete? ? {} : {content_src: @content_src} do
+        div data: @import.complete? ? {} : {content_src: @content_src}, class: "pb-4" do
           render Settings::Imports::StatusComponent.new import: @import, onboarding: @onboarding
         end
       end
