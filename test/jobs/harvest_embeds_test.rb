@@ -131,6 +131,24 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal 0, HarvestEmbeds::Download.jobs.size
   end
 
+  test "should skip channels api when all channels are present" do
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+
+    Embed.youtube_channel.create!(provider_id: "channel_id", data: {})
+
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    stub_youtube_api(live_broadcast_content: "none")
+
+    channels_request = stub_request(:get, %r{www.googleapis.com/youtube/v3/channels})
+
+    HarvestEmbeds.new.perform(nil, true)
+    job = HarvestEmbeds::Download.jobs.shift
+    HarvestEmbeds::Download.new.perform(*job["args"])
+
+    assert_not_requested channels_request
+  end
+
   test "should requeue ids on api error" do
     Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
 

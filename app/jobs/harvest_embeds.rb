@@ -60,7 +60,16 @@ class HarvestEmbeds
       end
 
       channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
-      channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
+
+      have_channels = Embed.youtube_channel.where(provider_id: channel_ids).pluck(:provider_id)
+      want_channels = (channel_ids - have_channels).uniq
+
+      channels = if want_channels.present?
+        youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
+      else
+        Sidekiq.logger.info "All channels present"
+        {}
+      end
 
       video_embeds = videos.safe_dig("items")&.map do
         Embed.new(
@@ -81,7 +90,7 @@ class HarvestEmbeds
 
       items.concat(video_embeds)
 
-      items.concat(channel_embeds)
+      items.concat(channel_embeds) if channel_embeds
 
       if items.present?
         Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]})
