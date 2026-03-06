@@ -110,6 +110,7 @@ class HarvestEmbeds
       video_map = videos.index_by(&:provider_id)
 
       channels.each do |channel|
+        next unless channel.respond_to?(:provider_id)
         if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
           feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
         end
