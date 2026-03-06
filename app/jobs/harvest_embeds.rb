@@ -47,7 +47,12 @@ class HarvestEmbeds
     include Sidekiq::Worker
     include SidekiqHelper
 
+    VALID_YOUTUBE_ID = /\A[A-Za-z0-9_-]{11}\z/
+
     def perform(ids)
+      ids = ids.select { |id| id.match?(VALID_YOUTUBE_ID) }
+      return if ids.empty?
+
       items = []
 
       videos = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
