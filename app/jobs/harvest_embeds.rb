@@ -55,7 +55,7 @@ class HarvestEmbeds
       # if there is an error add the ids back into the queue
       if code = videos.safe_dig("error", "code")
         add_to_queue(SET_NAME, [*ids])
-        Sidekiq.logger.info "YouTube api error code=#{code} retrying=#{ids}"
+        Sidekiq.logger.info "YouTube api error code=#{code} message=#{videos.safe_dig("error")} retrying=#{ids}"
         return
       end
 
