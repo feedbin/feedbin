@@ -57,7 +57,7 @@ module FeedCrawler
 
     def report
       if ENV["FEED_REFRESHER_REPORT_URL"]
-        HTTP.get(ENV["FEED_REFRESHER_REPORT_URL"])
+        HTTP.post(ENV["FEED_REFRESHER_REPORT_URL"])
       end
     end
 
