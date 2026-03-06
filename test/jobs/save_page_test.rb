@@ -51,7 +51,7 @@ class SavePageTest < ActiveSupport::TestCase
 
   test "should save YouTube video" do
     stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
-    youtube_video_id = "video_id"
+    youtube_video_id = "dQw4w9WgXcQ"
     videos = {
       items: [
         {

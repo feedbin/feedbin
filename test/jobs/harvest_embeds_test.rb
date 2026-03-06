@@ -9,7 +9,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should harvest from iframe" do
-    @entry.update(content: %(<iframe src="http://www.youtube.com/embed/video_id"></iframe>))
+    @entry.update(content: %(<iframe src="http://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>))
 
     assert_difference -> { Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) } }, +1 do
       HarvestEmbeds.new.perform(@entry.id)
@@ -18,7 +18,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should harvest from youtube feed" do
-    @entry.update(data: {youtube_video_id: "video_id"})
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"})
 
     assert_difference -> { Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) } }, +1 do
       HarvestEmbeds.new.perform(@entry.id)
@@ -26,10 +26,10 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should create embed records" do
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"}, provider_id: "dQw4w9WgXcQ")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "dQw4w9WgXcQ") } == 1
     stub_youtube_api(
       live_broadcast_content: "live",
       live_streaming_details: {
@@ -50,9 +50,9 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should add provider_parent_id from existing embed" do
-    Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
+    Embed.youtube_video.create!(provider_id: "dQw4w9WgXcQ", parent_id: "channel_id", data: {})
 
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"}, provider_id: "dQw4w9WgXcQ")
     @entry.provider_youtube!
     @entry.send(:provider_metadata)
     @entry.save!
@@ -61,11 +61,11 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should requeue live videos scheduled in the future" do
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"}, provider_id: "dQw4w9WgXcQ")
     @entry.provider_youtube!
 
     scheduled_time = 1.day.from_now
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "dQw4w9WgXcQ") } == 1
     stub_youtube_api(
       live_broadcast_content: "upcoming",
       live_streaming_details: {
@@ -86,14 +86,14 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     scheduled_job = HarvestEmbeds::Download::Redownload.jobs.last
     expected_time = scheduled_time + 1.hour
     assert_in_delta expected_time.to_f, scheduled_job["at"], 1.0
-    assert_equal ["video_id"], scheduled_job["args"]
+    assert_equal ["dQw4w9WgXcQ"], scheduled_job["args"]
   end
 
   test "should not requeue live videos scheduled more than 24 hours ago" do
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"}, provider_id: "dQw4w9WgXcQ")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "dQw4w9WgXcQ") } == 1
     stub_youtube_api(
       live_broadcast_content: "live",
       live_streaming_details: {
@@ -114,10 +114,10 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should not requeue videos with liveBroadcastContent none" do
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"}, provider_id: "dQw4w9WgXcQ")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "dQw4w9WgXcQ") } == 1
     stub_youtube_api(live_broadcast_content: "none")
 
     HarvestEmbeds.new.perform(nil, true)
@@ -132,12 +132,12 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should skip channels api when all channels are present" do
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.update(data: {youtube_video_id: "dQw4w9WgXcQ"}, provider_id: "dQw4w9WgXcQ")
     @entry.provider_youtube!
 
     Embed.youtube_channel.create!(provider_id: "channel_id", data: {})
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "dQw4w9WgXcQ") }
     stub_youtube_api(live_broadcast_content: "none")
 
     channels_request = stub_request(:get, %r{www.googleapis.com/youtube/v3/channels})
@@ -150,7 +150,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should requeue ids on api error" do
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "dQw4w9WgXcQ") }
 
     stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
       .to_return body: {error: {code: 403, message: "forbidden"}}.to_json, headers: {content_type: "application/json"}
@@ -162,12 +162,12 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     count = Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) }
     assert_equal 1, count
     member = Sidekiq.redis { _1.smembers(HarvestEmbeds::SET_NAME) }
-    assert_equal ["video_id"], member
+    assert_equal ["dQw4w9WgXcQ"], member
   end
 
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)
     video_item = {
-      id: "video_id",
+      id: "dQw4w9WgXcQ",
       snippet: {
         channelId: "channel_id",
         liveBroadcastContent: live_broadcast_content
