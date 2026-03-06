@@ -462,9 +462,9 @@ class User < ApplicationRecord
 
   def record_stats
     if plan.stripe_id == "trial"
-      Librato.increment("user.trial.cancel")
+      Appsignal.increment_counter("user.trial.cancel", 1)
     else
-      Librato.increment("user.paid.cancel")
+      Appsignal.increment_counter("user.paid.cancel", 1)
     end
   end
 

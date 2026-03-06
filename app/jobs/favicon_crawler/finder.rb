@@ -40,7 +40,7 @@ module FaviconCrawler
           "Etag"          => new_favicon[:response].etag,
           "Last-Modified" => new_favicon[:response].last_modified
         }
-        Librato.increment("favicon.updated")
+        Appsignal.increment_counter("favicon.updated", 1)
       end
 
       @favicon.save

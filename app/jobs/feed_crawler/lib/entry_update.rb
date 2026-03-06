@@ -29,9 +29,9 @@ module FeedCrawler
             "fingerprint" => @original_entry.fingerprint,
           }
         end
-        Librato.increment("entry.change", source: "large")
+        Appsignal.increment_counter("entry.change", 1, size: "large")
       else
-        Librato.increment("entry.change", source: "small")
+        Appsignal.increment_counter("entry.change", 1, size: "small")
       end
 
       changes = update.each_with_object([]) do |(attribute, value), array|
@@ -44,7 +44,7 @@ module FeedCrawler
 
       @original_entry.update(update)
 
-      Librato.increment("entry.update")
+      Appsignal.increment_counter("entry.update", 1)
     end
 
     def significant_change?(current_content, new_content)
@@ -77,7 +77,7 @@ module FeedCrawler
       end
       UpdatedEntry.import(updated_entries, validate: false, on_duplicate_key_ignore: true)
 
-      Librato.increment("entry.update_big")
+      Appsignal.increment_counter("entry.update_big", 1)
     rescue Exception => e
       ErrorService.notify(
         error_class: "Receiver#create_update_notifications",

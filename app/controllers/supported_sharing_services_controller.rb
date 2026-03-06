@@ -38,7 +38,7 @@ class SupportedSharingServicesController < ApplicationController
   def share
     @user = current_user
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
-    Librato.increment("supported_sharing_services.share", source: sharing_service.service_id)
+    Appsignal.increment_counter("supported_sharing_services.share", 1, service: sharing_service.service_id)
     @response = sharing_service.share(params.to_unsafe_h)
   end
 

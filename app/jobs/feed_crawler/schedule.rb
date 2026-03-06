@@ -50,7 +50,7 @@ module FeedCrawler
     end
 
     def increment
-      Librato.increment "refresh_feeds"
+      Appsignal.increment_counter "refresh_feeds", 1
       Sidekiq.redis { _1.incr(COUNT_KEY) }
       Sidekiq.redis { _1.set(LAST_REFRESH_KEY, Time.now.to_i) }
     end

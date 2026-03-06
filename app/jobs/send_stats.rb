@@ -5,34 +5,32 @@ class SendStats
   MEGABYTE = 1024.0 * 1024.0
 
   def perform
-    if ENV["LIBRATO_TOKEN"]
-      redis_stats
-      postgres_stats
-      plan_count
-      active_users_count
-      queue_depth
-      clear_empty_jobs
-      sidekiq_queue_depth
-      sidekiq_latency
-      # yjit_stats
-    end
+    redis_stats
+    postgres_stats
+    plan_count
+    active_users_count
+    queue_depth
+    clear_empty_jobs
+    sidekiq_queue_depth
+    sidekiq_latency
+    # yjit_stats
   end
 
   def yjit_stats
     RubyVM::YJIT.runtime_stats.each do |name, value|
-      Librato.measure "yjit.jobs.#{name}", value, source: Socket.gethostname
+      Appsignal.set_gauge "yjit.jobs.#{name}", value, hostname: Socket.gethostname
     end
   end
 
   def sidekiq_queue_depth
     Sidekiq::Queue.all.each do |queue|
-      Librato.measure "sidekiq.queue_depth.#{queue.name}", queue.size
+      Appsignal.set_gauge "sidekiq.queue_depth.#{queue.name}", queue.size
     end
   end
 
   def sidekiq_latency
     Sidekiq::ProcessSet.new.each do |process|
-      Librato.measure "sidekiq.latency", process["rtt_us"], source: process["tag"]
+      Appsignal.set_gauge "sidekiq.latency", process["rtt_us"], tag: process["tag"]
     end
   end
 
@@ -46,31 +44,29 @@ class SendStats
     if socket && File.exist?(socket)
       result = Raindrops::Linux.unix_listener_stats([socket])
       stats = result.values.first
-      Librato.measure "server_queue_depth.active", stats.active, source: Socket.gethostname
-      Librato.measure "server_queue_depth.queued", stats.queued, source: Socket.gethostname
+      Appsignal.set_gauge "server_queue_depth.active", stats.active, hostname: Socket.gethostname
+      Appsignal.set_gauge "server_queue_depth.queued", stats.queued, hostname: Socket.gethostname
     end
   end
 
   def active_users_count
     count = User.where(plan: Plan.where.not(price: 0), suspended: false).count
-    Librato.measure("active_users_count", count)
+    Appsignal.set_gauge("active_users_count", count)
   end
 
   def plan_count
     counts = User.where(suspended: false).group(:plan_id).count
     plans = Plan.all.index_by(&:id)
     counts.each do |plan_id, count|
-      Librato.measure("plan_count", (plans[plan_id].price * count).to_i, source: plans[plan_id].stripe_id)
+      Appsignal.set_gauge("plan_count", (plans[plan_id].price * count).to_i, source: plans[plan_id].stripe_id)
     end
   end
 
   def redis_stats
     redis_info = Sidekiq.redis { _1.info }
-    Librato.group "redis" do |group|
-      group.measure("connected_clients", redis_info["connected_clients"].to_f)
-      group.measure("used_memory", redis_info["used_memory"].to_f / MEGABYTE)
-      group.measure("operations", redis_info["instantaneous_ops_per_sec"].to_f)
-    end
+    Appsignal.set_gauge("redis.connected_clients", redis_info["connected_clients"].to_f)
+    Appsignal.set_gauge("redis.used_memory", redis_info["used_memory"].to_f / MEGABYTE)
+    Appsignal.set_gauge("redis.operations", redis_info["instantaneous_ops_per_sec"].to_f)
   end
 
   def postgres_stats
@@ -80,7 +76,11 @@ class SendStats
     stats.concat(database_size)
     stats.concat(table_size)
     stats.each do |stat|
-      Librato.measure("postgres.#{stat[:name]}", stat[:value], source: stat[:source])
+      if stat[:source]
+        Appsignal.set_gauge("postgres.#{stat[:name]}", stat[:value], source: stat[:source])
+      else
+        Appsignal.set_gauge("postgres.#{stat[:name]}", stat[:value])
+      end
     end
   end
 

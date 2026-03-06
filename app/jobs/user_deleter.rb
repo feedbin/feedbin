@@ -18,9 +18,9 @@ class UserDeleter
 
     if billing_event = @user.billing_events.find_by_id(id)
       Stripe::Refund.create(charge: billing_event.event_object["id"])
-      Librato.increment("user.refund.accepted")
+      Appsignal.increment_counter("user.refund.accepted", 1)
     else
-      Librato.increment("user.refund.declined")
+      Appsignal.increment_counter("user.refund.declined", 1)
     end
   rescue Stripe::InvalidRequestError
   end

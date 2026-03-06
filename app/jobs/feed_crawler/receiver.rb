@@ -39,10 +39,10 @@ module FeedCrawler
 
     def create_entry(item, feed)
       if alternate_exists?(item)
-        Librato.increment("entry.alternate_exists")
+        Appsignal.increment_counter("entry.alternate_exists", 1)
       else
         feed.entries.create!(item)
-        Librato.increment("entry.create")
+        Appsignal.increment_counter("entry.create", 1)
         Sidekiq.logger.info "Creating entry=#{item["public_id"]}"
       end
     end

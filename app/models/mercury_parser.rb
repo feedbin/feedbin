@@ -8,14 +8,14 @@ class MercuryParser
   end
 
   def self.parse(...)
-    Librato.increment "readability.first_parse"
+    Appsignal.increment_counter "readability.first_parse", 1
     instance = new(...)
     instance.result
     instance
   end
 
   def self.parse_with_html(...)
-    Librato.increment "readability.first_parse"
+    Appsignal.increment_counter "readability.first_parse", 1
     instance = new(...)
     instance.result
     instance
