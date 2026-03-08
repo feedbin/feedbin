@@ -1,0 +1,1 @@
+Appsignal::Probes.unregister(:sidekiq)
