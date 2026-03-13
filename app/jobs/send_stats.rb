@@ -5,17 +5,14 @@ class SendStats
   MEGABYTE = 1024.0 * 1024.0
 
   def perform
-    if ENV["LIBRATO_TOKEN"]
-      redis_stats
-      postgres_stats
-      plan_count
-      active_users_count
-      queue_depth
-      clear_empty_jobs
-      sidekiq_queue_depth
-      sidekiq_latency
-      # yjit_stats
-    end
+    redis_stats
+    postgres_stats
+    plan_count
+    active_users_count
+    queue_depth
+    clear_empty_jobs
+    sidekiq_queue_depth
+    sidekiq_latency
   end
 
   def yjit_stats

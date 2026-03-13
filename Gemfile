@@ -13,6 +13,9 @@ gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedb
 gem "html_diff",           github: "feedbin/html_diff",           ref: "c1107c0"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 
+gem "librato-metrics", github: "benubois/librato-metrics", branch: "feedbin"
+gem "librato-rails", github: "benubois/librato-rails", branch: "feedbin"
+
 gem "net-protocol"
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
@@ -36,7 +39,6 @@ gem "importmap-rails"
 gem "jbuilder"
 gem "jquery-rails"
 gem "jwt"
-gem "librato-rails", "~> 1.4.2"
 gem "lograge"
 gem "lookbook"
 gem "mail"
