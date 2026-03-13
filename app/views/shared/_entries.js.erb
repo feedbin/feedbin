@@ -16,7 +16,7 @@ var callback = function() {
     <% end %>
 
     <% if @page_query %>
-        feedbin.updatePager("<%= j will_paginate(@page_query) %>");
+        feedbin.updatePager("<%= j will_paginate(@page_query, params: @anchor ? { anchor: @anchor } : {}) %>");
     <% else %>
         feedbin.updatePager("");
     <% end %>
