@@ -252,34 +252,31 @@ class ApplicationController < ActionController::Base
   end
 
   def feeds_response
-    pagination_anchor
     view_mode = params[:view] || params[:view_mode]
     if view_mode == "view_all"
-      scope = Entry.where(feed: @feed_ids)
-      scope = scope.where("entries.id <= ?", @anchor) if @anchor
+      scope = pagination_anchor(Entry.where(feed: @feed_ids), column: Entry.arel_table[:id])
       @page_query = scope.order(published: :desc).page(params[:page])
       @entries = Entry.entries_with_feed(@page_query.pluck(:id), "DESC").entries_list
     elsif view_mode == "view_starred"
-      scope = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids)
-      scope = scope.where("entry_id <= ?", @anchor) if @anchor
+      scope = pagination_anchor(@user.starred_entries.select(:entry_id).where(feed_id: @feed_ids))
       @page_query = scope.page(params[:page]).order("published DESC")
       @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), "DESC").entries_list
     else
       @all_unread = "true"
-      scope = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids)
-      scope = scope.where("entry_id <= ?", @anchor) if @anchor
+      scope = pagination_anchor(@user.unread_entries.select(:entry_id).where(feed_id: @feed_ids))
       @page_query = scope.page(params[:page]).sort_preference(@user.entry_sort)
       @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), @user.entry_sort).entries_list
     end
     @append = params[:page].present?
   end
 
-  def pagination_anchor
-    @anchor = if params[:anchor].present?
+  def pagination_anchor(scope, column: scope.arel_table[:entry_id])
+    @anchor ||= if params[:anchor].present?
       params[:anchor].to_i
     else
       Entry.maximum(:id)
     end
+    @anchor ? scope.where(column.lteq(@anchor)) : scope
   end
 
   def honeybadger_context
