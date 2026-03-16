@@ -207,7 +207,7 @@ class EntriesControllerTest < ActionController::TestCase
   test "pagination anchor is preserved from params" do
     login_as @user
     anchor = Entry.maximum(:id) - 1
-    get :unread, params: {anchor: anchor}, xhr: true
+    get :unread, params: {page_anchor: anchor}, xhr: true
     assert_response :success
     assert_equal anchor, assigns(:anchor)
   end
@@ -220,7 +220,7 @@ class EntriesControllerTest < ActionController::TestCase
     new_entry = create_entry(@feeds.first)
     UnreadEntry.create_from_owners(@user, new_entry)
 
-    get :unread, params: {anchor: anchor}, xhr: true
+    get :unread, params: {page_anchor: anchor}, xhr: true
     assert_response :success
     refute_includes assigns(:entries).map(&:id), new_entry.id
 
@@ -238,7 +238,7 @@ class EntriesControllerTest < ActionController::TestCase
     new_entry = create_entry(@feeds.first)
     UnreadEntry.create_from_owners(@user, new_entry)
 
-    get :unread, params: {anchor: anchor}, xhr: true
+    get :unread, params: {page_anchor: anchor}, xhr: true
     assert_response :success
     refute_includes assigns(:entries).map(&:id), new_entry.id
   end
@@ -250,7 +250,7 @@ class EntriesControllerTest < ActionController::TestCase
 
     create_entry(@feeds.first)
 
-    get :index, params: {view: "view_all", anchor: anchor}, xhr: true
+    get :index, params: {view: "view_all", page_anchor: anchor}, xhr: true
     assert_response :success
     assert_equal original_count, assigns(:entries).length
   end
