@@ -271,8 +271,8 @@ class ApplicationController < ActionController::Base
   end
 
   def pagination_anchor(scope, column: scope.arel_table[:entry_id])
-    @anchor ||= if params[:anchor].present?
-      params[:anchor].to_i
+    @anchor ||= if params[:page_anchor].present?
+      params[:page_anchor].to_i
     else
       Entry.maximum(:id)
     end
