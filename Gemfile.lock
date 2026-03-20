@@ -1,23 +1,4 @@
 GIT
-  remote: https://github.com/benubois/librato-metrics.git
-  revision: 8dbd988d8c7c10f8ff4652746760d53085f58b9b
-  branch: feedbin
-  specs:
-    librato-metrics (2.1.2)
-      aggregate (~> 0.2.2)
-      faraday
-
-GIT
-  remote: https://github.com/benubois/librato-rails.git
-  revision: 06491ef572938cfd13824526651f2c06d2102b9e
-  branch: feedbin
-  specs:
-    librato-rails (2.1.0)
-      activesupport (>= 3.0)
-      librato-rack (~> 2.0.0)
-      railties (>= 3.0)
-
-GIT
   remote: https://github.com/feedbin/carrierwave.git
   revision: 3cefc38b31e079da24f3e372c243b7132ba59708
   branch: feedbin
@@ -82,6 +63,25 @@ GIT
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       llhttp-ffi (~> 0.5.0)
+
+GIT
+  remote: https://github.com/feedbin/librato-metrics.git
+  revision: 8dbd988d8c7c10f8ff4652746760d53085f58b9b
+  branch: feedbin
+  specs:
+    librato-metrics (2.1.2)
+      aggregate (~> 0.2.2)
+      faraday
+
+GIT
+  remote: https://github.com/feedbin/librato-rails.git
+  revision: 06491ef572938cfd13824526651f2c06d2102b9e
+  branch: feedbin
+  specs:
+    librato-rails (2.1.0)
+      activesupport (>= 3.0)
+      librato-rack (~> 2.0.0)
+      railties (>= 3.0)
 
 GIT
   remote: https://github.com/feedbin/sax-machine.git
