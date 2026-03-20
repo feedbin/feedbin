@@ -1,6 +1,0 @@
-development:
-  user: "app"
-  token: "cb11c657-c7f2-4051-8b15-f6a3b36e7e26"
-  api_endpoint: "http://localhost:5000"
-  flush_interval: 10
-  log_level: "debug"

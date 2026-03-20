@@ -4,7 +4,7 @@ ActiveSupport::Notifications.subscribe("process_action.action_controller") do |n
     action = payload[:params]["action"]
     if finish && start
       time = (finish - start) * 1000
-      Librato.timing "controller.#{controller}.#{action}.time", time
+      Librato.timing "controller.#{controller}.#{action}.time", time, source: "total"
       if payload[:params].present? && payload[:params]["subdomain"].present? && payload[:params]["subdomain"] == "api"
         Librato.timing "response_time.api", time, source: Socket.gethostname
       else
@@ -12,10 +12,10 @@ ActiveSupport::Notifications.subscribe("process_action.action_controller") do |n
       end
     end
     if payload[:db_runtime]
-      Librato.timing "controller.#{controller}.#{action}.time.db", payload[:db_runtime]
+      Librato.timing "controller.#{controller}.#{action}.time", payload[:db_runtime], source: "db"
     end
     if payload[:view_runtime]
-      Librato.timing "controller.#{controller}.#{action}.time.view", payload[:view_runtime], source: Socket.gethostname
+      Librato.timing "controller.#{controller}.#{action}.time", payload[:view_runtime], source: "view"
     end
   end
 end

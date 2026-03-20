@@ -1,6 +1,9 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
+# load first so environment is initialized
+gem "dotenv-rails", "= 2.8.1"
+
 gem "rails", "7.2.3"
 gem "will_paginate"
 
@@ -12,9 +15,8 @@ gem "feedkit",             github: "feedbin/feedkit",             branch: "maste
 gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedbin"
 gem "html_diff",           github: "feedbin/html_diff",           ref: "c1107c0"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
-
-gem "librato-metrics", github: "benubois/librato-metrics", branch: "feedbin"
-gem "librato-rails", github: "benubois/librato-rails", branch: "feedbin"
+gem "librato-metrics",     github: "feedbin/librato-metrics",     branch: "feedbin"
+gem "librato-rails",       github: "feedbin/librato-rails",       branch: "feedbin"
 
 gem "net-protocol"
 gem "activerecord-import"
@@ -27,7 +29,6 @@ gem "clockwork"
 gem "coffee-rails"
 gem "concurrent-ruby"
 gem "connection_pool", "< 3"
-gem "dotenv-rails", "= 2.8.1"
 gem "down"
 gem "evernote_oauth"
 gem "fog-aws"
