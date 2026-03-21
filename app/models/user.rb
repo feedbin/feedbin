@@ -462,9 +462,9 @@ class User < ApplicationRecord
 
   def record_stats
     if plan.stripe_id == "trial"
-      Librato.increment("user.trial.cancel")
+      Librato.increment("user.trial", source: "cancel")
     else
-      Librato.increment("user.paid.cancel")
+      Librato.increment("user.paid", source: "cancel")
     end
   end
 
