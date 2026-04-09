@@ -21,7 +21,7 @@ class EntriesController < ApplicationController
   def unread
     @user = current_user
 
-    @page_query = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
+    @page_query = pagination_anchor(@user.unread_entries.select(:entry_id)).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), @user.entry_sort).entries_list
 
     @append = params[:page].present?
@@ -36,7 +36,7 @@ class EntriesController < ApplicationController
   def starred
     @user = current_user
 
-    @page_query = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
+    @page_query = pagination_anchor(@user.starred_entries.select(:entry_id)).page(params[:page]).order("published DESC")
     @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), "published DESC").entries_list
 
     @append = params[:page].present?

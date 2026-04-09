@@ -13,11 +13,11 @@ class EditTest < ApplicationSystemTestCase
       find("[data-behavior~=feed_settings]").click
     end
 
-    wait_for_ajax
-
-    find(".modal [data-behavior~=autofocus]").set(feed_name)
-    find("input[placeholder='+ New Tag']").set(tag_name)
-    find(".modal form button[type=submit]").click
+    within "dialog" do
+      find("#subscription_title").set(feed_name)
+      find("input[placeholder='+ New Tag']").set(tag_name)
+      click_button "Save"
+    end
 
     wait_for_ajax
 
@@ -44,10 +44,10 @@ class EditTest < ApplicationSystemTestCase
       find("[data-behavior~=feed_settings]").click
     end
 
-    wait_for_ajax
-
-    find(".modal [data-behavior~=autofocus]").set(new_tag_name)
-    find(".modal form button[type=submit]").click
+    within "dialog" do
+      find("#tag_name").set(new_tag_name)
+      click_button "Save"
+    end
 
     wait_for_ajax
 
@@ -70,10 +70,10 @@ class EditTest < ApplicationSystemTestCase
       find("[data-behavior~=feed_settings]").click
     end
 
-    wait_for_ajax
-
-    find(".modal [data-behavior~=autofocus]").set(new_search_name)
-    find(".modal form button[type=submit]").click
+    within "dialog" do
+      find("#saved_search_name").set(new_search_name)
+      click_button "Save"
+    end
 
     wait_for_ajax
 

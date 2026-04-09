@@ -23,8 +23,9 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "should format for evernote" do
-    expected = %(<p><a href="http://kottke.org/link"><img src="http://kottke.org/img.png"></a></p>)
-    ContentFormatter.evernote_format(@entry.content, @entry)
+    result = ContentFormatter.evernote_format(@entry.content, @entry)
+    assert_includes result, "http://kottke.org/link"
+    assert_includes result, "http://kottke.org/img.png"
   end
 
   test "should make summary" do

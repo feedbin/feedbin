@@ -93,8 +93,9 @@ module FeedCrawler
 
     def test_should_send_user_agent
       url = "http://example.com/atom.xml"
-      stub_request_file("atom.xml", url).with(headers: {"User-Agent" => "Feedbin feed-id:1 - 10 subscribers"})
+      request = stub_request_file("atom.xml", url).with(headers: {"User-Agent" => "Feedbin feed-id:1 - 10 subscribers"})
       Downloader.new.perform(1, url, 10)
+      assert_requested request
     end
 
     def test_should_send_authorization
@@ -102,8 +103,9 @@ module FeedCrawler
       password = "password"
       url = "http://#{username}:#{password}@example.com/atom.xml"
 
-      stub_request(:get, "http://example.com/atom.xml").with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
+      request = stub_request(:get, "http://example.com/atom.xml").with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
       Downloader.new.perform(1, url, 10)
+      assert_requested request
     end
 
     def test_should_use_saved_redirect
@@ -113,8 +115,9 @@ module FeedCrawler
 
       data = CrawlData.new(redirected_to: url_two)
 
-      stub_request(:get, url_two)
+      request = stub_request(:get, url_two)
       Downloader.new.perform(feed_id, url_one, 10, data.to_h)
+      assert_requested request
     end
 
     def test_should_use_saved_redirect_with_basic_auth
@@ -126,8 +129,9 @@ module FeedCrawler
 
       data = CrawlData.new(redirected_to: url_two)
 
-      stub_request(:get, url_two).with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
+      request = stub_request(:get, url_two).with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
       Downloader.new.perform(feed_id, url_one, 10, data.to_h)
+      assert_requested request
     end
 
     def test_should_do_nothing_if_not_modified
@@ -183,9 +187,10 @@ module FeedCrawler
         }
       }
       stub_request(:get, first_url).to_return(response)
-      stub_request(:get, last_url)
+      redirect_request = stub_request(:get, last_url)
 
       Downloader.new.perform(1, first_url, 10)
+      assert_requested redirect_request
     end
 
     def test_should_save_redirected_to

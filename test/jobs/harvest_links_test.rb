@@ -56,5 +56,7 @@ class HarvestLinksTest < ActiveSupport::TestCase
 
     # if hostname filter is not present, this will raise an error when it tries to download the url
     HarvestLinks.new.perform(entry.id)
+
+    assert_nil entry.reload.data["saved_pages"], "Links to the entry's own host should be ignored"
   end
 end

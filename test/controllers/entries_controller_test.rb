@@ -196,4 +196,62 @@ class EntriesControllerTest < ActionController::TestCase
     get :newsletter, params: {id: entry.public_id}
     assert_response :success
   end
+
+  test "pagination anchor is set to max entry id on first page" do
+    login_as @user
+    get :unread, xhr: true
+    assert_response :success
+    assert_equal Entry.maximum(:id), assigns(:anchor)
+  end
+
+  test "pagination anchor is preserved from params" do
+    login_as @user
+    anchor = Entry.maximum(:id) - 1
+    get :unread, params: {page_anchor: anchor}, xhr: true
+    assert_response :success
+    assert_equal anchor, assigns(:anchor)
+  end
+
+  test "pagination anchor excludes new entries from unread" do
+    mark_unread(@user)
+    login_as @user
+    anchor = Entry.maximum(:id)
+
+    new_entry = create_entry(@feeds.first)
+    UnreadEntry.create_from_owners(@user, new_entry)
+
+    get :unread, params: {page_anchor: anchor}, xhr: true
+    assert_response :success
+    refute_includes assigns(:entries).map(&:id), new_entry.id
+
+    get :unread, xhr: true
+    assert_response :success
+    assert_includes assigns(:entries).map(&:id), new_entry.id
+  end
+
+  test "pagination anchor excludes new entries with ASC sort" do
+    @user.update(entry_sort: "ASC")
+    mark_unread(@user)
+    login_as @user
+    anchor = Entry.maximum(:id)
+
+    new_entry = create_entry(@feeds.first)
+    UnreadEntry.create_from_owners(@user, new_entry)
+
+    get :unread, params: {page_anchor: anchor}, xhr: true
+    assert_response :success
+    refute_includes assigns(:entries).map(&:id), new_entry.id
+  end
+
+  test "pagination anchor excludes new entries with view_all" do
+    login_as @user
+    original_count = @user.entries.count
+    anchor = Entry.maximum(:id)
+
+    create_entry(@feeds.first)
+
+    get :index, params: {view: "view_all", page_anchor: anchor}, xhr: true
+    assert_response :success
+    assert_equal original_count, assigns(:entries).length
+  end
 end
