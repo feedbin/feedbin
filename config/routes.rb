@@ -281,6 +281,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :onboarding, only: [:update], controller: "onboarding"
+
   namespace :onboarding do
     resources :imports, only: [:show, :create]
     resource :subscriptions, only: [:update]

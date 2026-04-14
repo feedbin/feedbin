@@ -48,19 +48,25 @@ module Settings
               end
 
               if @import.complete?
-                details(class: "group flex flex-col") do
-                  summary(class: "flex cursor-pointer items-center text-blue-600 gap-2 list-none [&::-webkit-details-marker]:hidden") do
-                    Icon("icon-caret", class: "transition -rotate-90 group-open:rotate-0 fill-blue-600")
-                    span class: "group-open:tw-hidden" do
-                      "View Report"
+                if @failed_items.present? || @fixable_items.present?
+                  details(class: "group flex flex-col") do
+                    summary(class: "flex cursor-pointer items-center text-blue-600 gap-2 list-none [&::-webkit-details-marker]:hidden") do
+                      Icon("icon-caret", class: "transition -rotate-90 group-open:rotate-0 fill-blue-600")
+                      span class: "group-open:tw-hidden" do
+                        "View Report"
+                      end
+                      span class: "tw-hidden group-open:inline" do
+                        "Hide Report"
+                      end
                     end
-                    span class: "tw-hidden group-open:inline" do
-                      "Hide Report"
+
+                    div(class: "mt-2 w-full") do
+                      tabs
                     end
                   end
-
-                  div(class: "mt-2 w-full") do
-                    tabs
+                else
+                  span class: "text-700" do
+                    "Import complete"
                   end
                 end
               else
@@ -73,9 +79,7 @@ module Settings
                     "- A report will be available upon completion"
                   end
                 end
-
               end
-
             end
           end
         end

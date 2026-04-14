@@ -40,6 +40,9 @@ $.extend feedbin,
       data.event.target.dispatchEvent(delegatedEvent)
     $(document).on(eventName, handler)
 
+  selectFirst: ->
+    $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
+
   updateContent: ->
     $('[data-content-src]').each ->
       element = $(@)

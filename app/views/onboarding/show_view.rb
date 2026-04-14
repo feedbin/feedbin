@@ -10,7 +10,8 @@ module Onboarding
           step: :welcome,
           path: nil,
           animate: "true",
-          import_started: "false"
+          import_started: "false",
+          save_url: onboarding_path,
         },
         actions: {
           "upload:uploaded@window" => "importStarted",
@@ -18,7 +19,7 @@ module Onboarding
       )
 
       div data: stimulus_controller, class: "select-none group h-full w-full flex flex-col" do
-        div class: "flex shrink-0 flex-center p-3 relative" do
+        div class: "flex shrink-0 flex-center p-3 relative bg-base" do
           div class: "text-700 text-[15px] font-bold" do
             "Get Started"
           end
@@ -51,7 +52,7 @@ module Onboarding
                   "Continue"
                 end
 
-                button class: "ml-auto button tw-hidden group-data-[onboarding--main-step-value=extension]:block", data: stimulus_item(actions: {click: :continue}, for: STIMULUS_CONTROLLER) do
+                button class: "ml-auto button tw-hidden group-data-[onboarding--main-step-value=extension]:block", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
                   "Done"
                 end
               end
@@ -83,7 +84,7 @@ module Onboarding
               panel: :add
             )
             div class: "pt-6 flex flex-center shrink-0 relative" do
-              button class: "text-blue-600" do
+              button class: "text-blue-600", data: stimulus_item(actions: {click: :close}, for: STIMULUS_CONTROLLER) do
                 "Skip"
               end
             end

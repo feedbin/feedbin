@@ -117,7 +117,7 @@ class feedbin.CountsBehavior
     feedbin.applyCounts(false)
 
     if selectFirst
-      $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
+      feedbin.selectFirst()
 
     $('[data-behavior~=change_view_mode]').blur()
     viewModeField.closest('form').submit()

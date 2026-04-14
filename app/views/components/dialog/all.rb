@@ -3,6 +3,9 @@ module Dialog
 
     def view_template
       render Dialog::Template.new
+      if current_user.setting_on?(:needs_onboarding)
+        render Dialog::Onboarding.new
+      end
       render Dialog::KeyboardShortcuts.new
       render Dialog::AddFeed.new
       render Dialog::SettingsNav.new

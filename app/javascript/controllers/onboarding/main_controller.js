@@ -10,6 +10,7 @@ export default class extends Controller {
     animate: Boolean,
     path: String, // path can either be `add` or `import`
     importStarted: Boolean,
+    saveUrl: String,
   }
 
   connect() {
@@ -17,10 +18,32 @@ export default class extends Controller {
     window.visualViewport.addEventListener("resize", () => {
       this.boundResize(this.stepValue, false)
     })
+
+    this.dialog = this.element.closest("dialog")
+    if (this.dialog && !this.dialog.open) {
+      this.dialog.addEventListener("close", () => this.save())
+      this.dialog.showModal()
+    }
   }
 
   disconnect() {
     window.visualViewport.removeEventListener("resize", this.boundResize)
+  }
+
+  close() {
+    if (this.dialog) {
+      this.dialog.close()
+    }
+  }
+
+  save() {
+    if (this.saveUrlValue && !this.saved) {
+      this.saved = true
+      window.$.ajax({
+        type: "PATCH",
+        url: this.saveUrlValue
+      })
+    }
   }
 
   panelSelected(event) {
@@ -52,10 +75,6 @@ export default class extends Controller {
         return
       }
     }
-  }
-
-  setPath(event) {
-    console.log({"this.pathValue": this.pathValue});
   }
 
   importStarted(event) {
