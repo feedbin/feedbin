@@ -4,8 +4,11 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 # load first so environment is initialized
 gem "dotenv-rails", "= 2.8.1"
 
-gem "rails", "7.2.3"
+gem "rails", "7.2.3.1"
 gem "will_paginate"
+
+# update once http-cookie has a release above 1.1.4
+gem "http-cookie", "= 1.1.0"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
 gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
