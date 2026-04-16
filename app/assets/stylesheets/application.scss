@@ -1839,6 +1839,12 @@ li.selected > a .favicon-wrap,
   }
 }
 
+.feeds, .entries, .entry-toolbar {
+  a:focus {
+    outline: 0;
+  }
+}
+
 .entry-summary-link {
   $margin: 4px;
   display: block;
@@ -1847,9 +1853,6 @@ li.selected > a .favicon-wrap,
   @include size-in-rems(padding, 8 8px 0 8px);
   @include color($color-contrast-600);
   text-decoration: none !important;
-  &:focus {
-    outline: 0;
-  }
   .entry-summary-inner {
     @include size-in-rems(padding, 8 8px 8 8px);
   }
