@@ -31,3 +31,4 @@ coverage
 .zed
 
 /config/master.key
+/.worktrees/
