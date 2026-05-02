@@ -7,7 +7,7 @@ class MarketingMailerTest < ActionMailer::TestCase
 
   def assert_marketing_email(mail, subject:)
     assert_equal [@user.email], mail.to
-    assert_equal ["example@example.com""], mail.from
+    assert_equal ["example@example.com"], mail.from
     assert_equal subject, mail.subject
   end
 
