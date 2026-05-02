@@ -56,6 +56,55 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
     end
   end
 
+  test "index returns empty array when user has no saved searches" do
+    @user.saved_searches.destroy_all
+    login_as @user
+
+    get :index, format: :json
+    assert_response :success
+    assert_equal [], assigns(:saved_searches)
+  end
+
+  test "show returns forbidden when saved search does not belong to user" do
+    other_search = users(:ben).saved_searches.create!(query: "x", name: "x")
+    login_as @user
+
+    get :show, params: {id: other_search.id}, format: :json
+    assert_response :forbidden
+  end
+
+  test "destroy returns forbidden when saved search does not belong to user" do
+    other_search = users(:ben).saved_searches.create!(query: "x", name: "x")
+    login_as @user
+
+    assert_no_difference "SavedSearch.count" do
+      delete :destroy, params: {id: other_search.id}, format: :json
+    end
+    assert_response :forbidden
+  end
+
+  test "update returns forbidden when saved search does not belong to user" do
+    other_search = users(:ben).saved_searches.create!(query: "x", name: "x")
+    login_as @user
+
+    patch :update,
+      params: {id: other_search.id, saved_search: {query: "new", name: "new"}},
+      format: :json
+    assert_response :forbidden
+
+    other_search.reload
+    assert_equal "x", other_search.query
+  end
+
+  test "show returns empty json when no entries match" do
+    empty_search = @user.saved_searches.create!(query: "verynonexistentquerystring12345", name: "empty")
+    login_as @user
+
+    get :show, params: {id: empty_search.id}, format: :json
+    assert_response :success
+    assert_equal [], parse_json
+  end
+
   private
 
   def saved_search_keys

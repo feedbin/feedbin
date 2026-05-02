@@ -41,4 +41,5 @@ class KnownPatternTest < ActiveSupport::TestCase
       Source::KnownPattern.find(response)
     end
   end
+
 end

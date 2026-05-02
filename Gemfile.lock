@@ -267,6 +267,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
+    docile (1.4.1)
     domain_name (0.6.20240107)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
@@ -651,6 +652,12 @@ GEM
       rack (>= 2.2.4, < 3.3)
       redis-client (>= 0.23.0, < 1)
     simple_oauth (0.3.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
@@ -821,6 +828,7 @@ DEPENDENCIES
   sass-rails
   sax-machine!
   sidekiq
+  simplecov
   standard
   stimulus-rails
   stringio

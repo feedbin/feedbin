@@ -104,6 +104,6 @@ group :development, :test do
   gem "cuprite"
   gem "standard"
   gem "webmock"
-  # gem "phlex-testing-nokogiri"
+  gem "simplecov"
 end
 

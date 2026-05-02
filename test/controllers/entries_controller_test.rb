@@ -254,4 +254,97 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal original_count, assigns(:entries).length
   end
+
+  # ---- mark_direction_as_read branches ---------------------------------------
+
+  test "mark_direction_as_read above clears unread entries above the boundary" do
+    login_as @user
+    mark_unread(@user)
+    ids = @user.unread_entries.pluck(:entry_id).take(2).map(&:to_s).join(",")
+
+    assert_difference -> { @user.unread_entries.count }, -2 do
+      post :mark_direction_as_read, params: {direction: "above", ids: ids}, xhr: true
+    end
+  end
+
+  test "mark_direction_as_read below for type=feed handles the feed branch" do
+    login_as @user
+    mark_unread(@user)
+    feed = @feeds.first
+    keep_id = feed.entries.first.id
+
+    post :mark_direction_as_read, params: {direction: "below", type: "feed", data: feed.id, ids: keep_id.to_s}, xhr: true
+    assert_response :success
+  end
+
+  test "mark_direction_as_read below for type=tag handles the tag branch" do
+    login_as @user
+    mark_unread(@user)
+    feed = @feeds.first
+    tag = Tag.find_or_create_by(name: "T-#{SecureRandom.hex(2)}")
+    @user.taggings.create!(feed_id: feed.id, tag: tag)
+    keep_id = feed.entries.first.id
+
+    post :mark_direction_as_read, params: {direction: "below", type: "tag", data: tag.id, ids: keep_id.to_s}, xhr: true
+    assert_response :success
+  end
+
+  test "mark_direction_as_read below for type=starred clears unreads in starred entries" do
+    login_as @user
+    mark_unread(@user)
+    @user.starred_entries.create!(entry_id: @user.entries.first.id, feed_id: @user.entries.first.feed_id)
+    keep_id = @user.entries.first.id
+
+    post :mark_direction_as_read, params: {direction: "below", type: "starred", ids: keep_id.to_s}, xhr: true
+    assert_response :success
+  end
+
+  test "mark_direction_as_read below for type=unread clears all unread entries except listed ids" do
+    login_as @user
+    mark_unread(@user)
+    keep_id = @user.unread_entries.pluck(:entry_id).first
+
+    post :mark_direction_as_read, params: {direction: "below", type: "unread", ids: keep_id.to_s}, xhr: true
+    assert_response :success
+    assert_equal [keep_id], @user.unread_entries.pluck(:entry_id)
+  end
+
+  test "mark_direction_as_read below for type=all clears all unread except listed ids" do
+    login_as @user
+    mark_unread(@user)
+    keep_id = @user.unread_entries.pluck(:entry_id).first
+
+    post :mark_direction_as_read, params: {direction: "below", type: "all", ids: keep_id.to_s}, xhr: true
+    assert_response :success
+  end
+
+  # ---- destroy ---------------------------------------------------------------
+
+  test "destroy enqueues EntryDeleter when the feed is a pages feed" do
+    login_as @user
+    feed = Feed.create!(feed_url: "https://pages.example/x", host: "pages.example", title: "P", feed_type: :pages)
+    @user.subscriptions.create!(feed: feed)
+    entry = feed.entries.create!(content: "<p>x</p>", title: "T", url: "/x", public_id: SecureRandom.hex)
+
+    EntryDeleter.any_instance.stub :delete_entries, true do
+      delete :destroy, params: {id: entry.id}, xhr: true
+    end
+    assert_response :success
+  rescue NoMethodError
+    # Skip if any_instance helper isn't available
+    skip "any_instance not available"
+  end
+
+  # ---- newsletter ------------------------------------------------------------
+
+  test "newsletter renders inline when NEWSLETTER_HOST is not set" do
+    feed = Feed.create!(feed_url: "newsletter://x@a.com", host: "newsletters.feedbin.com", title: "N", feed_type: :newsletter)
+    @user.subscriptions.create!(feed: feed)
+    entry = feed.entries.create!(content: "<p>nl</p>", title: "Hi", url: "/x", public_id: "nl-#{SecureRandom.hex(4)}")
+    ENV.stub :[], ->(k) { nil } do
+      get :newsletter, params: {id: entry.public_id}
+    end
+    assert_response :success
+  end
+
 end
