@@ -304,7 +304,7 @@ GEM
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
-    ffi-compiler (1.4.1)
+    ffi-compiler (1.4.2)
       ffi (>= 1.15.5)
       rake
     fog-aws (3.33.2)
@@ -533,14 +533,14 @@ GEM
     puma (8.0.1)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (2.2.23)
-    rack-session (1.0.2)
-      rack (< 3)
+    rack (3.2.6)
+    rack-session (2.1.2)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0)
     rack-test (2.2.0)
       rack (>= 1.3)
-    rackup (1.0.1)
-      rack (< 3)
-      webrick
+    rackup (2.3.1)
+      rack (>= 3)
     rails (7.2.3.1)
       actioncable (= 7.2.3.1)
       actionmailbox (= 7.2.3.1)
@@ -627,7 +627,7 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
-    rubyzip (3.2.2)
+    rubyzip (3.3.0)
     sanitize (7.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.16.8)
@@ -643,12 +643,12 @@ GEM
       tilt
     securerandom (0.4.1)
     shellany (0.0.1)
-    sidekiq (7.3.10)
-      base64
-      connection_pool (>= 2.3.0, < 3)
-      logger
-      rack (>= 2.2.4, < 3.3)
-      redis-client (>= 0.23.0, < 1)
+    sidekiq (8.0.10)
+      connection_pool (>= 2.5.0)
+      json (>= 2.9.0)
+      logger (>= 1.6.2)
+      rack (>= 3.1.0)
+      redis-client (>= 0.23.2)
     simple_oauth (0.3.1)
     simplecov (0.22.0)
       docile (~> 1.1)
@@ -809,7 +809,6 @@ DEPENDENCIES
   premailer-rails
   pry
   puma
-  rack (< 3)
   rails (= 7.2.3.1)
   rails-controller-testing
   redcarpet
