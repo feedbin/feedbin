@@ -1,35 +1,46 @@
-# Puma can serve each request in a thread from an internal thread pool.
-# The `threads` method setting takes two numbers: a minimum and maximum.
-# Any libraries that use thread pools should be configured to match
-# the maximum value specified for Puma. Default is set to 5 threads for minimum
-# and maximum; this matches the default thread size of Active Record.
-#
-max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
-min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
-threads min_threads_count, max_threads_count
+require "etc"
 
-# Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-#
-port ENV.fetch("PORT") { 3000 }
+rails_env = ENV.fetch("RAILS_ENV", "development")
+environment rails_env
 
-# Specifies the `environment` that Puma will run in.
-#
-environment ENV.fetch("RAILS_ENV") { "development" }
+if rails_env == "production"
+  require "dotenv"
 
-# Specifies the number of `workers` to boot in clustered mode.
-# Workers are forked web server processes. If using threads and workers together
-# the concurrency of the application would be max `threads` * `workers`.
-# Workers do not work on JRuby or Windows (both of which do not support
-# processes).
-#
-# workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+  # systemd sets the working directory to the Capistrano `current` symlink, so the
+  # deploy root is one level up and `shared/` is its sibling.
+  shared_path = File.expand_path("../shared", Dir.pwd)
+  shared_path = Dir.pwd unless File.directory?(shared_path)
 
-# Use the `preload_app!` method when specifying a `workers` number.
-# This directive tells Puma to first boot the application and load code
-# before forking the application. This takes advantage of Copy On Write
-# process behavior so workers use less memory.
-#
-# preload_app!
+  # Match the Capistrano-Puma plugin's defaults so the systemd unit, nginx upstream,
+  # and pumactl all agree on where to find the socket/pid/state files.
+  bind       "unix://#{File.join(shared_path, "tmp", "puma.sock")}"
+  pidfile    File.join(shared_path, "tmp", "puma.pid")
+  state_path File.join(shared_path, "tmp", "puma.state")
 
-# Allow puma to be restarted by `rails restart` command.
-plugin :tmp_restart
+  workers Integer(ENV.fetch("WEB_CONCURRENCY", Etc.nprocessors))
+  threads 1, 1
+  preload_app!
+
+  before_fork do
+    defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
+
+    # Autotuner recommendation: compact the heap before forking so workers share more CoW pages.
+    3.times { GC.start }
+    GC.compact
+  end
+
+  before_worker_boot do
+    defined?(ActiveRecord::Base) && ActiveRecord::Base.establish_connection
+  end
+
+  # Hot restart re-execs puma; refresh env from .env so the new master sees current values.
+  before_restart do
+    ENV.update Dotenv.load
+  end
+else
+  port    ENV.fetch("PORT", 3000)
+  threads ENV.fetch("RAILS_MIN_THREADS", 5).to_i, ENV.fetch("RAILS_MAX_THREADS", 5).to_i
+  workers ENV.fetch("WEB_CONCURRENCY", 0).to_i
+
+  plugin :tmp_restart
+end

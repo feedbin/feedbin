@@ -387,7 +387,6 @@ GEM
     json (2.19.4)
     jwt (3.1.2)
       base64
-    kgio (2.11.4)
     language_server-protocol (3.17.0.5)
     librato-rack (2.0.5)
       hetchy (~> 1.0)
@@ -578,7 +577,6 @@ GEM
       tsort (>= 0.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    raindrops (0.20.1)
     rake (13.4.2)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
@@ -715,9 +713,6 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
-    unicorn (6.1.0)
-      kgio (~> 2.6)
-      raindrops (~> 0.7)
     uri (1.1.1)
     useragent (0.16.11)
     version_gem (1.1.9)
@@ -817,7 +812,6 @@ DEPENDENCIES
   rack (< 3)
   rails (= 7.2.3.1)
   rails-controller-testing
-  raindrops
   redcarpet
   redis (< 5)
   responders
@@ -841,7 +835,6 @@ DEPENDENCIES
   twitter!
   twitter-text
   uglifier
-  unicorn
   web-push
   webmock
   will_paginate
