@@ -13,9 +13,9 @@ if rails_env == "production"
 
   # Match the Capistrano-Puma plugin's defaults so the systemd unit, nginx upstream,
   # and pumactl all agree on where to find the socket/pid/state files.
-  bind       "unix://#{File.join(shared_path, "tmp", "puma.sock")}"
-  pidfile    File.join(shared_path, "tmp", "puma.pid")
-  state_path File.join(shared_path, "tmp", "puma.state")
+  bind       "unix://#{File.join(shared_path, "tmp", "sockets", "puma.sock")}"
+  pidfile    File.join(shared_path, "tmp", "pids", "puma.pid")
+  state_path File.join(shared_path, "tmp", "pids", "puma.state")
 
   workers Integer(ENV.fetch("WEB_CONCURRENCY", Etc.nprocessors))
   threads 1, 1
