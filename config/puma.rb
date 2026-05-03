@@ -6,6 +6,8 @@ environment rails_env
 if rails_env == "production"
   require "dotenv"
 
+  prune_bundler true
+
   before_fork do
     defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
 
