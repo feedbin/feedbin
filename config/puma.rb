@@ -6,7 +6,6 @@ environment rails_env
 if rails_env == "production"
   require "dotenv"
 
-  prune_bundler true
   workers :auto
 
   before_fork do
