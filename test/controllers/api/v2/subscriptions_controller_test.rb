@@ -46,4 +46,20 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
       assert_equal(value, subscription.reload.send(attribute))
     end
   end
+
+  test "should return 400 on malformed JSON body" do
+    api_content_type
+    login_as @user
+
+    notifications = []
+    ErrorService.stub :notify, ->(exception) { notifications << exception } do
+      post :create, body: "{not valid json", format: :json
+    end
+
+    assert_response :bad_request
+    body = JSON.parse(response.body)
+    assert_equal 400, body["status"]
+    assert_equal "Problem parsing JSON", body["message"]
+    assert_equal 1, notifications.size
+  end
 end

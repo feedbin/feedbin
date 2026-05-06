@@ -14,8 +14,8 @@ module FeedCrawler
       assert difference > FeedCrawler::Throttle::TIMEOUT
 
       assert Throttle.retry_after("https://www.example.com") > Time.now.to_i
-      assert_equal(nil, Throttle.retry_after("https://www.not-example.com"))
-      assert_equal(nil, Throttle.retry_after(nil))
+      assert_nil Throttle.retry_after("https://www.not-example.com")
+      assert_nil Throttle.retry_after(nil)
     end
   end
 end

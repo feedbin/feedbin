@@ -12,7 +12,8 @@ class UpdatedEntryTest < ActiveSupport::TestCase
     assert_equal @entry.feed_id, record.feed_id
     assert_equal @entry.id, record.entry_id
     assert_equal @entry.published, record.published
-    assert_equal @entry.updated, record.updated
+    assert_nil @entry.updated
+    assert_nil record.updated
     assert record.new_record?
   end
 

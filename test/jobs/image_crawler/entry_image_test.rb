@@ -75,7 +75,6 @@ module ImageCrawler
       parsed = Feedkit::Parser::XMLFeed.new(xml, "http://example.com")
       feed = Feed.create_from_parsed_feed(parsed)
       entry = feed.entries.last
-      pp entry.micropost?
       EntryImage.new.perform(entry.public_id)
       image = Image.new(Pipeline::Find.jobs.first["args"].first)
       extracted_urls = image.image_urls

@@ -39,8 +39,6 @@ class BackfillGuid
     result = [parsed.userinfo, parsed.path, parsed.query, parsed.fragment].join
     result == "" ? uri : result
   rescue
-    uri.gsub!("http:", "")
-    uri.gsub!("https:", "")
-    uri
+    uri.gsub(/https?:/, "")
   end
 end

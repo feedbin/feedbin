@@ -84,14 +84,8 @@ class WebPushNotificationSend
 
   def format_text(string, max_bytes)
     if string.present?
-      string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
-      omission = if string.length > max_bytes
-        "…"
-      else
-        ""
-      end
-      string = string.limit(max_bytes).to_s
-      string = string.strip + omission
+      string = ApplicationController.helpers.sanitize(string, tags: []).squish
+      string = string.truncate_bytes(max_bytes, omission: "…").strip
       string = CGI.unescapeHTML(string)
     end
     string

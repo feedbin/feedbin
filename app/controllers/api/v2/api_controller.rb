@@ -76,7 +76,7 @@ module Api
         ErrorService.notify(exception)
       end
 
-      rescue_from MultiJson::DecodeError do |exception|
+      rescue_from JSON::ParserError do |exception|
         @error = {status: 400, message: "Problem parsing JSON", errors: []}
         render partial: "api/v2/shared/api_error", status: 400
         ErrorService.notify(exception)

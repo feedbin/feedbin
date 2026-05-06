@@ -18,7 +18,7 @@ class StarredEntriesExport
     starred_ids.each_slice(100) do |entry_ids|
       entries = Entry.where(id: entry_ids).includes(:feed)
       entries.each do |entry|
-        json = MultiJson.dump(build_hash(entry))
+        json = JSON.generate(build_hash(entry))
         file.write("#{json},\n")
       end
     end
