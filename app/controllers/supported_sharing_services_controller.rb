@@ -146,7 +146,7 @@ class SupportedSharingServicesController < ApplicationController
     if response.token && response.secret
       session[:oauth_token] = response.token
       session[:oauth_secret] = response.secret
-      redirect_to response.authorize_url
+      redirect_to response.authorize_url, allow_other_host: true
     else
       ErrorService.notify(
         error_class: "SupportedSharingServicesController#oauth_request",
@@ -168,7 +168,7 @@ class SupportedSharingServicesController < ApplicationController
   def oauth2_request(service_id)
     service_info = SupportedSharingService.info!(service_id)
     klass = service_info[:klass].constantize.new
-    redirect_to klass.authorize_redirect(params)
+    redirect_to klass.authorize_redirect(params), allow_other_host: true
   rescue Share::Service::AuthError => exception
     redirect_to sharing_services_url, alert: exception.message
   rescue => exception

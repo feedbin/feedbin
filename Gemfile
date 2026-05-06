@@ -1,10 +1,16 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
+gem "next_rails"
+
+def next?
+  File.basename(__FILE__) == "Gemfile.next"
+end
+
 # load first so environment is initialized
 gem "dotenv-rails", "= 2.8.1"
 
-gem "rails", "7.2.3.1"
+gem "rails", "8.1.3"
 gem "will_paginate"
 
 # update once http-cookie has a release above 1.1.4

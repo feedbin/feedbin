@@ -11,7 +11,7 @@ class FeedUpdate
       password: parsed_url.password,
     )
     result = response.parse(original_url: feed.feed_url)
-    feed_data = result.to_feed.compact_blank
+    feed_data = result.to_feed.compact_blank.except(:feed_url)
     feed.update(feed_data)
 
     entries = result.entries.map do |entry|

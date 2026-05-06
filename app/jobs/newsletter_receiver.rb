@@ -115,7 +115,7 @@ class NewsletterReceiver
         feed_type: :newsletter
       }
       Feed.create_with(attributes).find_or_create_by(feed_url: newsletter.feed_url).tap do |record|
-        record.update(attributes)
+        record.update(attributes.except(:feed_url))
       end
     end
   end

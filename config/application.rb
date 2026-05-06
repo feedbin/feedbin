@@ -18,7 +18,23 @@ module Feedbin
     config.eager_load_paths += %W(#{root}/app #{root}/app/views #{root}/app/views/components #{root}/app/views/layouts)
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.1
+    config.load_defaults 8.1
+
+    # Preserve SHA1 key derivation so existing session cookies and signed/encrypted
+    # messages issued under the old default remain decryptable. Flipping to SHA256
+    # would invalidate every active session.
+    config.active_support.key_generator_hash_digest_class = OpenSSL::Digest::SHA1
+
+    # Preserve SHA1 hashing for cache keys and ETags. Flipping to SHA256 would
+    # invalidate the entire cache on deploy.
+    config.active_support.hash_digest_class = OpenSSL::Digest::SHA1
+
+    # Keep YAML as the default coder for `serialize` columns without an explicit
+    # coder. ImportItem#details is stored as YAML.
+    config.active_record.default_column_serializer = ActiveRecord::Coders::YAMLColumn
+
+    # Stay on MiniMagick — production does not have libvips installed for ActiveStorage.
+    config.active_storage.variant_processor = :mini_magick
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

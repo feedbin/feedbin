@@ -27,7 +27,7 @@ class RemoteFilesController < ApplicationController
     end
 
     unless RemoteFile::BUCKET
-      redirect_to url and return
+      redirect_to url, allow_other_host: true and return
     end
 
     size = %w(32 64 128 200 400).include?(params[:size]) ? params[:size] : "400"

@@ -2,7 +2,7 @@ class User < ApplicationRecord
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
     :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
 
-  has_secure_password
+  has_secure_password reset_token: false
 
   store_accessor :settings,
     :entry_sort,

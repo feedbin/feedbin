@@ -8,7 +8,7 @@ module FeedCrawler
       if data["entries"].present?
         receive_entries(data["entries"], feed)
       end
-      feed.update(data["feed"])
+      feed.update(data["feed"].except("feed_url", :feed_url))
     end
 
     def receive_entries(items, feed)
