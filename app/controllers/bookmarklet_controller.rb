@@ -4,6 +4,6 @@ class BookmarkletController < ApplicationController
 
   def script
     url = ActionController::Base.helpers.asset_url("bookmarklet.js", host: ENV["ASSET_HOST"])
-    redirect_to url, status: :found
+    redirect_to url, status: :found, allow_other_host: true
   end
 end
