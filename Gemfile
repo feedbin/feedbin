@@ -1,12 +1,6 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "next_rails"
-
-def next?
-  File.basename(__FILE__) == "Gemfile.next"
-end
-
 # load first so environment is initialized
 gem "dotenv-rails", "= 2.8.1"
 
@@ -60,8 +54,7 @@ gem "pg"
 gem "phlex-rails"
 gem "postmark-rails"
 gem "premailer-rails"
-gem "rack", "< 3" # Unicorn is not yet compatible with rack 3
-gem "raindrops"
+gem "puma"
 gem "redcarpet"
 gem "redis", "< 5"
 gem "responders"
@@ -70,7 +63,7 @@ gem "ruby-vips"
 gem "rubyzip", require: "zip"
 gem "sanitize"
 gem "sass-rails"
-gem "sidekiq"
+gem "sidekiq", "< 8"
 gem "stimulus-rails"
 gem "stringio"
 gem "stripe", "~> 5.55.0"
@@ -80,7 +73,6 @@ gem "tailwindcss-ruby", "< 4"
 gem "tailwindcss-rails", "< 4"
 gem "twitter-text"
 gem "uglifier"
-gem "unicorn"
 gem "web-push"
 gem "autotuner"
 
@@ -105,7 +97,6 @@ group :development, :test do
   gem "minitest", "< 6"
   gem "minitest-stub-const"
   gem "minitest-stub_any_instance"
-  gem "puma"
   gem "rails-controller-testing"
   gem "cuprite"
   gem "standard"
