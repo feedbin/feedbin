@@ -6,7 +6,7 @@ Rails.application.routes.draw do
 
   mount StripeEvent::Engine, at: "/stripe"
 
-  constraints lambda { |request| AuthConstraint.admin?(request) } do
+  if Rails.env.development?
     mount Lookbook::Engine, at: "/lookbook"
   end
 

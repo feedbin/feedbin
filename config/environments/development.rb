@@ -85,4 +85,10 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.action_mailer.default_url_options = {host: ENV.fetch("DEFAULT_URL_OPTIONS_HOST", "feedbin.dev")}
+
+  config.lookbook.preview_layout = "component_preview"
+  config.lookbook.project_name = "Feedkit"
+  config.lookbook.ui_theme_overrides = {
+    header_bg: "#000000"
+  }
 end
