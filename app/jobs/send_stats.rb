@@ -9,7 +9,6 @@ class SendStats
     postgres_stats
     plan_count
     active_users_count
-    queue_depth
     clear_empty_jobs
     sidekiq_queue_depth
     sidekiq_latency
@@ -36,16 +35,6 @@ class SendStats
   def clear_empty_jobs
     queue = Sidekiq::Queue.new("")
     queue.clear
-  end
-
-  def queue_depth
-    socket = ENV["UNICORN_SOCKET"]
-    if socket && File.exist?(socket)
-      result = Raindrops::Linux.unix_listener_stats([socket])
-      stats = result.values.first
-      Librato.measure "server_queue_depth.active", stats.active, source: Socket.gethostname
-      Librato.measure "server_queue_depth.queued", stats.queued, source: Socket.gethostname
-    end
   end
 
   def active_users_count
