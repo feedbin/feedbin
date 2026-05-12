@@ -7,9 +7,6 @@ gem "dotenv-rails", "= 2.8.1"
 gem "rails", "8.1.3"
 gem "will_paginate"
 
-# update once http-cookie has a release above 1.1.4
-gem "http-cookie", "= 1.1.0"
-
 gem "http",                github: "feedbin/http",                branch: "feedbin"
 gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
 gem "sax-machine",         github: "feedbin/sax-machine",         branch: "feedbin"
@@ -62,7 +59,7 @@ gem "ruby-vips"
 gem "rubyzip", require: "zip"
 gem "sanitize"
 gem "sass-rails"
-gem "sidekiq", "< 8"
+gem "sidekiq"
 gem "stimulus-rails"
 gem "stringio"
 gem "stripe", "~> 5.55.0"
