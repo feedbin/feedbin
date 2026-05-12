@@ -92,7 +92,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/stripe-ruby-mock.git
-  revision: c3911313ce131e58f6d7662f7bc8164e694401bd
+  revision: 4e77f5f9105f74be83f378aacbebb67ad8d957fe
   branch: feedbin
   specs:
     stripe-ruby-mock (2.5.0)
