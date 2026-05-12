@@ -101,6 +101,16 @@ GIT
       stripe (>= 2.0.3)
 
 GIT
+  remote: https://github.com/feedbin/twitter-text.git
+  revision: 8b9f384bee009dfb0c82612a3187e52fa0b8b05b
+  branch: feedbin
+  glob: rb/*.gemspec
+  specs:
+    twitter-text (3.1.0)
+      idn-ruby
+      unf (~> 0.1.0)
+
+GIT
   remote: https://github.com/feedbin/twitter.git
   revision: 4511c868b01382387ed47b7d1176639fd9b429ea
   branch: feedbin
@@ -438,7 +448,10 @@ GEM
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
-    minitest (5.27.0)
+    minitest (6.0.6)
+      drb (~> 2.0)
+      prism (~> 1.5)
+    minitest-mock (5.27.0)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
     msgpack (1.8.0)
@@ -698,9 +711,6 @@ GEM
     tilt (2.7.0)
     timeout (0.6.1)
     tsort (0.2.0)
-    twitter-text (3.1.0)
-      idn-ruby
-      unf (~> 0.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uglifier (4.2.1)
@@ -793,7 +803,8 @@ DEPENDENCIES
   lograge
   lookbook
   mail
-  minitest (< 6)
+  minitest
+  minitest-mock
   minitest-stub-const
   minitest-stub_any_instance
   net-http-persistent
@@ -830,7 +841,7 @@ DEPENDENCIES
   tailwindcss-rails (< 4)
   tailwindcss-ruby (< 4)
   twitter!
-  twitter-text
+  twitter-text!
   uglifier
   web-push
   webmock
