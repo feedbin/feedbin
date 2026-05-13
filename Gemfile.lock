@@ -507,6 +507,9 @@ GEM
       phlex (~> 2.4.0)
       railties (>= 7.1, < 9)
       zeitwerk (~> 2.7)
+    pitchfork (0.18.2)
+      logger
+      rack (>= 2.0)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -807,6 +810,7 @@ DEPENDENCIES
   ostruct
   pg
   phlex-rails
+  pitchfork
   postmark-rails
   premailer-rails
   pry

@@ -50,7 +50,7 @@ gem "pg"
 gem "phlex-rails"
 gem "postmark-rails"
 gem "premailer-rails"
-gem "puma"
+gem "pitchfork"
 gem "redcarpet"
 gem "redis", "< 5"
 gem "responders"
@@ -100,5 +100,6 @@ group :development, :test do
   gem "standard"
   gem "webmock"
   gem "simplecov"
+  gem "puma"
 end
 
