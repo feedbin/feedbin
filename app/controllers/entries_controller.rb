@@ -229,7 +229,7 @@ class EntriesController < ApplicationController
   def newsletter
     @entry = Entry.where(public_id: params[:id]).take!
     if ENV["NEWSLETTER_HOST"]
-      redirect_to @entry.newsletter_url
+      redirect_to @entry.newsletter_url, allow_other_host: true
     else
       render layout: nil
     end
