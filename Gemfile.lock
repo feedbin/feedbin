@@ -237,6 +237,7 @@ GEM
     builder (3.3.0)
     byebug (13.0.0)
       reline (>= 0.6.0)
+    cgi (0.5.1)
     clockwork (4.0.1)
       activesupport
       tzinfo
@@ -507,6 +508,9 @@ GEM
       phlex (~> 2.4.0)
       railties (>= 7.1, < 9)
       zeitwerk (~> 2.7)
+    pitchfork (0.18.2)
+      logger
+      rack (>= 2.0)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -762,6 +766,7 @@ DEPENDENCIES
   byebug
   capybara!
   carrierwave!
+  cgi
   clockwork
   coffee-rails
   concurrent-ruby
@@ -807,6 +812,7 @@ DEPENDENCIES
   ostruct
   pg
   phlex-rails
+  pitchfork
   postmark-rails
   premailer-rails
   pry
