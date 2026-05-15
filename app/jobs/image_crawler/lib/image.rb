@@ -150,6 +150,15 @@ module ImageCrawler
       preset.bucket || BUCKET
     end
 
+    def trace(message:, metadata: {})
+      defaults = {
+        public_id: id,
+        preset: preset_name,
+      }.merge(metadata)
+
+      Sidekiq.logger.info "Image trace: #{message} #{defaults.map { |k, v| "#{k}=#{v}" }.join(" ")}"
+    end
+
     def storage_options
       {
         "Cache-Control" => "max-age=315360000, public",
