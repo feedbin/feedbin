@@ -12,9 +12,13 @@ module ImageCrawler
 
     def find_urls
       if cache.urls
+        Librato.increment("meta_images", source: "cached")
         cache.urls
       elsif needs_download?
+        Librato.increment("meta_images", source: "download")
         download
+      else
+        Librato.increment("meta_images", source: "skip")
       end
     end
 

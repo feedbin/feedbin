@@ -48,8 +48,9 @@ module ImageCrawler
 
     def test_should_not_download_from_site_with_no_meta
       url = Addressable::URI.parse("http://example.com/article")
-      cache = MetaImagesCache.new(url)
-      cache.has_meta!(false)
+      MetaImagesCache::FAILURE_THRESHOLD.times do
+        MetaImagesCache.new(url).has_meta!(false)
+      end
 
       urls = MetaImages.new(url)
       assert !urls.needs_download?

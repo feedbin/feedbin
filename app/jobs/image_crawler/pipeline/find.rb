@@ -13,6 +13,10 @@ module ImageCrawler
         timer = Timer.new(45)
         count = 0
 
+        if @image.image_urls.empty?
+          Sidekiq.logger.info @image.trace(message: "no image candidates found, skipping")
+        end
+
         while original_url = @image.image_urls.shift
           count += 1
 
