@@ -43,12 +43,12 @@ module ImageCrawler
 
             image.send_to_feedbin
 
-            Sidekiq.logger.info @image.trace(message: "copied existing image", metadata: {image_url: image.final_url, storage_url: image.storage_url})
+            Sidekiq.logger.info @image.trace(message: "copied existing image", metadata: {image_url: @image.final_url, storage_url: @image.storage_url})
             break
           elsif download_cache.download?
             break if download_image(original_url, download_cache)
           else
-            Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {image_url: image.final_url, storage_url: image.storage_url})
+            Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {image_url: @image.final_url})
           end
         end
       rescue => exception
