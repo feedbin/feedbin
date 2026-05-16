@@ -52,7 +52,7 @@ module ImageCrawler
           end
         end
       rescue => exception
-        Sidekiq.logger.info @image.trace(message: "find image exception", metadata: {exception: exception})
+        Sidekiq.logger.info @image.trace(message: "find image exception", metadata: {exception: exception, backtrace: exception.backtrace})
       end
 
       def download_image(original_url, download_cache)
