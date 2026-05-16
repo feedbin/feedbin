@@ -19,6 +19,7 @@ module ImageCrawler
         download
       else
         Librato.increment("meta_images", source: "skip")
+        []
       end
     end
 
