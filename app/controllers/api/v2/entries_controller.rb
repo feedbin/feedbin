@@ -4,7 +4,6 @@ module Api
       respond_to :json
       before_action :correct_user, only: [:show]
       before_action :limit_ids, only: [:index]
-      skip_before_action :authorize, only: [:text]
 
       def index
         @user = current_user
