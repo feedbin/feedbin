@@ -7,14 +7,11 @@ class Settings::BillingsControllerTest < ActionController::TestCase
   end
 
   test "should get billing" do
-    StripeMock.start
     events = [
-      StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id}),
-      StripeMock.mock_webhook_event("invoice.payment_succeeded", {customer: @user.customer_id})
+      stripe_webhook_event("charge_succeeded", customer: @user.customer_id),
+      stripe_webhook_event("invoice_payment_succeeded", customer: @user.customer_id)
     ]
-    events.each do |event|
-      BillingEvent.create(info: event.as_json)
-    end
+    events.each { |event| BillingEvent.create(info: event) }
 
     login_as @user
     get :index
@@ -22,25 +19,20 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:next_payment_date)
     assert assigns(:billing_events).present?
-    StripeMock.stop
   end
 
   test "should get payment_history" do
-    StripeMock.start
     events = [
-      StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id}),
-      StripeMock.mock_webhook_event("invoice.payment_succeeded", {customer: @user.customer_id})
+      stripe_webhook_event("charge_succeeded", customer: @user.customer_id),
+      stripe_webhook_event("invoice_payment_succeeded", customer: @user.customer_id)
     ]
-    events.each do |event|
-      BillingEvent.create(info: event.as_json)
-    end
+    events.each { |event| BillingEvent.create(info: event) }
 
     login_as @user
     get :payment_history
 
     assert_response :success
     assert assigns(:billing_events).present?
-    StripeMock.stop
   end
 
   test "should update plan" do

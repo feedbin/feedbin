@@ -1,0 +1,15 @@
+{
+  "id": "evt_charge_succeeded",
+  "type": "charge.succeeded",
+  "data": {
+    "object": {
+      "object": "charge",
+      "id": "ch_test_123",
+      "amount": 5000,
+      "currency": "usd",
+      "created": 1717000000,
+      "customer": "cus_placeholder",
+      "invoice": "in_test_123"
+    }
+  }
+}
