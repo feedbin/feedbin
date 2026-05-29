@@ -84,8 +84,12 @@ class Settings::BillingsController < ApplicationController
       Rails.cache.delete(FeedbinUtils.payment_details_key(@user.id))
       @user.update(suspended: false)
       @user.subscriptions.update_all(active: true)
-      customer = Billing::Customer.retrieve(@user.customer_id)
-      Billing::Subscription.reopen_account(@user.customer_id) if customer.unpaid?
+      begin
+        customer = Billing::Customer.retrieve(@user.customer_id)
+        Billing::Subscription.reopen_account(@user.customer_id) if customer.unpaid?
+      rescue Stripe::StripeError => exception
+        ErrorService.notify(exception)
+      end
       render json: {status: intent.status}
     else
       render json: {status: intent.status, client_secret: intent.client_secret, requires_action: true}

@@ -89,6 +89,23 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert JSON.parse(response.body)["error"].present?
   end
 
+  test "update_credit_card returns requires_action with a client secret when authentication is needed" do
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    intent = OpenStruct.new(status: "requires_action", client_secret: "seti_123_secret_abc")
+    Billing::PaymentMethod.stub(:confirm_and_set_default, intent) do
+      post :update_credit_card, params: {confirmation_token: "ctoken_123"}, format: :json
+    end
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal "requires_action", body["status"]
+    assert_equal "seti_123_secret_abc", body["client_secret"]
+    assert_equal true, body["requires_action"]
+  end
+
   test "create_subscription activates the existing subscription and returns json" do
     create_stripe_price(plans(:basic_yearly_3))
     user = stripe_user
