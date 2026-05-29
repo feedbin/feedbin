@@ -1,14 +1,5 @@
-<%= render Settings::H1Component.new do %>
-  Billing
+<% content_for :head do %>
+  <%= javascript_include_tag "https://js.stripe.com/v3/" %>
 <% end %>
 
-<%= form_tag update_credit_card_settings_billing_path, id: "payment-form" do %>
-  <%= hidden_field_tag :stripe_token, nil, id: "stripe_token" %>
-
-  <%= render partial: "shared/credit_card_form" %>
-
-  <%= render Settings::ButtonRowComponent.new do %>
-    <div id="payment_request_button"><small>Loading&hellip;</small></div>
-    <button type="submit" class="button" id="credit_card_button" disabled>Update</button>
-  <% end %>
-<% end %>
+<%= render Billing::UpdateCardComponent.new(publishable_key: STRIPE_PUBLIC_KEY) %>
