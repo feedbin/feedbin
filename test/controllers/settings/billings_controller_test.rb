@@ -104,4 +104,20 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal "succeeded", body["status"]
     assert_equal plans(:basic_yearly_3), user.reload.plan
   end
+
+  test "create_subscription rejects a plan not available to the user without touching Stripe" do
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    forbidden = plans(:free)
+    called = false
+    Billing::Subscription.stub(:subscribe, ->(**) { called = true; OpenStruct.new(status: "succeeded") }) do
+      post :create_subscription, params: {plan_id: forbidden.id, confirmation_token: "ct_1"}, format: :json
+    end
+
+    assert_response :unprocessable_entity
+    refute called, "subscribe must not be called for a forbidden plan"
+    assert JSON.parse(response.body)["error"].present?
+  end
 end

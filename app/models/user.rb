@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
+  attr_accessor :old_password_valid, :update_auth_token,
     :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted,
     :skip_billing_plan_change
 

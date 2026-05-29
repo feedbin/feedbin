@@ -28,7 +28,6 @@
           Invalid coupon.
         </div>
       <% end %>
-      <%= f.hidden_field :stripe_token, data: { behavior: "stripe_token" } %>
 
       <%= render partial: "shared/flash", locals: {flash: flash} %>
 

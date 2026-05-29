@@ -39,6 +39,10 @@ class Settings::BillingsController < ApplicationController
     @user = current_user
     plan = Plan.find(params[:plan_id])
 
+    unless @user.available_plans.include?(plan)
+      return render json: {error: "That plan isn't available on your account."}, status: :unprocessable_entity
+    end
+
     intent = Billing::Subscription.subscribe(
       customer_id: @user.customer_id,
       subscription_id: @user.stripe_customer.subscription.id,
