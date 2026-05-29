@@ -62,7 +62,8 @@ module Billing
         plans: @plans,
         default_plan: @default_plan,
         subscribe_title: "Switch to Subscription",
-        mode: @user.trial_end.future? ? "setup" : "payment"
+        mode: @user.trial_end.future? ? "setup" : "payment",
+        user: @user
       )
 
       render_payment_history

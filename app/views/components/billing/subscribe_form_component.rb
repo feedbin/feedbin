@@ -3,12 +3,13 @@ module Billing
     include Phlex::Rails::Helpers::Routes
     register_value_helper :number_to_currency
 
-    def initialize(publishable_key:, plans:, default_plan:, subscribe_title:, mode:)
+    def initialize(publishable_key:, plans:, default_plan:, subscribe_title:, mode:, user:)
       @publishable_key = publishable_key
       @plans = plans
       @default_plan = default_plan
       @subscribe_title = subscribe_title
       @mode = mode # "setup" for a future trial, "payment" for an immediate charge
+      @user = user
     end
 
     def view_template
@@ -20,7 +21,8 @@ module Billing
         endpoint: create_subscription_settings_billing_path,
         return_url: settings_billing_url,
         submit_label: "Subscribe",
-        default_plan_id: @default_plan.id
+        default_plan_id: @default_plan.id,
+        description: Billing::SubscribeDescriptionComponent.new(user: @user, plans: @plans, default_plan: @default_plan)
       ) do
         render Settings::ControlGroupComponent.new(class: "mb-14") do |group|
           group.header { @subscribe_title }

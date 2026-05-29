@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="billing"
 export default class extends Controller {
-  static targets = ["paymentElement", "error", "submit", "planInput"]
+  static targets = ["paymentElement", "error", "submit", "planInput", "planHelp"]
   static values = {
     publishableKey: String,
     mode: String,
@@ -30,6 +30,9 @@ export default class extends Controller {
     if (amount > 0) {
       this.elements.update({ amount })
     }
+    this.planHelpTargets.forEach((el) => {
+      el.classList.toggle("hidden", el.dataset.planId !== event.target.value)
+    })
   }
 
   async submit(event) {

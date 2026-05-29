@@ -11,7 +11,7 @@
     <%= render Billing::SubscribeFormComponent.new(
           publishable_key: STRIPE_PUBLIC_KEY,
           plans: @plans, default_plan: @default_plan, subscribe_title: "Plan",
-          mode: @user.trial_end.future? ? "setup" : "payment") %>
+          mode: @user.trial_end.future? ? "setup" : "payment", user: @user) %>
   <% else %>
     <%= render Billing::StatusComponent.new(user: @user, plans: @plans, default_plan: @default_plan) %>
   <% end %>
