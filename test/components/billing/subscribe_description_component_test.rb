@@ -15,12 +15,12 @@ class Billing::SubscribeDescriptionComponentTest < ComponentTestCase
     end
   end
 
-  test "the container is hidden and targeted so it only shows once the element mounts" do
+  test "the container is hidden until the billing mounted value flips true" do
     user = users(:ben)
     plans = [plans(:basic_yearly_3)]
     html = render(Billing::SubscribeDescriptionComponent.new(user: user, plans: plans, default_plan: plans.first)).to_s
-    assert_includes html, 'data-billing-target="description"'
-    assert_match(/<div class="subscribe-description[^"]*\bhidden\b/, html)
+    assert_includes html, "tw-hidden"
+    assert_includes html, "group-data-[billing-mounted-value=true]:block"
   end
 
   test "future-trial wording names the trial end date" do

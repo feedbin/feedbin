@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="billing"
 export default class extends Controller {
-  static targets = ["paymentElement", "error", "submit", "planInput", "planHelp", "description"]
+  static targets = ["paymentElement", "error", "submit", "planInput", "planHelp"]
   static values = {
     publishableKey: String,
     mode: String,
@@ -23,15 +23,10 @@ export default class extends Controller {
       appearance: this.appearance()
     })
     this.paymentElement = this.elements.create("payment")
+    // Sets data-billing-mounted-value="true"; markup reveals the charge
+    // description purely via a Tailwind group-data variant (no classList here).
     this.paymentElement.on("ready", () => { this.mountedValue = true })
     this.paymentElement.mount(this.paymentElementTarget)
-  }
-
-  // Reveal the charge description only once the Payment Element has finished loading.
-  mountedValueChanged() {
-    if (this.hasDescriptionTarget) {
-      this.descriptionTarget.classList.toggle("hidden", !this.mountedValue)
-    }
   }
 
   planChanged(event) {

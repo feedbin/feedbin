@@ -14,6 +14,7 @@ module Billing
 
     def view_template(&block)
       div(
+        class: "group",
         data: stimulus(
           controller: :billing,
           values: {
