@@ -26,19 +26,19 @@ module Billing
       ) do
         render Settings::ControlGroupComponent.new(class: "mb-14") do |group|
           group.header { @subscribe_title }
-          @plans.each { |plan| render_plan_row(group, plan) }
+          @plans.each_with_index { |plan, index| render_plan_row(group, plan, index) }
         end
       end
     end
 
     private
 
-    def render_plan_row(group, plan)
+    def render_plan_row(group, plan, index)
       group.item do
         input(
           type: "radio", name: "plan_id", id: dom_id(plan), value: plan.id,
           class: "peer", checked: plan == @default_plan,
-          data: stimulus_item(target: :plan_input, actions: {change: :plan_changed}, for: :billing).merge(amount: plan.price_in_cents)
+          data: stimulus_item(target: :plan_input, actions: {change: :plan_changed}, for: :billing).merge(amount: plan.price_in_cents, index: index)
         )
         label(for: dom_id(plan), class: "group") do
           render Settings::ControlRowComponent.new do |row|

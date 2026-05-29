@@ -2,6 +2,21 @@ module Billing
   class SubscribeDescriptionComponent < ApplicationComponent
     register_value_helper :number_to_currency
 
+    # Each plan's note shows only when the billing controller's selectedPlan
+    # value (the chosen plan's index) matches. These are written as literals so
+    # Tailwind's content scan generates the variants — it can't see interpolated
+    # class names. Indexed by the plan's position in the list.
+    PLAN_VISIBILITY = [
+      "group-data-[billing-selected-plan-value=0]:block",
+      "group-data-[billing-selected-plan-value=1]:block",
+      "group-data-[billing-selected-plan-value=2]:block",
+      "group-data-[billing-selected-plan-value=3]:block",
+      "group-data-[billing-selected-plan-value=4]:block",
+      "group-data-[billing-selected-plan-value=5]:block",
+      "group-data-[billing-selected-plan-value=6]:block",
+      "group-data-[billing-selected-plan-value=7]:block"
+    ].freeze
+
     def initialize(user:, plans:, default_plan:)
       @user = user
       @plans = plans
@@ -10,17 +25,14 @@ module Billing
 
     def view_template
       div(class: "text-500 text-sm mt-4 tw-hidden group-data-[billing-mounted-value=true]:block") do
-        @plans.each { |plan| description_for(plan) }
+        @plans.each_with_index { |plan, index| description_for(plan, index) }
       end
     end
 
     private
 
-    def description_for(plan)
-      p(
-        class: ("hidden" unless plan == @default_plan),
-        data: stimulus_item(target: :plan_help, for: :billing).merge(plan_id: plan.id)
-      ) do
+    def description_for(plan, index)
+      p(class: "tw-hidden #{PLAN_VISIBILITY[index]}") do
         plain "Subscribing will charge your card "
         strong { number_to_currency(plan.price, precision: 0) }
         if @user.trial_end.future?

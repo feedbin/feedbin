@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="billing"
 export default class extends Controller {
-  static targets = ["paymentElement", "error", "submit", "planInput", "planHelp"]
+  static targets = ["paymentElement", "error", "submit", "planInput"]
   static values = {
     publishableKey: String,
     mode: String,
@@ -11,6 +11,7 @@ export default class extends Controller {
     endpoint: String,
     returnUrl: String,
     defaultPlan: Number,
+    selectedPlan: Number,
     mounted: { type: Boolean, default: false }
   }
 
@@ -22,6 +23,11 @@ export default class extends Controller {
       amount: this.amountValue > 0 ? this.amountValue : undefined,
       appearance: this.appearance()
     })
+    // Seed the selected plan from the checked radio so the matching charge
+    // description shows on load (markup reacts via a group-data variant).
+    const checked = this.hasPlanInputTarget && this.planInputTargets.find((input) => input.checked)
+    if (checked) this.selectedPlanValue = parseInt(checked.dataset.index, 10)
+
     this.paymentElement = this.elements.create("payment")
     // Sets data-billing-mounted-value="true"; markup reveals the charge
     // description purely via a Tailwind group-data variant (no classList here).
@@ -34,9 +40,9 @@ export default class extends Controller {
     if (amount > 0) {
       this.elements.update({ amount })
     }
-    this.planHelpTargets.forEach((el) => {
-      el.classList.toggle("hidden", el.dataset.planId !== event.target.value)
-    })
+    // Drives which plan's charge description shows, purely via Tailwind reacting
+    // to data-billing-selected-plan-value (no classList toggling here).
+    this.selectedPlanValue = parseInt(event.target.dataset.index, 10)
   }
 
   async submit(event) {
@@ -168,6 +174,9 @@ export default class extends Controller {
         },
         ".Error": {
           color: danger
+        },
+        ".TermsText": {
+          fontSize: "14px"
         }
       }
     }

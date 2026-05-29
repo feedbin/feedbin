@@ -11,8 +11,10 @@ class Billing::SubscribeFormComponentTest < ComponentTestCase
     assert_includes html, "Plan"
     assert_includes html, 'data-billing-target="planInput"'
     assert_includes html, "Subscribe"
-    assert_includes html, "subscribe-description"
-    assert_includes html, 'data-billing-target="planHelp"'
+    # per-plan charge description, gated on the selected-plan index
+    assert_includes html, "Subscribing will charge your card"
+    assert_includes html, 'data-index="0"'
+    assert_includes html, "group-data-[billing-selected-plan-value=0]:block"
   end
 
   test "uses setup mode and zero amount for a future trial" do
