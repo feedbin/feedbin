@@ -35,10 +35,11 @@ require "support/factory_helper"
 require "support/assertions"
 require "support/api_controller_test_case"
 require "support/push_server_mock"
+require "support/stripe_mock_server"
 require "component_test_case"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
-StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
+StripeMockServer.configure!
 WebMock.disable_net_connect!(allow_localhost: true)
 Sidekiq.logger.level = Logger::WARN
 

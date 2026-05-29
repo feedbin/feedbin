@@ -32,6 +32,10 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+      stripe-mock:
+        image: stripe/stripe-mock:latest
+        ports:
+          - 12111:12111
     steps:
       - uses: actions/checkout@v3
       - uses: nanasess/setup-chromedriver@v2
@@ -84,6 +88,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           PGPASSWORD: postgres
           RAILS_ENV: test
+          STRIPE_MOCK_HOST: http://localhost:12111
           KINDLEGEN_PATH: /usr/local/bin/kindlegen
           RUBYOPT: "--yjit --yjit-exec-mem-size=1024"
         run: |
