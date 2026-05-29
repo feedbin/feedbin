@@ -9,7 +9,7 @@ module Billing
     end
 
     def view_template
-      div(class: "subscribe-description mt-4 tw-hidden group-data-[billing-mounted-value=true]:block") do
+      div(class: "text-500 text-sm mt-4 tw-hidden group-data-[billing-mounted-value=true]:block") do
         @plans.each { |plan| description_for(plan) }
       end
     end

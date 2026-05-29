@@ -126,7 +126,7 @@ export default class extends Controller {
       theme: dark ? "night" : "stripe",
       variables: {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        fontSizeBase: "14px",
+        fontSizeBase: "16px",
         borderRadius: "6px",
         colorBackground: base,
         colorText: text,
