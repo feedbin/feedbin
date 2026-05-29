@@ -65,29 +65,28 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
-  test "should update credit card" do
-    StripeMock.start
-    plan = plans(:trial)
-    last4 = "1234"
-    card_1 = StripeMock.generate_card_token(last4: "4242", exp_month: 99, exp_year: 3005)
-    card_2 = StripeMock.generate_card_token(last4: last4, exp_month: 99, exp_year: 3005)
-    create_stripe_plan(plan)
-
-    user = User.create(
-      email: "cc@example.com",
-      password: default_password,
-      plan: plan
-    )
-    user.stripe_token = card_1
-    user.save
-
+  test "update_credit_card confirms a setup intent and returns json" do
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
     login_as user
-    post :update_credit_card, params: {stripe_token: card_2}
-    assert_redirected_to settings_billing_url
 
-    customer = Stripe::Customer.retrieve(user.customer_id)
-    assert_equal last4, customer.sources.data.first.last4
-    StripeMock.stop
+    Billing::PaymentMethod.stub(:confirm_and_set_default, OpenStruct.new(status: "succeeded")) do
+      post :update_credit_card, params: {confirmation_token: "ctoken_123"}, format: :json
+    end
+
+    assert_response :success
+    assert_equal "succeeded", JSON.parse(response.body)["status"]
+  end
+
+  test "update_credit_card returns 422 when the confirmation token is missing" do
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    post :update_credit_card, params: {}, format: :json
+
+    assert_response :unprocessable_entity
+    assert JSON.parse(response.body)["error"].present?
   end
 
   test "create_subscription activates the existing subscription and returns json" do

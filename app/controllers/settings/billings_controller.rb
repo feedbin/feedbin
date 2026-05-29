@@ -57,15 +57,13 @@ class Settings::BillingsController < ApplicationController
     else
       render json: {status: intent.status, client_secret: intent.client_secret, requires_action: true}
     end
-  rescue Stripe::CardError => exception
+  rescue Stripe::StripeError => exception
     render json: {error: exception.message}, status: :unprocessable_entity
   end
 
   def payment_details
     @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id), expires_in: 5.minutes) {
-      customer = Customer.retrieve(@user.customer_id)
-      card = customer.sources.first
-      "#{card.brand} ××#{card.last4[-2..-1]}"
+      Billing::PaymentMethod.summary(current_user.customer_id)
     }
   rescue
     @message = "No payment info"
@@ -73,23 +71,27 @@ class Settings::BillingsController < ApplicationController
 
   def update_credit_card
     @user = current_user
-
-    if params[:stripe_token].present?
-      @user.stripe_token = params[:stripe_token]
-      if @user.save
-        Rails.cache.delete(FeedbinUtils.payment_details_key(current_user.id))
-        customer = Customer.retrieve(@user.customer_id)
-        customer.reopen_account if customer.unpaid?
-        redirect_to settings_billing_url, notice: "Your card has been updated."
-      else
-        redirect_to edit_settings_billing_url, alert: @user.errors.messages[:base].join(" ")
-      end
-    else
-      redirect_to edit_settings_billing_url, alert: "There was a problem updating your card. Please try again."
+    if params[:confirmation_token].blank?
       Librato.increment("billing.token_missing")
+      return render json: {error: "There was a problem updating your card. Please try again."}, status: :unprocessable_entity
     end
-  rescue Stripe::CardError => exception
-    redirect_to edit_settings_billing_url, alert: exception.message
+
+    intent = Billing::PaymentMethod.confirm_and_set_default(
+      customer_id: @user.customer_id, confirmation_token: params[:confirmation_token]
+    )
+
+    if intent.status == "succeeded"
+      Rails.cache.delete(FeedbinUtils.payment_details_key(@user.id))
+      @user.update(suspended: false)
+      @user.subscriptions.update_all(active: true)
+      customer = Billing::Customer.retrieve(@user.customer_id)
+      Billing::Subscription.reopen_account(@user.customer_id) if customer.unpaid?
+      render json: {status: intent.status}
+    else
+      render json: {status: intent.status, client_secret: intent.client_secret, requires_action: true}
+    end
+  rescue Stripe::StripeError => exception
+    render json: {error: exception.message}, status: :unprocessable_entity
   end
 
   private

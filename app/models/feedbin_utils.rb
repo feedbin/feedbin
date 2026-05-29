@@ -21,7 +21,7 @@ class FeedbinUtils
   end
 
   def self.payment_details_key(user_id)
-    "payment_details:%s:v5" % user_id
+    "payment_details:%s:v6" % user_id
   end
 
   def self.shared_cache(key)
