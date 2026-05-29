@@ -15,6 +15,11 @@
 - Targeted test run: `bundle exec rails test <file> -n <test_name>`. Full suite: `bundle exec rake`.
 - Commit after each green task with the message shown in the task's commit step.
 
+**Test policy (IMPORTANT — `stripe-mock` is stateless):** The official `stripe-mock` server returns canned, spec-compliant fixtures. It does **not** persist writes and **ignores list filters** (e.g. `Stripe::Subscription.list(customer:, status:)` always returns one canned active subscription regardless of arguments; a `retrieve` after an `update` does not reflect the change). Therefore:
+- **`Billing::` service unit tests** assert *our* logic with **Minitest stubs** (`Stripe::X.stub(:method, ...) do ... end`): which Stripe call is made, with what arguments, and how the response is mapped/branched. Do not write round-trip "create → retrieve → assert persisted" assertions — they cannot pass against stripe-mock.
+- **stripe-mock** is still the harness and is fine for calls whose *response* you don't assert on (e.g. creating a throwaway customer to get a real `cus_` id) and for controller/integration tests that exercise the full stack.
+- The test snippets shown in the service tasks below are illustrative; where a snippet assumes persistence/filtering, convert it to a stubbed assertion following this policy. Controller-task snippets already use stubs and need no change.
+
 ---
 
 ## Phase 0 — Discovery & Harness
