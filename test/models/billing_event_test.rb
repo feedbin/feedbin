@@ -80,13 +80,15 @@ class BillingEventTest < ActiveSupport::TestCase
     assert_equal [@user.customer_id, "pm_test_1"], set_default_args
   end
 
-  test "payment_intent_succeeded for an active user sets default but does not run reactivation" do
+  test "payment_intent_succeeded is a no-op for an active (non-suspended) user" do
     assert @user.active?
-    Billing::PaymentMethod.stub(:set_default, ->(*) {}) do
+    set_default_called = false
+    Billing::PaymentMethod.stub(:set_default, ->(*) { set_default_called = true }) do
       assert_nothing_raised do
         BillingEvent.create(info: stripe_webhook_event("payment_intent_succeeded", customer: @user.customer_id))
       end
     end
     assert @user.reload.active?
+    refute set_default_called, "backstop must not touch Stripe for a healthy active user"
   end
 end
