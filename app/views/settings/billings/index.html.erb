@@ -13,7 +13,7 @@
           plans: @plans, default_plan: @default_plan, subscribe_title: "Plan",
           mode: @user.trial_end.future? ? "setup" : "payment") %>
   <% else %>
-    <%= render partial: "shared/billing/billing_status" %>
+    <%= render Billing::StatusComponent.new(user: @user, plans: @plans, default_plan: @default_plan) %>
   <% end %>
   <script>$.get("<%= payment_details_settings_billing_path %>");</script>
 <% else %>
