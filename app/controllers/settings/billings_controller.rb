@@ -51,13 +51,18 @@ class Settings::BillingsController < ApplicationController
       return render json: {error: "No active subscription found. Please contact support."}, status: :unprocessable_entity
     end
 
-    intent = Billing::Subscription.subscribe(
-      customer_id: @user.customer_id,
-      subscription_id: subscription.id,
-      price_id: plan.stripe_id,
-      trial_end: @user.trial_end,
-      confirmation_token: params[:confirmation_token]
-    )
+    intent =
+      if params[:intent_id].present?
+        Billing::Subscription.finalize(
+          customer_id: @user.customer_id, subscription_id: subscription.id,
+          price_id: plan.stripe_id, trial_end: @user.trial_end, intent_id: params[:intent_id]
+        )
+      else
+        Billing::Subscription.subscribe(
+          customer_id: @user.customer_id, subscription_id: subscription.id,
+          price_id: plan.stripe_id, trial_end: @user.trial_end, confirmation_token: params[:confirmation_token]
+        )
+      end
 
     if intent.status == "succeeded"
       # Persist the plan without re-triggering the price change in update_billing
@@ -83,25 +88,24 @@ class Settings::BillingsController < ApplicationController
 
   def update_credit_card
     @user = current_user
-    if params[:confirmation_token].blank?
+
+    if params[:intent_id].blank? && params[:confirmation_token].blank?
       Librato.increment("billing.token_missing")
       return render json: {error: "There was a problem updating your card. Please try again."}, status: :unprocessable_entity
     end
 
-    intent = Billing::PaymentMethod.confirm_and_set_default(
-      customer_id: @user.customer_id, confirmation_token: params[:confirmation_token]
-    )
+    intent =
+      if params[:intent_id].present?
+        Billing::PaymentMethod.finalize(customer_id: @user.customer_id, intent_id: params[:intent_id])
+      else
+        Billing::PaymentMethod.confirm_and_set_default(
+          customer_id: @user.customer_id, confirmation_token: params[:confirmation_token]
+        )
+      end
 
     if intent.status == "succeeded"
       Rails.cache.delete(FeedbinUtils.payment_details_key(@user.id))
-      @user.update(suspended: false)
-      @user.subscriptions.update_all(active: true)
-      begin
-        customer = Billing::Customer.retrieve(@user.customer_id)
-        Billing::Subscription.reopen_account(@user.customer_id) if customer.unpaid?
-      rescue Stripe::StripeError => exception
-        ErrorService.notify(exception)
-      end
+      @user.reactivate_billing!
       render json: {status: intent.status}
     else
       render json: {status: intent.status, client_secret: intent.client_secret, requires_action: true}

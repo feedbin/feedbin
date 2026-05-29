@@ -19,6 +19,14 @@ module Billing
       intent
     end
 
+    # Finalize a card update after a client-side 3DS challenge: re-read the
+    # SetupIntent and, if it now succeeded, set its payment method as default.
+    def self.finalize(customer_id:, intent_id:)
+      intent = Stripe::SetupIntent.retrieve(intent_id)
+      set_default(customer_id, intent.payment_method) if intent.status == "succeeded"
+      intent
+    end
+
     def self.set_default(customer_id, payment_method_id)
       Stripe::Customer.update(customer_id, invoice_settings: {default_payment_method: payment_method_id})
     end

@@ -167,6 +167,42 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal original_plan, user.reload.plan
   end
 
+  test "create_subscription finalize sets the plan when the intent succeeds" do
+    create_stripe_price(plans(:basic_yearly_3))
+    user = stripe_user
+    new_plan = plans(:basic_yearly_3)
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    Stripe::Subscription.stub(:list, OpenStruct.new(data: [OpenStruct.new(id: "sub_live")])) do
+      Billing::Subscription.stub(:finalize, OpenStruct.new(status: "succeeded")) do
+        post :create_subscription, params: {
+          plan_id: new_plan.id, intent_id: "seti_x"
+        }, format: :json
+      end
+    end
+
+    assert_response :success
+    assert_equal "succeeded", JSON.parse(response.body)["status"]
+    assert_equal new_plan, user.reload.plan
+  end
+
+  test "update_credit_card finalize confirms and reactivates billing on success" do
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id, suspended: true)
+    login_as user
+
+    Billing::PaymentMethod.stub(:finalize, OpenStruct.new(status: "succeeded")) do
+      Billing::Customer.stub(:retrieve, OpenStruct.new(unpaid?: false)) do
+        post :update_credit_card, params: {intent_id: "seti_x"}, format: :json
+      end
+    end
+
+    assert_response :success
+    assert_equal "succeeded", JSON.parse(response.body)["status"]
+    refute user.reload.suspended
+  end
+
   test "create_subscription rejects a plan not available to the user without touching Stripe" do
     user = stripe_user
     user.update(customer_id: Stripe::Customer.create(email: user.email).id)

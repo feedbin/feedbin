@@ -49,6 +49,23 @@ export default class extends Controller {
     const payload = { confirmation_token: confirmationToken.id }
     if (this.hasPlanInputTarget) payload.plan_id = this.selectedPlanId()
 
+    const data = await this.post(payload)
+    if (data === null) return
+
+    if (data.requires_action && data.client_secret) {
+      const { error } = await this.stripe.handleNextAction({ clientSecret: data.client_secret })
+      if (error) return this.fail(error.message)
+
+      const finalizePayload = { intent_id: data.client_secret.split("_secret_")[0] }
+      if (this.hasPlanInputTarget) finalizePayload.plan_id = this.selectedPlanId()
+      const finalizeData = await this.post(finalizePayload)
+      if (finalizeData === null) return
+    }
+
+    window.location = this.returnUrlValue
+  }
+
+  async post(payload) {
     const response = await fetch(this.endpointValue, {
       method: "POST",
       headers: {
@@ -59,15 +76,11 @@ export default class extends Controller {
       body: JSON.stringify(payload)
     })
     const data = await response.json()
-
-    if (!response.ok) return this.fail(data.error || "Payment failed.")
-
-    if (data.requires_action && data.client_secret) {
-      const { error } = await this.stripe.handleNextAction({ clientSecret: data.client_secret })
-      if (error) return this.fail(error.message)
+    if (!response.ok) {
+      this.fail(data.error || "Payment failed.")
+      return null
     }
-
-    window.location = this.returnUrlValue
+    return data
   }
 
   selectedPlanId() {

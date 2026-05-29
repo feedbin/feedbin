@@ -482,6 +482,16 @@ class User < ApplicationRecord
     subscriptions.update_all(active: false)
   end
 
+  def reactivate_billing!
+    update(suspended: false)
+    subscriptions.update_all(active: true)
+    begin
+      Billing::Subscription.reopen_account(customer_id) if Billing::Customer.retrieve(customer_id).unpaid?
+    rescue Stripe::StripeError => exception
+      ErrorService.notify(exception)
+    end
+  end
+
   def active?
     !suspended
   end

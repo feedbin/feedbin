@@ -182,4 +182,62 @@ class Billing::SubscriptionTest < ActiveSupport::TestCase
     end
     refute confirm_called, "PaymentIntent.confirm must not be called for a zero-amount invoice"
   end
+
+  test "finalize (seti_ succeeded) sets the default PM and changes the price" do
+    intent = OpenStruct.new(status: "succeeded", payment_method: "pm_9")
+    set_default_args = nil
+    change_price_args = nil
+    Stripe::SetupIntent.stub(:retrieve, intent) do
+      Billing::PaymentMethod.stub(:set_default, ->(cid, pm) { set_default_args = [cid, pm] }) do
+        Billing::Subscription.stub(:change_price, ->(**kw) { change_price_args = kw }) do
+          result = Billing::Subscription.finalize(
+            customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+            trial_end: 30.days.from_now, intent_id: "seti_x"
+          )
+          assert_equal "succeeded", result.status
+        end
+      end
+    end
+    assert_equal ["cus_1", "pm_9"], set_default_args
+    assert_equal "sub_1", change_price_args[:subscription_id]
+    assert_equal "price_new", change_price_args[:price_id]
+  end
+
+  test "finalize (pi_ succeeded) sets the default PM but does not change the price" do
+    intent = OpenStruct.new(status: "succeeded", payment_method: "pm_5")
+    set_default_args = nil
+    change_price_called = false
+    Stripe::PaymentIntent.stub(:retrieve, intent) do
+      Billing::PaymentMethod.stub(:set_default, ->(cid, pm) { set_default_args = [cid, pm] }) do
+        Billing::Subscription.stub(:change_price, ->(**) { change_price_called = true }) do
+          result = Billing::Subscription.finalize(
+            customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+            trial_end: 1.day.ago, intent_id: "pi_x"
+          )
+          assert_equal "succeeded", result.status
+        end
+      end
+    end
+    assert_equal ["cus_1", "pm_5"], set_default_args
+    refute change_price_called, "change_price must not run on the immediate (pi_) path"
+  end
+
+  test "finalize does neither when the intent is not succeeded" do
+    intent = OpenStruct.new(status: "requires_action", payment_method: nil)
+    set_default_called = false
+    change_price_called = false
+    Stripe::SetupIntent.stub(:retrieve, intent) do
+      Billing::PaymentMethod.stub(:set_default, ->(*) { set_default_called = true }) do
+        Billing::Subscription.stub(:change_price, ->(**) { change_price_called = true }) do
+          result = Billing::Subscription.finalize(
+            customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+            trial_end: 30.days.from_now, intent_id: "seti_x"
+          )
+          assert_equal "requires_action", result.status
+        end
+      end
+    end
+    refute set_default_called
+    refute change_price_called
+  end
 end

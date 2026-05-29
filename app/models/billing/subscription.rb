@@ -67,6 +67,24 @@ module Billing
       end
     end
 
+    # Finalize a subscribe after a client-side 3DS challenge. SetupIntent ids
+    # ("seti_") are the future-trial path, where the price change was deferred
+    # until authentication; PaymentIntent ids ("pi_") are the immediate path,
+    # where the price was already changed during the initial subscribe.
+    def self.finalize(customer_id:, subscription_id:, price_id:, trial_end:, intent_id:)
+      if intent_id.start_with?("seti_")
+        intent = Stripe::SetupIntent.retrieve(intent_id)
+        if intent.status == "succeeded"
+          Billing::PaymentMethod.set_default(customer_id, intent.payment_method)
+          change_price(subscription_id: subscription_id, price_id: price_id, trial_end: trial_end)
+        end
+      else
+        intent = Stripe::PaymentIntent.retrieve(intent_id)
+        Billing::PaymentMethod.set_default(customer_id, intent.payment_method) if intent.status == "succeeded"
+      end
+      intent
+    end
+
     # Replaces the old invoice.closed / attempt_count logic. After a customer
     # updates a failed card, attempt to pay the latest open invoice; if the
     # subscription is unpaid, restart its billing cycle.

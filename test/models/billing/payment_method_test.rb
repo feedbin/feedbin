@@ -64,4 +64,31 @@ class Billing::PaymentMethodTest < ActiveSupport::TestCase
     end
     refute update_called
   end
+
+  test "finalize retrieves the setup intent and sets the default when succeeded" do
+    intent = OpenStruct.new(status: "succeeded", payment_method: "pm_9")
+    retrieved_id = nil
+    set_args = nil
+    Stripe::SetupIntent.stub(:retrieve, ->(id) { retrieved_id = id; intent }) do
+      Stripe::Customer.stub(:update, ->(id, params) { set_args = [id, params]; OpenStruct.new }) do
+        result = Billing::PaymentMethod.finalize(customer_id: "cus_1", intent_id: "seti_1")
+        assert_equal "succeeded", result.status
+      end
+    end
+    assert_equal "seti_1", retrieved_id
+    assert_equal "cus_1", set_args[0]
+    assert_equal "pm_9", set_args[1][:invoice_settings][:default_payment_method]
+  end
+
+  test "finalize does not set a default when the intent is not succeeded" do
+    intent = OpenStruct.new(status: "requires_action", payment_method: nil)
+    update_called = false
+    Stripe::SetupIntent.stub(:retrieve, intent) do
+      Stripe::Customer.stub(:update, ->(*) { update_called = true; OpenStruct.new }) do
+        result = Billing::PaymentMethod.finalize(customer_id: "cus_1", intent_id: "seti_1")
+        assert_equal "requires_action", result.status
+      end
+    end
+    refute update_called
+  end
 end
