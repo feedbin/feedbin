@@ -92,4 +92,76 @@ class Billing::SubscriptionTest < ActiveSupport::TestCase
       assert_nil Billing::Subscription.reopen_account("cus_1")
     end
   end
+
+  test "subscribe (future trial) confirms a setup intent, sets the default PM, and changes price keeping the trial" do
+    intent = OpenStruct.new(status: "succeeded", payment_method: "pm_9")
+    set_default_args = nil
+    change_price_args = nil
+    Stripe::SetupIntent.stub(:create, intent) do
+      Billing::PaymentMethod.stub(:set_default, ->(cid, pm) { set_default_args = [cid, pm] }) do
+        Billing::Subscription.stub(:change_price, ->(**kw) { change_price_args = kw }) do
+          result = Billing::Subscription.subscribe(
+            customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+            confirmation_token: "ct_1", trial_end: 30.days.from_now
+          )
+          assert_equal "succeeded", result.status
+        end
+      end
+    end
+    assert_equal ["cus_1", "pm_9"], set_default_args
+    assert_equal "sub_1", change_price_args[:subscription_id]
+    assert_equal "price_new", change_price_args[:price_id]
+  end
+
+  test "subscribe (future trial) does not set default or change price when the setup intent is not succeeded" do
+    intent = OpenStruct.new(status: "requires_action", payment_method: nil)
+    set_default_called = false
+    change_price_called = false
+    Stripe::SetupIntent.stub(:create, intent) do
+      Billing::PaymentMethod.stub(:set_default, ->(*) { set_default_called = true }) do
+        Billing::Subscription.stub(:change_price, ->(**) { change_price_called = true }) do
+          result = Billing::Subscription.subscribe(
+            customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+            confirmation_token: "ct_1", trial_end: 30.days.from_now
+          )
+          assert_equal "requires_action", result.status
+        end
+      end
+    end
+    refute set_default_called
+    refute change_price_called
+  end
+
+  test "subscribe (expired trial) ends the trial now and confirms the invoice payment intent" do
+    existing = OpenStruct.new(items: OpenStruct.new(data: [OpenStruct.new(id: "si_1")]))
+    updated = OpenStruct.new(
+      latest_invoice: OpenStruct.new(
+        confirmation_secret: OpenStruct.new(client_secret: "pi_ABC_secret_xyz")
+      )
+    )
+    pi = OpenStruct.new(status: "succeeded", payment_method: "pm_5")
+    update_args = nil
+    confirm_args = nil
+    set_default_args = nil
+    Stripe::Subscription.stub(:retrieve, existing) do
+      Stripe::Subscription.stub(:update, ->(id, params) { update_args = [id, params]; updated }) do
+        Stripe::PaymentIntent.stub(:confirm, ->(pi_id, **kw) { confirm_args = [pi_id, kw]; pi }) do
+          Billing::PaymentMethod.stub(:set_default, ->(cid, pm) { set_default_args = [cid, pm] }) do
+            result = Billing::Subscription.subscribe(
+              customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+              confirmation_token: "ct_1", trial_end: 1.day.ago
+            )
+            assert_equal "succeeded", result.status
+          end
+        end
+      end
+    end
+    assert_equal "sub_1", update_args[0]
+    assert_equal [{id: "si_1", price: "price_new"}], update_args[1][:items]
+    assert_equal "now", update_args[1][:trial_end]
+    assert_equal "default_incomplete", update_args[1][:payment_behavior]
+    assert_equal "pi_ABC", confirm_args[0]
+    assert_equal "ct_1", confirm_args[1][:confirmation_token]
+    assert_equal ["cus_1", "pm_5"], set_default_args
+  end
 end

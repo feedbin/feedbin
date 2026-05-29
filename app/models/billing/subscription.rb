@@ -34,6 +34,37 @@ module Billing
       trial_end.to_i
     end
 
+    # Subscribe step. Operates on the existing (signup-created) subscription.
+    # Future trial -> confirm a SetupIntent and keep the trial. Expired/immediate
+    # -> end the trial now and confirm the first invoice's PaymentIntent on-session.
+    # Returns the confirmed SetupIntent or PaymentIntent.
+    def self.subscribe(customer_id:, subscription_id:, price_id:, confirmation_token:, trial_end:)
+      if trial_end && trial_end.future?
+        intent = Stripe::SetupIntent.create(
+          customer: customer_id, usage: "off_session",
+          confirmation_token: confirmation_token, confirm: true
+        )
+        if intent.status == "succeeded"
+          Billing::PaymentMethod.set_default(customer_id, intent.payment_method)
+          change_price(subscription_id: subscription_id, price_id: price_id, trial_end: trial_end)
+        end
+        intent
+      else
+        sub = Stripe::Subscription.retrieve(subscription_id)
+        updated = Stripe::Subscription.update(subscription_id, {
+          items: [{id: sub.items.data.first.id, price: price_id}],
+          trial_end: "now",
+          proration_behavior: "none",
+          payment_behavior: "default_incomplete",
+          expand: ["latest_invoice.confirmation_secret"]
+        })
+        payment_intent_id = updated.latest_invoice.confirmation_secret.client_secret.split("_secret_").first
+        intent = Stripe::PaymentIntent.confirm(payment_intent_id, confirmation_token: confirmation_token)
+        Billing::PaymentMethod.set_default(customer_id, intent.payment_method) if intent.status == "succeeded"
+        intent
+      end
+    end
+
     # Replaces the old invoice.closed / attempt_count logic. After a customer
     # updates a failed card, attempt to pay the latest open invoice; if the
     # subscription is unpaid, restart its billing cycle.
