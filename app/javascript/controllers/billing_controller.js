@@ -92,9 +92,85 @@ export default class extends Controller {
     return checked ? checked.value : this.defaultPlanValue
   }
 
+  // Match the Payment Element to the site by resolving its theme CSS custom
+  // properties to concrete values. The Element renders in a cross-origin iframe
+  // so it can't read page CSS, and colorPrimary/Background/Text/Danger reject
+  // var()/rgba() — so we resolve each --color-* (which the site swaps per theme)
+  // off a hidden probe and feed hex/rgb values in.
   appearance() {
     const dark = ["dusk", "midnight"].includes(window.feedbin?.theme) || window.feedbin?.darkMode?.()
-    return { theme: dark ? "night" : "stripe" }
+
+    const probe = document.createElement("span")
+    probe.style.display = "none"
+    this.element.appendChild(probe)
+    const compute = (cssVar) => {
+      probe.style.color = `var(${cssVar})`
+      return getComputedStyle(probe).color
+    }
+    const hex = (cssVar) => {
+      const [r, g, b] = compute(cssVar).match(/\d+(\.\d+)?/g).map(Number)
+      return "#" + [r, g, b].map((n) => Math.round(n).toString(16).padStart(2, "0")).join("")
+    }
+
+    const base = hex("--color-base")
+    const text = hex("--color-600")
+    const strong = hex("--color-700")
+    const secondary = hex("--color-500")
+    const border = hex("--color-400")
+    const primary = hex("--color-blue-600")
+    const danger = hex("--color-red-600")
+    const shadow = compute("--color-shadow-100")
+    probe.remove()
+
+    return {
+      theme: dark ? "night" : "stripe",
+      variables: {
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontSizeBase: "14px",
+        borderRadius: "6px",
+        colorBackground: base,
+        colorText: text,
+        colorTextSecondary: secondary,
+        colorTextPlaceholder: secondary,
+        colorPrimary: primary,
+        colorDanger: danger
+      },
+      rules: {
+        ".Input": {
+          border: `1px solid ${border}`,
+          boxShadow: `0px 1px 1px 0px ${shadow}`,
+          padding: "11px 8px"
+        },
+        ".Input:focus": {
+          color: strong,
+          border: `1px solid ${primary}`,
+          boxShadow: `0 0 0 1px ${primary}`
+        },
+        ".Input--invalid": {
+          border: `1px solid ${danger}`,
+          boxShadow: `0 0 0 1px ${danger}`
+        },
+        ".Label": {
+          color: text,
+          fontWeight: "500"
+        },
+        ".Tab": {
+          border: `1px solid ${border}`,
+          boxShadow: `0px 1px 1px 0px ${shadow}`
+        },
+        ".Tab:hover": {
+          color: strong
+        },
+        ".Tab--selected": {
+          color: strong,
+          borderColor: primary,
+          boxShadow: `0 0 0 1px ${primary}`
+        },
+        ".Error": {
+          color: danger
+        }
+      }
+    }
   }
 
   setBusy(busy) {
