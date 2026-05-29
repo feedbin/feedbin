@@ -15,6 +15,14 @@ class Billing::SubscribeDescriptionComponentTest < ComponentTestCase
     end
   end
 
+  test "the container is hidden and targeted so it only shows once the element mounts" do
+    user = users(:ben)
+    plans = [plans(:basic_yearly_3)]
+    html = render(Billing::SubscribeDescriptionComponent.new(user: user, plans: plans, default_plan: plans.first)).to_s
+    assert_includes html, 'data-billing-target="description"'
+    assert_match(/<div class="subscribe-description[^"]*\bhidden\b/, html)
+  end
+
   test "future-trial wording names the trial end date" do
     user = users(:ben)
     user.stub(:trial_end, 10.days.from_now) do

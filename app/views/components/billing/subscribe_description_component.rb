@@ -9,7 +9,7 @@ module Billing
     end
 
     def view_template
-      div(class: "subscribe-description mt-4") do
+      div(class: "subscribe-description mt-4 hidden", data: stimulus_item(target: :description, for: :billing)) do
         @plans.each { |plan| description_for(plan) }
       end
     end
