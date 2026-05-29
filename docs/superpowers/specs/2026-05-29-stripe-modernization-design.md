@@ -18,6 +18,7 @@ Replace Feedbin's legacy Stripe integration (gem `5.55.0`, API version pinned to
 ### Decisions on record
 
 - **Scope:** Full modernization — the API-version bump touches all affected billing code (services, `User` billing callbacks, webhook/`BillingEvent` processing, payment-history parsing, jobs), not just card collection.
+- **Subscription lifecycle:** The Stripe Subscription is still created **at signup** (`create_customer` keeps creating a trialing subscription). The subscribe step therefore operates on that **existing** subscription — it never creates a second one.
 - **Server architecture:** New `Billing::` service layer (the existing `Customer` PORO is replaced, not patched).
 - **Tests:** Official `stripe-mock` server replaces the `feedbin/stripe-ruby-mock` fork.
 - **API version:** Latest — `2026-05-27.dahlia`.
@@ -27,13 +28,10 @@ Replace Feedbin's legacy Stripe integration (gem `5.55.0`, API version pinned to
 
 ### Two collection flows, both deferred
 
-**1. Subscribe** (trial → paid, free → paid, or plan change), in `settings/billing`:
+**1. Subscribe** (trial → paid, free → paid, or plan change), in `settings/billing`. Operates on the subscription created at signup; the server-side path branches on whether the trial is still in the future:
 
-- Client renders Payment Element with `mode: 'subscription'`, `amount`, `currency`.
-- On submit: `elements.submit()` → `stripe.createConfirmationToken({ elements })` → POST confirmation token + `plan_id` to the server.
-- Server creates the subscription with `payment_behavior: 'default_incomplete'`, expands the intent, and confirms it with the confirmation token.
-  - **Trial still in the future** → no charge → confirm the subscription's `pending_setup_intent` (a **SetupIntent**).
-  - **Trial expired / immediate** → confirm `latest_invoice`'s **PaymentIntent**.
+- **Future trial → SetupIntent.** Client renders Payment Element with `mode: 'setup'`. On submit: `elements.submit()` → `stripe.createConfirmationToken({ elements })` → POST token + `plan_id`. Server confirms a SetupIntent with the token, sets the resulting PaymentMethod as the customer's default, and changes the existing subscription's price (keeping the future trial). No charge now; the first charge happens off-session when the trial ends.
+- **Expired / immediate → PaymentIntent.** Client renders Payment Element with `mode: 'payment'`, `amount`, `currency`. On submit: same confirmation-token POST. Server updates the existing subscription (`items: [{ id:, price: }]`, `trial_end: 'now'`, `payment_behavior: 'default_incomplete'`), then confirms `latest_invoice`'s PaymentIntent with the token (this attaches the PM and charges on-session), and sets it as default.
 - Server returns JSON. If `next_action` is required (3DS), it returns the `client_secret`; the Stimulus controller calls `stripe.handleNextAction`, then navigates.
 
 **2. Update card** (existing subscriber), in `settings/billing/edit`:
@@ -49,14 +47,14 @@ Both endpoints return **JSON** (a change from today's form-submit + hidden `stri
 Replaces the `Customer` PORO (`app/models/customer.rb`). Small, single-purpose objects:
 
 - **`Billing::Customer`** — create / retrieve / update email / cancel. `customer.subscriptions` is no longer embedded → use `Stripe::Subscription.list(customer:)`.
-- **`Billing::Subscription`** — deferred create + confirm; plan change via `Stripe::Subscription.update(id, items: [{ id: item_id, price: price_id }], proration_behavior:, trial_end:)` (replaces `subscription.plan=`); trial handling; `reopen_account` reworked off `invoice.status` (`open`/`draft`/`uncollectible`) + `Stripe::Invoice.pay` (the old `invoice.closed` / `attempt_count` fields are gone).
+- **`Billing::Subscription`** — `create_trialing` (signup); `change_price` via `Stripe::Subscription.update(id, items: [{ id: item_id, price: price_id }], proration_behavior:, trial_end:)` (replaces `subscription.plan=`); `subscribe` (the two-path SetupIntent/PaymentIntent flow above, operating on the existing subscription); `reopen_account` reworked off `invoice.status` (`open`/`draft`/`uncollectible`) + `Stripe::Invoice.pay` (the old `invoice.closed` / `attempt_count` fields are gone).
 - **`Billing::PaymentMethod`** — confirm SetupIntent, set default PM, and the card brand/last4 lookup `payment_details` needs (`customer.sources.first` → `Stripe::PaymentMethod.list(customer:, type: 'card')` or the default PM).
 
 ### Controller endpoints
 
 In `Settings::BillingsController` (routes under the existing `resource :billing`):
 
-- `POST create_subscription` — confirmation token + `plan_id` → `Billing::Subscription` deferred create/confirm → JSON `{ status, client_secret?, requires_action? }`.
+- `POST create_subscription` — confirmation token + `plan_id` → `Billing::Subscription.subscribe` (SetupIntent or PaymentIntent path) → JSON `{ status, client_secret?, requires_action? }`. (Name kept for the route; it activates the existing subscription rather than creating one.)
 - `POST update_credit_card` — reworked to receive a confirmation token, confirm a SetupIntent via `Billing::PaymentMethod`, set default PM → JSON.
 - `POST update_plan` — keeps its route; uses `Billing::Subscription` for the plan change.
 - `GET payment_details` — uses `Billing::PaymentMethod`; cache key `payment_details:<id>:vN` bumped.
