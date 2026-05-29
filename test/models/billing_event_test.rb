@@ -56,4 +56,37 @@ class BillingEventTest < ActiveSupport::TestCase
     end
     assert_equal billing_event.id, UpdateStatementDescriptor.jobs.first["args"].first
   end
+
+  test "setup_intent_succeeded sets the default payment method and reactivates a suspended user" do
+    @user.deactivate
+    assert_not @user.reload.active?
+
+    set_default_args = nil
+    Billing::PaymentMethod.stub(:set_default, ->(cid, pm) { set_default_args = [cid, pm] }) do
+      BillingEvent.create(info: stripe_webhook_event("setup_intent_succeeded", customer: @user.customer_id))
+    end
+
+    assert @user.reload.active?
+    assert_equal [@user.customer_id, "pm_test_1"], set_default_args
+  end
+
+  test "payment_intent_succeeded reactivates a suspended user" do
+    @user.deactivate
+    set_default_args = nil
+    Billing::PaymentMethod.stub(:set_default, ->(cid, pm) { set_default_args = [cid, pm] }) do
+      BillingEvent.create(info: stripe_webhook_event("payment_intent_succeeded", customer: @user.customer_id))
+    end
+    assert @user.reload.active?
+    assert_equal [@user.customer_id, "pm_test_1"], set_default_args
+  end
+
+  test "payment_intent_succeeded for an active user sets default but does not run reactivation" do
+    assert @user.active?
+    Billing::PaymentMethod.stub(:set_default, ->(*) {}) do
+      assert_nothing_raised do
+        BillingEvent.create(info: stripe_webhook_event("payment_intent_succeeded", customer: @user.customer_id))
+      end
+    end
+    assert @user.reload.active?
+  end
 end

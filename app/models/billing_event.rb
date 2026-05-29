@@ -46,6 +46,10 @@ class BillingEvent < ApplicationRecord
     if invoice_created?
       UpdateStatementDescriptor.perform_async(id)
     end
+
+    if payment_authenticated?
+      finalize_payment
+    end
   end
 
   def charge_succeeded?
@@ -76,6 +80,23 @@ class BillingEvent < ApplicationRecord
 
   def invoice_created?
     event_type == "invoice.created"
+  end
+
+  def payment_authenticated?
+    ["setup_intent.succeeded", "payment_intent.succeeded"].include?(event_type)
+  end
+
+  # Safety net for a client that completes 3DS but never returns. set_default is
+  # idempotent (re-setting the same PM is harmless), and reactivation only runs
+  # for a suspended (locked-out) user so normal subscription-renewal
+  # payment_intent.succeeded events don't do unnecessary work.
+  def finalize_payment
+    return unless billable
+    payment_method = event_object["payment_method"]
+    Billing::PaymentMethod.set_default(billable.customer_id, payment_method) if payment_method.present?
+    billable.reactivate_billing! if billable.suspended?
+  rescue Stripe::StripeError => exception
+    ErrorService.notify(exception)
   end
 
   def invoice

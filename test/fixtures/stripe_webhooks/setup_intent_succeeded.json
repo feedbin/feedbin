@@ -1,0 +1,5 @@
+{
+  "id": "evt_setup_intent_succeeded",
+  "type": "setup_intent.succeeded",
+  "data": { "object": { "object": "setup_intent", "id": "seti_test_1", "status": "succeeded", "customer": "cus_placeholder", "payment_method": "pm_test_1" } }
+}
