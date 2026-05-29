@@ -36,25 +36,14 @@ class Settings::BillingsControllerTest < ActionController::TestCase
   end
 
   test "should update plan" do
-    StripeMock.start
-    stripe_helper = StripeMock.create_test_helper
-
-    plans = {
-      original: plans(:basic_monthly_3),
-      new: plans(:basic_yearly_3)
-    }
-    plans.each do |_, plan|
-      create_stripe_plan(plan)
-    end
-
-    customer = Stripe::Customer.create({email: @user.email, plan: plans[:original].stripe_id, source: stripe_helper.generate_card_token})
-    @user.update(customer_id: customer.id)
-    @user.reload.inspect
+    new_plan = plans(:basic_yearly_3)
+    @user.update(customer_id: Stripe::Customer.create(email: @user.email).id)
 
     login_as @user
-    post :update_plan, params: {plan: plans[:new].id}
-    assert_equal plans[:new], @user.reload.plan
-    StripeMock.stop
+    Billing::Subscription.stub(:change_price, OpenStruct.new) do
+      post :update_plan, params: {plan: new_plan.id}
+    end
+    assert_equal new_plan, @user.reload.plan
   end
 
   test "update_credit_card confirms a setup intent and returns json" do

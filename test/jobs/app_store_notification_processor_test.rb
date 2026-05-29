@@ -8,16 +8,14 @@ class AppStoreNotificationProcessorTest < ActiveSupport::TestCase
   end
 
   test "should create app store notification" do
-    StripeMock.start
-    create_stripe_plan(plans(:basic_monthly_3))
-    create_stripe_plan(plans(:app_subscription))
+    create_stripe_price(plans(:basic_monthly_3))
+    create_stripe_price(plans(:app_subscription))
 
-    customer = Stripe::Customer.create({email: @user.email, plan: @user.plan.stripe_id})
+    customer = Stripe::Customer.create(email: @user.email)
     @user.update(customer_id: customer.id)
     assert_difference("AppStoreNotification.count", +1) do
       AppStoreNotificationProcessor.new.perform(@notification["signedPayload"])
     end
     assert_equal(Plan.find_by_stripe_id("app-subscription"), @user.reload.plan)
-    StripeMock.stop
   end
 end

@@ -6,7 +6,7 @@ class FeedbinUtilsTest < ActiveSupport::TestCase
   end
 
   test "payment_details_key formats the redis key for a user" do
-    assert_equal "payment_details:42:v5", FeedbinUtils.payment_details_key(42)
+    assert_equal "payment_details:42:v6", FeedbinUtils.payment_details_key(42)
   end
 
   test "update_public_id_cache stores the content length under the public_id" do

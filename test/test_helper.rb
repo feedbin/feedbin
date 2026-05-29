@@ -126,10 +126,6 @@ class ActiveSupport::TestCase
     JSON.parse(File.read(support_file(file_name)))
   end
 
-  def create_stripe_plan(plan)
-    Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price.to_i, currency: "USD", interval: "day")
-  end
-
   def stripe_webhook_event(name, customer:)
     data = JSON.parse(File.read(Rails.root.join("test/fixtures/stripe_webhooks/#{name}.json")))
     data["id"] = "evt_#{SecureRandom.hex(8)}"

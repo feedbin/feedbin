@@ -18,25 +18,21 @@ class SettingsControllerTest < ActionController::TestCase
   end
 
   test "should get account @last_payment" do
-    StripeMock.start
-    event = StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id})
-    BillingEvent.create(info: event.as_json)
+    event = stripe_webhook_event("charge_succeeded", customer: @user.customer_id)
+    BillingEvent.create(info: event)
     login_as @user
     get :account
     assert_response :success
     assert assigns(:last_payment).present?, "@last_payment should exist"
-    StripeMock.stop
   end
 
   test "should not get account @last_payment because it is too old" do
-    StripeMock.start
-    event = StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id})
-    BillingEvent.create(info: event.as_json).update(created_at: 8.days.ago)
+    event = stripe_webhook_event("charge_succeeded", customer: @user.customer_id)
+    BillingEvent.create(info: event).update(created_at: 8.days.ago)
     login_as @user
     get :account
     assert_response :success
     assert_nil assigns(:last_payment)
-    StripeMock.stop
   end
 
   test "should update settings" do
