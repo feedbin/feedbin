@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
-    :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
+    :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted,
+    :skip_billing_plan_change
 
   has_secure_password reset_token: false
 
@@ -319,8 +320,11 @@ class User < ApplicationRecord
   end
 
   def create_customer
-    @stripe_customer = Customer.create(email, plan.stripe_id, trial_end)
-    self.customer_id = @stripe_customer.id
+    customer = Billing::Customer.create(email: email)
+    self.customer_id = customer.id
+    Billing::Subscription.create_trialing(
+      customer_id: customer.id, price_id: plan.stripe_id, trial_end: trial_end
+    )
     if coupon_code
       coupon_record = Coupon.find_by_coupon_code(coupon_code)
       coupon_record.update(redeemed: true)
@@ -329,35 +333,27 @@ class User < ApplicationRecord
   end
 
   def update_billing
-    if email_changed?
-      stripe_customer.update_email(email)
-    end
+    stripe_customer.update_email(email) if email_changed?
 
-    if stripe_token.present?
-      stripe_customer.update_source(stripe_token)
-      self.suspended = false
-      subscriptions.update_all(active: true)
+    if plan_id_changed? && !skip_billing_plan_change && stripe_customer.subscription
+      Billing::Subscription.change_price(
+        subscription_id: stripe_customer.subscription.id,
+        price_id: plan.stripe_id,
+        trial_end: trial_end
+      )
     end
-
-    if plan_id_changed?
-      stripe_customer.update_plan(plan.stripe_id, trial_end)
-    end
-
-    self.stripe_token = nil
   rescue Stripe::StripeError => exception
     ErrorService.notify(exception)
     errors.add :base, exception.message.to_s
-    self.stripe_token = nil
     throw(:abort)
   end
 
   def stripe_customer
-    @stripe_customer ||= Customer.retrieve(customer_id)
+    @stripe_customer ||= Billing::Customer.retrieve(customer_id)
   end
 
   def cancel_billing
-    customer = Stripe::Customer.retrieve(customer_id)
-    customer.delete
+    Billing::Customer.retrieve(customer_id).cancel
   rescue Stripe::StripeError => e
     logger.error "Stripe Error: " + e.message
     errors.add :base, "#{e.message}."

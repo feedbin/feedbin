@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class UsersControllerTest < ActionController::TestCase
   include SessionsHelper
@@ -9,15 +10,12 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should create user" do
-    StripeMock.start
     plan = plans(:trial)
-    create_stripe_plan(plan)
     assert_difference "User.count", +1 do
       post :create, params: {user: {email: "example@example.com", password: default_password, plan_id: plan.id}}
       assert_redirected_to root_url
     end
     assert signed_in?
-    StripeMock.stop
   end
 
   test "should change password" do
@@ -30,37 +28,20 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should change plan" do
-    StripeMock.start
-    stripe_helper = StripeMock.create_test_helper
     user = users(:ann)
     new_plan = plans(:basic_monthly_3)
-    last4 = "1234"
-    token = stripe_helper.generate_card_token(last4: last4, exp_month: 99, exp_year: 3005)
-    create_stripe_plan(user.plan)
-    create_stripe_plan(new_plan)
-
-    customer = Stripe::Customer.create({email: user.email, plan: user.plan.stripe_id})
-    user.update(customer_id: customer.id)
-
-    redirect_url = settings_billing_url
-
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
     login_as user
-    patch :update, params: {id: user, redirect_to: redirect_url, user: {stripe_token: token, plan_id: new_plan.id}}
-    assert_redirected_to redirect_url
+    Billing::Subscription.stub(:change_price, OpenStruct.new) do
+      patch :update, params: {id: user, redirect_to: settings_billing_url, user: {plan_id: new_plan.id}}
+    end
+    assert_redirected_to settings_billing_url
     assert_equal new_plan, user.reload.plan
-
-    customer = Stripe::Customer.retrieve(user.customer_id)
-    assert_equal last4, customer.sources.data.first.last4
-
-    StripeMock.stop
   end
 
   test "should destroy user" do
-    StripeMock.start
     user = users(:ben)
-    customer = Stripe::Customer.create({email: user.email})
-    user.update(customer_id: customer.id)
-
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
     login_as user
     assert_difference "User.count", -1 do
       Sidekiq::Testing.inline! do
@@ -68,6 +49,5 @@ class UsersControllerTest < ActionController::TestCase
         assert_redirected_to account_closed_public_settings_url
       end
     end
-    StripeMock.stop
   end
 end

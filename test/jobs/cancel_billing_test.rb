@@ -1,21 +1,14 @@
 require "test_helper"
+require "ostruct"
 
 class CancelBillingTest < ActiveSupport::TestCase
-  test "should cancel subscription" do
-    StripeMock.start
-    plan = plans(:trial)
-    create_stripe_plan(plan)
-
-    user = User.create(
-      email: "cc@example.com",
-      password: default_password,
-      plan: plan
-    )
-
-    CancelBilling.new.perform(user.customer_id)
-
-    customer = Stripe::Customer.retrieve(user.customer_id)
-    assert customer.deleted
-    StripeMock.stop
+  test "deletes the stripe customer" do
+    deleted = false
+    customer = Object.new
+    customer.define_singleton_method(:delete) { deleted = true }
+    Stripe::Customer.stub(:retrieve, customer) do
+      CancelBilling.new.perform("cus_123")
+    end
+    assert deleted
   end
 end

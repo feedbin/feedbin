@@ -48,15 +48,6 @@ module FactoryHelper
 
   def stripe_user
     plan = plans(:trial)
-    card = StripeMock.generate_card_token(last4: "4242", exp_month: 99, exp_year: 3005)
-    create_stripe_plan(plan)
-    user = User.create(
-      email: "cc@example.com",
-      password: default_password,
-      plan: plan
-    )
-    user.stripe_token = card
-    user.save
-    user
+    User.create(email: "stripe-#{SecureRandom.hex(4)}@example.com", password: default_password, plan: plan)
   end
 end

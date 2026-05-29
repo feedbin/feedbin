@@ -130,6 +130,18 @@ class ActiveSupport::TestCase
     Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price.to_i, currency: "USD", interval: "day")
   end
 
+  def create_stripe_price(plan)
+    Stripe::Price.create(
+      id: plan.stripe_id,
+      unit_amount: plan.price_in_cents,
+      currency: "usd",
+      recurring: {interval: "day"},
+      product_data: {name: plan.name}
+    )
+  rescue Stripe::InvalidRequestError
+    Stripe::Price.retrieve(plan.stripe_id)
+  end
+
   def clear_search
     Search.client { _1.request(:delete, $search[:config][:aliases][:entries]) }
     Search.client { _1.request(:delete, $search[:config][:aliases][:actions]) }
