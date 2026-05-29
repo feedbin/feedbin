@@ -1,0 +1,14 @@
+{
+  "id": "evt_invoice_payment_failed",
+  "type": "invoice.payment_failed",
+  "data": {
+    "object": {
+      "object": "invoice",
+      "id": "in_payment_failed_1",
+      "created": 1717000000,
+      "amount_due": 5000,
+      "currency": "usd",
+      "customer": "cus_placeholder"
+    }
+  }
+}

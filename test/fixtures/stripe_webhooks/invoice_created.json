@@ -1,0 +1,12 @@
+{
+  "id": "evt_invoice_created",
+  "type": "invoice.created",
+  "data": {
+    "object": {
+      "object": "invoice",
+      "id": "in_created_1",
+      "created": 1717000000,
+      "customer": "cus_placeholder"
+    }
+  }
+}

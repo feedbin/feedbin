@@ -1,0 +1,12 @@
+{
+  "id": "evt_customer_subscription_updated_unpaid",
+  "type": "customer.subscription.updated",
+  "data": {
+    "object": {
+      "object": "subscription",
+      "id": "sub_x",
+      "status": "unpaid",
+      "customer": "cus_placeholder"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "evt_customer_subscription_updated_reactivated",
+  "type": "customer.subscription.updated",
+  "data": {
+    "object": {
+      "object": "subscription",
+      "id": "sub_x",
+      "status": "active",
+      "customer": "cus_placeholder"
+    },
+    "previous_attributes": {
+      "status": "unpaid"
+    }
+  }
+}

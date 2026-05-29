@@ -6,17 +6,16 @@ class UpdateStatementDescriptorTest < ActiveSupport::TestCase
   end
 
   test "Should update invoice" do
-    StripeMock.start
-    event = StripeMock.mock_webhook_event("invoice.created", {customer: @user.customer_id})
-    StripeMock.stop
+    event = stripe_webhook_event("invoice_created", customer: @user.customer_id)
+    invoice_id = event["data"]["object"]["id"]
 
-    stub_request(:post, "https://api.stripe.com/v1/invoices/in_00000000000000")
+    stub_request(:post, "#{Stripe.api_base}/v1/invoices/#{invoice_id}")
       .to_raise(Stripe::APIError)
 
-    billing_event = BillingEvent.create!(info: event.as_json)
+    billing_event = BillingEvent.create!(info: event)
 
     UpdateStatementDescriptor.new.perform(billing_event.id) rescue nil
 
-    assert_requested(:post, "https://api.stripe.com/v1/invoices/in_00000000000000") { _1.body == "statement_descriptor=Example%2C+Inc.+#{@user.id}" }
+    assert_requested(:post, "#{Stripe.api_base}/v1/invoices/#{invoice_id}") { _1.body == "statement_descriptor=Example%2C+Inc.+#{@user.id}" }
   end
 end

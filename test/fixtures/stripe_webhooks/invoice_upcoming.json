@@ -1,0 +1,14 @@
+{
+  "id": "evt_invoice_upcoming",
+  "type": "invoice.upcoming",
+  "data": {
+    "object": {
+      "object": "invoice",
+      "created": 1748449600,
+      "currency": "usd",
+      "amount_remaining": 2500,
+      "period_end": 1748536000,
+      "customer": "cus_placeholder"
+    }
+  }
+}
