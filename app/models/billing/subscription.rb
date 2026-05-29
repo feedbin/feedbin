@@ -33,5 +33,23 @@ module Billing
       return "now" if trial_end.nil? || trial_end.past?
       trial_end.to_i
     end
+
+    # Replaces the old invoice.closed / attempt_count logic. After a customer
+    # updates a failed card, attempt to pay the latest open invoice; if the
+    # subscription is unpaid, restart its billing cycle.
+    def self.reopen_account(customer_id)
+      invoice = Stripe::Invoice.list(customer: customer_id, limit: 1).data.first
+      return unless invoice
+
+      case invoice.status
+      when "open", "uncollectible"
+        Stripe::Invoice.pay(invoice.id)
+      when "draft"
+        subscription = Stripe::Subscription.list(customer: customer_id, status: "unpaid", limit: 1).data.first
+        if subscription
+          Stripe::Subscription.update(subscription.id, billing_cycle_anchor: "now", proration_behavior: "none")
+        end
+      end
+    end
   end
 end

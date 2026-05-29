@@ -48,4 +48,48 @@ class Billing::SubscriptionTest < ActiveSupport::TestCase
     future = 1.day.from_now
     assert_equal future.to_i, Billing::Subscription.trial_end_param(future)
   end
+
+  test "reopen_account pays an open invoice" do
+    invoice = OpenStruct.new(id: "in_1", status: "open")
+    paid_id = nil
+    Stripe::Invoice.stub(:list, OpenStruct.new(data: [invoice])) do
+      Stripe::Invoice.stub(:pay, ->(id) { paid_id = id; OpenStruct.new }) do
+        Billing::Subscription.reopen_account("cus_1")
+      end
+    end
+    assert_equal "in_1", paid_id
+  end
+
+  test "reopen_account pays an uncollectible invoice" do
+    invoice = OpenStruct.new(id: "in_2", status: "uncollectible")
+    paid_id = nil
+    Stripe::Invoice.stub(:list, OpenStruct.new(data: [invoice])) do
+      Stripe::Invoice.stub(:pay, ->(id) { paid_id = id; OpenStruct.new }) do
+        Billing::Subscription.reopen_account("cus_1")
+      end
+    end
+    assert_equal "in_2", paid_id
+  end
+
+  test "reopen_account restarts the billing cycle for a draft invoice on an unpaid subscription" do
+    invoice = OpenStruct.new(id: "in_3", status: "draft")
+    sub = OpenStruct.new(id: "sub_1")
+    captured = nil
+    Stripe::Invoice.stub(:list, OpenStruct.new(data: [invoice])) do
+      Stripe::Subscription.stub(:list, OpenStruct.new(data: [sub])) do
+        Stripe::Subscription.stub(:update, ->(id, params) { captured = [id, params]; OpenStruct.new }) do
+          Billing::Subscription.reopen_account("cus_1")
+        end
+      end
+    end
+    assert_equal "sub_1", captured[0]
+    assert_equal "now", captured[1][:billing_cycle_anchor]
+    assert_equal "none", captured[1][:proration_behavior]
+  end
+
+  test "reopen_account does nothing when there is no invoice" do
+    Stripe::Invoice.stub(:list, OpenStruct.new(data: [])) do
+      assert_nil Billing::Subscription.reopen_account("cus_1")
+    end
+  end
 end
