@@ -64,7 +64,7 @@ gem "sass-rails"
 gem "sidekiq"
 gem "stimulus-rails"
 gem "stringio"
-gem "stripe", "~> 5.55.0"
+gem "stripe", "~> 19.2.0"
 gem "stripe_event"
 gem "strong_migrations", "< 2"
 gem "tailwindcss-ruby", "< 4"
@@ -87,7 +87,6 @@ group :development do
 end
 
 group :development, :test do
-  gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
   gem "capybara", github: "teamcapybara/capybara"
   gem "debug"
