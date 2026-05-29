@@ -1,16 +1,21 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+<% end %>
+
 <%= render Settings::H1Component.new do %>
   Billing
 <% end %>
 
 <% if ENV["STRIPE_API_KEY"] %>
   <% if @user.plan.stripe_id == "trial" %>
-    <%= render partial: "shared/billing/billing_subscribe", locals: {subscribe_title: "Plan"} %>
+    <%= render Billing::SubscribeFormComponent.new(
+          publishable_key: STRIPE_PUBLIC_KEY,
+          plans: @plans, default_plan: @default_plan, subscribe_title: "Plan",
+          mode: @user.trial_end.future? ? "setup" : "payment") %>
   <% else %>
     <%= render partial: "shared/billing/billing_status" %>
   <% end %>
-  <script>
-    $.get("<%= payment_details_settings_billing_path %>");
-  </script>
+  <script>$.get("<%= payment_details_settings_billing_path %>");</script>
 <% else %>
   <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>
 <% end %>

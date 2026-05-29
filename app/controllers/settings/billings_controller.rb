@@ -7,6 +7,7 @@ class Settings::BillingsController < ApplicationController
 
     payments
     plan_setup
+    @default_plan ||= @plans.first
 
     render layout: "settings"
   end
