@@ -34,6 +34,33 @@ class Settings::BillingsController < ApplicationController
     redirect_to settings_billing_url, alert: "Your card was declined, please update your billing information."
   end
 
+  def create_subscription
+    @user = current_user
+    plan = Plan.find(params[:plan_id])
+
+    intent = Billing::Subscription.subscribe(
+      customer_id: @user.customer_id,
+      subscription_id: @user.stripe_customer.subscription.id,
+      price_id: plan.stripe_id,
+      trial_end: @user.trial_end,
+      confirmation_token: params[:confirmation_token]
+    )
+
+    # Persist the plan without re-triggering the price change in update_billing
+    # (Billing::Subscription.subscribe already changed the Stripe side).
+    @user.skip_billing_plan_change = true
+    @user.update(plan: plan)
+    Rails.cache.delete(FeedbinUtils.payment_details_key(@user.id))
+
+    if intent.status == "succeeded"
+      render json: {status: intent.status}
+    else
+      render json: {status: intent.status, client_secret: intent.client_secret, requires_action: true}
+    end
+  rescue Stripe::CardError => exception
+    render json: {error: exception.message}, status: :unprocessable_entity
+  end
+
   def payment_details
     @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id), expires_in: 5.minutes) {
       customer = Customer.retrieve(@user.customer_id)

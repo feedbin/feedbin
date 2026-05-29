@@ -211,6 +211,7 @@ Rails.application.routes.draw do
         get :payment_details
         post :update_credit_card
         post :update_plan
+        post :create_subscription
       end
     end
 

@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class Settings::BillingsControllerTest < ActionController::TestCase
   setup do
@@ -87,5 +88,23 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     customer = Stripe::Customer.retrieve(user.customer_id)
     assert_equal last4, customer.sources.data.first.last4
     StripeMock.stop
+  end
+
+  test "create_subscription activates the existing subscription and returns json" do
+    create_stripe_price(plans(:basic_yearly_3))
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    Billing::Subscription.stub(:subscribe, OpenStruct.new(status: "succeeded")) do
+      post :create_subscription, params: {
+        plan_id: plans(:basic_yearly_3).id, confirmation_token: "ctoken_123"
+      }, format: :json
+    end
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal "succeeded", body["status"]
+    assert_equal plans(:basic_yearly_3), user.reload.plan
   end
 end
