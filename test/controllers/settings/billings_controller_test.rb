@@ -46,6 +46,25 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal new_plan, @user.reload.plan
   end
 
+  test "update_plan shows an alert and does not claim success when the plan change fails" do
+    original_plan = @user.plan
+    new_plan = plans(:basic_yearly_3)
+    @user.update(customer_id: Stripe::Customer.create(email: @user.email).id)
+    login_as @user
+
+    error = Stripe::InvalidRequestError.new("No such subscription", nil)
+    Billing::Subscription.stub(:change_price, ->(**) { raise error }) do
+      Stripe::Subscription.stub(:list, OpenStruct.new(data: [OpenStruct.new(id: "sub_live")])) do
+        post :update_plan, params: {plan: new_plan.id}
+      end
+    end
+
+    assert_nil flash[:notice]
+    assert flash[:alert].present?
+    refute_equal "Plan successfully changed.", flash[:alert]
+    assert_equal original_plan, @user.reload.plan
+  end
+
   test "update_credit_card confirms a setup intent and returns json" do
     user = stripe_user
     user.update(customer_id: Stripe::Customer.create(email: user.email).id)
@@ -103,6 +122,49 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     body = JSON.parse(response.body)
     assert_equal "succeeded", body["status"]
     assert_equal plans(:basic_yearly_3), user.reload.plan
+  end
+
+  test "create_subscription returns 422 when the customer has no live subscription" do
+    create_stripe_price(plans(:basic_yearly_3))
+    user = stripe_user
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    called = false
+    Stripe::Subscription.stub(:list, OpenStruct.new(data: [])) do
+      Billing::Subscription.stub(:subscribe, ->(**) { called = true; OpenStruct.new(status: "succeeded") }) do
+        post :create_subscription, params: {
+          plan_id: plans(:basic_yearly_3).id, confirmation_token: "ctoken_123"
+        }, format: :json
+      end
+    end
+
+    assert_response :unprocessable_entity
+    assert JSON.parse(response.body)["error"].present?
+    refute called, "subscribe must not be called when there is no live subscription"
+  end
+
+  test "create_subscription with requires_action does not change the local plan" do
+    create_stripe_price(plans(:basic_yearly_3))
+    user = stripe_user
+    original_plan = user.plan
+    user.update(customer_id: Stripe::Customer.create(email: user.email).id)
+    login_as user
+
+    intent = OpenStruct.new(status: "requires_action", client_secret: "seti_1_secret_x")
+    Stripe::Subscription.stub(:list, OpenStruct.new(data: [OpenStruct.new(id: "sub_live")])) do
+      Billing::Subscription.stub(:subscribe, intent) do
+        post :create_subscription, params: {
+          plan_id: plans(:basic_yearly_3).id, confirmation_token: "ctoken_123"
+        }, format: :json
+      end
+    end
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal true, body["requires_action"]
+    assert body["client_secret"].present?
+    assert_equal original_plan, user.reload.plan
   end
 
   test "create_subscription rejects a plan not available to the user without touching Stripe" do

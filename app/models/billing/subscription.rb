@@ -58,7 +58,9 @@ module Billing
           payment_behavior: "default_incomplete",
           expand: ["latest_invoice.confirmation_secret"]
         })
-        payment_intent_id = updated.latest_invoice.confirmation_secret.client_secret.split("_secret_").first
+        secret = updated.latest_invoice.confirmation_secret
+        return Stripe::StripeObject.construct_from(status: "succeeded") if secret.nil?
+        payment_intent_id = secret.client_secret.split("_secret_").first
         intent = Stripe::PaymentIntent.confirm(payment_intent_id, confirmation_token: confirmation_token)
         Billing::PaymentMethod.set_default(customer_id, intent.payment_method) if intent.status == "succeeded"
         intent

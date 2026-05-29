@@ -29,8 +29,11 @@ class Settings::BillingsController < ApplicationController
     @user = current_user
     plan = Plan.find(params[:plan])
     @user.plan = plan
-    @user.save
-    redirect_to settings_billing_url, notice: "Plan successfully changed."
+    if @user.save
+      redirect_to settings_billing_url, notice: "Plan successfully changed."
+    else
+      redirect_to settings_billing_url, alert: @user.errors.full_messages.to_sentence.presence || "There was a problem changing your plan."
+    end
   rescue Stripe::CardError
     redirect_to settings_billing_url, alert: "Your card was declined, please update your billing information."
   end
@@ -43,21 +46,25 @@ class Settings::BillingsController < ApplicationController
       return render json: {error: "That plan isn't available on your account."}, status: :unprocessable_entity
     end
 
+    subscription = @user.stripe_customer.subscription
+    unless subscription
+      return render json: {error: "No active subscription found. Please contact support."}, status: :unprocessable_entity
+    end
+
     intent = Billing::Subscription.subscribe(
       customer_id: @user.customer_id,
-      subscription_id: @user.stripe_customer.subscription.id,
+      subscription_id: subscription.id,
       price_id: plan.stripe_id,
       trial_end: @user.trial_end,
       confirmation_token: params[:confirmation_token]
     )
 
-    # Persist the plan without re-triggering the price change in update_billing
-    # (Billing::Subscription.subscribe already changed the Stripe side).
-    @user.skip_billing_plan_change = true
-    @user.update(plan: plan)
-    Rails.cache.delete(FeedbinUtils.payment_details_key(@user.id))
-
     if intent.status == "succeeded"
+      # Persist the plan without re-triggering the price change in update_billing
+      # (Billing::Subscription.subscribe already changed the Stripe side).
+      @user.skip_billing_plan_change = true
+      @user.update(plan: plan)
+      Rails.cache.delete(FeedbinUtils.payment_details_key(@user.id))
       render json: {status: intent.status}
     else
       render json: {status: intent.status, client_secret: intent.client_secret, requires_action: true}

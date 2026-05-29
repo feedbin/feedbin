@@ -164,4 +164,22 @@ class Billing::SubscriptionTest < ActiveSupport::TestCase
     assert_equal "ct_1", confirm_args[1][:confirmation_token]
     assert_equal ["cus_1", "pm_5"], set_default_args
   end
+
+  test "subscribe (expired trial) returns a succeeded intent without confirming when the invoice has no confirmation secret" do
+    existing = OpenStruct.new(items: OpenStruct.new(data: [OpenStruct.new(id: "si_1")]))
+    updated = OpenStruct.new(latest_invoice: OpenStruct.new(confirmation_secret: nil))
+    confirm_called = false
+    Stripe::Subscription.stub(:retrieve, existing) do
+      Stripe::Subscription.stub(:update, updated) do
+        Stripe::PaymentIntent.stub(:confirm, ->(*) { confirm_called = true; raise "should not confirm" }) do
+          result = Billing::Subscription.subscribe(
+            customer_id: "cus_1", subscription_id: "sub_1", price_id: "price_new",
+            confirmation_token: "ct_1", trial_end: 1.day.ago
+          )
+          assert_equal "succeeded", result.status
+        end
+      end
+    end
+    refute confirm_called, "PaymentIntent.confirm must not be called for a zero-amount invoice"
+  end
 end

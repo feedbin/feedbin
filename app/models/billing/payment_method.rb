@@ -27,7 +27,11 @@ module Billing
     def self.summary(customer_id)
       pm = default_card(customer_id)
       return "No payment info" unless pm
-      "#{pm.card.brand.capitalize} ××#{pm.card.last4[-2..]}"
+      if pm.type == "card" && pm.card
+        "#{pm.card.brand.capitalize} ××#{pm.card.last4[-2..]}"
+      else
+        pm.type.to_s.tr("_", " ").capitalize
+      end
     end
 
     def self.default_card(customer_id)

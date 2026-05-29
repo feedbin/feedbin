@@ -22,7 +22,7 @@ module Billing
     end
 
     def subscription
-      @subscription ||= Stripe::Subscription.list(customer: id, limit: 1, status: "all").data.first
+      @subscription ||= Stripe::Subscription.list(customer: id, limit: 1).data.first
     end
 
     def unpaid?

@@ -22,11 +22,21 @@ class Billing::PaymentMethodTest < ActiveSupport::TestCase
   end
 
   test "summary returns brand and last-2 for the default card" do
-    card = OpenStruct.new(card: OpenStruct.new(brand: "visa", last4: "4242"))
+    card = OpenStruct.new(type: "card", card: OpenStruct.new(brand: "visa", last4: "4242"))
     customer = OpenStruct.new(invoice_settings: OpenStruct.new(default_payment_method: "pm_1"))
     Stripe::Customer.stub(:retrieve, customer) do
       Stripe::PaymentMethod.stub(:retrieve, card) do
         assert_equal "Visa ××42", Billing::PaymentMethod.summary("cus_1")
+      end
+    end
+  end
+
+  test "summary returns the humanized type for a non-card default payment method" do
+    customer = OpenStruct.new(invoice_settings: OpenStruct.new(default_payment_method: "pm_link"))
+    pm = OpenStruct.new(type: "link", card: nil)
+    Stripe::Customer.stub(:retrieve, customer) do
+      Stripe::PaymentMethod.stub(:retrieve, pm) do
+        assert_equal "Link", Billing::PaymentMethod.summary("cus_1")
       end
     end
   end
