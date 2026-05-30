@@ -49,7 +49,9 @@ class HarvestEmbeds
     def perform(ids)
       items = []
 
-      videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
+      videos = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
+      return if videos.safe_dig("items").blank?
+
       channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
       channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
 
