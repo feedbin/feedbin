@@ -1,5 +1,6 @@
 # Points the Stripe gem at a locally-running stripe-mock instance for the test suite.
-# Start stripe-mock before running tests:  stripe-mock -http-port 12111
+# test_helper.rb boots stripe-mock automatically (unless ENV["CI"], where it runs as
+# a service container) and sets STRIPE_MOCK_HOST, so no manual startup is needed.
 module StripeMockServer
   HOST = ENV.fetch("STRIPE_MOCK_HOST", "http://localhost:12111")
 

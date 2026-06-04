@@ -14,8 +14,17 @@ unless ENV["CI"]
   ENV["REDIS_URL"] = "redis://localhost:%d" % port
   redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
 
+  stripe_mock_socket = Socket.new(:INET, :STREAM, 0)
+  stripe_mock_socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+  stripe_mock_port = stripe_mock_socket.local_address.ip_port
+  stripe_mock_socket.close
+
+  ENV["STRIPE_MOCK_HOST"] = "http://localhost:%d" % stripe_mock_port
+  stripe_mock_instance = IO.popen("stripe-mock -http-port %d" % stripe_mock_port)
+
   Minitest.after_run do
     Process.kill("INT", redis_test_instance.pid)
+    Process.kill("INT", stripe_mock_instance.pid)
   end
 end
 

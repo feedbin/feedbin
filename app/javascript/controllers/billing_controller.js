@@ -36,9 +36,13 @@ export default class extends Controller {
   }
 
   planChanged(event) {
-    const amount = parseInt(event.target.dataset.amount, 10)
-    if (amount > 0) {
-      this.elements.update({ amount })
+    // In "setup" mode (future trial) there's no upfront charge, so Elements was
+    // created without an amount and elements.update({ amount }) is rejected.
+    if (this.modeValue !== "setup") {
+      const amount = parseInt(event.target.dataset.amount, 10)
+      if (amount > 0) {
+        this.elements.update({ amount })
+      }
     }
     // Drives which plan's charge description shows, purely via Tailwind reacting
     // to data-billing-selected-plan-value (no classList toggling here).
