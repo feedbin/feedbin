@@ -56,4 +56,12 @@ class UserTest < ActiveSupport::TestCase
 
     assert_equal(ids, @user.can_read_filter(ids))
   end
+
+  test "tier 4 trial user can choose the $7 and $70 plans" do
+    @user.update_columns(price_tier: 4, plan_id: plans(:trial).id)
+
+    stripe_ids = @user.available_plans.map(&:stripe_id)
+
+    assert_equal ["basic-yearly-4", "basic-monthly-4"], stripe_ids
+  end
 end

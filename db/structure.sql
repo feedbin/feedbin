@@ -3040,6 +3040,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260604120000'),
 ('20251027170411'),
 ('20250117094633'),
 ('20240502090914'),

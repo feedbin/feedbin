@@ -51,3 +51,15 @@ podcast_subscription:
   name: Podcast Subscription
   price: 0
   price_tier: 3
+
+basic_monthly_4:
+  stripe_id: basic-monthly-4
+  name: Monthly
+  price: 7
+  price_tier: 4
+
+basic_yearly_4:
+  stripe_id: basic-yearly-4
+  name: Yearly
+  price: 70
+  price_tier: 4
