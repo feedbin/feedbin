@@ -157,16 +157,14 @@ module Settings
               end
 
               row.control do
-                div class: "group", data: stimulus(controller: :extension_link, values: {browser: "chrome"}) do
-                  a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco", class: "button button-secondary tw-hidden group-data-[extension-link-browser-value=chrome]:block" do
-                    "Get for Chrome"
-                  end
-                  a href: "https://apps.apple.com/us/app/feedbin/id1444961766", class: "button button-secondary tw-hidden group-data-[extension-link-browser-value=safari]:block" do
-                    "Get for Safari"
-                  end
-                  a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/", class: "button button-secondary tw-hidden group-data-[extension-link-browser-value=firefox]:block" do
-                    "Get for Firefox"
-                  end
+                a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco", class: "button button-secondary tw-hidden group-data-[browser-name=chrome]/body:block" do
+                  "Get for Chrome"
+                end
+                a href: "https://apps.apple.com/us/app/feedbin/id1444961766", class: "button button-secondary tw-hidden group-data-[browser-name=safari]/body:block" do
+                  "Get for Safari"
+                end
+                a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/", class: "button button-secondary tw-hidden group-data-[browser-name=firefox]/body:block" do
+                  "Get for Firefox"
                 end
               end
             end

@@ -276,4 +276,16 @@ module ApplicationHelper
       "#{minutes}:#{seconds.to_s.rjust(2, '0')}"
     end
   end
+
+  def browser_name
+    agent = request.user_agent.to_s.downcase
+
+    # Order matters: Chrome UAs contain "safari".
+    case agent
+    when /chrome|crios/   then "chrome"
+    when /firefox|fxios/  then "firefox"
+    when /safari/         then "safari"
+    else "chrome"
+    end
+  end
 end

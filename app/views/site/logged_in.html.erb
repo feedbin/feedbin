@@ -21,7 +21,7 @@
     <div class="loading-app">
         <%= svg_tag "logo", inline: true %>
     </div>
-    <div class="app-wrap fade">
+    <div class="app-wrap fade sm:group-data-[browser-name=safari]/body:border-t">
         <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>" data-controller="toolbar" data-toolbar-section-value="feeds-column" data-action="click->toolbar#show">
             <div class="inner-column">
                 <div class="top-toolbar">
