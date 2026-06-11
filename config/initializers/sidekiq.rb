@@ -6,6 +6,7 @@ Sidekiq.strict_args!(false)
 # Sidekiq::Extensions.enable_delay!
 
 Sidekiq.configure_server do |config|
+  config.logger.formatter = Sidekiq::Logger::Formatters::Plain.new
   ActiveRecord::Base.establish_connection
   config.server_middleware do |chain|
     chain.add JobStat
