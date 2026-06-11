@@ -2,11 +2,12 @@ SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
+SET standard_conforming_strings = off;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
+SET escape_string_warning = off;
 SET row_security = off;
 
 --
@@ -34,7 +35,7 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
 -- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
+COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQL statements executed';
 
 
 --
@@ -53,7 +54,7 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 
 SET default_tablespace = '';
 
-SET default_table_access_method = heap;
+SET default_with_oids = false;
 
 --
 -- Name: account_migration_items; Type: TABLE; Schema: public; Owner: -
@@ -922,10 +923,10 @@ CREATE TABLE public.podcast_subscriptions (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     playlist_id bigint,
-    chapter_filter character varying,
-    chapter_filter_type bigint DEFAULT 0 NOT NULL,
     download_filter character varying,
-    download_filter_type bigint DEFAULT 0 NOT NULL
+    download_filter_type bigint DEFAULT 0 NOT NULL,
+    chapter_filter character varying,
+    chapter_filter_type bigint DEFAULT 1 NOT NULL
 );
 
 
@@ -957,7 +958,7 @@ CREATE TABLE public.queued_entries (
     user_id bigint NOT NULL,
     entry_id bigint NOT NULL,
     feed_id bigint NOT NULL,
-    "order" bigint DEFAULT EXTRACT(epoch FROM now()) NOT NULL,
+    "order" bigint DEFAULT date_part('epoch'::text, now()) NOT NULL,
     progress bigint DEFAULT 0 NOT NULL,
     duration bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
