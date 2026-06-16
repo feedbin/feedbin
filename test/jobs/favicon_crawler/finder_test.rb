@@ -124,6 +124,22 @@ module FaviconCrawler
       assert_nil Favicon.unscoped.where(host: @page_url.host).take
     end
 
+    test "should fall through to default location when homepage download errors" do
+      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
+      stub_request(:get, @page_url)
+        .to_timeout
+
+      stub_request_file("favicon.ico", @default_url)
+
+      assert_nothing_raised do
+        Finder.new.perform(@page_url.host)
+      end
+
+      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+    end
+
     test "should fall through to default location when icon download errors" do
       body = <<-eot
       <html>
