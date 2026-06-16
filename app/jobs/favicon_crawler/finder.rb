@@ -75,7 +75,7 @@ module FaviconCrawler
       urls.push(default_favicon_location)
     rescue => exception
       Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@favicon.host}"
-      nil
+      [default_favicon_location]
     end
 
     def default_favicon_location
