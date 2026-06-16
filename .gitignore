@@ -29,6 +29,7 @@ coverage
 !/app/assets/builds/.keep
 .nova
 .zed
+.mcp.json
 
 /config/master.key
 /.worktrees/
