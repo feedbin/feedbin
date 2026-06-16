@@ -17,8 +17,8 @@ module FaviconCrawler
       new_favicon = nil
       all_favicon_urls.each do |url|
         response = download_favicon(url)
-        break if response.not_modified?
         next if response.blank?
+        break if response.not_modified?
         resized = Image.resize(response.path)
         next if resized.blank?
 
