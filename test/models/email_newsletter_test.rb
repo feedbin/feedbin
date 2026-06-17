@@ -54,4 +54,32 @@ class EmailNewsletterTest < ActiveSupport::TestCase
       assert value.valid_encoding?
     end
   end
+
+  test "text and content are nil when a multipart email has no text or html part" do
+    # A multipart message with neither a text/plain nor a text/html part (here,
+    # only an image attachment). Mail::Message#decoded raises NoMethodError on a
+    # multipart message, so the whole-message fallback must not be reached.
+    source = <<~EMAIL
+      From: Ben Ubois <ben@benubois.com>
+      To: token@newsletters.feedbin.com
+      Subject: Multipart with no body
+      Date: Tue, 18 May 2021 14:16:22 -0700
+      Content-Type: multipart/mixed; boundary="boundary"
+
+      --boundary
+      Content-Type: image/png
+      Content-Transfer-Encoding: base64
+      Content-Disposition: attachment; filename="pixel.png"
+
+      iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==
+
+      --boundary--
+    EMAIL
+
+    newsletter = EmailNewsletter.new(Mail.from_source(source), "token")
+
+    assert_nil newsletter.text
+    assert_nil newsletter.html
+    assert_nil newsletter.content
+  end
 end
