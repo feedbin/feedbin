@@ -29,4 +29,29 @@ class EmailNewsletterTest < ActiveSupport::TestCase
 
     assert_equal "token@newsletters.feedbin.com", newsletter.to_email
   end
+
+  test "the body is coerced to valid UTF-8 when it has no usable charset" do
+    # A body with no declared charset and raw high bytes (0xF1 = ñ in Latin-1)
+    # decodes as ASCII-8BIT. valid_encoding? is true for binary, but Postgres
+    # rejects the raw bytes as invalid UTF-8 on INSERT, so the invalid bytes get
+    # replaced with the U+FFFD replacement character.
+    source = <<~EMAIL.dup.force_encoding("ASCII-8BIT")
+      From: Hola <hola@example.com>
+      To: token@newsletters.feedbin.com
+      Subject: Hola
+      Date: Tue, 18 May 2021 14:16:22 -0700
+
+      Espa\xF1a, hello
+    EMAIL
+
+    newsletter = EmailNewsletter.new(Mail.from_source(source), "token")
+
+    assert_equal "Espa�a, hello\r\n", newsletter.text
+    assert_equal "Espa�a, hello\r\n", newsletter.content
+
+    [newsletter.text, newsletter.content].each do |value|
+      assert_equal Encoding::UTF_8, value.encoding
+      assert value.valid_encoding?
+    end
+  end
 end

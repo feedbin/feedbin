@@ -139,4 +139,41 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     feed = Feed.find_by_title("Ben Ubois")
     assert_equal feed.feed_type, "newsletter"
   end
+
+  test "invalid_encoding_attributes names attributes whose strings are not valid UTF-8" do
+    receiver = NewsletterReceiver.new
+    binary = "Pe\xF1a".dup.force_encoding(Encoding::ASCII_8BIT)
+    invalid_utf8 = "Pe\xF1a".dup.force_encoding(Encoding::UTF_8)
+    attributes = {
+      author: "Clean Author",
+      content: binary,
+      published: Time.now,
+      data: {newsletter_text: invalid_utf8, type: "newsletter"}
+    }
+
+    assert_equal ["content", "data.newsletter_text"], receiver.send(:invalid_encoding_attributes, attributes)
+  end
+
+  test "invalid_encoding_attributes is empty when every attribute is valid UTF-8" do
+    receiver = NewsletterReceiver.new
+    attributes = {author: "José", content: "<p>ok</p>", data: {newsletter_text: "fin"}}
+
+    assert_empty receiver.send(:invalid_encoding_attributes, attributes)
+  end
+
+  test "records the failing attributes and re-raises when an entry insert is rejected" do
+    recorded = []
+    rejected_insert = ->(*) { raise ActiveRecord::StatementInvalid, "PG::CharacterNotInRepertoire" }
+
+    ErrorService.stub(:context, ->(params) { recorded << params }) do
+      Entry.stub_any_instance(:save!, rejected_insert) do
+        assert_raises(ActiveRecord::StatementInvalid) do
+          NewsletterReceiver.new.perform(@token, @s3_url_html)
+        end
+      end
+    end
+
+    assert recorded.any? { |params| params.key?(:invalid_encoding_attributes) },
+      "expected ErrorService.context to be given :invalid_encoding_attributes"
+  end
 end
