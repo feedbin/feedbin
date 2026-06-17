@@ -44,11 +44,11 @@ class EmailNewsletter
   end
 
   def text
-    to_utf8(@email.text_part&.decoded || !html? && @email.decoded || nil)
+    to_utf8(@email.text_part&.decoded || (!html? && decoded_body) || nil)
   end
 
   def html
-    to_utf8(@email.html_part&.decoded || html? && @email.decoded || nil)
+    to_utf8(@email.html_part&.decoded || (html? && decoded_body) || nil)
   end
 
   def content
@@ -103,6 +103,12 @@ class EmailNewsletter
     return value unless value.is_a?(String)
     value = value.dup.force_encoding(Encoding::UTF_8) unless value.encoding == Encoding::UTF_8
     value.valid_encoding? ? value : value.scrub
+  end
+
+  # Mail::Message#decoded raises NoMethodError on a multipart message, so only
+  # fall back to the whole-message body when there is a single decodable body.
+  def decoded_body
+    @email.decoded unless @email.multipart?
   end
 
   def html?
