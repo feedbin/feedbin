@@ -24,7 +24,7 @@ class EmailNewsletter
   end
 
   def to_email
-    parsed_to.address
+    parsed_to&.address
   end
 
   def from_name
@@ -110,7 +110,7 @@ class EmailNewsletter
   end
 
   def parsed_to
-    @email[:to].element.addresses.first
+    @email[:to]&.element&.addresses&.first
   end
 
 end
