@@ -140,6 +140,27 @@ class NewsletterReceiver
       feed.entries.create!(attributes).tap do |record|
         NewsletterSaver.perform_async(record.id)
       end
+    rescue ActiveRecord::StatementInvalid
+      ErrorService.context(invalid_encoding_attributes: invalid_encoding_attributes(attributes))
+      raise
     end
+  end
+
+  # Names the attributes whose strings are not valid UTF-8, so the failing
+  # column shows up in the error notice instead of just the raw byte sequence.
+  def invalid_encoding_attributes(attributes)
+    attributes.flat_map do |key, value|
+      if value.is_a?(Hash)
+        value.filter_map { |nested_key, nested_value| "#{key}.#{nested_key}" if invalid_utf8?(nested_value) }
+      elsif invalid_utf8?(value)
+        key.to_s
+      end
+    end.compact
+  end
+
+  def invalid_utf8?(value)
+    return false unless value.is_a?(String)
+    bytes = value.encoding == Encoding::UTF_8 ? value : value.dup.force_encoding(Encoding::UTF_8)
+    !bytes.valid_encoding?
   end
 end

@@ -28,19 +28,19 @@ class EmailNewsletter
   end
 
   def from_name
-    to_utf8(parsed_from.name || from_email)
+    parsed_from.name || from_email
   end
 
   def name
-    to_utf8(parsed_from.name)
+    parsed_from.name
   end
 
   def from
-    to_utf8(parsed_from.decoded)
+    parsed_from.decoded
   end
 
   def subject
-    to_utf8(@email.subject)
+    @email.subject
   end
 
   def text
@@ -90,15 +90,15 @@ class EmailNewsletter
   end
 
   def to_s
-    to_utf8(@email.to_s)
+    @email.to_s
   end
 
   private
 
-  # Email parts can be decoded into strings that are not valid UTF-8 — either
+  # The decoded email body can be a string that is not valid UTF-8 — either
   # tagged ASCII-8BIT with raw high bytes (no usable charset) or tagged UTF-8
   # but containing invalid byte sequences (a body that lies about its charset).
-  # Postgres rejects both on INSERT, so coerce everything to valid UTF-8.
+  # Postgres rejects both on INSERT, so coerce the body to valid UTF-8.
   def to_utf8(value)
     return value unless value.is_a?(String)
     value = value.dup.force_encoding(Encoding::UTF_8) unless value.encoding == Encoding::UTF_8
