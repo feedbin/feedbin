@@ -281,8 +281,7 @@ class Entry < ApplicationRecord
   end
 
   def tweet
-    return @tweet if defined?(@tweet)
-    @tweet =
+    @tweet ||=
       if data.is_a?(Hash) && data["tweet"].is_a?(Hash)
         Tweet.new(data, image) rescue nil
       end
