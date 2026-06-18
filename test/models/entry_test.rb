@@ -111,4 +111,41 @@ class EntryTest < ActiveSupport::TestCase
     })
     assert_equal("Robert Nemiroff and Jerry Bonnell", @entry.reload.author)
   end
+
+  test "tweet? is false for a non-tweet entry" do
+    @entry.data = {"enclosure_url" => "http://example.com/a.mp3"}
+    refute @entry.tweet?
+    assert_nil @entry.tweet
+  end
+
+  test "tweet? is false when data is nil" do
+    @entry.data = nil
+    refute @entry.tweet?
+    assert_nil @entry.tweet
+  end
+
+  test "accessing tweet on a non-tweet entry raises no exceptions" do
+    @entry.data = {"enclosure_url" => "http://example.com/a.mp3"}
+
+    raised = 0
+    tp = TracePoint.new(:raise) do |t|
+      raised += 1 if t.path.end_with?("app/models/tweet.rb", "app/models/entry.rb")
+    end
+    # Mirror the render path, which touches tweet?/tweet many times per entry.
+    tp.enable { 10.times { @entry.tweet?; @entry.tweet } }
+    tp.disable
+
+    assert_equal 0, raised, "expected no exceptions building tweet for a non-tweet entry"
+  end
+
+  test "tweet? is true and tweet is built for a tweet entry" do
+    @entry.data = {"tweet" => load_tweet("one")}
+    assert @entry.tweet?
+    assert_instance_of Tweet, @entry.tweet
+  end
+
+  test "tweet is memoized across calls" do
+    @entry.data = {"tweet" => load_tweet("one")}
+    assert_same @entry.tweet, @entry.tweet
+  end
 end

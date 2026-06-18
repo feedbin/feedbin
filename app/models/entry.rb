@@ -281,7 +281,11 @@ class Entry < ApplicationRecord
   end
 
   def tweet
-    @tweet ||= Tweet.new(data, image) rescue nil
+    return @tweet if defined?(@tweet)
+    @tweet =
+      if data.is_a?(Hash) && data["tweet"].is_a?(Hash)
+        Tweet.new(data, image) rescue nil
+      end
   end
 
   def json_feed
