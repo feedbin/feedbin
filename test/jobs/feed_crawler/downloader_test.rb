@@ -176,6 +176,15 @@ module FeedCrawler
       assert_equal(2, @feed.reload.crawl_data.error_count)
     end
 
+    def test_should_handle_error_with_nil_response
+      url = "http://example.com/atom.xml"
+      Feedkit::Request.stub(:download, ->(*) { raise Feedkit::ServerError.new("500 Internal Server Error", nil) }) do
+        assert_nothing_raised do
+          Downloader.new.perform(1, url, 10, {})
+        end
+      end
+    end
+
     def test_should_follow_redirects
       first_url = "http://www.example.com"
       last_url = "#{first_url}/final"
