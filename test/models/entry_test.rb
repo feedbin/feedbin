@@ -103,6 +103,19 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal("http://daringfireball.net/test", @entry.fully_qualified_url)
   end
 
+  test "rebase_url returns a String for absolute urls" do
+    result = @entry.rebase_url("http://example.com/podcast.mp3")
+    assert_instance_of String, result
+    assert_equal("http://example.com/podcast.mp3", result)
+  end
+
+  test "rebase_url returns a String for relative urls" do
+    @entry.url = "http://daringfireball.net/episode"
+    result = @entry.rebase_url("/podcast.mp3")
+    assert_instance_of String, result
+    assert_equal("http://daringfireball.net/podcast.mp3", result)
+  end
+
   test "should use JSON feed author" do
     @entry.update(data: {
       json_feed: {

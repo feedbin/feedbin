@@ -119,7 +119,7 @@ class Entry < ApplicationRecord
 
     base = Addressable::URI.heuristic_parse(fully_qualified_url)
     original_url = Addressable::URI.heuristic_parse(original_url)
-    Addressable::URI.join(base, original_url)
+    Addressable::URI.join(base, original_url).to_s
   rescue Addressable::URI::InvalidURIError
     Rails.logger.error("Invalid uri original_url=#{original_url} fully_qualified_url=#{fully_qualified_url}")
     nil
