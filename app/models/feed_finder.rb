@@ -58,7 +58,10 @@ class FeedFinder
     else
       Rails.logger.error exception.message
       Rails.logger.error exception.backtrace.join("\n")
-      ErrorService.notify(exception)
+      # Feedkit::Error means the user's URL itself failed to fetch/parse
+      # (connection refused, 4xx/5xx, timeout, SSL, etc). That's an expected
+      # upstream condition, not a bug, so log it but don't report it.
+      ErrorService.notify(exception) unless exception.is_a?(Feedkit::Error)
       feeds
     end
   end
