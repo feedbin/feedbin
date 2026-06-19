@@ -12,9 +12,15 @@ class StarredEntry < ApplicationRecord
   end
 
   def self.create_from_owners(user, entry, source = nil)
-    result = new_from_owners(user, entry, source)
-    result.save
-    result
+    # Look up / insert by the columns the unique index covers so that a
+    # concurrent request which wins the race is recovered via find_by rather
+    # than raising RecordNotUnique. The remaining attributes are only applied
+    # on the create path.
+    create_or_find_by(user_id: user.id, entry_id: entry.id) do |starred_entry|
+      starred_entry.feed_id = entry.feed_id
+      starred_entry.published = entry.published
+      starred_entry.source = source
+    end
   end
 
   def expire_caches
