@@ -12,7 +12,15 @@ class UnreadEntry < ApplicationRecord
   end
 
   def self.create_from_owners(user, entry)
-    new_from_owners(user, entry).save
+    # Look up / insert by the columns the unique index covers so that a
+    # concurrent request which wins the race is recovered via find_by rather
+    # than raising RecordNotUnique. The remaining attributes are only applied
+    # on the create path.
+    create_or_find_by(user_id: user.id, entry_id: entry.id) do |unread_entry|
+      unread_entry.feed_id = entry.feed_id
+      unread_entry.published = entry.published
+      unread_entry.entry_created_at = entry.created_at
+    end
   end
 
   def self.sort_preference(sort)
