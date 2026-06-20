@@ -22,7 +22,7 @@ class UrlCache
 
   def result
     @body, @headers = Rails.cache.fetch(cache_key) {
-      request = HTTP.timeout(write: 5, connect: 5, read: 10).follow(max_hops: 5).get(url, options)
+      request = HTTP.timeout(write: 5, connect: 5, read: 10).follow(max_hops: 5).get(url, **options)
       [request.to_s, request.headers.to_h]
     }
   end

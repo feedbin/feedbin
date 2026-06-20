@@ -29,7 +29,7 @@ module ImageCrawler
             fields: "thumbnail_url"
           }
         }
-        JSON.load(HTTP.get(OEMBED_URL, options).to_s)
+        JSON.load(HTTP.get(OEMBED_URL, **options).to_s)
       end
     end
   end

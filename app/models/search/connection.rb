@@ -143,7 +143,7 @@ module Search
       unless path.start_with?("/")
         path = "/#{path}"
       end
-      connection.request(method.to_sym, path, options).parse
+      connection.request(method.to_sym, path, **options).parse
     end
 
     def close
