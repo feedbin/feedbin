@@ -77,9 +77,12 @@ The change is mechanical — wrap each existing index reference:
 - `app/models/concerns/searchable.rb` — `msearch`, `validate`, `search` (3 sites)
 - `app/models/feed_search.rb` — `search(...)`
 
-**Tests**
-- `test/jobs/search/search_server_setup_test.rb:36` — queries ES by
-  `Entry.table_name` directly; gets the same wrap.
+**Tests** — several search tests query ES directly by `Model.table_name` and
+get the same wrap:
+- `test/jobs/search/search_server_setup_test.rb:36` — `search(Entry.table_name)`
+- `test/jobs/search/search_index_store_test.rb:14` — `get(Entry.table_name)`
+- `test/jobs/search/search_index_remove_test.rb:13` — `count(Entry.table_name)`
+- `test/jobs/search/reindex_feeds_test.rb:13,17` — `get_indexes_from_alias(Feed.table_name)`
 - `test/test_helper.rb`'s `clear_search` already routes through the prefixed
   `$search[:config][:aliases]` hash, so it needs **no** change.
 
