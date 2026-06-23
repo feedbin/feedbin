@@ -10,11 +10,11 @@ module Search
     end
 
     test "should reindex feeds" do
-      before = Search.client {_1.get_indexes_from_alias(Feed.table_name)}
+      before = Search.client {_1.get_indexes_from_alias(Search.index_name(Feed.table_name))}
       ReindexFeeds.new.perform
       Search.client { _1.refresh }
 
-      after = Search.client {_1.get_indexes_from_alias(Feed.table_name)}
+      after = Search.client {_1.get_indexes_from_alias(Search.index_name(Feed.table_name))}
       results = Feed.search(@feeds.first.title)
 
       assert after.length == 1

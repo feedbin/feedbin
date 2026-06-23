@@ -12,7 +12,7 @@ module Search
     end
 
     def index(entry, document)
-      Search.client(mirror: true) { _1.index(Entry.table_name, id: entry.id, document: document) }
+      Search.client(mirror: true) { _1.index(Search.index_name(Entry.table_name), id: entry.id, document: document) }
     end
 
     def percolate(entry, document, update)
@@ -39,7 +39,7 @@ module Search
         }
       }
 
-      ids = Search.client { _1.all_matches(Action.table_name, query: query) }
+      ids = Search.client { _1.all_matches(Search.index_name(Action.table_name), query: query) }
       if ids.present?
         ActionsPerform.perform_async(entry.id, ids, update)
       end

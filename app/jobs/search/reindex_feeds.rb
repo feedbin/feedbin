@@ -4,7 +4,7 @@ module Search
 
     def perform
       Search.client(mirror: true) do |client|
-        client.reindex(Feed.table_name, mappings: $search[:config][:mappings][:feeds]) do |new_index|
+        client.reindex(Search.index_name(Feed.table_name), mappings: $search[:config][:mappings][:feeds]) do |new_index|
           reindex(new_index)
         end
       end

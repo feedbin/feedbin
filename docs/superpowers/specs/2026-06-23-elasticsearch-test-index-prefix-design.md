@@ -76,6 +76,15 @@ The change is mechanical — wrap each existing index reference:
 **Models**
 - `app/models/concerns/searchable.rb` — `msearch`, `validate`, `search` (3 sites)
 - `app/models/feed_search.rb` — `search(...)`
+- `app/models/action.rb` — `validate`, `search`, and `_percolator`'s `get(...)` (3 sites)
+
+**Controllers**
+- `app/controllers/entries_controller.rb` — `all_matches(...)` in `matched_search_ids`
+
+> Enumerate index references repo-wide, not just under `app/jobs/search` and the
+> search models. The `action.rb` and `entries_controller.rb` sites are easy to
+> miss; the full search suite (`test/models/action_test.rb` percolator tests in
+> particular) is what catches an incomplete wrap.
 
 **Tests** — several search tests query ES directly by `Model.table_name` and
 get the same wrap:

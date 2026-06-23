@@ -11,7 +11,7 @@ module Search
     test "should index entry" do
       SearchIndexStore.new.perform("Entry", @entry.id)
       Search.client { _1.refresh }
-      entry = Search.client { _1.get(Entry.table_name, id: @entry.id) }
+      entry = Search.client { _1.get(Search.index_name(Entry.table_name), id: @entry.id) }
       assert entry["found"]
     end
 

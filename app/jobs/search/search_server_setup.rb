@@ -12,7 +12,7 @@ module Search
       records = entries.map do |entry|
         Search::BulkRecord.new(
           action: :index,
-          index: Entry.table_name,
+          index: Search.index_name(Entry.table_name),
           id: entry.id,
           document: entry.search_data
         )

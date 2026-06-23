@@ -198,9 +198,9 @@ Rails.application.reloader.to_prepare do
         feeds: feeds_mapping
       },
       aliases: {
-        entries: "#{Entry.table_name}-01",
-        actions: "#{Action.table_name}-01",
-        feeds: "#{Feed.table_name}-01"
+        entries: "#{Search.index_name(Entry.table_name)}-01",
+        actions: "#{Search.index_name(Action.table_name)}-01",
+        feeds: "#{Search.index_name(Feed.table_name)}-01"
       }
     }
   end
@@ -220,9 +220,9 @@ Rails.application.reloader.to_prepare do
         Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:actions], json: $search[:config][:mappings][:actions]) }
         Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:feeds], json: $search[:config][:mappings][:feeds]) }
 
-        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:entries], alias_name: Entry.table_name) }
-        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:actions], alias_name: Action.table_name) }
-        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:feeds], alias_name: Feed.table_name) }
+        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:entries], alias_name: Search.index_name(Entry.table_name)) }
+        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:actions], alias_name: Search.index_name(Action.table_name)) }
+        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:feeds], alias_name: Search.index_name(Feed.table_name)) }
       rescue => exception
         Rails.logger.error("---------------------------")
         Rails.logger.error("Error initializing search: #{exception.inspect}")
