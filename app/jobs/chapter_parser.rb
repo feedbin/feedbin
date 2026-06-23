@@ -28,7 +28,7 @@ class ChapterParser
     response.body.each do |chunk|
       tempfile.write(chunk)
       chunk.clear
-      if !response[:content_range] && tempfile.size > MAX_SIZE
+      if !response.headers[:content_range] && tempfile.size > MAX_SIZE
         break
       end
     end
