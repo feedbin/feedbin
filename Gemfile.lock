@@ -24,7 +24,7 @@ GIT
 GIT
   remote: https://github.com/feedbin/feedkit.git
   revision: 74dcbde9214c710bddb20bee88b3b9ecde9b90df
-  branch: http6
+  branch: master
   specs:
     feedkit (0.1.0)
       addressable (~> 2.8.0)
@@ -102,7 +102,7 @@ GIT
 GIT
   remote: https://github.com/feedbin/twitter.git
   revision: 72251c068289044108f194ace4e60748aa691b92
-  branch: http6
+  branch: feedbin
   specs:
     twitter (7.0.0)
       addressable (~> 2.3)
