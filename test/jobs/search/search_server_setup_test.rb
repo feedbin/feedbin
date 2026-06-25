@@ -33,7 +33,7 @@ module Search
           }
         }
       }
-      assert_equal @entries.count, Search.client { _1.search(Entry.table_name, query: query) }.total
+      assert_equal @entries.count, Search.client { _1.search(Search.index_name(Entry.table_name), query: query) }.total
     end
 
     test "should touch actions" do

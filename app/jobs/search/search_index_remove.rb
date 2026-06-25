@@ -6,7 +6,7 @@ module Search
       records = ids.map do |id|
         Search::BulkRecord.new(
           action: :delete,
-          index: Entry.table_name,
+          index: Search.index_name(Entry.table_name),
           id: id,
           document: nil
         )

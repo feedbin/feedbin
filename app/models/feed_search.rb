@@ -22,7 +22,7 @@ class FeedSearch
         }
       }
     }
-    response = Search.client { _1.search(Feed.table_name, query: query, per_page: 3) }
+    response = Search.client { _1.search(Search.index_name(Feed.table_name), query: query, per_page: 3) }
     response.records(Feed)
   end
 end

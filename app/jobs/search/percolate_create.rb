@@ -11,7 +11,7 @@ module Search
       elsif empty_notifier_action?
         percolate_destroy
       else
-        Search.client(mirror: true) { _1.index(Action.table_name, id: @action.id, document: @action.search_body) }
+        Search.client(mirror: true) { _1.index(Search.index_name(Action.table_name), id: @action.id, document: @action.search_body) }
       end
     end
 
