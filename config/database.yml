@@ -15,3 +15,6 @@ test:
   username: <%= ENV['POSTGRES_USERNAME'] %>
   password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
   host: <%= ENV.fetch('POSTGRES_HOST', 'localhost') %>
+  # Avoid libpq GSSAPI/krb5 state that segfaults in forked parallel-test
+  # workers: https://notes.max.engineer/ruby-pg-gem-segfault
+  gssencmode: disable

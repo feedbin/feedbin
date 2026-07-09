@@ -4,8 +4,6 @@ module Search
     include SidekiqHelper
     sidekiq_options queue: :search_index
 
-    Client = $search[:servers][:secondary] || $search[:servers][:primary]
-
     def perform(batch)
       ids = build_ids(batch)
       entries = Entry.where(id: ids).includes(:feed)
@@ -17,7 +15,7 @@ module Search
           document: entry.search_data
         )
       end
-      Client.with { _1.bulk(records) } unless records.empty?
+      client.with { _1.bulk(records) } unless records.empty?
     end
 
     def build
@@ -35,6 +33,12 @@ module Search
       rescue
         nil
       end
+    end
+
+    private
+
+    def client
+      $search[:servers][:secondary] || $search[:servers][:primary]
     end
   end
 end

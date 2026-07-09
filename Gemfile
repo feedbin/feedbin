@@ -90,7 +90,10 @@ group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
   gem "capybara", github: "teamcapybara/capybara"
-  gem "debug"
+  # Load only the prelude so binding.break works without starting a debugger
+  # session during Rails boot. The full session installs fork/at_exit hooks
+  # that can wait on test child processes such as the local redis-server.
+  gem "debug", require: "debug/prelude"
   gem "faker"
   gem "minitest"
   gem "minitest-mock"
@@ -103,4 +106,3 @@ group :development, :test do
   gem "simplecov"
   gem "puma"
 end
-

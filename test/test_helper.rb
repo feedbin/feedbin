@@ -3,6 +3,7 @@ ENV["RAILS_ENV"] ||= "test"
 require "minitest"
 require "minitest/mock"
 require "socket"
+require "uri"
 require "connection_pool"
 
 unless ENV["CI"]
@@ -12,19 +13,29 @@ unless ENV["CI"]
   socket.close
 
   ENV["REDIS_URL"] = "redis://localhost:%d" % port
-  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
+  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no --databases 32" % port)
 
+  redis_parent_pid = Process.pid
   Minitest.after_run do
-    Process.kill("INT", redis_test_instance.pid)
+    Process.kill("INT", redis_test_instance.pid) if Process.pid == redis_parent_pid
   end
 end
 
-$redis = {
-  entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
-  refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) }
-}
+REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path = "" }.to_s
 
 require File.expand_path("../../config/environment", __FILE__)
+
+# MakeEpub's cover generation renders text with libvips, which on macOS
+# lazily loads the CoreText backend on first use and triggers a one-time
+# +[UIFontDescriptor initialize]. If that class-init is still running on a
+# background thread the moment parallelize() below forks a worker, the
+# child crashes the instant *it* touches the same class post-fork ("may
+# have been in progress in another thread when fork() was called" -- macOS's
+# objc runtime refuses to safely continue). Forcing the same call here,
+# synchronously, in the single-threaded parent before any fork happens
+# retires that one-time init early and removes the race. No-op cost on
+# Linux CI (no objc runtime, but also nothing to warm).
+Vips::Image.text("warmup", font: "Helvetica Bold 16") if RbConfig::CONFIG["host_os"].include?("darwin")
 
 require "rails/test_help"
 require "sidekiq/testing"
@@ -46,6 +57,36 @@ Sidekiq.logger.level = Logger::WARN
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
+
+  parallelize(workers: :number_of_processors)
+
+  parallelize_setup do |worker|
+    ENV["TEST_WORKER"] = worker.to_s
+    ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker}"
+
+    load Rails.root.join("config/initializers/redis.rb")
+    Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
+    Sidekiq.default_configuration.redis = {url: ENV["REDIS_URL"]}
+
+    Search.configure!
+    Search.setup
+  end
+
+  parallelize_teardown do
+    Search.client do |client|
+      # Search::ReindexFeeds swaps an alias's -01 index for a timestamped one,
+      # so delete whatever indexes the worker's aliases point at now, then the
+      # original physical names in case an index lost its alias.
+      [Entry, Action, Feed].each do |model|
+        client.get_indexes_from_alias(Search.index_name(model.table_name)).each do |index|
+          client.delete_index(index)
+        end
+      end
+      $search[:config][:aliases].each_value do |index|
+        client.delete_index(index)
+      end
+    end
+  end
 
   fixtures :all
 
