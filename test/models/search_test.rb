@@ -26,6 +26,17 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal "#{prefix}-feeds-01", $search[:config][:aliases][:feeds]
   end
 
+  test "configure! rebuilds the search config from the current environment" do
+    with_test_worker("99") do
+      Search.configure!
+      assert_equal "test-99-entries-01", $search[:config][:aliases][:entries]
+      assert_equal "test-99-actions-01", $search[:config][:aliases][:actions]
+      assert_equal "test-99-feeds-01", $search[:config][:aliases][:feeds]
+    end
+  ensure
+    Search.configure!
+  end
+
   private
 
   def with_test_worker(number)
