@@ -37,8 +37,9 @@ require "test_helper"
 
 class SearchTest < ActiveSupport::TestCase
   test "prefixes the base name in the test environment" do
-    expected = ["test", ENV["TEST_WORKER"], "entries"].compact.join("-")
-    assert_equal expected, Search.index_name("entries")
+    with_test_worker(nil) do
+      assert_equal "test-entries", Search.index_name("entries")
+    end
   end
 
   test "includes the parallel worker number when TEST_WORKER is set" do
@@ -72,7 +73,7 @@ class SearchTest < ActiveSupport::TestCase
 end
 ```
 
-Notes on why these shapes: the first and fourth tests compute their expectation from `ENV["TEST_WORKER"]` because once Task 5 lands, this file itself runs inside workers where the var is set. The second test pins the exact worker format deterministically.
+Notes on why these shapes: the worker-format tests pin exact values deterministically by forcing `TEST_WORKER` through the helper (`ENV["X"] = nil` deletes the key in Ruby, so `with_test_worker(nil)` tests the unset path even when the suite itself later runs inside a worker). The alias-config test must compute its prefix from the ambient `ENV["TEST_WORKER"]` because `$search` is built from whatever the current process's env actually is — under Task 5 that's the worker number.
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -183,7 +184,6 @@ Restructure it so all the config-building locals and the `$search` assignment mo
 Rails.application.reloader.to_prepare do
   module Search
     def configure!
-      defaults = { ... }                    # moved verbatim
       exact_field = { ... }                 # moved verbatim
       shared_settings = { ... }             # moved verbatim
       entries_mapping = { ... }             # moved verbatim
@@ -217,7 +217,7 @@ end
 
 The trailing `ActiveSupport::Notifications.subscribe` block at the bottom of the file stays untouched.
 
-Note: the `defaults` local (ES client logging/ssl options) is dead code in the current file — nothing below its definition references it (the `ConnectionPool` blocks construct `Search::Connection` directly). Move it into `configure!` unchanged anyway; this task is a mechanical verbatim move, not a cleanup.
+Note: the `defaults` local (ES client logging/ssl options, currently the first thing in the `to_prepare` block) is dead code — nothing references it; the `ConnectionPool` blocks construct `Search::Connection` directly. Delete it rather than moving it. Everything else moves verbatim.
 
 - [ ] **Step 4: Run test to verify it passes**
 
