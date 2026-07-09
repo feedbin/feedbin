@@ -10,6 +10,8 @@ end
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :cuprite
 
+  parallelize(workers: 1)
+
   def login_as(user)
     visit login_path
     fill_in "Email", with: user.email

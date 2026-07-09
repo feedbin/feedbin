@@ -1,8 +1,16 @@
 ENV["RAILS_ENV"] ||= "test"
 
+# Keep the debug gem in lazy (prelude) mode. Its full session intercepts fork
+# and registers an at_exit in the parallel-test parent that waits on *any*
+# child process (debug/local.rb, after_fork_parent). The redis-server spawned
+# below is such a child, so the suite would hang at exit. binding.break still
+# activates the session on demand.
+ENV["RUBY_DEBUG_LAZY"] ||= "1"
+
 require "minitest"
 require "minitest/mock"
 require "socket"
+require "uri"
 require "connection_pool"
 
 unless ENV["CI"]
@@ -12,17 +20,15 @@ unless ENV["CI"]
   socket.close
 
   ENV["REDIS_URL"] = "redis://localhost:%d" % port
-  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
+  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no --databases 32" % port)
 
+  redis_parent_pid = Process.pid
   Minitest.after_run do
-    Process.kill("INT", redis_test_instance.pid)
+    Process.kill("INT", redis_test_instance.pid) if Process.pid == redis_parent_pid
   end
 end
 
-$redis = {
-  entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
-  refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) }
-}
+REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path = "" }.to_s
 
 require File.expand_path("../../config/environment", __FILE__)
 
@@ -46,6 +52,36 @@ Sidekiq.logger.level = Logger::WARN
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
+
+  parallelize(workers: :number_of_processors)
+
+  parallelize_setup do |worker|
+    ENV["TEST_WORKER"] = worker.to_s
+    ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker}"
+
+    load Rails.root.join("config/initializers/redis.rb")
+    Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
+    Sidekiq.default_configuration.redis = {url: ENV["REDIS_URL"]}
+
+    Search.configure!
+    Search.setup
+  end
+
+  parallelize_teardown do
+    Search.client do |client|
+      # Search::ReindexFeeds swaps an alias's -01 index for a timestamped one,
+      # so delete whatever indexes the worker's aliases point at now, then the
+      # original physical names in case an index lost its alias.
+      [Entry, Action, Feed].each do |model|
+        client.get_indexes_from_alias(Search.index_name(model.table_name)).each do |index|
+          client.delete_index(index)
+        end
+      end
+      $search[:config][:aliases].each_value do |index|
+        client.delete_index(index)
+      end
+    end
+  end
 
   fixtures :all
 
