@@ -37,6 +37,30 @@ class FeedImporterTest < ActiveSupport::TestCase
     assert_equal("failed", import_item.reload.status)
   end
 
+  test "should complete import when last item hits RecordNotUnique" do
+    feed = feeds(:daring_fireball)
+    feed.stub(:tag, ->(*) { raise ActiveRecord::RecordNotUnique }) do
+      FeedFinder.stub(:feeds, [feed]) do
+        FeedImporter.new.perform(@import_item.id)
+      end
+    end
+    assert_equal("complete", @import_item.reload.status)
+    assert @import_item.import.reload.complete?
+  end
+
+  test "should complete import when last item fails unexpectedly" do
+    feed = feeds(:daring_fireball)
+    feed.stub(:tag, ->(*) { raise "boom" }) do
+      FeedFinder.stub(:feeds, [feed]) do
+        assert_raises(RuntimeError) do
+          FeedImporter.new.perform(@import_item.id)
+        end
+      end
+    end
+    assert_equal("failed", @import_item.reload.status)
+    assert @import_item.import.reload.complete?
+  end
+
   test "should title subscription" do
     FeedImporter.new.perform(@import_item.id)
     feed = Feed.where(feed_url: @import_item.details[:xml_url]).take!

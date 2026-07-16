@@ -29,16 +29,17 @@ class FeedImporter
       end
     end
 
-    import.with_lock do
+  rescue ActiveRecord::RecordNotUnique
+    @import_item.complete!
+  rescue => exception
+    @import_item&.failed!
+    raise exception
+  ensure
+    import&.with_lock do
       unless import.import_items.where(status: :pending).exists?
         import.update(complete: true)
       end
     end
-  rescue ActiveRecord::RecordNotUnique
-    @import_item.complete!
-  rescue => exception
-    @import_item.failed!
-    raise exception
   end
 
   def discover_feeds
