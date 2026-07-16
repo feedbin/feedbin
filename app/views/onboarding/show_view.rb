@@ -142,13 +142,13 @@ module Onboarding
               "Create email addresses for newsletter subscriptions"
             end
           end
-          a href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco", class: "button button-secondary text-center tw-hidden group-data-[browser-name=chrome]/body:block" do
+          a target: "_blank", href: "https://chromewebstore.google.com/detail/feedbin-subscribe-save/dokieklajbcljjhhaabkjceopenlimco", class: "button button-secondary text-center tw-hidden group-data-[browser-name=chrome]/body:block" do
             "Get for Chrome"
           end
-          a href: "https://apps.apple.com/us/app/feedbin/id1444961766", class: "button button-secondary text-center tw-hidden group-data-[browser-name=safari]/body:block" do
+          a target: "_blank", href: "https://apps.apple.com/us/app/feedbin/id1444961766", class: "button button-secondary text-center tw-hidden group-data-[browser-name=safari]/body:block" do
             "Get for Safari"
           end
-          a href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/", class: "button button-secondary text-center tw-hidden group-data-[browser-name=firefox]/body:block" do
+          a target: "_blank", href: "https://addons.mozilla.org/en-US/firefox/addon/feedbin-subscribe-save/", class: "button button-secondary text-center tw-hidden group-data-[browser-name=firefox]/body:block" do
             "Get for Firefox"
           end
 
