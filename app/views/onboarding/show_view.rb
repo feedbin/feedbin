@@ -126,7 +126,7 @@ module Onboarding
             "Get the Extension"
           end
 
-          img src: asset_path("extension-promo"), class: "rounded"
+          img src: asset_path("extension-promo.png"), class: "rounded"
 
           div class: "font-bold" do
             "Subscribe to feeds, newsletters, and save pages to Feedbin"
