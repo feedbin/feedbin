@@ -19,6 +19,8 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::CollectionCheckBoxes
   include Phlex::Rails::Helpers::PasswordFieldTag
   include Phlex::Rails::Helpers::Truncate
+  include Phlex::Rails::Helpers::ImageTag
+  include Phlex::Rails::Helpers::AssetPath
 
   register_value_helper :bookmarklet
   register_value_helper :class_names
@@ -79,7 +81,7 @@ class ApplicationComponent < Phlex::HTML
     end
   end
 
-  def stimulus(controller:, actions: {}, values: {}, outlets: {}, classes: {}, data: {})
+  def stimulus(controller:, actions: {}, values: {}, outlets: {}, classes: {}, target: {}, data: {})
     stimulus_controller = controller.to_s.dasherize
 
     action = actions.map do |event, function|
@@ -98,7 +100,11 @@ class ApplicationComponent < Phlex::HTML
       [controller, key, "class"].join("_").to_sym
     end
 
-    { controller: stimulus_controller, action: }.merge!({ **values, **outlets, **classes, **data})
+    target = if target.present?
+      {:"#{controller}_target" => target.to_s.camelize(:lower)}
+    end
+
+    { controller: stimulus_controller, action: }.merge!({ **values, **outlets, **classes, **target, **data })
   end
 
   def stimulus_item(target: nil, actions: {}, params: {}, data: {}, for:)

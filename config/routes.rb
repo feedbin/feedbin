@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   constraints lambda { |request| Rails.env.development? } do
     get :auto_sign_in, to: "site#auto_sign_in"
+    get :onboarding, to: "onboarding#show"
   end
 
   get :health_check, to: proc { |env| [200, {}, ["OK"]] }
@@ -198,6 +199,9 @@ Rails.application.routes.draw do
       member do
         post :replace_all
       end
+      collection do
+        post :create_remote
+      end
     end
 
     resources :import_items, only: [:update]
@@ -276,6 +280,14 @@ Rails.application.routes.draw do
       match "*path",                to: "api#options",          via: :options
     end
   end
+
+  resource :onboarding, only: [:update], controller: "onboarding"
+
+  namespace :onboarding do
+    resources :imports, only: [:show, :create]
+    resource :subscriptions, only: [:update]
+  end
+
 
   constraints subdomain: "api" do
     namespace :api, path: nil do

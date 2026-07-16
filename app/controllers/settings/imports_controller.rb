@@ -17,7 +17,7 @@ class Settings::ImportsController < ApplicationController
     respond_to do |format|
       format.js
       format.html do
-        render Settings::Imports::ShowView.new(import: @import), layout: "settings"
+        render Settings::Imports::ShowView.new(import: @import, content_src: settings_import_path(@import)), layout: "settings"
       end
     end
   end
@@ -55,6 +55,9 @@ class Settings::ImportsController < ApplicationController
       import_item.complete!
       FeedImportFixer.perform_async(@user.id, import_item.id)
     end
-    redirect_to settings_import_url(@import), notice: "Imports replaced."
+    respond_to do |format|
+      format.html { redirect_to settings_import_url(@import), notice: "Imports replaced." }
+      format.js { }
+    end
   end
 end

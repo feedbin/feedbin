@@ -2,14 +2,15 @@ module Settings
   module ImportItems
     class ImportItemComponent < ApplicationComponent
 
-      def initialize(import_item:)
+      def initialize(import_item:, import_items:)
         @import_item = import_item
+        @import_items = import_items
       end
 
       def view_template
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
-            div class: "border rounded-lg mb-4 px-4 pb-4" do
+            div class: (@import_item != @import_items.last ? "mb-8 pb-8 border-b" : "") do
               if @import_item.discovered_feeds.present?
                 render FixFeeds::SuggestionComponent.new(replaceable: @import_item, source: @import_item, redirect: fix_feeds_url)
               else
@@ -22,7 +23,7 @@ module Settings
                       link_to @import_item.details[:title] || "Untitled", @import_item.details[:html_url], target: "_blank", class: "!text-600"
                     end
                     feed.subhead do
-                      a(href: @import_item.details[:xml_url], class: "!text-500 truncate" ) do
+                      a(href: @import_item.details[:xml_url], class: "!text-500 truncate", target: :blank) do
                         short_url(@import_item.details[:xml_url])
                       end
                     end

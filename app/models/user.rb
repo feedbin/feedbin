@@ -56,7 +56,8 @@ class User < ApplicationRecord
     :floaty,
     :feed_search,
     :password_resettable,
-    :mute_filter_available
+    :mute_filter_available,
+    :needs_onboarding
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -149,6 +150,7 @@ class User < ApplicationRecord
     self.font = "default"
     self.font_size = 5
     self.price_tier = Feedbin::Application.config.price_tier
+    self.needs_onboarding = "1"
   end
 
   def with_params(params)

@@ -1,19 +1,29 @@
 module Settings
   module Imports
     class ShowView < ApplicationView
-      def initialize(import:)
+
+      slots :header
+
+      def initialize(import:, content_src:, onboarding: false)
         @import = import
+        @onboarding = onboarding
+        @content_src = content_src
       end
 
       def view_template
-        render Settings::H1Component.new do
-          "Import Status"
+        if header?
+          render &@header
+        else
+          render Settings::H1Component.new do
+            "Import Status"
+          end
+          render SubtitleComponent.new do
+            @import.created_at.to_formatted_s(:date)
+          end
         end
-        render SubtitleComponent.new do
-          @import.created_at.to_formatted_s(:date)
-        end
-        div data: @import.complete? ? {} : {content_src: settings_import_path(@import)} do
-          render Settings::Imports::StatusComponent.new import: @import
+
+        div data: @import.complete? ? {} : {content_src: @content_src}, class: "pb-4" do
+          render Settings::Imports::StatusComponent.new import: @import, onboarding: @onboarding
         end
       end
     end
