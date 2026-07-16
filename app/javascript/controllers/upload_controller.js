@@ -7,6 +7,7 @@ export default class extends Controller {
     dragging: Boolean,
     dropped: Boolean,
     error: Boolean,
+    uploading: Boolean,
   }
 
   connect() {
@@ -21,6 +22,11 @@ export default class extends Controller {
   dragOver(event) {
     event.preventDefault()
     event.stopPropagation()
+
+    if (this.uploadingValue) {
+      return
+    }
+
     event.dataTransfer.dropEffect = "copy"
     this.draggingValue = true
   }
@@ -49,7 +55,7 @@ export default class extends Controller {
   }
 
   chooseFile(event) {
-    if (this.hasFileInputTarget) {
+    if (this.hasFileInputTarget && !this.uploadingValue) {
       this.fileInputTarget.click()
     }
   }
@@ -66,6 +72,7 @@ export default class extends Controller {
   }
 
   error(message) {
+    this.uploadingValue = false
     this.errorValue = true
     this.errorMessageTarget.textContent = message
     setTimeout(() => {
@@ -74,6 +81,10 @@ export default class extends Controller {
   }
 
   handleFiles(file) {
+    if (this.uploadingValue) {
+      return
+    }
+
     const maxSize = 500 * 1024
     if (file.size > maxSize) {
       this.error("File is too large. Maximum size is 500KB.")
@@ -91,6 +102,7 @@ export default class extends Controller {
 
       this.filenameFieldTarget.value = file.name
       this.xmlFieldTarget.value = text
+      this.uploadingValue = true
       window.$(this.formTarget).submit()
       this.dispatch("uploaded")
     }

@@ -3,4 +3,5 @@ $("[data-content-src='<%= j onboarding_import_path(@import) %>']").html("<%= j r
 feedbin.faviconColors()
 <% if @import.complete? %>
 clearInterval(feedbin.remoteContentIntervals["<%= j request.path_info %>"]);
+window.feedbin.refresh();
 <% end %>

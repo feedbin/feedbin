@@ -160,7 +160,7 @@ module Onboarding
       controller = :upload
       render PanelView.new(panel: :import, attributes: {class: "tw-hidden group-data-[onboarding--main-path-value=import]:block"}) do
         div class: "w-full h-full", data: {behavior: "onboarding_import"} do
-          div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false}, actions: { "upload:serverError@window" => "serverError"}) do
+          div class: "w-full h-full group", data: stimulus(controller: controller, values: {dragging: false, dropped: false, error: false, uploading: false}, actions: { "upload:serverError@window" => "serverError"}) do
             input(
               type: "file",
               accept: ".opml,.xml",
@@ -172,7 +172,7 @@ module Onboarding
               form.hidden_field :filename, data: stimulus_item(target: :filename_field, for: controller)
               form.hidden_field :xml, data: stimulus_item(target: :xml_field, for: controller)
               div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-blue-300 group-data-[upload-error-value=true]:border-red-600 group-data-[upload-error-value=true]:bg-red-300" do
-                div class: "flex flex-col gap-4 flex-center group-data-[upload-error-value=true]:tw-hidden" do
+                div class: "flex flex-col gap-4 flex-center group-data-[upload-error-value=true]:tw-hidden group-data-[upload-uploading-value=true]:tw-hidden" do
                   Icon("icon-cloud", class: "fill-600")
                   div class: "" do
                     "Drag & Drop OPML Here"
@@ -180,8 +180,14 @@ module Onboarding
                   div class: "font-bold" do
                     "OR"
                   end
-                  button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary" do
+                  button data: stimulus_item(actions: {click: :choose_file}, for: controller), type: "button", class: "button button-secondary group-data-[upload-uploading-value=true]:pointer-events-none" do
                     "Choose File"
+                  end
+                end
+                div class: "flex-col gap-4 tw-hidden flex-center group-data-[upload-uploading-value=true]:flex" do
+                  span class: "spinner large"
+                  div class: "text-500" do
+                    "Processing…"
                   end
                 end
                 div class: "flex-col gap-4 tw-hidden flex-center group-data-[upload-error-value=true]:flex" do
