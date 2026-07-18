@@ -4,6 +4,10 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 # load first so environment is initialized
 gem "dotenv-rails", "= 2.8.1"
 
+gem "llhttp", github: "benubois/llhttp",
+              branch: "memory_corruption",
+              glob: "mri/*.gemspec"
+
 gem "rails", "8.1.3"
 gem "will_paginate"
 

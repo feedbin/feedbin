@@ -1,4 +1,12 @@
 GIT
+  remote: https://github.com/benubois/llhttp.git
+  revision: 456ed6d98550e30cf36e718176b4d67459ef9ade
+  branch: memory_corruption
+  glob: mri/*.gemspec
+  specs:
+    llhttp (0.6.2)
+
+GIT
   remote: https://github.com/feedbin/carrierwave.git
   revision: 3cefc38b31e079da24f3e372c243b7132ba59708
   branch: feedbin
@@ -401,7 +409,6 @@ GEM
       logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    llhttp (0.6.2)
     logger (1.7.0)
     lograge (0.15.0)
       actionpack (>= 4)
@@ -801,6 +808,7 @@ DEPENDENCIES
   librato-metrics!
   librato-rails!
   listen
+  llhttp!
   lograge
   lookbook
   mail
