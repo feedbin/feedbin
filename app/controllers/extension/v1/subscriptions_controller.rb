@@ -5,6 +5,7 @@ module Extension
         @user = current_user
         @feeds = FeedFinder.feeds(params[:url])
         @subscriptions = @user.existing_subscriptions(@feeds)
+        @tag_names = tag_names
       end
 
       def create
@@ -20,6 +21,16 @@ module Extension
             subscription.feed.tag(tags, user)
           end
         end
+      end
+
+      private
+
+      def tag_names
+        @user.taggings
+          .where(feed_id: @subscriptions.values.map(&:feed_id))
+          .includes(:tag)
+          .group_by(&:feed_id)
+          .transform_values { |taggings| taggings.map { it.tag.name }.sort }
       end
     end
   end

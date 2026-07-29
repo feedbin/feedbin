@@ -22,6 +22,57 @@ class Extension::V1::SubscriptionsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "includes subscription details for subscribed feeds" do
+    @feed.tag("Tech,Design", @user)
+    subscription = @user.subscriptions.where(feed: @feed).take!
+
+    result = find_feed
+
+    assert result["subscribed"]
+    assert_equal ["Design", "Tech"], result["tags"]
+    assert_equal false, result["muted"]
+    assert_equal false, result["crawl_error"]
+    assert_equal edit_settings_subscription_url(subscription, host: "test.host"), result["manage_url"]
+  end
+
+  test "reports muted subscriptions" do
+    @user.subscriptions.where(feed: @feed).take!.update!(muted: true)
+
+    assert find_feed["muted"]
+  end
+
+  test "reports feeds that fail to crawl" do
+    @feed.update!(crawl_data: {error_count: 24})
+
+    assert find_feed["crawl_error"]
+  end
+
+  test "omits subscription details for unsubscribed feeds" do
+    @user.subscriptions.where(feed: @feed).destroy_all
+
+    result = find_feed
+
+    assert_equal false, result["subscribed"]
+    assert_nil result["manage_url"]
+    assert_equal [], result["tags"]
+    assert_equal false, result["muted"]
+    assert_equal false, result["crawl_error"]
+  end
+
+  test "resolves subscription details through a redirect" do
+    redirected = feeds(:kottke)
+    redirected.update!(redirected_to: @feed.feed_url)
+    @user.subscriptions.where(feed: @feed).destroy_all
+    subscription = @user.subscriptions.create!(feed: redirected)
+    redirected.tag("Design", @user)
+
+    result = find_feed
+
+    assert result["subscribed"]
+    assert_equal ["Design"], result["tags"]
+    assert_equal edit_settings_subscription_url(subscription, host: "test.host"), result["manage_url"]
+  end
+
   test "creates subscription" do
     @user.subscriptions.where(feed: @feed).destroy_all
 
@@ -136,5 +187,17 @@ class Extension::V1::SubscriptionsControllerTest < ActionController::TestCase
   test "requires authentication for create" do
     post :create, params: {feeds: {}, tags: []}, format: :json
     assert_response :unauthorized
+  end
+
+  private
+
+  # Feed discovery has its own tests. These cases are about how a discovered
+  # feed is described, so hand the controller the feed directly.
+  def find_feed
+    FeedFinder.stub(:feeds, [@feed]) do
+      post :new, params: {url: @feed.feed_url, page_token: @user.page_token}, format: :json
+    end
+    assert_response :success
+    parse_json["feeds"].find { it["id"] == @feed.id }
   end
 end

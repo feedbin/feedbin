@@ -64,4 +64,32 @@ class UserTest < ActiveSupport::TestCase
 
     assert_equal ["basic-yearly-4", "basic-monthly-4"], stripe_ids
   end
+
+  test "existing subscriptions are keyed by feed id" do
+    feed = @user.feeds.first
+    subscription = @user.subscriptions.where(feed: feed).take!
+
+    existing = @user.existing_subscriptions([feed])
+
+    assert_equal subscription, existing[feed.id]
+    assert existing.include?(feed.id)
+  end
+
+  test "existing subscriptions are keyed by the url a subscribed feed redirects to" do
+    searched = feeds(:daring_fireball)
+    redirected = @user.feeds.where.not(id: searched.id).first
+    redirected.update!(redirected_to: searched.feed_url)
+    @user.subscriptions.where(feed: searched).destroy_all
+    subscription = @user.subscriptions.where(feed: redirected).take!
+
+    existing = @user.existing_subscriptions([searched])
+
+    assert_equal subscription, existing[searched.feed_url]
+    assert existing.include?(searched.feed_url)
+    refute existing.include?(searched.id)
+  end
+
+  test "existing subscriptions is empty without feeds to search" do
+    assert_equal({}, @user.existing_subscriptions([]))
+  end
 end

@@ -652,12 +652,21 @@ class User < ApplicationRecord
     end
   end
 
+  # Subscriptions matching the given feeds, keyed by feed id and by redirect
+  # url. The redirect key covers subscribing to a feed that later redirected to
+  # one of the feeds being searched: that feed still counts as subscribed, and
+  # resolves to the subscription actually owned. Callers that only need a yes or
+  # no can check either key, since Hash#include? tests keys.
   def existing_subscriptions(feeds_to_search)
-    return [] if feeds_to_search.blank?
+    return {} if feeds_to_search.blank?
     @existing ||= begin
-      redirected_feeds = feeds.where(redirected_to: feeds_to_search.map(&:feed_url)).pluck(:redirected_to)
-      subscribed_feeds = subscriptions.where(feed_id: feeds_to_search.map(&:id)).pluck(:feed_id)
-      redirected_feeds + subscribed_feeds
+      matching = Feed.where(id: feeds_to_search.map(&:id)).or(Feed.where(redirected_to: feeds_to_search.map(&:feed_url)))
+      subscriptions.where(feed: matching).includes(:feed).each_with_object({}) do |subscription, hash|
+        hash[subscription.feed_id] = subscription
+        if (redirect = subscription.feed.redirected_to).present?
+          hash[redirect] = subscription
+        end
+      end
     end
   end
 end
