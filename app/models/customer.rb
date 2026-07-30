@@ -1,5 +1,10 @@
 # wraps a Stripe::Customer instance
 class Customer
+  # Stripe reports "the customer has to authenticate this payment" as an error
+  # rather than a return value, under a code that varies by API version. Neither
+  # of these means the card was declined.
+  AUTHENTICATION_ERROR_CODES = ["authentication_required", "invoice_payment_intent_requires_action"].freeze
+
   attr_reader :customer
 
   delegate :id, to: :customer
@@ -56,6 +61,26 @@ class Customer
         }
       )
     end
+  end
+
+  # Retry the customer's open invoice against whatever payment method is now the
+  # default. Stripe doesn't do this on its own: an `authentication_required`
+  # decline schedules no retry, and a past_due subscription never reattempts an
+  # invoice whose attempts are spent — so without this a customer who responds to
+  # a failed charge by updating their card is left with the invoice still open.
+  #
+  # Returns :paid, :requires_action when the bank wants the customer to
+  # authenticate, or nil when there was nothing owed. A genuine decline raises
+  # Stripe::CardError, the same as any other charge in this controller.
+  def pay_open_invoice
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice = Stripe::Invoice.list({customer: id, status: "open", limit: 1}, options).data.first
+    return nil unless invoice
+
+    Stripe::Invoice.pay(invoice.id, {}, options).paid ? :paid : :requires_action
+  rescue Stripe::StripeError => exception
+    raise unless AUTHENTICATION_ERROR_CODES.include?(exception.code)
+    :requires_action
   end
 
   def update_email(email)

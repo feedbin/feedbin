@@ -92,6 +92,48 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "should pay an open invoice with the newly saved card" do
+    with_card_saving_user("retry-paid@example.com") do |user|
+      stub_open_invoice(paid: true) do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+    end
+
+    assert_redirected_to settings_billing_url
+    assert_equal "Your card has been updated.", flash[:notice]
+  end
+
+  test "should send the customer to authenticate when the retried invoice needs it" do
+    with_card_saving_user("retry-action@example.com") do |user|
+      stub_open_invoice(paid: false) do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+    end
+
+    assert_redirected_to authenticate_settings_billing_url
+  end
+
+  test "should treat an authentication_required decline as needing authentication" do
+    with_card_saving_user("retry-auth-error@example.com") do |user|
+      stub_open_invoice(error_code: "authentication_required") do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+    end
+
+    assert_redirected_to authenticate_settings_billing_url
+  end
+
+  test "should surface a real decline from the retried invoice" do
+    with_card_saving_user("retry-declined@example.com") do |user|
+      stub_open_invoice(error_code: "card_declined") do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+    end
+
+    assert_redirected_to edit_settings_billing_url
+    assert_equal "Your card was declined.", flash[:alert]
+  end
+
   test "should get edit with a setup intent url on the form" do
     login_as @user
     get :edit
@@ -196,6 +238,31 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal "Visa ××99", assigns(:message)
+    StripeMock.stop
+  end
+
+  private
+
+  # A signed-in user with a Stripe customer and a card already on file, set up so
+  # the block can post a replacement card.
+  def with_card_saving_user(email)
+    StripeMock.start
+    create_stripe_plan(plans(:trial))
+
+    user = User.create(
+      email: email,
+      password: default_password,
+      plan: plans(:trial)
+    )
+
+    stub_payment_methods do
+      user.stripe_token = "pm_original"
+      user.save
+
+      login_as user
+      yield user
+    end
+
     StripeMock.stop
   end
 end
