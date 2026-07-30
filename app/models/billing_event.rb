@@ -85,8 +85,11 @@ class BillingEvent < ApplicationRecord
   # The recurring charge was attempted and the bank wants the customer to
   # authenticate it. Nothing has failed yet — the invoice stays open until they
   # do, or until Stripe gives up retrying and sends invoice.payment_failed.
+  #
+  # Events can arrive for customers with no user here — a deleted account, or a
+  # throwaway customer from `stripe trigger` — and there's nobody to email.
   def payment_action_required?
-    event_type == "invoice.payment_action_required"
+    event_type == "invoice.payment_action_required" && billable.present?
   end
 
   def invoice

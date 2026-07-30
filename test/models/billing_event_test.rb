@@ -83,6 +83,18 @@ class BillingEventTest < ActiveSupport::TestCase
     assert_match "/settings/billing/authenticate", mail.body.to_s
   end
 
+  test "payment_action_required? is a no-op for a customer with no user" do
+    event = StripeMock.mock_webhook_event("invoice.payment_action_required", customer: "cus_not_a_feedbin_user")
+    billing_event = assert_no_difference "ActionMailer::Base.deliveries.count" do
+      Sidekiq::Testing.inline! do
+        BillingEvent.create(info: event.as_json)
+      end
+    end
+
+    assert_nil billing_event.billable
+    assert_not billing_event.payment_action_required?
+  end
+
   private
 
   def webhook_defaults
