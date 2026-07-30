@@ -134,6 +134,23 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal "Your card was declined.", flash[:alert]
   end
 
+  test "should not collect a lapsed invoice that reopen_account just wrote off" do
+    paid = []
+
+    with_card_saving_user("reanchored@example.com") do |user|
+      Customer.stub_any_instance(:unpaid?, true) do
+        Customer.stub_any_instance(:reopen_account, :reanchored) do
+          Customer.stub_any_instance(:pay_open_invoice, -> { paid << :charged }) do
+            post :update_credit_card, params: {stripe_token: "pm_replacement"}
+          end
+        end
+      end
+    end
+
+    assert_empty paid, "re-anchoring bills a fresh period, so charging the lapsed invoice would double up"
+    assert_redirected_to settings_billing_url
+  end
+
   test "should get edit with a setup intent url on the form" do
     login_as @user
     get :edit

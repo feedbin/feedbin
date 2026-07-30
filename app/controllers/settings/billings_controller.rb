@@ -80,12 +80,13 @@ class Settings::BillingsController < ApplicationController
       if @user.save
         Rails.cache.delete(FeedbinUtils.payment_details_key(current_user.id))
         customer = Customer.retrieve(@user.customer_id)
-        customer.reopen_account if customer.unpaid?
+        recovery = customer.reopen_account if customer.unpaid?
 
         # A card update is often the answer to a failed charge, so put the new
         # card to work on whatever is owed rather than reporting success over an
-        # invoice that's still open.
-        if customer.pay_open_invoice == :requires_action
+        # invoice that's still open. Skipped after a re-anchor, which has already
+        # written the lapsed period off — collecting it too would double charge.
+        if recovery != :reanchored && customer.pay_open_invoice == :requires_action
           redirect_to authenticate_settings_billing_url
         else
           redirect_to settings_billing_url, notice: "Your card has been updated."

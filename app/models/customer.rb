@@ -48,11 +48,23 @@ class Customer
     customer.try(:subscriptions).try(:first).try(:status) == "unpaid"
   end
 
+  # Recovery for a fully lapsed account — one whose retries are spent, which is
+  # what `unpaid?` means. Returns :reopened when the outstanding invoice was put
+  # back into collection, :reanchored when the billing period was reset instead,
+  # or nil when neither applied.
+  #
+  # `:reanchored` matters to the caller: resetting the anchor bills a fresh period
+  # and writes off the lapsed one, so collecting the old invoice afterwards would
+  # charge the customer twice for the same gap.
+  #
+  # `invoice.closed` only exists at the pinned API version — it was replaced by
+  # `auto_advance`, so this branch quietly stops matching if the pin ever moves.
   def reopen_account
     invoice = Stripe::Invoice.list(customer: id, limit: 1).first
     if !invoice.paid && invoice.closed && invoice.status != "draft"
       invoice.closed = false
       invoice.save
+      :reopened
     elsif (!invoice.paid && invoice.attempt_count >= 4) || invoice.status == "draft"
       Stripe::Subscription.update(invoice.subscription,
         {
@@ -60,6 +72,7 @@ class Customer
           proration_behavior: "none"
         }
       )
+      :reanchored
     end
   end
 
