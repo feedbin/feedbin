@@ -128,6 +128,25 @@ class Settings::BillingsControllerTest < ActionController::TestCase
       stub_open_invoice(error_code: "card_declined") do
         post :update_credit_card, params: {stripe_token: "pm_replacement"}
       end
+
+      assert_not user.reload.suspended, "an account that wasn't suspended shouldn't become suspended"
+    end
+
+    assert_redirected_to edit_settings_billing_url
+    assert_equal "Your card was declined.", flash[:alert]
+  end
+
+  test "should re-suspend a suspended account when the replacement card declines" do
+    with_card_saving_user("declined-while-suspended@example.com", suspended: true) do |user|
+      assert user.reload.suspended
+
+      # update_billing lifts the suspension mid-request, so this only stays true
+      # if the decline puts it back.
+      stub_open_invoice(error_code: "card_declined") do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+
+      assert user.reload.suspended, "a card that doesn't work must not buy access"
     end
 
     assert_redirected_to edit_settings_billing_url
@@ -280,7 +299,7 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
   # A signed-in user with a Stripe customer and a card already on file, set up so
   # the block can post a replacement card.
-  def with_card_saving_user(email)
+  def with_card_saving_user(email, suspended: false)
     StripeMock.start
     create_stripe_plan(plans(:trial))
 
@@ -293,6 +312,7 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     stub_payment_methods do
       user.stripe_token = "pm_original"
       user.save
+      user.update_columns(suspended: true) if suspended
 
       login_as user
       yield user

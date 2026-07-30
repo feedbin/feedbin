@@ -74,6 +74,7 @@ class Settings::BillingsController < ApplicationController
 
   def update_credit_card
     @user = current_user
+    was_suspended = @user.suspended
 
     if params[:stripe_token].present?
       @user.stripe_token = params[:stripe_token]
@@ -99,6 +100,11 @@ class Settings::BillingsController < ApplicationController
       Librato.increment("billing.token_missing")
     end
   rescue Stripe::CardError => exception
+    # Saving the card lifted the suspension before we knew the card worked. Put it
+    # back, because nothing downstream will: Stripe rolls a declined re-anchor
+    # back completely, and it never reattempts payment on an unpaid subscription,
+    # so no further webhook arrives to suspend the account again.
+    @user.deactivate if was_suspended
     redirect_to edit_settings_billing_url, alert: exception.message
   end
 
