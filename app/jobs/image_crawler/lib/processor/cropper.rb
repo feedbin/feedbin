@@ -21,7 +21,7 @@ module ImageCrawler
       end
 
       def source
-        @source ||= Vips::Image.new_from_file(@file)
+        @source ||= Vips::Image.new_from_file(ImageFormat.checked!(@file))
       end
 
       def size
@@ -31,7 +31,7 @@ module ImageCrawler
       def valid?(validate)
         source.avg
         validate ? (source.width >= @width && source.height >= @height) : true
-      rescue ::Vips::Error
+      rescue ::Vips::Error, ImageFormat::Unsupported
         false
       end
 

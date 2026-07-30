@@ -82,6 +82,20 @@ module ImageCrawler
 
         FileUtils.rm image.file
       end
+
+      def test_should_reject_content_that_is_not_an_image
+        file = File.join(Dir.tmpdir, SecureRandom.hex)
+        File.binwrite(file, "%!PS-Adobe-3.0\n/Times findfont")
+
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+
+        assert_not cropper.valid?(true)
+        assert_raises ImageFormat::Unsupported do
+          cropper.source
+        end
+
+        FileUtils.rm file
+      end
     end
   end
 end
