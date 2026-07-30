@@ -57,7 +57,24 @@ class BillingEvent < ApplicationRecord
   end
 
   def charge_failed?
-    event_type == "invoice.payment_failed"
+    event_type == "invoice.payment_failed" && !awaiting_authentication?
+  end
+
+  # Stripe sends invoice.payment_failed alongside invoice.payment_action_required
+  # when the charge was declined with `authentication_required`. The card is fine
+  # in that case, so telling the customer to update their billing information
+  # would be wrong — payment_action_required? sends them the right email.
+  #
+  # `payment_intent` is absent from invoice payloads rendered before 2019-02-11,
+  # which just means the dunning email goes out as it always did.
+  def awaiting_authentication?
+    payment_intent_id = event_object["payment_intent"]
+    return false if payment_intent_id.blank?
+
+    intent = Stripe::PaymentIntent.retrieve(payment_intent_id, {stripe_version: STRIPE_INTENTS_API_VERSION})
+    intent.status == "requires_action"
+  rescue Stripe::StripeError
+    false
   end
 
   def subscription_deactivated?

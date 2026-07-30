@@ -83,6 +83,22 @@ class BillingEventTest < ActiveSupport::TestCase
     assert_match "/settings/billing/authenticate", mail.body.to_s
   end
 
+  test "charge_failed? skips the dunning email when the charge only needs authentication" do
+    event = StripeMock.mock_webhook_event("invoice.payment_failed", webhook_defaults.merge(payment_intent: "pi_needs_action"))
+    intent = Stripe::PaymentIntent.construct_from(id: "pi_needs_action", object: "payment_intent", status: "requires_action")
+
+    Stripe::PaymentIntent.stub(:retrieve, intent) do
+      billing_event = assert_no_difference "ActionMailer::Base.deliveries.count" do
+        Sidekiq::Testing.inline! do
+          BillingEvent.create(info: event.as_json)
+        end
+      end
+
+      assert_not billing_event.charge_failed?
+      assert billing_event.awaiting_authentication?
+    end
+  end
+
   test "payment_action_required? is a no-op for a customer with no user" do
     event = StripeMock.mock_webhook_event("invoice.payment_action_required", customer: "cus_not_a_feedbin_user")
     billing_event = assert_no_difference "ActionMailer::Base.deliveries.count" do
