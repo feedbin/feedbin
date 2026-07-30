@@ -1,7 +1,10 @@
 class SiteController < ApplicationController
   skip_before_action :authorize, only: [:index, :manifest, :service_worker, :auto_sign_in]
   skip_before_action :verify_authenticity_token, only: [:service_worker]
-  before_action :check_user, if: :signed_in?
+  # `check_user` bounces a suspended session to billing, and as a before_action it
+  # would run before auto_sign_in ever did — so signing in as a different account
+  # from a suspended one appeared to do nothing at all.
+  before_action :check_user, if: :signed_in?, except: [:auto_sign_in]
 
   def index
     if signed_in?
@@ -41,12 +44,34 @@ class SiteController < ApplicationController
     render formats: :json, content_type: "application/manifest+json"
   end
 
+  # Development only, routed under a Rails.env.development? constraint. `email` or
+  # `id` picks a specific account, which is what makes it possible to move between
+  # test accounts while working on billing. A miss renders 404 rather than falling
+  # back to User.first, so a typo can't quietly leave you as the wrong user.
   def auto_sign_in
-    sign_in User.first
-    redirect_to root_url
+    user = if params[:email].present?
+      User.find_by_email(params[:email])
+    elsif params[:id].present?
+      User.find_by_id(params[:id])
+    else
+      User.first
+    end
+
+    return render_404 if user.nil?
+
+    sign_in user
+    redirect_to destination
   end
 
   private
+
+  # `path` saves a hop when the account being signed in as is only interesting on
+  # one page — a suspended one lands on billing anyway. Relative paths only, so
+  # this stays a convenience and not an open redirect.
+  def destination
+    path = params[:path].to_s
+    path.start_with?("/") ? path : root_url
+  end
 
   def check_user
     if current_user.suspended && !native?

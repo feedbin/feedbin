@@ -13,8 +13,14 @@ class Settings::BillingsController < ApplicationController
 
   def edit
     @user = current_user
-    @default_plan = @user.plan
     plan_setup
+
+    # The wallet button quotes an amount, so the default has to be one of the plans
+    # the page actually rendered. `available_plans` filters by the user's price tier
+    # and leaves out trial, free and prepaid plans, so a customer on one of those has
+    # a current plan that isn't in the list — and handing its id to Stripe.js left it
+    # without a paymentRequest to quote.
+    @default_plan = @plans.detect { |plan| plan == @user.plan } || @plans.first
 
     render layout: "settings"
   end
@@ -52,10 +58,17 @@ class Settings::BillingsController < ApplicationController
   # looked up fresh rather than carried in the link, so the URL is safe to email
   # and still works if Stripe retries the charge before the customer clicks.
   def authenticate
-    @client_secret = Customer.retrieve(@user.customer_id).authentication_client_secret
+    customer = Customer.retrieve(@user.customer_id)
+    @client_secret = customer.authentication_client_secret
 
     if @client_secret
       render layout: "settings"
+    elsif customer.open_invoice?
+      # A declined or abandoned challenge leaves the PaymentIntent needing a payment
+      # method rather than an authentication, so there's nothing left to confirm —
+      # but the invoice is still owed. Saying "no payment waiting" and dropping them
+      # on the billing page would read as though it had gone through.
+      redirect_to edit_settings_billing_url, alert: "That payment could not be confirmed. Please update your card to complete it."
     else
       redirect_to settings_billing_url, notice: "There's no payment waiting to be confirmed."
     end

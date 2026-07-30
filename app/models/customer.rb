@@ -80,6 +80,14 @@ class Customer
     intent.client_secret if intent.status == "requires_action"
   end
 
+  # Whether dunning is still working on something, regardless of whether it's the
+  # customer's turn to act. `authentication_client_secret` returning nil while this
+  # is true means the challenge was declined or abandoned: the PaymentIntent has
+  # fallen back to `requires_payment_method`, so what's needed now is a new card.
+  def open_invoice?
+    !dunning_invoice({stripe_version: STRIPE_INTENTS_API_VERSION}).nil?
+  end
+
   # Retry the customer's open invoice against whatever payment method is now the
   # default. Stripe doesn't do this on its own: an `authentication_required`
   # decline schedules no retry, and a past_due subscription never reattempts an

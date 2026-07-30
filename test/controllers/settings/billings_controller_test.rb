@@ -261,16 +261,23 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "pi_123_secret", assigns(:client_secret)
     assert_match "pi_123_secret", response.body
+    # A challenge that fails leaves the PaymentIntent needing a payment method, so
+    # the way out of this page is the card form, not the billing summary.
+    assert_match edit_settings_billing_path, response.body
   end
 
-  test "should skip authenticate when the intent no longer needs action" do
+  test "should send the customer to the card form when a challenge was not completed" do
     login_as @user
 
-    stub_authentication_intent(status: "succeeded") do
+    # Declining or abandoning the challenge drops the PaymentIntent back to
+    # requires_payment_method while the invoice stays open, so there is nothing left
+    # to confirm but something still owed.
+    stub_authentication_intent(status: "requires_payment_method") do
       get :authenticate
     end
 
-    assert_redirected_to settings_billing_url
+    assert_redirected_to edit_settings_billing_url
+    assert_equal "That payment could not be confirmed. Please update your card to complete it.", flash[:alert]
   end
 
   test "should skip authenticate when there is no open invoice" do
@@ -293,6 +300,52 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
     assert_redirected_to settings_billing_url
     assert_equal "Could not load the payment. Please try again.", flash[:alert]
+  end
+
+  test "should offer a default plan the page actually rendered" do
+    # A trialing customer's own plan is never in available_plans, and handing its id
+    # to Stripe.js left the wallet button with no paymentRequest to quote — which
+    # threw, and took the card form down with it.
+    @user.update_columns(plan_id: plans(:trial).id)
+    login_as @user
+
+    get :edit
+
+    assert_response :success
+    assert_not_includes assigns(:plans), plans(:trial), "the fixture no longer sets up the mismatch"
+    assert_includes assigns(:plan_data).map { _1[:id] }, assigns(:default_plan).id
+  end
+
+  test "should keep the customer's own plan as the default when it is offered" do
+    login_as @user
+
+    get :edit
+
+    assert_response :success
+    assert_equal @user.plan, assigns(:default_plan)
+  end
+
+  test "should not put Stripe's own error text in front of the customer" do
+    errors = {"pm_bogus" => Stripe::InvalidRequestError.new("No such PaymentMethod: 'pm_bogus'", nil)}
+
+    with_card_saving_user("stripe-error-message@example.com", attach_errors: errors) do |user|
+      post :update_credit_card, params: {stripe_token: "pm_bogus"}
+    end
+
+    assert_redirected_to edit_settings_billing_url
+    assert_equal "Your billing information could not be updated. Please try again.", flash[:alert]
+    assert_no_match(/pm_bogus/, flash[:alert])
+  end
+
+  test "should still show a declined card in the words Stripe wrote for the customer" do
+    errors = {"pm_declined" => Stripe::CardError.new("Your card was declined.", nil, code: "card_declined")}
+
+    with_card_saving_user("card-decline-message@example.com", attach_errors: errors) do |user|
+      post :update_credit_card, params: {stripe_token: "pm_declined"}
+    end
+
+    assert_redirected_to edit_settings_billing_url
+    assert_equal "Your card was declined.", flash[:alert]
   end
 
   test "should create a setup intent" do
@@ -369,7 +422,7 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
   # A signed-in user with a Stripe customer and a card already on file, set up so
   # the block can post a replacement card.
-  def with_card_saving_user(email, suspended: false)
+  def with_card_saving_user(email, suspended: false, attach_errors: {})
     StripeMock.start
     create_stripe_plan(plans(:trial))
 
@@ -379,7 +432,7 @@ class Settings::BillingsControllerTest < ActionController::TestCase
       plan: plans(:trial)
     )
 
-    stub_payment_methods do
+    stub_payment_methods(attach_errors: attach_errors) do
       user.stripe_token = "pm_original"
       user.save
       user.update_columns(suspended: true) if suspended

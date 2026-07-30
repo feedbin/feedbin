@@ -6,11 +6,18 @@ module StripePaymentMethodHelper
   #
   # Yields arrays recording each attach ({payment_method:, customer:}) and each
   # detach (the PaymentMethod id).
-  def stub_payment_methods(brand: "Visa", last4: "4242")
+  #
+  # `attach_errors` maps a PaymentMethod id to an exception to raise instead of
+  # attaching it, so a test can fail one specific card while others still save.
+  # Nesting a second `Stripe::PaymentMethod.stub(:attach, …)` inside this one is not
+  # an option: `attach` comes from an included module rather than being a singleton
+  # method, and unwinding the inner stub leaves it undefined for the rest of the run.
+  def stub_payment_methods(brand: "Visa", last4: "4242", attach_errors: {})
     attachments = []
     detachments = []
 
     attach = lambda do |payment_method, params = {}, _opts = {}|
+      raise attach_errors.fetch(payment_method) if attach_errors.key?(payment_method)
       attachments << {payment_method: payment_method, customer: params[:customer]}
       nil
     end

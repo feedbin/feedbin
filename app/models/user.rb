@@ -348,9 +348,21 @@ class User < ApplicationRecord
     self.stripe_token = nil
   rescue Stripe::StripeError => exception
     ErrorService.notify(exception)
-    errors.add :base, exception.message.to_s
+    errors.add :base, billing_error_message(exception)
     self.stripe_token = nil
     throw(:abort)
+  end
+
+  # These errors reach the customer as a flash message, so only CardError is
+  # repeated verbatim — Stripe writes those to be read ("Your card was declined").
+  # Every other message is API diagnostics: "No such PaymentMethod: 'pm_…'", or a
+  # masked key from an authentication_error. That belongs in the error report.
+  def billing_error_message(exception)
+    if exception.is_a?(Stripe::CardError)
+      exception.message.to_s
+    else
+      "Your billing information could not be updated. Please try again."
+    end
   end
 
   def stripe_customer
