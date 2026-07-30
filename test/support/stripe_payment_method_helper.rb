@@ -29,20 +29,36 @@ module StripePaymentMethodHelper
     end
   end
 
-  # stripe-ruby-mock has no PaymentIntent handler and its invoice list ignores
-  # the `status` filter, so both halves of the authentication lookup are stubbed.
-  def stub_authentication_intent(status: "requires_action", client_secret: "pi_test_secret", payment_intent: "pi_test")
-    invoices = Stripe::ListObject.construct_from(
+  # Stands in for Customer.dunning_invoice: a subscription whose `latest_invoice`
+  # points at an invoice in `status`. Also fails the test if anything reaches for
+  # the newest-open-invoice query that this deliberately replaced.
+  def stub_dunning_invoice(status: "open", payment_intent: "pi_test", invoice_id: "in_open")
+    subscriptions = Stripe::ListObject.construct_from(
       object: "list",
       has_more: false,
-      data: [{
-        id: "in_test",
-        object: "invoice",
-        status: "open",
-        payment_intent: payment_intent
-      }]
+      data: [{id: "sub_test", object: "subscription", latest_invoice: invoice_id}]
     )
 
+    invoice = Stripe::Invoice.construct_from(
+      id: invoice_id,
+      object: "invoice",
+      status: status,
+      payment_intent: payment_intent
+    )
+
+    no_list = ->(*) { raise "collection must gate on the subscription's latest_invoice, not the newest open invoice" }
+
+    Stripe::Subscription.stub(:list, subscriptions) do
+      Stripe::Invoice.stub(:list, no_list) do
+        Stripe::Invoice.stub(:retrieve, invoice) do
+          yield
+        end
+      end
+    end
+  end
+
+  # stripe-ruby-mock has no PaymentIntent handler, so the intent read is stubbed.
+  def stub_authentication_intent(status: "requires_action", client_secret: "pi_test_secret", payment_intent: "pi_test")
     intent = Stripe::PaymentIntent.construct_from(
       id: "pi_test",
       object: "payment_intent",
@@ -50,7 +66,7 @@ module StripePaymentMethodHelper
       client_secret: client_secret
     )
 
-    Stripe::Invoice.stub(:list, invoices) do
+    stub_dunning_invoice(payment_intent: payment_intent) do
       Stripe::PaymentIntent.stub(:retrieve, intent) do
         yield
       end
@@ -58,21 +74,15 @@ module StripePaymentMethodHelper
   end
 
   # Exercises the retry that follows a card update. stripe-ruby-mock can't pay an
-  # invoice, so the list-and-pay pair is stubbed. `error_code` makes the pay call
-  # raise, standing in for a decline or an authentication demand.
+  # invoice, so the pay call is stubbed. `error_code` makes it raise, standing in
+  # for a decline or an authentication demand.
   def stub_open_invoice(paid: false, error_code: nil)
-    invoices = Stripe::ListObject.construct_from(
-      object: "list",
-      has_more: false,
-      data: [{id: "in_open", object: "invoice", status: "open", payment_intent: "pi_test"}]
-    )
-
     pay = lambda do |_id, _params = {}, _opts = {}|
       raise Stripe::CardError.new("Your card was declined.", nil, code: error_code) if error_code
       Stripe::Invoice.construct_from(id: "in_open", object: "invoice", status: paid ? "paid" : "open", paid: paid)
     end
 
-    Stripe::Invoice.stub(:list, invoices) do
+    stub_dunning_invoice do
       Stripe::Invoice.stub(:pay, pay) do
         yield
       end

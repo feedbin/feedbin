@@ -32,12 +32,30 @@ class Customer
   # pinned API version, so both reads happen at the newer one.
   def self.authentication_client_secret(customer_id)
     options = {stripe_version: STRIPE_INTENTS_API_VERSION}
-    invoice = Stripe::Invoice.list({customer: customer_id, status: "open", limit: 1}, options).data.first
+    invoice = dunning_invoice(customer_id, options)
     payment_intent_id = invoice && invoice[:payment_intent]
     return nil if payment_intent_id.blank?
 
     intent = Stripe::PaymentIntent.retrieve(payment_intent_id, options)
     intent.client_secret if intent.status == "requires_action"
+  end
+
+  # The subscription's `latest_invoice` is the one Stripe's dunning is working on,
+  # and the only one this app has any business collecting or authenticating.
+  # Asking for "the newest open invoice on the customer" instead would also pick
+  # up a period that was written off, a stale plan-change invoice, or anything
+  # raised by hand — and charge it the next time the customer saves a card.
+  #
+  # Returns nil unless that invoice is open, i.e. unless something is actually
+  # owed. The subscription is re-read rather than taken from the customer object
+  # so this doesn't depend on the pinned version's expansion.
+  def self.dunning_invoice(customer_id, options)
+    subscription = Stripe::Subscription.list({customer: customer_id, limit: 1}, options).data.first
+    latest_invoice_id = subscription && subscription[:latest_invoice]
+    return nil if latest_invoice_id.blank?
+
+    invoice = Stripe::Invoice.retrieve(latest_invoice_id, options)
+    invoice if invoice.status == "open"
   end
 
   def initialize(customer)
@@ -72,6 +90,11 @@ class Customer
           proration_behavior: "none"
         }
       )
+      # Re-anchoring bills a fresh period and abandons this one, so say so rather
+      # than leaving the invoice outstanding forever. Voiding is only valid on an
+      # open invoice — a draft has nothing to write off. Done after the re-anchor
+      # so a failure here still leaves the account recovered.
+      Stripe::Invoice.void_invoice(invoice.id, {}, {stripe_version: STRIPE_INTENTS_API_VERSION}) if invoice.status == "open"
       :reanchored
     end
   end
@@ -87,7 +110,7 @@ class Customer
   # Stripe::CardError, the same as any other charge in this controller.
   def pay_open_invoice
     options = {stripe_version: STRIPE_INTENTS_API_VERSION}
-    invoice = Stripe::Invoice.list({customer: id, status: "open", limit: 1}, options).data.first
+    invoice = self.class.dunning_invoice(id, options)
     return nil unless invoice
 
     Stripe::Invoice.pay(invoice.id, {}, options).paid ? :paid : :requires_action

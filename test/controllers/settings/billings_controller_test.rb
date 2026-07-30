@@ -134,6 +134,24 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal "Your card was declined.", flash[:alert]
   end
 
+  test "should not collect an invoice that dunning is not working on" do
+    paid = []
+
+    with_card_saving_user("stale-invoice@example.com") do |user|
+      # The subscription is settled; whatever else may be sitting open on the
+      # customer is not this app's to charge.
+      stub_dunning_invoice(status: "paid") do
+        Stripe::Invoice.stub(:pay, ->(*) { paid << :charged }) do
+          post :update_credit_card, params: {stripe_token: "pm_replacement"}
+        end
+      end
+    end
+
+    assert_empty paid, "only the subscription's latest_invoice should ever be collected"
+    assert_redirected_to settings_billing_url
+    assert_equal "Your card has been updated.", flash[:notice]
+  end
+
   test "should not collect a lapsed invoice that reopen_account just wrote off" do
     paid = []
 
