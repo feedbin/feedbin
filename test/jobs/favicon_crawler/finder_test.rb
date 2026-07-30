@@ -166,5 +166,43 @@ module FaviconCrawler
 
       assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
     end
+
+    test "should skip a favicon that is not an image and keep looking" do
+      body = <<-eot
+      <html>
+          <head>
+              <link rel="icon" href="#{@icon_url.path}">
+          </head>
+      </html>
+      eot
+
+      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
+      stub_request(:get, @page_url)
+        .to_return(body: body, status: 200)
+
+      # PostScript reaches Ghostscript if it gets as far as magickload
+      stub_request(:get, @icon_url)
+        .to_return(body: "%!PS-Adobe-3.0\n/Times findfont", status: 200)
+
+      stub_request_file("favicon.ico", @default_url)
+
+      Finder.new.perform(@page_url.host)
+
+      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+    end
+
+    test "should not save a favicon when nothing served is an image" do
+      stub_request(:get, @page_url)
+        .to_return(body: "<html><head></head></html>", status: 200)
+
+      stub_request(:get, @default_url)
+        .to_return(body: "%PDF-1.4\n1 0 obj", status: 200)
+
+      Finder.new.perform(@page_url.host)
+
+      assert_nil Favicon.unscoped.where(host: @page_url.host).take
+    end
   end
 end
