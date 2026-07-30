@@ -31,11 +31,8 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should change plan" do
     StripeMock.start
-    stripe_helper = StripeMock.create_test_helper
     user = users(:ann)
     new_plan = plans(:basic_monthly_3)
-    last4 = "1234"
-    token = stripe_helper.generate_card_token(last4: last4, exp_month: 99, exp_year: 3005)
     create_stripe_plan(user.plan)
     create_stripe_plan(new_plan)
 
@@ -45,12 +42,14 @@ class UsersControllerTest < ActionController::TestCase
     redirect_url = settings_billing_url
 
     login_as user
-    patch :update, params: {id: user, redirect_to: redirect_url, user: {stripe_token: token, plan_id: new_plan.id}}
+    stub_payment_methods do
+      patch :update, params: {id: user, redirect_to: redirect_url, user: {stripe_token: "pm_new_card", plan_id: new_plan.id}}
+    end
     assert_redirected_to redirect_url
     assert_equal new_plan, user.reload.plan
 
     customer = Stripe::Customer.retrieve(user.customer_id)
-    assert_equal last4, customer.sources.data.first.last4
+    assert_equal "pm_new_card", customer.invoice_settings.default_payment_method
 
     StripeMock.stop
   end

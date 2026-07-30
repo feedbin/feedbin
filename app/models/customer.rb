@@ -47,9 +47,21 @@ class Customer
     customer.save
   end
 
-  def update_source(stripe_token)
-    customer.source = stripe_token
-    customer.save
+  # `payment_method` is a PaymentMethod id (pm_…) from a SetupIntent confirmed in
+  # the browser, not a card token. Stripe pays subscription invoices with
+  # `invoice_settings.default_payment_method` in preference to the customer's
+  # legacy `default_source`, so setting it here is what switches the card over.
+  def update_source(payment_method)
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    Stripe::PaymentMethod.attach(payment_method, {customer: id}, options)
+    Stripe::Customer.update(id, {invoice_settings: {default_payment_method: payment_method}}, options)
+  end
+
+  # Cards saved through the SetupIntent flow are PaymentMethods, which don't show
+  # up in `sources`. Cards saved before it are still legacy sources.
+  def card_description
+    card = default_payment_method_card || sources.first
+    "#{card.brand} ××#{card.last4[-2..-1]}"
   end
 
   def update_plan(plan_id, trial_end)
@@ -64,5 +76,17 @@ class Customer
 
   def subscription
     @subscription ||= customer.subscriptions.first
+  end
+
+  private
+
+  # `invoice_settings` isn't part of the customer shape at the pinned API
+  # version, so `customer` never carries it — re-read at a version that does.
+  def default_payment_method_card
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice_settings = Stripe::Customer.retrieve(id, options)[:invoice_settings]
+    payment_method_id = invoice_settings && invoice_settings[:default_payment_method]
+    return nil if payment_method_id.blank?
+    Stripe::PaymentMethod.retrieve(payment_method_id, options).card
   end
 end

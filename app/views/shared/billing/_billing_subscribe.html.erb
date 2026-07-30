@@ -8,7 +8,7 @@
   <% end %>
 </p>
 
-<%= form_for @user, html: {id: "payment-form"} do |f| %>
+<%= form_for @user, html: {id: "payment-form", data: {setup_intent_url: create_setup_intent_settings_billing_path}} do |f| %>
   <%= f.hidden_field :stripe_token, id: 'stripe_token' %>
   <%= hidden_field_tag :redirect_to, settings_billing_url %>
 

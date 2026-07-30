@@ -34,11 +34,23 @@ class Settings::BillingsController < ApplicationController
     redirect_to settings_billing_url, alert: "Your card was declined, please update your billing information."
   end
 
+  # Confirming this client-side is what triggers 3D Secure when the card needs
+  # it. The card details never reach us: Stripe.js turns the token into a
+  # PaymentMethod, and the form posts back only its id.
+  def create_setup_intent
+    intent = Stripe::SetupIntent.create(
+      {customer: current_user.customer_id, usage: "off_session"},
+      {stripe_version: STRIPE_INTENTS_API_VERSION}
+    )
+    render json: {client_secret: intent.client_secret}
+  rescue Stripe::StripeError => exception
+    ErrorService.notify(exception)
+    render json: {error: "Could not start card setup. Please try again."}, status: :service_unavailable
+  end
+
   def payment_details
     @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id), expires_in: 5.minutes) {
-      customer = Customer.retrieve(@user.customer_id)
-      card = customer.sources.first
-      "#{card.brand} ××#{card.last4[-2..-1]}"
+      Customer.retrieve(@user.customer_id).card_description
     }
   rescue
     @message = "No payment info"

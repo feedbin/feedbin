@@ -67,9 +67,6 @@ class Settings::BillingsControllerTest < ActionController::TestCase
   test "should update credit card" do
     StripeMock.start
     plan = plans(:trial)
-    last4 = "1234"
-    card_1 = StripeMock.generate_card_token(last4: "4242", exp_month: 99, exp_year: 3005)
-    card_2 = StripeMock.generate_card_token(last4: last4, exp_month: 99, exp_year: 3005)
     create_stripe_plan(plan)
 
     user = User.create(
@@ -77,15 +74,97 @@ class Settings::BillingsControllerTest < ActionController::TestCase
       password: default_password,
       plan: plan
     )
-    user.stripe_token = card_1
-    user.save
 
-    login_as user
-    post :update_credit_card, params: {stripe_token: card_2}
-    assert_redirected_to settings_billing_url
+    stub_payment_methods do |attachments|
+      user.stripe_token = "pm_original"
+      user.save
+
+      login_as user
+      post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      assert_redirected_to settings_billing_url
+
+      assert_equal ["pm_original", "pm_replacement"], attachments.map { _1[:payment_method] }
+      assert_equal [user.customer_id, user.customer_id], attachments.map { _1[:customer] }
+    end
 
     customer = Stripe::Customer.retrieve(user.customer_id)
-    assert_equal last4, customer.sources.data.first.last4
+    assert_equal "pm_replacement", customer.invoice_settings.default_payment_method
+    StripeMock.stop
+  end
+
+  test "should get edit with a setup intent url on the form" do
+    login_as @user
+    get :edit
+
+    assert_response :success
+    assert_match create_setup_intent_settings_billing_path, response.body
+  end
+
+  test "should get billing with a setup intent url on the subscribe form" do
+    StripeMock.start
+    plan = plans(:trial)
+    create_stripe_plan(plan)
+
+    user = User.create(
+      email: "trial@example.com",
+      password: default_password,
+      plan: plan
+    )
+
+    login_as user
+    get :index
+
+    assert_response :success
+    assert_match create_setup_intent_settings_billing_path, response.body
+    StripeMock.stop
+  end
+
+  test "should create a setup intent" do
+    login_as @user
+
+    stub_setup_intent(client_secret: "seti_123_secret") do
+      post :create_setup_intent
+    end
+
+    assert_response :success
+    assert_equal "seti_123_secret", response.parsed_body["client_secret"]
+  end
+
+  test "should get payment details for a card saved as a payment method" do
+    StripeMock.start
+    plan = plans(:trial)
+    create_stripe_plan(plan)
+
+    user = User.create(
+      email: "pm@example.com",
+      password: default_password,
+      plan: plan
+    )
+
+    stub_payment_methods(brand: "Visa", last4: "4242") do
+      user.stripe_token = "pm_saved"
+      user.save
+
+      login_as user
+      get :payment_details, format: :js, xhr: true
+    end
+
+    assert_response :success
+    assert_equal "Visa ××42", assigns(:message)
+    StripeMock.stop
+  end
+
+  test "should get payment details for a card saved before payment methods" do
+    StripeMock.start
+    stripe_helper = StripeMock.create_test_helper
+    customer = Stripe::Customer.create({email: @user.email, source: stripe_helper.generate_card_token(last4: "9999")})
+    @user.update(customer_id: customer.id)
+
+    login_as @user
+    get :payment_details, format: :js, xhr: true
+
+    assert_response :success
+    assert_equal "Visa ××99", assigns(:message)
     StripeMock.stop
   end
 end

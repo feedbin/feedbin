@@ -11,10 +11,33 @@ class feedbin.Payments
     @createButton()
     @createCard()
 
+  # Confirming a SetupIntent with the token is what surfaces a 3D Secure
+  # challenge when the card requires one. Stripe.js converts the token into a
+  # PaymentMethod — carrying the name and country already collected on the token
+  # — and the form posts that id rather than the token.
   tokenHandler: (token) ->
-    hiddenInput = document.getElementById("stripe_token")
-    hiddenInput.setAttribute "value", token.id
-    @paymentForm.submit()
+    @createSetupIntent()
+      .then (data) =>
+        @stripe.confirmCardSetup data.client_secret,
+          payment_method:
+            card:
+              token: token.id
+      .then (result) =>
+        throw new Error result.error.message if result.error
+        # Stripe.js renders objects at the account's default API version, which
+        # called this field `source` before 2019-02-11.
+        intent = result.setupIntent
+        document.getElementById("stripe_token").value = intent.payment_method or intent.source
+        @paymentForm.submit()
+      .catch (error) =>
+        @creditCardButton.disabled = false
+        feedbin.showNotification (error?.message or "Could not save your card. Please try again."), true
+
+  # Wrapped in Promise.resolve because jQuery 2 deferreds don't adopt native
+  # promises returned from .then, so the confirm step wouldn't be awaited.
+  # jquery_ujs adds the CSRF header to jQuery ajax requests via $.ajaxPrefilter.
+  createSetupIntent: ->
+    Promise.resolve $.post($(@paymentForm).attr("data-setup-intent-url"), {}, null, "json")
 
   updatePaymentRequest: (id) ->
     typeof(@button) != "undefined" && @button.destroy()

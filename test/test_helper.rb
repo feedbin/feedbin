@@ -43,6 +43,7 @@ require "webmock/minitest"
 
 require "support/login_helper"
 require "support/factory_helper"
+require "support/stripe_payment_method_helper"
 require "support/assertions"
 require "support/api_controller_test_case"
 require "support/push_server_mock"
@@ -57,6 +58,7 @@ Sidekiq.logger.level = Logger::WARN
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
+  include StripePaymentMethodHelper
 
   parallelize(workers: :number_of_processors)
 
