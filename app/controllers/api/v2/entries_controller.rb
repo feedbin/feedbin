@@ -25,8 +25,12 @@ module Api
       end
 
       def text
-        entry = Entry.find(params[:id])
-        render plain: EntriesHelper.text_format(entry.content), content_type: "text/plain"
+        if @user.can_read_entry?(params[:id])
+          entry = Entry.find(params[:id])
+          render plain: EntriesHelper.text_format(entry.content), content_type: "text/plain"
+        else
+          render_404
+        end
       end
 
       def watch
