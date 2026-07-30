@@ -29,14 +29,14 @@ module StripePaymentMethodHelper
     end
   end
 
-  # Stands in for Customer.dunning_invoice: a subscription whose `latest_invoice`
-  # points at an invoice in `status`. Also fails the test if anything reaches for
-  # the newest-open-invoice query that this deliberately replaced.
+  # Gives Customer#subscription a `latest_invoice` pointing at an invoice in
+  # `status` — stripe-ruby-mock's subscriptions predate that field. Also fails the
+  # test if anything reaches for the newest-open-invoice query this replaced.
   def stub_dunning_invoice(status: "open", payment_intent: "pi_test", invoice_id: "in_open")
-    subscriptions = Stripe::ListObject.construct_from(
-      object: "list",
-      has_more: false,
-      data: [{id: "sub_test", object: "subscription", latest_invoice: invoice_id}]
+    subscription = Stripe::StripeObject.construct_from(
+      id: "sub_test",
+      object: "subscription",
+      latest_invoice: invoice_id
     )
 
     invoice = Stripe::Invoice.construct_from(
@@ -48,7 +48,7 @@ module StripePaymentMethodHelper
 
     no_list = ->(*) { raise "collection must gate on the subscription's latest_invoice, not the newest open invoice" }
 
-    Stripe::Subscription.stub(:list, subscriptions) do
+    Customer.stub_any_instance(:subscription, subscription) do
       Stripe::Invoice.stub(:list, no_list) do
         Stripe::Invoice.stub(:retrieve, invoice) do
           yield
@@ -66,9 +66,15 @@ module StripePaymentMethodHelper
       client_secret: client_secret
     )
 
+    # The lookup hangs off a Customer instance now, and these tests don't care
+    # which customer — stub_dunning_invoice supplies the subscription.
+    wrapped = Customer.new(Stripe::Customer.construct_from(id: "cus_test", object: "customer"))
+
     stub_dunning_invoice(payment_intent: payment_intent) do
-      Stripe::PaymentIntent.stub(:retrieve, intent) do
-        yield
+      Customer.stub(:retrieve, wrapped) do
+        Stripe::PaymentIntent.stub(:retrieve, intent) do
+          yield
+        end
       end
     end
   end

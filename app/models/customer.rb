@@ -30,34 +30,6 @@ class Customer
   # waiting, so this doubles as the check for whether to offer authentication.
   # Neither `invoice.payment_intent` nor PaymentIntents themselves exist at the
   # pinned API version, so both reads happen at the newer one.
-  def self.authentication_client_secret(customer_id)
-    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
-    invoice = dunning_invoice(customer_id, options)
-    payment_intent_id = invoice && invoice[:payment_intent]
-    return nil if payment_intent_id.blank?
-
-    intent = Stripe::PaymentIntent.retrieve(payment_intent_id, options)
-    intent.client_secret if intent.status == "requires_action"
-  end
-
-  # The subscription's `latest_invoice` is the one Stripe's dunning is working on,
-  # and the only one this app has any business collecting or authenticating.
-  # Asking for "the newest open invoice on the customer" instead would also pick
-  # up a period that was written off, a stale plan-change invoice, or anything
-  # raised by hand — and charge it the next time the customer saves a card.
-  #
-  # Returns nil unless that invoice is open, i.e. unless something is actually
-  # owed. The subscription is re-read rather than taken from the customer object
-  # so this doesn't depend on the pinned version's expansion.
-  def self.dunning_invoice(customer_id, options)
-    subscription = Stripe::Subscription.list({customer: customer_id, limit: 1}, options).data.first
-    latest_invoice_id = subscription && subscription[:latest_invoice]
-    return nil if latest_invoice_id.blank?
-
-    invoice = Stripe::Invoice.retrieve(latest_invoice_id, options)
-    invoice if invoice.status == "open"
-  end
-
   def initialize(customer)
     @customer = customer
   end
@@ -108,9 +80,25 @@ class Customer
   # Returns :paid, :requires_action when the bank wants the customer to
   # authenticate, or nil when there was nothing owed. A genuine decline raises
   # Stripe::CardError, the same as any other charge in this controller.
+  # When a recurring charge needs authentication Stripe leaves the invoice open
+  # with its PaymentIntent in `requires_action`, and that intent's client secret
+  # is what the browser needs to run the challenge. Returns nil when nothing is
+  # waiting, so this doubles as the check for whether to offer authentication.
+  # PaymentIntents don't exist at the pinned API version, so the read happens at
+  # the newer one.
+  def authentication_client_secret
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice = dunning_invoice(options)
+    payment_intent_id = invoice && invoice[:payment_intent]
+    return nil if payment_intent_id.blank?
+
+    intent = Stripe::PaymentIntent.retrieve(payment_intent_id, options)
+    intent.client_secret if intent.status == "requires_action"
+  end
+
   def pay_open_invoice
     options = {stripe_version: STRIPE_INTENTS_API_VERSION}
-    invoice = self.class.dunning_invoice(id, options)
+    invoice = dunning_invoice(options)
     return nil unless invoice
 
     Stripe::Invoice.pay(invoice.id, {}, options).paid ? :paid : :requires_action
@@ -156,6 +144,23 @@ class Customer
   end
 
   private
+
+  # The subscription's `latest_invoice` is the one Stripe's dunning is working on,
+  # and the only one this app has any business collecting or authenticating.
+  # Asking for "the newest open invoice on the customer" instead would also pick
+  # up a period that was written off, a stale plan-change invoice, or anything
+  # raised by hand — and charge it the next time the customer saves a card.
+  #
+  # Read off `subscription`, the same accessor unpaid? and update_plan use, rather
+  # than looking the subscription up a second way. Returns nil unless the invoice
+  # is open, i.e. unless something is actually owed.
+  def dunning_invoice(options)
+    latest_invoice_id = subscription && subscription[:latest_invoice]
+    return nil if latest_invoice_id.blank?
+
+    invoice = Stripe::Invoice.retrieve(latest_invoice_id, options)
+    invoice if invoice.status == "open"
+  end
 
   # `invoice_settings` isn't part of the customer shape at the pinned API
   # version, so `customer` never carries it — re-read at a version that does.

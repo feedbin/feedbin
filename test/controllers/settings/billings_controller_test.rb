@@ -238,12 +238,14 @@ class Settings::BillingsControllerTest < ActionController::TestCase
   end
 
   test "should skip authenticate when there is no open invoice" do
-    StripeMock.start
-    login_as @user
-    get :authenticate
+    # A real mock customer, so this exercises the nothing-owed path rather than
+    # tripping over a customer that doesn't exist.
+    with_card_saving_user("nothing-owed@example.com") do |user|
+      get :authenticate
+    end
 
     assert_redirected_to settings_billing_url
-    StripeMock.stop
+    assert_equal "There's no payment waiting to be confirmed.", flash[:notice]
   end
 
   test "should create a setup intent" do

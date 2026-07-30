@@ -52,7 +52,7 @@ class Settings::BillingsController < ApplicationController
   # looked up fresh rather than carried in the link, so the URL is safe to email
   # and still works if Stripe retries the charge before the customer clicks.
   def authenticate
-    @client_secret = Customer.authentication_client_secret(@user.customer_id)
+    @client_secret = Customer.retrieve(@user.customer_id).authentication_client_secret
 
     if @client_secret
       render layout: "settings"
