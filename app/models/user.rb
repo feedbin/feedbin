@@ -336,7 +336,7 @@ class User < ApplicationRecord
     end
 
     if stripe_token.present?
-      stripe_customer.update_source(stripe_token)
+      stripe_customer.update_payment_method(stripe_token)
       self.suspended = false
       subscriptions.update_all(active: true)
     end

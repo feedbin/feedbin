@@ -1,15 +1,22 @@
 module StripePaymentMethodHelper
-  # stripe-ruby-mock has no PaymentMethod handler, so the two PaymentMethod calls
+  # stripe-ruby-mock has no PaymentMethod handler, so the PaymentMethod calls
   # made while saving a card are stubbed at the library boundary. The
   # `Stripe::Customer.update` that sets `invoice_settings.default_payment_method`
   # still runs against the mock, so the result of saving a card is assertable.
   #
-  # Yields an array that records each attach, as {payment_method:, customer:}.
+  # Yields arrays recording each attach ({payment_method:, customer:}) and each
+  # detach (the PaymentMethod id).
   def stub_payment_methods(brand: "Visa", last4: "4242")
     attachments = []
+    detachments = []
 
     attach = lambda do |payment_method, params = {}, _opts = {}|
       attachments << {payment_method: payment_method, customer: params[:customer]}
+      nil
+    end
+
+    detach = lambda do |payment_method, _params = {}, _opts = {}|
+      detachments << payment_method
       nil
     end
 
@@ -23,8 +30,10 @@ module StripePaymentMethodHelper
     end
 
     Stripe::PaymentMethod.stub(:attach, attach) do
-      Stripe::PaymentMethod.stub(:retrieve, retrieve) do
-        yield attachments
+      Stripe::PaymentMethod.stub(:detach, detach) do
+        Stripe::PaymentMethod.stub(:retrieve, retrieve) do
+          yield attachments, detachments
+        end
       end
     end
   end
@@ -80,10 +89,12 @@ module StripePaymentMethodHelper
   end
 
   # Exercises the retry that follows a card update. stripe-ruby-mock can't pay an
-  # invoice, so the pay call is stubbed. `error_code` makes it raise, standing in
-  # for a decline or an authentication demand.
-  def stub_open_invoice(paid: false, error_code: nil)
+  # invoice, so the pay call is stubbed. `error_code` raises a CardError, standing
+  # in for a decline or an authentication demand; `error` raises the given
+  # exception, standing in for anything else going wrong mid-collection.
+  def stub_open_invoice(paid: false, error_code: nil, error: nil)
     pay = lambda do |_id, _params = {}, _opts = {}|
+      raise error if error
       raise Stripe::CardError.new("Your card was declined.", nil, code: error_code) if error_code
       Stripe::Invoice.construct_from(id: "in_open", object: "invoice", status: paid ? "paid" : "open", paid: paid)
     end

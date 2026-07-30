@@ -75,7 +75,7 @@ class Settings::BillingsControllerTest < ActionController::TestCase
       plan: plan
     )
 
-    stub_payment_methods do |attachments|
+    stub_payment_methods do |attachments, detachments|
       user.stripe_token = "pm_original"
       user.save
 
@@ -85,6 +85,7 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
       assert_equal ["pm_original", "pm_replacement"], attachments.map { _1[:payment_method] }
       assert_equal [user.customer_id, user.customer_id], attachments.map { _1[:customer] }
+      assert_equal ["pm_original"], detachments, "the replaced card should not stay attached"
     end
 
     customer = Stripe::Customer.retrieve(user.customer_id)
@@ -151,6 +152,41 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
     assert_redirected_to edit_settings_billing_url
     assert_equal "Your card was declined.", flash[:alert]
+  end
+
+  test "should keep a suspended account suspended until authentication finishes" do
+    with_card_saving_user("suspended-needs-auth@example.com", suspended: true) do |user|
+      stub_open_invoice(paid: false) do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+
+      assert user.reload.suspended, "an unauthenticated payment must not buy access"
+    end
+
+    assert_redirected_to authenticate_settings_billing_url
+  end
+
+  test "should report the save honestly when collecting the invoice errors" do
+    with_card_saving_user("collect-error@example.com") do |user|
+      stub_open_invoice(error: Stripe::APIConnectionError.new("Connection error")) do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+    end
+
+    assert_redirected_to settings_billing_url
+    assert_equal "Your card has been updated, but we could not collect the open invoice. Please try again.", flash[:alert]
+  end
+
+  test "should re-suspend a suspended account when collecting the invoice errors" do
+    with_card_saving_user("collect-error-suspended@example.com", suspended: true) do |user|
+      stub_open_invoice(error: Stripe::APIConnectionError.new("Connection error")) do
+        post :update_credit_card, params: {stripe_token: "pm_replacement"}
+      end
+
+      assert user.reload.suspended, "an invoice that wasn't collected must not buy access"
+    end
+
+    assert_redirected_to settings_billing_url
   end
 
   test "should not collect an invoice that dunning is not working on" do
@@ -248,6 +284,17 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal "There's no payment waiting to be confirmed.", flash[:notice]
   end
 
+  test "should recover when authenticate cannot reach Stripe" do
+    login_as @user
+
+    Customer.stub(:retrieve, ->(*) { raise Stripe::APIConnectionError.new("Connection error") }) do
+      get :authenticate
+    end
+
+    assert_redirected_to settings_billing_url
+    assert_equal "Could not load the payment. Please try again.", flash[:alert]
+  end
+
   test "should create a setup intent" do
     login_as @user
 
@@ -294,6 +341,27 @@ class Settings::BillingsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal "Visa ××99", assigns(:message)
+    StripeMock.stop
+  end
+
+  test "should show no payment info when the customer has no card" do
+    StripeMock.start
+    plan = plans(:trial)
+    create_stripe_plan(plan)
+
+    user = User.create(
+      email: "no-card@example.com",
+      password: default_password,
+      plan: plan
+    )
+    customer = Stripe::Customer.create({email: user.email})
+    user.update(customer_id: customer.id)
+
+    login_as user
+    get :payment_details, format: :js, xhr: true
+
+    assert_response :success
+    assert_equal "No payment info", assigns(:message)
     StripeMock.stop
   end
 

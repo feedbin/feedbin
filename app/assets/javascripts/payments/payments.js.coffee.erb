@@ -11,12 +11,9 @@ class feedbin.Payments
     @createButton()
     @createCard()
 
-  # Saving a card means confirming a SetupIntent — that's what surfaces a 3D
-  # Secure challenge when the card requires one — and the form posts the
-  # resulting PaymentMethod id, never the card details.
-  #
-  # Resolves with the client secret alongside the intent, so a caller that
-  # deferred the challenge can still run it afterwards.
+  # Confirming the SetupIntent is what surfaces a 3D Secure challenge when the
+  # card requires one. Resolves with the client secret alongside the intent, so
+  # a caller that deferred the challenge can still run it afterwards.
   confirmSetup: (paymentMethod, options = {}) ->
     clientSecret = null
     @createSetupIntent()
@@ -38,8 +35,7 @@ class feedbin.Payments
   # The wallet button. `handleActions: false` keeps Stripe.js from opening a
   # challenge while the payment sheet is still up — the sheet sits above it and
   # the customer would be stuck — so the sheet is dismissed first and any
-  # challenge runs after. Dismissing it also means reporting the real outcome:
-  # anything that fails before the sheet closes completes as "fail".
+  # challenge runs after. Failures before the sheet closes complete it as "fail".
   saveCardFromWallet: (event) ->
     dismissed = false
     @confirmSetup(event.paymentMethod.id, handleActions: false)
@@ -51,6 +47,9 @@ class feedbin.Payments
         else
           confirmed.intent
       .then (intent) =>
+        # Replaced only now that the card is definitely saved — a failed or
+        # cancelled challenge leaves the button mounted for another try.
+        $("#payment_request_button").html "<small>Loading…</small>"
         @submitPaymentMethod intent
       .catch (error) =>
         event.complete "fail" unless dismissed
@@ -67,9 +66,12 @@ class feedbin.Payments
     document.getElementById("stripe_token").value = intent.payment_method or intent.source
     @paymentForm.submit()
 
+  # A failed createSetupIntent call rejects with a jqXHR; the server's message
+  # rides in responseJSON.
   setupFailed: (error) ->
     @creditCardButton.disabled = false
-    feedbin.showNotification (error?.message or "Could not save your card. Please try again."), true
+    message = error?.message or error?.responseJSON?.error or "Could not save your card. Please try again."
+    feedbin.showNotification message, true
 
   # Wrapped in Promise.resolve because jQuery 2 deferreds don't adopt native
   # promises returned from .then, so the confirm step wouldn't be awaited.
@@ -91,10 +93,9 @@ class feedbin.Payments
         $("body").addClass "no-native-payment"
       $("body").addClass "payment-loaded"
 
-    # `paymentmethod` rather than `token`: it hands over a PaymentMethod directly,
-    # so there's nothing to convert, and it's the event Stripe pairs with Intents.
+    # `paymentmethod` rather than `token`: it hands over a PaymentMethod
+    # directly — nothing to convert.
     @plans[id].on "paymentmethod", (event) =>
-      $("#payment_request_button").html "<small>Loading…</small>"
       @saveCardFromWallet event
 
   makeButton: (id) ->

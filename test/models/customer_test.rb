@@ -40,7 +40,40 @@ class CustomerTest < ActiveSupport::TestCase
     assert_empty updated
   end
 
+  test "pay_open_invoice treats an invoice paid out from under it as paid" do
+    responses = [
+      Stripe::Invoice.construct_from(id: "in_open", object: "invoice", status: "open"),
+      Stripe::Invoice.construct_from(id: "in_open", object: "invoice", status: "paid")
+    ]
+    pay = ->(*) { raise Stripe::InvalidRequestError.new("Invoice is already paid", nil) }
+
+    Customer.stub_any_instance(:subscription, dunning_subscription) do
+      Stripe::Invoice.stub(:retrieve, ->(*) { responses.shift }) do
+        Stripe::Invoice.stub(:pay, pay) do
+          assert_equal :paid, customer.pay_open_invoice
+        end
+      end
+    end
+  end
+
+  test "pay_open_invoice re-raises when the invoice turns out not to be paid" do
+    invoice = Stripe::Invoice.construct_from(id: "in_open", object: "invoice", status: "open")
+    pay = ->(*) { raise Stripe::InvalidRequestError.new("No such invoice", nil) }
+
+    Customer.stub_any_instance(:subscription, dunning_subscription) do
+      Stripe::Invoice.stub(:retrieve, invoice) do
+        Stripe::Invoice.stub(:pay, pay) do
+          assert_raises(Stripe::InvalidRequestError) { customer.pay_open_invoice }
+        end
+      end
+    end
+  end
+
   private
+
+  def dunning_subscription
+    Stripe::StripeObject.construct_from(id: "sub_test", object: "subscription", latest_invoice: "in_open")
+  end
 
   def customer
     Customer.new(Stripe::Customer.construct_from(id: "cus_test", object: "customer"))

@@ -34,9 +34,9 @@ class Settings::BillingsController < ApplicationController
     redirect_to settings_billing_url, alert: "Your card was declined, please update your billing information."
   end
 
-  # Confirming this client-side is what triggers 3D Secure when the card needs
-  # it. The card details never reach us: Stripe.js turns the token into a
-  # PaymentMethod, and the form posts back only its id.
+  # Confirmed client-side, which is what triggers 3D Secure when the card needs
+  # it. The card details never reach us — the form posts back only the resulting
+  # PaymentMethod id.
   def create_setup_intent
     intent = Stripe::SetupIntent.create(
       {customer: current_user.customer_id, usage: "off_session"},
@@ -83,11 +83,14 @@ class Settings::BillingsController < ApplicationController
         customer = Customer.retrieve(@user.customer_id)
         recovery = customer.reopen_account if customer.unpaid?
 
-        # A card update is often the answer to a failed charge, so put the new
-        # card to work on whatever is owed rather than reporting success over an
-        # invoice that's still open. Skipped after a re-anchor, which has already
-        # written the lapsed period off — collecting it too would double charge.
+        # A card update is often the answer to a failed charge, so collect what's
+        # owed with the new card. Skipped after a re-anchor, which already wrote
+        # the lapsed period off — collecting it too would double charge.
         if recovery != :reanchored && customer.pay_open_invoice == :requires_action
+          # Nothing has been paid yet, so a suspension stays until the customer
+          # authenticates — abandoning the challenge must not buy access. The
+          # subscription_reactivated? webhook lifts it once the payment lands.
+          @user.deactivate if was_suspended
           redirect_to authenticate_settings_billing_url
         else
           redirect_to settings_billing_url, notice: "Your card has been updated."
@@ -106,6 +109,13 @@ class Settings::BillingsController < ApplicationController
     # so no further webhook arrives to suspend the account again.
     @user.deactivate if was_suspended
     redirect_to edit_settings_billing_url, alert: exception.message
+  rescue Stripe::StripeError => exception
+    # Anything else — a collection race, a Stripe outage — happened after the
+    # card saved, so report the save honestly and leave the invoice for a retry.
+    # The suspension logic is the same as above: no webhook will re-suspend.
+    ErrorService.notify(exception)
+    @user.deactivate if was_suspended
+    redirect_to settings_billing_url, alert: "Your card has been updated, but we could not collect the open invoice. Please try again."
   end
 
   private
