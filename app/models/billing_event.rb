@@ -46,6 +46,10 @@ class BillingEvent < ApplicationRecord
     if invoice_created?
       UpdateStatementDescriptor.perform_async(id)
     end
+
+    if payment_action_required?
+      UserMailer.payment_action_required(id).deliver_later
+    end
   end
 
   def charge_succeeded?
@@ -76,6 +80,13 @@ class BillingEvent < ApplicationRecord
 
   def invoice_created?
     event_type == "invoice.created"
+  end
+
+  # The recurring charge was attempted and the bank wants the customer to
+  # authenticate it. Nothing has failed yet — the invoice stays open until they
+  # do, or until Stripe gives up retrying and sends invoice.payment_failed.
+  def payment_action_required?
+    event_type == "invoice.payment_action_required"
   end
 
   def invoice

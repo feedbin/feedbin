@@ -48,6 +48,22 @@ class Settings::BillingsController < ApplicationController
     render json: {error: "Could not start card setup. Please try again."}, status: :service_unavailable
   end
 
+  # Where the invoice.payment_action_required email lands. The client secret is
+  # looked up fresh rather than carried in the link, so the URL is safe to email
+  # and still works if Stripe retries the charge before the customer clicks.
+  def authenticate
+    @client_secret = Customer.authentication_client_secret(@user.customer_id)
+
+    if @client_secret
+      render layout: "settings"
+    else
+      redirect_to settings_billing_url, notice: "There's no payment waiting to be confirmed."
+    end
+  rescue Stripe::StripeError => exception
+    ErrorService.notify(exception)
+    redirect_to settings_billing_url, alert: "Could not load the payment. Please try again."
+  end
+
   def payment_details
     @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id), expires_in: 5.minutes) {
       Customer.retrieve(@user.customer_id).card_description

@@ -29,6 +29,34 @@ module StripePaymentMethodHelper
     end
   end
 
+  # stripe-ruby-mock has no PaymentIntent handler and its invoice list ignores
+  # the `status` filter, so both halves of the authentication lookup are stubbed.
+  def stub_authentication_intent(status: "requires_action", client_secret: "pi_test_secret", payment_intent: "pi_test")
+    invoices = Stripe::ListObject.construct_from(
+      object: "list",
+      has_more: false,
+      data: [{
+        id: "in_test",
+        object: "invoice",
+        status: "open",
+        payment_intent: payment_intent
+      }]
+    )
+
+    intent = Stripe::PaymentIntent.construct_from(
+      id: "pi_test",
+      object: "payment_intent",
+      status: status,
+      client_secret: client_secret
+    )
+
+    Stripe::Invoice.stub(:list, invoices) do
+      Stripe::PaymentIntent.stub(:retrieve, intent) do
+        yield
+      end
+    end
+  end
+
   def stub_setup_intent(client_secret: "seti_test_secret")
     intent = Stripe::SetupIntent.construct_from(
       id: "seti_test",

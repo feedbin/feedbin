@@ -1,0 +1,9 @@
+Hi <%= @user.email %>,
+
+Your bank needs you to confirm the payment for your Feedbin subscription before it can go through. Nothing has been charged yet.
+
+Confirm the payment on: <%= authenticate_settings_billing_url %>
+
+It only takes a moment. If the payment isn't confirmed, your bank will decline it and your account will eventually be suspended.
+
+Thanks!

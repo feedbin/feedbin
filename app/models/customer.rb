@@ -19,6 +19,22 @@ class Customer
     new(Stripe::Customer.retrieve(customer_id))
   end
 
+  # When a recurring charge needs authentication Stripe leaves the invoice open
+  # with its PaymentIntent in `requires_action`, and that intent's client secret
+  # is what the browser needs to run the challenge. Returns nil when nothing is
+  # waiting, so this doubles as the check for whether to offer authentication.
+  # Neither `invoice.payment_intent` nor PaymentIntents themselves exist at the
+  # pinned API version, so both reads happen at the newer one.
+  def self.authentication_client_secret(customer_id)
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice = Stripe::Invoice.list({customer: customer_id, status: "open", limit: 1}, options).data.first
+    payment_intent_id = invoice && invoice[:payment_intent]
+    return nil if payment_intent_id.blank?
+
+    intent = Stripe::PaymentIntent.retrieve(payment_intent_id, options)
+    intent.client_secret if intent.status == "requires_action"
+  end
+
   def initialize(customer)
     @customer = customer
   end

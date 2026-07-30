@@ -67,6 +67,22 @@ class BillingEventTest < ActiveSupport::TestCase
     assert_equal(billing_event.id, UpdateStatementDescriptor.jobs.first["args"].first)
   end
 
+  test "payment_action_required?" do
+    event = StripeMock.mock_webhook_event("invoice.payment_action_required", webhook_defaults)
+    billing_event = assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        BillingEvent.create(info: event.as_json)
+      end
+    end
+
+    assert billing_event.payment_action_required?
+    assert_equal @user, billing_event.billable
+
+    mail = ActionMailer::Base.deliveries.last
+    assert_equal [@user.email], mail.to
+    assert_match "/settings/billing/authenticate", mail.body.to_s
+  end
+
   private
 
   def webhook_defaults

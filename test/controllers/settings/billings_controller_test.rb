@@ -119,6 +119,37 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "should authenticate a payment that needs it" do
+    login_as @user
+
+    stub_authentication_intent(client_secret: "pi_123_secret") do
+      get :authenticate
+    end
+
+    assert_response :success
+    assert_equal "pi_123_secret", assigns(:client_secret)
+    assert_match "pi_123_secret", response.body
+  end
+
+  test "should skip authenticate when the intent no longer needs action" do
+    login_as @user
+
+    stub_authentication_intent(status: "succeeded") do
+      get :authenticate
+    end
+
+    assert_redirected_to settings_billing_url
+  end
+
+  test "should skip authenticate when there is no open invoice" do
+    StripeMock.start
+    login_as @user
+    get :authenticate
+
+    assert_redirected_to settings_billing_url
+    StripeMock.stop
+  end
+
   test "should create a setup intent" do
     login_as @user
 

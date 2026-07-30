@@ -1,0 +1,32 @@
+<%= render Settings::H1Component.new do %>
+  Confirm Payment
+<% end %>
+
+<p class="mb-4" data-behavior="authentication_status">
+  Your bank needs to confirm this payment. Follow the prompt to finish&hellip;
+</p>
+
+<%= render Settings::ButtonRowComponent.new do %>
+  <%= link_to "Back to Billing", settings_billing_path, class: "button hide", data: {behavior: "authentication_retry"} %>
+<% end %>
+
+<% content_for :head do %>
+  <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+  <script>
+      $(function() {
+          var stripe = Stripe("<%= STRIPE_PUBLIC_KEY %>");
+
+          // The PaymentIntent already has the card attached, so confirming with
+          // just the client secret runs the bank's challenge and nothing else.
+          stripe.confirmCardPayment(<%= raw @client_secret.to_json %>).then(function(result) {
+              if (result.error) {
+                  feedbin.showNotification(result.error.message, true);
+                  $("[data-behavior~=authentication_status]").text("This payment could not be confirmed. Your bank may have declined it, or the card may need to be replaced.");
+                  $("[data-behavior~=authentication_retry]").removeClass("hide");
+              } else {
+                  window.location = "<%= j settings_billing_url %>";
+              }
+          });
+      });
+  </script>
+<% end %>
