@@ -18,7 +18,7 @@ class UserMailer < ApplicationMailer
   def payment_action_required(billing_event)
     @billing_event = BillingEvent.find(billing_event)
     @user = @billing_event.billable
-    mail to: @user.email, subject: "[Feedbin] Confirm Your Payment With Your Bank"
+    mail to: @user.email, subject: "[Feedbin] Confirm Your Payment"
   end
 
   def subscription_reminder(billing_event)
