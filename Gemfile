@@ -8,7 +8,7 @@ gem "llhttp", github: "benubois/llhttp",
               branch: "memory_corruption",
               glob: "mri/*.gemspec"
 
-gem "rails", "8.1.3"
+gem "rails", "8.1.3.1"
 gem "will_paginate"
 
 gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
