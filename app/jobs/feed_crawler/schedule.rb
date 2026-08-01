@@ -14,10 +14,10 @@ module FeedCrawler
         return
       end
 
-      unless last_refresh.before?(15.minutes.ago)
-        Sidekiq.logger.info "skipping, last crawl too recent: #{last_refresh}"
-        return
-      end
+      # unless last_refresh.before?(15.minutes.ago)
+      #   Sidekiq.logger.info "skipping, last crawl too recent: #{last_refresh}"
+      #   return
+      # end
 
       refresh_feeds
     end
