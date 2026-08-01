@@ -1,5 +1,11 @@
 window.feedbin ?= {}
 
+# A card that fails to save leaves behind one notification and nothing else — the
+# step it failed at, and what Stripe or the server actually said, are gone. In
+# development each step narrates itself to the console instead. Off everywhere
+# else: this logs card metadata, tokens and PaymentMethod ids.
+DEBUG = <%= Rails.env.development?.to_json %>
+
 class feedbin.Payments
 
   constructor: (plans, @defaultPlan) ->
@@ -8,32 +14,164 @@ class feedbin.Payments
     @plans = @formatPlans(plans)
     @paymentForm = document.getElementById("payment-form")
     @creditCardButton = document.getElementById("credit_card_button")
+    @log "init", plans: plans, defaultPlan: @defaultPlan, form: @paymentForm?.action
     @createButton()
     @createCard()
 
-  tokenHandler: (token) ->
-    hiddenInput = document.getElementById("stripe_token")
-    hiddenInput.setAttribute "value", token.id
+  log: (message, detail) ->
+    return unless DEBUG
+    if detail?
+      console.log "[payments] #{message}", detail
+    else
+      console.log "[payments] #{message}"
+
+  errorSummary: (error) ->
+    return null unless error
+    type: error.type
+    code: error.code
+    declineCode: error.decline_code
+    message: error.message
+
+  # Confirming the SetupIntent is what surfaces a 3D Secure challenge when the
+  # card requires one. Resolves with the client secret alongside the intent, so
+  # a caller that deferred the challenge can still run it afterwards.
+  confirmSetup: (paymentMethod, options = {}) ->
+    clientSecret = null
+    @log "confirmSetup", paymentMethod: paymentMethod, options: options
+    @createSetupIntent()
+      .then (data) =>
+        clientSecret = data.client_secret
+        @log "setup intent created", clientSecret: clientSecret
+        @stripe.confirmCardSetup clientSecret, {payment_method: paymentMethod}, options
+      .then (result) =>
+        # Only the diagnostic fields of an error: the whole object carries a copy
+        # of the SetupIntent, which buries everything useful.
+        @log "confirmCardSetup returned",
+          status: result.setupIntent?.status
+          paymentMethod: result.setupIntent?.payment_method
+          nextAction: result.setupIntent?.next_action?.type
+          error: @errorSummary(result.error)
+        throw new Error result.error.message if result.error
+        {intent: result.setupIntent, clientSecret: clientSecret}
+
+  # The card form, where Stripe.js is free to open the challenge inline.
+  saveCardFromForm: (token) ->
+    @log "saving card from form", token: token.id, card: token.card?.brand, last4: token.card?.last4
+    @confirmSetup(card: {token: token.id})
+      .then (confirmed) =>
+        @submitPaymentMethod confirmed.intent
+      .catch (error) =>
+        @setupFailed error
+
+  # The wallet button. `handleActions: false` keeps Stripe.js from opening a
+  # challenge while the payment sheet is still up — the sheet sits above it and
+  # the customer would be stuck — so the sheet is dismissed first and any
+  # challenge runs after. Failures before the sheet closes complete it as "fail".
+  saveCardFromWallet: (event) ->
+    dismissed = false
+    @log "wallet handed over a payment method",
+      paymentMethod: event.paymentMethod?.id
+      walletName: event.walletName
+    @confirmSetup(event.paymentMethod.id, handleActions: false)
+      .then (confirmed) =>
+        event.complete "success"
+        dismissed = true
+        if confirmed.intent.status == "requires_action"
+          @runNextAction confirmed.clientSecret
+        else
+          confirmed.intent
+      .then (intent) =>
+        # Replaced only now that the card is definitely saved — a failed or
+        # cancelled challenge leaves the button mounted for another try.
+        $("#payment_request_button").html "<small>Loading…</small>"
+        @submitPaymentMethod intent
+      .catch (error) =>
+        @log "wallet flow failed", sheetDismissed: dismissed
+        event.complete "fail" unless dismissed
+        @setupFailed error
+
+  runNextAction: (clientSecret) ->
+    @log "running deferred next action"
+    @stripe.confirmCardSetup(clientSecret).then (result) =>
+      @log "next action returned",
+        status: result.setupIntent?.status
+        error: @errorSummary(result.error)
+      throw new Error result.error.message if result.error
+      result.setupIntent
+
+  submitPaymentMethod: (intent) ->
+    # Stripe.js renders objects at the account's default API version, which
+    # called this field `source` before 2019-02-11.
+    token = intent.payment_method or intent.source
+    @log "submitting form", stripe_token: token, intentStatus: intent.status
+    document.getElementById("stripe_token").value = token
     @paymentForm.submit()
 
+  # A failed createSetupIntent call rejects with a jqXHR; the server's message
+  # rides in responseJSON.
+  setupFailed: (error) ->
+    @creditCardButton.disabled = false
+    message = error?.message or error?.responseJSON?.error or "Could not save your card. Please try again."
+    @log "setup failed",
+      shown: message
+      type: if error?.readyState? then "jqXHR" else error?.constructor?.name
+      status: error?.status
+      responseJSON: error?.responseJSON
+      responseText: error?.responseText?.slice(0, 200)
+      error: error
+    feedbin.showNotification message, true
+
+  # Wrapped in Promise.resolve because jQuery 2 deferreds don't adopt native
+  # promises returned from .then, so the confirm step wouldn't be awaited.
+  # jquery_ujs adds the CSRF header to jQuery ajax requests via $.ajaxPrefilter.
+  createSetupIntent: ->
+    url = $(@paymentForm).attr("data-setup-intent-url")
+    @log "requesting setup intent", url: url
+    Promise.resolve $.post(url, {}, null, "json")
+
   updatePaymentRequest: (id) ->
+    paymentRequest = @plans[id]
+
+    # Nothing to quote an amount from, so there's no wallet button to build. Bail
+    # out rather than letting Stripe.js throw on an undefined paymentRequest: the
+    # throw happens before the card form is revealed and would take it down too,
+    # leaving the page on "Loading…" with no way to enter a card.
+    unless paymentRequest
+      @log "no wallet button: unknown plan", plan: id, known: Object.keys(@plans)
+      @revealPaymentMethods false
+      return
+
     typeof(@button) != "undefined" && @button.destroy()
     @button = @makeButton(id)
-    @plans[id].canMakePayment().then (result) =>
-      $("[data-behavior~=hide_on_load]").addClass("hide")
-      if result && result.applePay == true
-        $("body").addClass "apple-pay"
-        $("body").addClass "native-payment"
-        $("#billing_method_apple_pay").prop "checked", true
-        @button.mount "#payment_request_button"
-      else
-        $("body").addClass "no-native-payment"
-      $("body").addClass "payment-loaded"
+    paymentRequest.canMakePayment()
+      .then (result) =>
+        @log "canMakePayment", plan: id, result: result
+        applePay = result? && result.applePay == true
+        @revealPaymentMethods applePay
+        if applePay
+          $("#billing_method_apple_pay").prop "checked", true
+          @button.mount "#payment_request_button"
+      .catch (error) =>
+        # Same reasoning as above: whatever went wrong with the wallet, the card
+        # form still has to appear.
+        @log "canMakePayment failed", plan: id, error: error?.message
+        @revealPaymentMethods false
 
-    @plans[id].on "token", (event) =>
-      @tokenHandler event.token
-      $("#payment_request_button").html "<small>Loading…</small>"
-      event.complete "success"
+    # `paymentmethod` rather than `token`: it hands over a PaymentMethod
+    # directly — nothing to convert.
+    paymentRequest.on "paymentmethod", (event) =>
+      @saveCardFromWallet event
+
+  # `payment-loaded` is what reveals the form, so every path out of
+  # updatePaymentRequest has to reach this — including the ones with no button.
+  revealPaymentMethods: (nativePayment) ->
+    $("[data-behavior~=hide_on_load]").addClass("hide")
+    if nativePayment
+      $("body").addClass "apple-pay"
+      $("body").addClass "native-payment"
+    else
+      $("body").addClass "no-native-payment"
+    $("body").addClass "payment-loaded"
 
   makeButton: (id) ->
     options =
@@ -72,22 +210,30 @@ class feedbin.Payments
     card.mount "#card-element"
     card.addEventListener "change", (event) =>
       if event.error
+        @log "card element invalid", code: event.error.code, message: event.error.message
         feedbin.showNotification event.error.message, true
       else
+        @log "card element", brand: event.brand, complete: event.complete, empty: event.empty
         feedbin.hideNotification()
 
     card.addEventListener "ready", (event) =>
+      @log "card element ready"
       @creditCardButton.disabled = false
 
     @paymentForm.addEventListener "submit", (event) =>
       event.preventDefault()
       @creditCardButton.disabled = true
+      @log "form submitted", @cardOptions()
       @stripe.createToken(card, @cardOptions()).then (result) =>
         if result.error
+          @log "createToken rejected the card",
+            type: result.error.type
+            code: result.error.code
+            message: result.error.message
           @creditCardButton.disabled = false
           feedbin.showNotification result.error.message, true
         else
-          @tokenHandler result.token
+          @saveCardFromForm result.token
 
   cardOptions: ->
     name = $("[name=billing_name]").val()

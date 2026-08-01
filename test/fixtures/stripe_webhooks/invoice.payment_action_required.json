@@ -1,0 +1,54 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "invoice.payment_action_required",
+  "object": "event",
+  "pending_webhooks": 1,
+  "request": null,
+  "data": {
+    "object": {
+      "id": "in_00000000000000",
+      "object": "invoice",
+      "customer": "cus_00000000000000",
+      "subscription": "sub_00000000000000",
+      "payment_intent": "pi_00000000000000",
+      "status": "open",
+      "attempted": true,
+      "attempt_count": 1,
+      "paid": false,
+      "amount_due": 5000,
+      "amount_paid": 0,
+      "amount_remaining": 5000,
+      "currency": "usd",
+      "billing_reason": "subscription_cycle",
+      "period_start": 1378082075,
+      "period_end": 1380674075,
+      "next_payment_attempt": 1380674206,
+      "lines": {
+        "object": "list",
+        "url": "/v1/invoices/in_00000000000000/lines",
+        "has_more": false,
+        "data": [
+          {
+            "id": "sli_00000000000000",
+            "object": "line_item",
+            "type": "subscription",
+            "livemode": false,
+            "amount": 5000,
+            "currency": "usd",
+            "proration": false,
+            "quantity": 1,
+            "description": "1 × Feedbin",
+            "period": {
+              "start": 1378082075,
+              "end": 1380674075
+            },
+            "metadata": {}
+          }
+        ]
+      },
+      "metadata": {}
+    }
+  }
+}

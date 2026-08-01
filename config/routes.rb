@@ -213,6 +213,8 @@ Rails.application.routes.draw do
         get :edit
         get :payment_history
         get :payment_details
+        get :authenticate
+        post :create_setup_intent
         post :update_credit_card
         post :update_plan
       end

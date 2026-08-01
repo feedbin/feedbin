@@ -1,5 +1,10 @@
 # wraps a Stripe::Customer instance
 class Customer
+  # Stripe reports "the customer has to authenticate this payment" as an error
+  # rather than a return value, under a code that varies by API version. Neither
+  # of these means the card was declined.
+  AUTHENTICATION_ERROR_CODES = ["authentication_required", "invoice_payment_intent_requires_action"].freeze
+
   attr_reader :customer
 
   delegate :id, to: :customer
@@ -27,11 +32,22 @@ class Customer
     customer.try(:subscriptions).try(:first).try(:status) == "unpaid"
   end
 
+  # Recovery for a fully lapsed account (`unpaid?`): returns :reopened when the
+  # outstanding invoice went back into collection, :reanchored when the billing
+  # period was reset instead, or nil when neither applied.
+  #
+  # `:reanchored` matters to the caller: resetting the anchor bills a fresh period
+  # and writes off the lapsed one, so collecting the old invoice afterwards would
+  # charge the customer twice for the same gap.
+  #
+  # `invoice.closed` only exists at the pinned API version — it was replaced by
+  # `auto_advance`, so this branch quietly stops matching if the pin ever moves.
   def reopen_account
     invoice = Stripe::Invoice.list(customer: id, limit: 1).first
     if !invoice.paid && invoice.closed && invoice.status != "draft"
       invoice.closed = false
       invoice.save
+      :reopened
     elsif (!invoice.paid && invoice.attempt_count >= 4) || invoice.status == "draft"
       Stripe::Subscription.update(invoice.subscription,
         {
@@ -39,7 +55,62 @@ class Customer
           proration_behavior: "none"
         }
       )
+      # Re-anchoring bills a fresh period and abandons this one, so say so rather
+      # than leaving the invoice outstanding forever. Voiding is only valid on an
+      # open invoice — a draft has nothing to write off. Done after the re-anchor
+      # so a failure here still leaves the account recovered.
+      Stripe::Invoice.void_invoice(invoice.id, {}, {stripe_version: STRIPE_INTENTS_API_VERSION}) if invoice.status == "open"
+      :reanchored
     end
+  end
+
+  # When a recurring charge needs authentication Stripe leaves the invoice open
+  # with its PaymentIntent in `requires_action`, and that intent's client secret
+  # is what the browser needs to run the challenge. Returns nil when nothing is
+  # waiting, so this doubles as the check for whether to offer authentication.
+  # Neither `invoice.payment_intent` nor PaymentIntents themselves exist at the
+  # pinned API version, so both reads happen at the newer one.
+  def authentication_client_secret
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice = dunning_invoice(options)
+    payment_intent_id = invoice && invoice[:payment_intent]
+    return nil if payment_intent_id.blank?
+
+    intent = Stripe::PaymentIntent.retrieve(payment_intent_id, options)
+    intent.client_secret if intent.status == "requires_action"
+  end
+
+  # Whether dunning is still working on something, regardless of whether it's the
+  # customer's turn to act. `authentication_client_secret` returning nil while this
+  # is true means the challenge was declined or abandoned: the PaymentIntent has
+  # fallen back to `requires_payment_method`, so what's needed now is a new card.
+  def open_invoice?
+    !dunning_invoice({stripe_version: STRIPE_INTENTS_API_VERSION}).nil?
+  end
+
+  # Retry the customer's open invoice against whatever payment method is now the
+  # default. Stripe doesn't do this on its own: an `authentication_required`
+  # decline schedules no retry, and a past_due subscription never reattempts an
+  # invoice whose attempts are spent — so without this a customer who responds to
+  # a failed charge by updating their card is left with the invoice still open.
+  #
+  # Returns :paid, :requires_action when the bank wants the customer to
+  # authenticate, or nil when there was nothing owed. A genuine decline raises
+  # Stripe::CardError, the same as any other charge.
+  def pay_open_invoice
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice = dunning_invoice(options)
+    return nil unless invoice
+
+    Stripe::Invoice.pay(invoice.id, {}, options).paid ? :paid : :requires_action
+  rescue Stripe::StripeError => exception
+    return :requires_action if AUTHENTICATION_ERROR_CODES.include?(exception.code)
+    raise unless invoice && exception.is_a?(Stripe::InvalidRequestError)
+
+    # A concurrent submit or a Stripe-side retry can pay the invoice between the
+    # read and the pay call — the outcome we wanted, just not by our hand.
+    raise unless Stripe::Invoice.retrieve(invoice.id, options).status == "paid"
+    :paid
   end
 
   def update_email(email)
@@ -47,9 +118,32 @@ class Customer
     customer.save
   end
 
-  def update_source(stripe_token)
-    customer.source = stripe_token
-    customer.save
+  # `payment_method` is a PaymentMethod id (pm_…) from a SetupIntent confirmed in
+  # the browser, not a card token. Stripe pays subscription invoices with
+  # `invoice_settings.default_payment_method` in preference to the customer's
+  # legacy `default_source`, so setting it here is what switches the card over.
+  # The card it replaces is then detached so dead cards don't pile up on the
+  # customer — best-effort, since the new card is already in place.
+  def update_payment_method(payment_method)
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    previous = default_payment_method_id(options)
+    Stripe::PaymentMethod.attach(payment_method, {customer: id}, options)
+    Stripe::Customer.update(id, {invoice_settings: {default_payment_method: payment_method}}, options)
+
+    if previous.present? && previous != payment_method
+      begin
+        Stripe::PaymentMethod.detach(previous, {}, options)
+      rescue Stripe::StripeError => exception
+        ErrorService.notify(exception)
+      end
+    end
+  end
+
+  # Cards saved through the SetupIntent flow are PaymentMethods, which don't show
+  # up in `sources`. Cards saved before it are still legacy sources.
+  def card_description
+    card = default_payment_method_card || sources.first
+    "#{card.brand} ××#{card.last4[-2..-1]}"
   end
 
   def update_plan(plan_id, trial_end)
@@ -64,5 +158,37 @@ class Customer
 
   def subscription
     @subscription ||= customer.subscriptions.first
+  end
+
+  private
+
+  # The subscription's `latest_invoice` is the one Stripe's dunning is working on,
+  # and the only one this app has any business collecting or authenticating.
+  # Asking for "the newest open invoice on the customer" instead would also pick
+  # up a period that was written off, a stale plan-change invoice, or anything
+  # raised by hand — and charge it the next time the customer saves a card.
+  #
+  # `latest_invoice` renders even at the pinned API version. Returns nil unless
+  # the invoice is open, i.e. unless something is actually owed.
+  def dunning_invoice(options)
+    latest_invoice_id = subscription && subscription[:latest_invoice]
+    return nil if latest_invoice_id.blank?
+
+    invoice = Stripe::Invoice.retrieve(latest_invoice_id, options)
+    invoice if invoice.status == "open"
+  end
+
+  # `invoice_settings` isn't part of the customer shape at the pinned API
+  # version, so `customer` never carries it — re-read at a version that does.
+  def default_payment_method_id(options)
+    invoice_settings = Stripe::Customer.retrieve(id, options)[:invoice_settings]
+    invoice_settings && invoice_settings[:default_payment_method]
+  end
+
+  def default_payment_method_card
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    payment_method_id = default_payment_method_id(options)
+    return nil if payment_method_id.blank?
+    Stripe::PaymentMethod.retrieve(payment_method_id, options).card
   end
 end

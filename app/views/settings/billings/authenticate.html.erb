@@ -1,0 +1,55 @@
+<%= render Settings::H1Component.new do %>
+  Confirm Payment
+<% end %>
+
+<p class="mb-4" data-behavior="authentication_status">
+  Your bank needs to confirm this payment. Follow the prompt to finish&hellip;
+</p>
+
+<%= render Settings::ButtonRowComponent.new do %>
+<%# The card form rather than the billing page: a challenge that fails leaves the
+    PaymentIntent needing a payment method, so replacing the card is what actually
+    settles the invoice. %>
+  <%= link_to "Update Card", edit_settings_billing_path, class: "button hide", data: {behavior: "authentication_retry"} %>
+<% end %>
+
+<% content_for :head do %>
+  <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+  <script>
+      $(function() {
+          var stripe = Stripe("<%= STRIPE_PUBLIC_KEY %>");
+
+          // Same narration the card form emits, so a challenge that fails here
+          // leaves a trace too. Development only.
+          var debug = <%= Rails.env.development?.to_json %>;
+          var log = function(message, detail) {
+              if (!debug) return;
+              if (detail === undefined) { console.log("[payments] " + message); }
+              else { console.log("[payments] " + message, detail); }
+          };
+
+          log("confirming the payment the bank is holding");
+
+          // The PaymentIntent already has the card attached, so confirming with
+          // just the client secret runs the bank's challenge and nothing else.
+          stripe.confirmCardPayment(<%= raw @client_secret.to_json %>).then(function(result) {
+              log("confirmCardPayment returned", {
+                  status: result.paymentIntent && result.paymentIntent.status,
+                  error: result.error && {
+                      type: result.error.type,
+                      code: result.error.code,
+                      declineCode: result.error.decline_code,
+                      message: result.error.message
+                  }
+              });
+              if (result.error) {
+                  feedbin.showNotification(result.error.message, true);
+                  $("[data-behavior~=authentication_status]").text("This payment could not be confirmed. Your bank may have declined it, or the card may need to be replaced.");
+                  $("[data-behavior~=authentication_retry]").removeClass("hide");
+              } else {
+                  window.location = "<%= j settings_billing_url %>";
+              }
+          });
+      });
+  </script>
+<% end %>

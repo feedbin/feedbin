@@ -2,7 +2,7 @@
   Billing
 <% end %>
 
-<%= form_tag update_credit_card_settings_billing_path, id: "payment-form" do %>
+<%= form_tag update_credit_card_settings_billing_path, id: "payment-form", data: {setup_intent_url: create_setup_intent_settings_billing_path} do %>
   <%= hidden_field_tag :stripe_token, nil, id: "stripe_token" %>
 
   <%= render partial: "shared/credit_card_form" %>
