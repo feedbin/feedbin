@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/benubois/http.git
-  revision: 56de6c7049ea612dddd3768362301b36a199e411
+  revision: cc5864c45a03ae15c2d527c1d860de4767105e71
   branch: localhost3
   specs:
     http (6.0.4)
@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: b5ed6156dc748f5deb925edd458277d5080e19cd
+  revision: 9fbd90c02ecac632160b3402c9f13e5664369272
   branch: localhost
   specs:
     feedkit (0.1.0)
