@@ -26,7 +26,7 @@ module FeedCrawler
     # recorded no matter what the shadow does. Takes the untouched crawl_data
     # argument, not @crawl_data, which download has already overwritten.
     def shadow(crawl_data)
-      BlockedHostShadow.call(
+      SsrfShadow.call(
         feed_id:     @feed_id,
         feed_url:    @feed_url,
         subscribers: @subscribers,
