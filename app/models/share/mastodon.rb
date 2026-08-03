@@ -36,7 +36,7 @@ class Share::Mastodon < Share::Service
     authenticated_share(@klass, params)
   end
 
-  def authorize_redirect(params)
+  def authorize_redirect(params, state)
     host = params[:mastodon_url]
     uri = Addressable::URI.heuristic_parse(host)
 
@@ -66,7 +66,8 @@ class Share::Mastodon < Share::Service
         redirect_uri: redirect_uri(uri.host),
         grant_type: "authorization_code",
         scope: "write:statuses",
-        response_type: "code"
+        response_type: "code",
+        state: state
       )
   rescue HTTP::Error => exception
     ErrorService.notify(exception)

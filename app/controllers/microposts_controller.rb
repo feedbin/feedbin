@@ -1,7 +1,7 @@
 class MicropostsController < ApplicationController
   def thread
     @user = current_user
-    @entry = Entry.find(params[:id])
+    @entry = authorized_entry or return
     @microposts = Rails.cache.fetch("microblog_thread:#{@entry.id}", expires_in: 2.minutes) {
       build_microposts
     }
@@ -32,9 +32,5 @@ class MicropostsController < ApplicationController
 
   def thread_id
     @entry.entry_id
-  end
-
-  def authorize
-    super && current_user.can_read_entry?(params[:id])
   end
 end

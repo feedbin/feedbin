@@ -46,4 +46,15 @@ class StarredEntriesControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
+
+  test "should not star an entry the user cannot read" do
+    entry = create_entry(feeds(:kottke))
+    refute @user.can_read_entry?(entry.id), "precondition: user cannot read this entry"
+
+    login_as @user
+    assert_no_difference "StarredEntry.count" do
+      patch :update, params: {id: entry}
+    end
+    assert_response :not_found
+  end
 end

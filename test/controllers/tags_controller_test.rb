@@ -38,4 +38,32 @@ class TagsControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
+
+  test "should get edit" do
+    login_as @user
+    get :edit, params: {id: @tag}, xhr: true
+    assert_response :success
+  end
+
+  test "should not expose a tag the user has no tagging for" do
+    stranger = users(:ann)
+    refute_includes stranger.feed_tags.map(&:id), @tag.id
+
+    login_as stranger
+
+    get :edit, params: {id: @tag}, xhr: true
+    assert_response :not_found
+    refute_includes @response.body, @tag.name
+
+    get :show, params: {id: @tag}, xhr: true
+    assert_response :not_found
+
+    assert_no_difference "Tag.count" do
+      post :update, params: {id: @tag, tag: {name: "Hijacked"}}, xhr: true
+    end
+    assert_response :not_found
+
+    delete :destroy, params: {id: @tag}, xhr: true
+    assert_response :not_found
+  end
 end

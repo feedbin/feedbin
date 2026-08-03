@@ -47,8 +47,8 @@ class Share::Raindrop < Share::Service
     authenticated_share(@klass, params)
   end
 
-  def authorize_redirect(params)
-    consumer.auth_code.authorize_url(redirect_uri: redirect_uri)
+  def authorize_redirect(params, state)
+    consumer.auth_code.authorize_url(redirect_uri: redirect_uri, state: state)
   end
 
   def request_access(params)

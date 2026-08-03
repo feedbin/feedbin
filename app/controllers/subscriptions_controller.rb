@@ -6,7 +6,8 @@ class SubscriptionsController < ApplicationController
       @feeds = @user.feeds.xml
     else
       @feeds = []
-      @tags = Tag.where(id: params[:tag])
+      tag = authorized_tag(params[:tag]) or return
+      @tags = [tag]
     end
     @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
       hash[feed_id] = title

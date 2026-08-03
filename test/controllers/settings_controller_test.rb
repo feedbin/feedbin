@@ -64,6 +64,15 @@ class SettingsControllerTest < ActionController::TestCase
     assert_not_equal @entries.first.id, @user.reload.now_playing_entry.to_s
   end
 
+  test "settings_update cannot write now_playing_entry" do
+    entry = create_entry(feeds(:kottke))
+    refute @user.can_read_entry?(entry.id), "precondition: ben cannot read this entry"
+
+    login_as @user
+    patch :settings_update, params: {id: @user.id, user: {now_playing_entry: entry.id.to_s}}
+    assert_nil @user.reload.now_playing_entry
+  end
+
   test "should remove now playing" do
     login_as @user
     now_playing_entry = "1"

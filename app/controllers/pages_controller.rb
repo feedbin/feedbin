@@ -1,16 +1,10 @@
 class PagesController < ApplicationController
-  skip_before_action :verify_authenticity_token
   skip_before_action :authorize, only: [:options]
 
   after_action :cors_headers, only: [:create, :options]
 
   def create
-    save_page
-  end
-
-  def fallback
-    save_page
-    redirect_to root_url, notice: "Page saved!"
+    SavePage.perform_async(current_user.id, params[:url], params[:title])
   end
 
   def options
@@ -19,8 +13,11 @@ class PagesController < ApplicationController
 
   private
 
-  def save_page
-    SavePage.perform_async(current_user.id, params[:url], params[:title])
+  # The bookmarklet and the extension post cross-origin, so they carry their own
+  # credential rather than a forgery token. A request that authenticated on the
+  # session cookie alone gets the normal check.
+  def verify_authenticity_token
+    super if params[:page_token].blank? && request.authorization.blank?
   end
 
   def authorize

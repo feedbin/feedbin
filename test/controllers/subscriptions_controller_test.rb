@@ -11,6 +11,24 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should export a tag the user has" do
+    tag = @user.feeds.first.tag("Design", @user).first.tag
+    login_as @user
+    get :index, params: {tag: tag.id}, format: :xml
+    assert_response :success
+    assert_includes @response.body, tag.name
+  end
+
+  test "should not export a tag the user has no tagging for" do
+    tag = feeds(:kottke).tag("Ann Private Tag", users(:ann)).first.tag
+    refute_includes @user.feed_tags.map(&:id), tag.id
+
+    login_as @user
+    get :index, params: {tag: tag.id}, format: :xml
+    assert_response :not_found
+    refute_includes @response.body, tag.name
+  end
+
   test "should create subscription" do
     html_url = "www.example.com/index.html"
     feed_url = "http://www.example.com/atom.xml"
