@@ -13,27 +13,10 @@ module FeedCrawler
       @subscribers = subscribers
       @crawl_data  = CrawlData.new(crawl_data)
       @parsing     = false
-      @response    = nil
-      @error       = nil
 
       download
-      shadow(crawl_data)
     ensure
       persist_crawl_data unless @parsing
-    end
-
-    # Runs after download has fully settled, so the crawl's outcome is already
-    # recorded no matter what the shadow does. Takes the untouched crawl_data
-    # argument, not @crawl_data, which download has already overwritten.
-    def shadow(crawl_data)
-      SsrfShadow.call(
-        feed_id:     @feed_id,
-        feed_url:    @feed_url,
-        subscribers: @subscribers,
-        crawl_data:  crawl_data,
-        response:    @response,
-        error:       @error
-      )
     end
 
     def download
@@ -61,7 +44,6 @@ module FeedCrawler
 
       parse if content_changed
     rescue Feedkit::Error => exception
-      @error = exception
       @crawl_data.download_error(exception)
       message = "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url} next_retry=#{@crawl_data.relative_retry_after}"
       if exception.respond_to?(:response) && exception.response
@@ -81,7 +63,8 @@ module FeedCrawler
         last_modified: @crawl_data.last_modified,
         etag:          @crawl_data.etag,
         auto_inflate:  auto_inflate,
-        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers",
+        block_ssrf:    true
       )
     end
 
