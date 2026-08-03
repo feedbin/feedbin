@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/benubois/http.git
+  revision: 4ea8d1593e5a62e42a352d98540285e15fd52733
+  branch: eof
+  specs:
+    http (6.0.4)
+      http-cookie (~> 1.0)
+      llhttp (~> 0.6.1)
+
+GIT
   remote: https://github.com/benubois/llhttp.git
   revision: 21f80ae30efef7ec5bec26c320fa655c33facde0
   branch: memory_corruption
@@ -31,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 5ba995ad1d577724bbba3988d9a4c6107730c1f4
+  revision: 0aafc2e60fb4d32263099c9a3b07eb5e09ab57a2
   branch: main
   specs:
     feedkit (0.1.0)
@@ -358,9 +367,6 @@ GEM
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http-2 (1.2.1)
-    http (6.0.4)
-      http-cookie (~> 1.0)
-      llhttp (~> 0.6.1)
     http-cookie (1.1.6)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
@@ -793,6 +799,7 @@ DEPENDENCIES
   html_diff!
   htmlbeautifier
   htmlentities
+  http!
   httparty
   image_processing
   importmap-rails
