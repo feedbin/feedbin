@@ -178,7 +178,6 @@ module FeedCrawler
       Librato.increment "feed.shadow_ssrf.rule", source: rule if rule
       Librato.increment "feed.shadow_ssrf.status", source: shadow[:status] if failed_status?(shadow)
       Librato.increment "feed.shadow_ssrf.dns_failed" if dns_failed?
-      Librato.increment "feed.shadow_ssrf.allowed_private" if allowed_private.any?
       Librato.measure "feed.shadow_ssrf.addresses", addresses.count
       Librato.measure "feed.shadow_ssrf.dns_ms", resolution[:ms] if resolution[:ms]
 
@@ -204,10 +203,6 @@ module FeedCrawler
         # Feedkit rejects an address rather than the host, so a block reported
         # alongside a usable public address would mean that filtering broke.
         public_addresses: public_addresses.count,
-        # Private addresses the operator opted back in with
-        # FEEDKIT_ALLOWED_PRIVATE_ADDRESSES. Non-zero means the escape hatch is
-        # load-bearing for this feed.
-        allowed_private:  allowed_private.count,
         # Resolv is asked for both families and keeps at most two of each, then
         # races them, so neither ordering nor a single "first" address decides
         # which one gets used.
@@ -268,12 +263,6 @@ module FeedCrawler
       end
     end
 
-    # An allowed address is checked before the private test, so it is never
-    # blocked even though it is not publicly routable.
-    def allowed_private
-      @allowed_private ||= addresses.select { |address| private?(address) && allowed?(address) }
-    end
-
     def public_addresses
       @public_addresses ||= addresses.reject { |address| private?(address) }
     end
@@ -283,12 +272,13 @@ module FeedCrawler
       ip ? Feedkit::PrivateAddressCheck.private_address?(ip) : false
     end
 
-    def allowed?(address)
-      ip = ip_for(address)
-      ip ? Feedkit::PrivateAddressCheck.allowed_address?(ip) : false
-    end
-
+    # Feedkit's resolver returns IPAddr, and IPAddr.new raises on one of those
+    # rather than passing it through. Parsing unconditionally sent every
+    # resolved address down the rescue, so each one read as nil: nothing was
+    # private, every address was counted as publicly routable, and both family
+    # counts stayed zero. Only blocked_address arrives as a String.
     def ip_for(address)
+      return address if address.is_a?(IPAddr)
       IPAddr.new(address)
     rescue
       nil

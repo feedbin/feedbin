@@ -6,7 +6,7 @@ module FeedCrawler
 
     PUBLIC_V4 = "93.184.216.34".freeze
 
-    ENV_KEYS = %w[SHADOW_BLOCK_SSRF FEEDKIT_CURL_HOSTS FEEDKIT_PROXIED_HOSTS FEEDKIT_ALLOWED_PRIVATE_ADDRESSES].freeze
+    ENV_KEYS = %w[SHADOW_BLOCK_SSRF FEEDKIT_CURL_HOSTS FEEDKIT_PROXIED_HOSTS].freeze
 
     def setup
       flush_redis
@@ -114,6 +114,7 @@ module FeedCrawler
       assert_includes line, "blocked_address=10.0.0.1"
       assert_includes line, "blocked_host=example.com"
       assert_includes line, "hop=origin"
+      assert_includes line, "public_addresses=0"
     end
 
     def test_reports_blocked_control_error_when_the_feed_was_already_failing
@@ -173,18 +174,6 @@ module FeedCrawler
 
       assert_includes line, "v6=2"
       assert_includes line, "v4=1"
-    end
-
-    # The escape hatch: an allowed address is checked before the private test,
-    # so it is never blocked even though it is not publicly routable.
-    def test_counts_private_addresses_the_operator_opted_back_in
-      ENV["FEEDKIT_ALLOWED_PRIVATE_ADDRESSES"] = "10.0.0.1"
-      stub_request_file("atom.xml", URL)
-
-      line = crawl(resolved: ["10.0.0.1"]) { Downloader.new.perform(1, URL, 10, {}) }
-
-      assert_includes line, "allowed_private=1"
-      assert_includes line, "public_addresses=0"
     end
 
     def test_reports_regressed_when_the_shadow_fails_without_blocking
@@ -324,7 +313,10 @@ module FeedCrawler
     # `shadow:` supplies its result, `observe:` just watches the arguments.
     def crawl(resolved: [PUBLIC_V4], shadow: nil, observe: nil, &block)
       capture_log do
-        Feedkit::PrivateAddressCheck::Socket.stub(:addresses, resolved) do
+        # IPAddr, not String: that is what Feedkit's resolver hands back, and
+        # stubbing strings here hid a production bug where every address parsed
+        # to nil and each one was counted as publicly routable.
+        Feedkit::PrivateAddressCheck::Socket.stub(:addresses, resolved.map { |address| IPAddr.new(address) }) do
           if shadow || observe
             with_download(shadow, observe, &block)
           else
