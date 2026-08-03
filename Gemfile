@@ -14,7 +14,7 @@ gem "will_paginate"
 gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
 gem "sax-machine",         github: "feedbin/sax-machine",         branch: "feedbin"
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
-gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
+gem "feedkit",             github: "feedbin/feedkit",             branch: "main"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedbin"
 gem "html_diff",           github: "feedbin/html_diff",           ref: "c1107c0"
@@ -39,7 +39,6 @@ gem "evernote_oauth"
 gem "fog-aws"
 gem "honeybadger"
 gem "htmlentities"
-gem "http"
 gem "httparty"
 gem "image_processing"
 gem "importmap-rails"
@@ -93,7 +92,7 @@ end
 group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
-  gem "capybara", github: "teamcapybara/capybara"
+  gem "capybara"
   # Load only the prelude so binding.break works without starting a debugger
   # session during Rails boot. The full session installs fork/at_exit hooks
   # that can wait on test child processes such as the local redis-server.

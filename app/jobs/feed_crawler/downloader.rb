@@ -63,7 +63,8 @@ module FeedCrawler
         last_modified: @crawl_data.last_modified,
         etag:          @crawl_data.etag,
         auto_inflate:  auto_inflate,
-        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers",
+        block_ssrf:    true
       )
     end
 
