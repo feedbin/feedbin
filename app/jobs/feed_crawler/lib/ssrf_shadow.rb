@@ -13,9 +13,10 @@ module FeedCrawler
   #      per family and bounded by the socket's own RESOLV_TIMEOUT. A host that
   #      resolves to nothing inside that budget surfaces as a connection error
   #      reading "no address for <host>", not as a timeout.
-  #   3. FEEDKIT_CURL_HOSTS is skipped entirely when blocking, so those feeds
-  #      change transport rather than being exempt. They are the highest-risk
-  #      records in the set now, not the least interesting.
+  #   3. Nothing about FEEDKIT_CURL_HOSTS or FEEDKIT_PROXIED_HOSTS. Curl is an
+  #      operator-curated list of known-safe hosts and keeps its shortcut, and a
+  #      proxied request is rewritten to a host the operator chose, so Feedkit
+  #      applies no check to either and there is nothing to compare.
   #
   # Nothing here may affect the crawl: no crawl_data writes, no parser jobs,
   # no persisted downloads, and every exception is swallowed.
@@ -54,11 +55,9 @@ module FeedCrawler
     def call
       return unless sample?
 
-      # A proxied request is rewritten to a host the operator configured, so
-      # Feedkit does not apply the check and there is nothing to compare.
-      if proxied?
-        Librato.increment "feed.shadow_ssrf.no_op", source: "proxy"
-        Sidekiq.logger.info "SsrfShadow verdict=no_op path=proxy feed_id=#{@feed_id} url=#{@feed_url}"
+      if no_op_path
+        Librato.increment "feed.shadow_ssrf.no_op", source: no_op_path
+        Sidekiq.logger.info "SsrfShadow verdict=no_op path=#{no_op_path} feed_id=#{@feed_id} url=#{@feed_url}"
         return
       end
 
@@ -82,16 +81,19 @@ module FeedCrawler
       "shadow_ssrf:#{@feed_id}"
     end
 
-    def proxied?
-      env_hosts("FEEDKIT_PROXIED_HOSTS").include?(origin_host)
-    end
-
-    # Blocking disables the curl shortcut, so these feeds are fetched by a
-    # different client than the control used. They are on that list because
-    # something about them needed curl, which makes a difference here a change
-    # of transport rather than a change of address checking.
-    def curl_bypassed?
-      env_hosts("FEEDKIT_CURL_HOSTS").include?(origin_host)
+    # Paths where blocking changes nothing, so a duplicate request would only
+    # compare a host against itself: curl keeps its shortcut because that list
+    # is operator-curated and known safe, and a proxied request is rewritten to
+    # a host the operator chose rather than one a feed can steer.
+    def no_op_path
+      return @no_op_path if defined?(@no_op_path)
+      @no_op_path = begin
+        if env_hosts("FEEDKIT_CURL_HOSTS").include?(origin_host)
+          "curl"
+        elsif env_hosts("FEEDKIT_PROXIED_HOSTS").include?(origin_host)
+          "proxy"
+        end
+      end
     end
 
     def env_hosts(name)
@@ -105,7 +107,8 @@ module FeedCrawler
     rescue Feedkit::PrivateNetworkAddress => exception
       {outcome: :blocked, message: exception.message, ms: elapsed(started)}
     rescue Feedkit::Error => exception
-      {outcome: :error, error: exception.class.name, message: exception.message, ms: elapsed(started)}
+      {outcome: :error, error: exception.class.name, message: exception.message,
+       status: error_status(exception), ms: elapsed(started)}
     ensure
       # Never persist!, so the tempfile would otherwise sit until GC.
       begin
@@ -151,6 +154,10 @@ module FeedCrawler
         "regressed"
       elsif shadow[:outcome] == :ok && control[:outcome] == :error
         "recovered"
+      elsif shadow[:outcome] != :ok
+        # Both failed. Now that an error carries its status, comparing statuses
+        # here would read two failures as a freshness disagreement.
+        "agree"
       elsif control[:status] != shadow[:status]
         # A 304 carries an empty body, so its checksum can never match a 200's.
         # Filing that under content_diff reports a freshness disagreement
@@ -169,7 +176,7 @@ module FeedCrawler
 
       Librato.increment "feed.shadow_ssrf", source: verdict
       Librato.increment "feed.shadow_ssrf.rule", source: rule if rule
-      Librato.increment "feed.shadow_ssrf.curl_bypassed" if curl_bypassed?
+      Librato.increment "feed.shadow_ssrf.status", source: shadow[:status] if failed_status?(shadow)
       Librato.increment "feed.shadow_ssrf.dns_failed" if dns_failed?
       Librato.increment "feed.shadow_ssrf.allowed_private" if allowed_private.any?
       Librato.measure "feed.shadow_ssrf.addresses", addresses.count
@@ -208,13 +215,9 @@ module FeedCrawler
         v4:               families[:v4],
         dns_ms:           resolution[:ms],
         # A resolution that produced nothing inside the socket's RESOLV_TIMEOUT.
-        # This was the dominant failure in the previous run, so it is counted
-        # rather than buried inside a generic connection error.
+        # This was the dominant failure two runs ago, so it is counted rather
+        # than buried inside a generic connection error.
         dns_failed:       dns_failed?,
-        # Blocking skips the curl shortcut, so the shadow used a different
-        # client than the control. A difference on these is transport, not
-        # address checking.
-        curl_bypassed:    curl_bypassed?,
         redirects:        shadow[:redirects],
         shadow_ms:        shadow[:ms]
       }
@@ -223,6 +226,17 @@ module FeedCrawler
 
     def dns_failed?
       @shadow[:outcome] == :error && @shadow[:message].to_s.include?(NO_ADDRESS)
+    end
+
+    # A rejection and a rate limit both arrive as Feedkit::ClientError but call
+    # for different responses, so the status is pulled off the response the
+    # error carries rather than left inside the class name.
+    def error_status(exception)
+      exception.response.status.code if exception.respond_to?(:response) && exception.response
+    end
+
+    def failed_status?(shadow)
+      shadow[:outcome] == :error && shadow[:status]
     end
 
     # Resolved with Feedkit's own resolver so the candidate list and the

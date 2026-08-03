@@ -240,34 +240,22 @@ module FeedCrawler
     # Blocking skips the curl shortcut, so these feeds change client rather than
     # being exempt. They are still shadowed -- that comparison is the point --
     # but a difference on them is transport, not address checking.
-    # Driven without the Downloader on purpose: with the host on the curl list
-    # the control would shell out to the real curl binary, which WebMock cannot
-    # intercept and which would put a live request in the test suite.
-    def test_flags_feeds_whose_transport_changes_because_curl_is_skipped
+    # Curl keeps its shortcut when blocking, because that list is
+    # operator-curated and known safe. Shadowing those feeds would compare curl
+    # against curl and pay for a duplicate fetch to learn nothing.
+    def test_skips_curl_hosts
       ENV["FEEDKIT_CURL_HOSTS"] = "example.com"
-      stub_request_file("atom.xml", URL)
 
       line = capture_log do
-        Feedkit::PrivateAddressCheck::Socket.stub(:addresses, [PUBLIC_V4]) do
-          SsrfShadow.call(feed_id: 1, feed_url: URL, subscribers: 10, crawl_data: {})
-        end
+        SsrfShadow.call(feed_id: 1, feed_url: URL, subscribers: 10, crawl_data: {})
       end
 
-      assert_includes line, "curl_bypassed=true"
-      # The shadow reached the HTTP client rather than curl, which WebMock
-      # could not have intercepted.
-      assert_requested :get, URL, times: 1
+      assert_includes line, "verdict=no_op"
+      assert_includes line, "path=curl"
+      assert_not_requested :get, URL
     end
 
-    def test_does_not_flag_transport_changes_for_other_hosts
-      stub_request_file("atom.xml", URL)
-
-      line = crawl { Downloader.new.perform(1, URL, 10, {}) }
-
-      assert_includes line, "curl_bypassed=false"
-    end
-
-    # Feedkit skips the check for proxied hosts, so there is nothing to compare.
+    # Feedkit rewrites these to a host the operator chose, so no check applies.
     def test_skips_proxied_hosts
       ENV["FEEDKIT_PROXIED_HOSTS"] = "example.com"
 
@@ -278,6 +266,32 @@ module FeedCrawler
       assert_includes line, "verdict=no_op"
       assert_includes line, "path=proxy"
       assert_not_requested :get, URL
+    end
+
+    # A rejection and a rate limit both arrive as Feedkit::ClientError but call
+    # for different responses, so the status has to survive into the log.
+    def test_records_the_status_behind_a_failed_shadow
+      stub_request_file("atom.xml", URL)
+      stub_request(:get, "http://blocked.example.com/").to_return(status: 403)
+      rejection = -> { Feedkit::Request.download("http://blocked.example.com/") }
+
+      line = crawl(shadow: rejection) { Downloader.new.perform(1, URL, 10, {}) }
+
+      assert_includes line, "verdict=regressed"
+      assert_includes line, "shadow_error=Feedkit::ClientError"
+      assert_includes line, "shadow_status=403"
+    end
+
+    # Both sides failing is agreement. Now that an error carries a status,
+    # comparing statuses here would read two failures as a freshness change.
+    def test_treats_two_failures_as_agreement
+      stub_request(:get, URL).to_return(status: 500)
+
+      line = crawl(shadow: -> { raise Feedkit::ServerError.new("500", nil) }) do
+        Downloader.new.perform(1, URL, 10, {})
+      end
+
+      assert_includes line, "verdict=agree"
     end
 
     def test_a_broken_shadow_never_breaks_the_crawl
