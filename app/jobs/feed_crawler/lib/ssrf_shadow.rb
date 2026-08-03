@@ -13,10 +13,10 @@ module FeedCrawler
   #      per family and bounded by the socket's own RESOLV_TIMEOUT. A host that
   #      resolves to nothing inside that budget surfaces as a connection error
   #      reading "no address for <host>", not as a timeout.
-  #   3. Nothing about FEEDKIT_CURL_HOSTS or FEEDKIT_PROXIED_HOSTS. Curl is an
-  #      operator-curated list of known-safe hosts and keeps its shortcut, and a
-  #      proxied request is rewritten to a host the operator chose, so Feedkit
-  #      applies no check to either and there is nothing to compare.
+  #   3. Nothing about FEEDKIT_CURL_HOSTS. Curl is an operator-curated list of
+  #      known-safe hosts rather than anything a feed can steer, so it keeps its
+  #      shortcut even when blocking. Feedkit applies no address check to those
+  #      hosts and there is nothing to compare.
   #
   # Nothing here may affect the crawl: no crawl_data writes, no parser jobs,
   # no persisted downloads, and every exception is swallowed.
@@ -81,19 +81,16 @@ module FeedCrawler
       "shadow_ssrf:#{@feed_id}"
     end
 
-    # Paths where blocking changes nothing, so a duplicate request would only
-    # compare a host against itself: curl keeps its shortcut because that list
-    # is operator-curated and known safe, and a proxied request is rewritten to
-    # a host the operator chose rather than one a feed can steer.
+    # The one path where blocking changes nothing, so a duplicate request would
+    # only compare a host against itself: curl keeps its shortcut because that
+    # list is operator-curated and known safe, and it resolves and connects on
+    # its own, so Feedkit never gets to check its addresses.
+    #
+    # Still a named path rather than a boolean: the metric is sourced on it, and
+    # proxied hosts were the other one until Feedkit dropped proxy support.
     def no_op_path
       return @no_op_path if defined?(@no_op_path)
-      @no_op_path = begin
-        if env_hosts("FEEDKIT_CURL_HOSTS").include?(origin_host)
-          "curl"
-        elsif env_hosts("FEEDKIT_PROXIED_HOSTS").include?(origin_host)
-          "proxy"
-        end
-      end
+      @no_op_path = ("curl" if env_hosts("FEEDKIT_CURL_HOSTS").include?(origin_host))
     end
 
     def env_hosts(name)

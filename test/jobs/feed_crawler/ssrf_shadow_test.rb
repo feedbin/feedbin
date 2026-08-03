@@ -6,7 +6,7 @@ module FeedCrawler
 
     PUBLIC_V4 = "93.184.216.34".freeze
 
-    ENV_KEYS = %w[SHADOW_BLOCK_SSRF FEEDKIT_CURL_HOSTS FEEDKIT_PROXIED_HOSTS].freeze
+    ENV_KEYS = %w[SHADOW_BLOCK_SSRF FEEDKIT_CURL_HOSTS].freeze
 
     def setup
       flush_redis
@@ -226,9 +226,6 @@ module FeedCrawler
       assert_not_includes line, "verdict=content_diff"
     end
 
-    # Blocking skips the curl shortcut, so these feeds change client rather than
-    # being exempt. They are still shadowed -- that comparison is the point --
-    # but a difference on them is transport, not address checking.
     # Curl keeps its shortcut when blocking, because that list is
     # operator-curated and known safe. Shadowing those feeds would compare curl
     # against curl and pay for a duplicate fetch to learn nothing.
@@ -241,19 +238,6 @@ module FeedCrawler
 
       assert_includes line, "verdict=no_op"
       assert_includes line, "path=curl"
-      assert_not_requested :get, URL
-    end
-
-    # Feedkit rewrites these to a host the operator chose, so no check applies.
-    def test_skips_proxied_hosts
-      ENV["FEEDKIT_PROXIED_HOSTS"] = "example.com"
-
-      line = capture_log do
-        SsrfShadow.call(feed_id: 1, feed_url: URL, subscribers: 10, crawl_data: {})
-      end
-
-      assert_includes line, "verdict=no_op"
-      assert_includes line, "path=proxy"
       assert_not_requested :get, URL
     end
 
