@@ -187,6 +187,66 @@ class ContentFormatterTest < ActiveSupport::TestCase
     end
   end
 
+  # 018 — Feedbin's client dispatches on data attributes, so content from a feed
+  # must not be able to supply them.
+  test "format! strips data attributes that came from the content" do
+    payload = %(<div data-behavior="iframe_placeholder" data-iframe-src="javascript:alert(1)" data-iframe-embed-url="https://evil.example/x.js" data-controller="embed-player" data-action="click-&gt;embed-player#showPlayer">Load embed</div>)
+
+    result = ContentFormatter.format!(payload)
+
+    %w[data-behavior data-iframe-src data-iframe-embed-url data-controller data-action].each do |attribute|
+      refute_includes result, attribute
+    end
+  end
+
+  test "api_format strips data attributes that came from the content" do
+    payload = %(<div data-behavior="iframe_placeholder">x</div>)
+
+    refute_includes ContentFormatter.api_format(payload, @entry), "data-behavior"
+  end
+
+  # The camo and iframe filters run after the attribute filter, so the ones
+  # Feedbin injects itself have to survive. "should format content" covers camo;
+  # this covers the ordering explicitly.
+  test "format! keeps the data attributes Feedbin injects downstream" do
+    result = ContentFormatter.format!(@entry.content, @entry)
+
+    assert_includes result, "data-canonical-src"
+  end
+
+  # 019 — every sibling formatter scrubs; this one did not.
+  test "app_format sanitizes" do
+    payload = %(<script>alert(document.cookie)</script><img src="x" onerror="alert(1)">)
+
+    result = ContentFormatter.app_format(payload, @entry)
+
+    refute_includes result, "<script>"
+    refute_includes result, "onerror"
+  end
+
+  test "app_format still moves the image src to the placeholder attribute" do
+    result = ContentFormatter.app_format(%(<img src="http://example.com/a.png">), @entry)
+
+    assert_includes result, "data-feedbin-src"
+  end
+
+  # 044 — the allowlist admits these attributes but named no protocols for them.
+  test "text_email refuses a javascript iframe src" do
+    result = ContentFormatter.text_email(%(<iframe src="javascript:alert(document.domain)"></iframe>))
+
+    refute_includes result, "javascript:"
+  end
+
+  test "text_email refuses javascript in the other url-bearing attributes" do
+    {
+      %(<source src="javascript:alert(1)">) => "source src",
+      %(<video src="javascript:alert(1)" poster="javascript:alert(2)"></video>) => "video src and poster",
+      %(<audio src="javascript:alert(1)"></audio>) => "audio src"
+    }.each do |payload, description|
+      refute_includes ContentFormatter.text_email(payload), "javascript:", description
+    end
+  end
+
   private
 
   def with_env(values)

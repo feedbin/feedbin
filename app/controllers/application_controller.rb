@@ -55,7 +55,10 @@ class ApplicationController < ActionController::Base
 
     user_titles = subscriptions.includes(:feed).each_with_object({}) { |subscription, hash|
       if subscription.title.present?
-        hash[subscription.feed_id] = ERB::Util.html_escape_once(subscription.title)
+        # Plain text. Every consumer renders it with textContent or .text(), so
+        # escaping here would show up as literal entities rather than protect
+        # anything.
+        hash[subscription.feed_id] = subscription.title
       end
     }
 

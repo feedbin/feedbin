@@ -1,2 +1,2 @@
 $.extend(feedbin.entries, <%= @entries.to_json.html_safe %>);
-feedbin.showEntry(<%= params[:id] %>);
+feedbin.showEntry(<%= params[:id].to_i %>);

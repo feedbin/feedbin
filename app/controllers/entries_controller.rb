@@ -192,7 +192,7 @@ class EntriesController < ApplicationController
 
   def search
     @user = current_user
-    @escaped_query = params[:query].tr("\"", "'").html_safe if params[:query]
+    @escaped_query = params[:query] if params[:query]
     params[:query] = "#{params[:query]} #{params[:query_extra]}"
 
     @saved_search = @user.saved_searches.build(query: params[:query])

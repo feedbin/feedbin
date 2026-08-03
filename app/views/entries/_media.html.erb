@@ -12,7 +12,7 @@
                 <div class="audio-text">
                     <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', title: strip_tags(entry.feed.title), data: {behavior: 'user_title', feed_id: entry.feed.id} %>
                     <div class="audio-title-wrap">
-                        <div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div>
+                        <div class="audio-title" title="<%= entry_presenter.entry_view_title_text %>"><%= entry_presenter.entry_view_title %></div>
                     </div>
                     <div class="audio-duration" data-behavior="audio_duration_<%= entry.id %>">
                         <%= entry_presenter.audio_duration %>

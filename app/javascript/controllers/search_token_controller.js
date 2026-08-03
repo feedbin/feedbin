@@ -137,7 +137,9 @@ export default class extends Controller {
         let element = resultTemplate.cloneNode(true)
         let updates = [
           {
-            type: "html",
+            // Text, not html: a tag name reaches here straight out of the
+            // database, and an imported OPML's outline titles become tag names.
+            type: "text",
             selector: "text",
             value: item.title,
           },

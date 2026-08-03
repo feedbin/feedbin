@@ -23,9 +23,9 @@ var callback = function() {
 
     <% if @search %>
         const custom = new CustomEvent("show-search-controls", {detail: {
-          query: "<%= @escaped_query %>",
-          savedSearchPath: "<%= @saved_search_path %>",
-          message: "<%= @search_message %>"
+          query: "<%= j @escaped_query %>",
+          savedSearchPath: "<%= j @saved_search_path %>",
+          message: "<%= j @search_message %>"
         }})
         window.dispatchEvent(custom)
 

@@ -58,6 +58,15 @@ class ContentFormatter
       },
       "audio" => {
         "src" => ["http", "https"]
+      },
+      # Sanitize only enforces a scheme where :protocols names one, so every
+      # attribute above that can hold a URL needs an entry here or it accepts
+      # javascript: and data: unchallenged.
+      "iframe" => {
+        "src" => ["http", "https"]
+      },
+      "source" => {
+        "src" => ["http", "https"]
       }
     }
 
@@ -221,8 +230,11 @@ class ContentFormatter
   end
 
   def _app_format(content, entry)
-    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::ImagePlaceholderFilter]
+    # Scrub and Attributes have to come before ImagePlaceholderFilter, which is
+    # what sets the data-feedbin-src the placeholder depends on.
+    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub, ContentFilters::Attributes, HTML::Pipeline::ImagePlaceholderFilter]
     context = {
+      scrub_mode: :default,
       image_base_url: entry.base_url,
       image_subpage_url: entry.fully_qualified_url || "",
       href_base_url: entry.base_url,
@@ -230,6 +242,11 @@ class ContentFormatter
       placeholder_url: "",
       placeholder_attribute: "data-feedbin-src"
     }
+
+    if entry.feed.newsletter?
+      context[:scrub_mode] = :newsletter
+    end
+
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(self.class.document(content))
     result[:output].to_s

@@ -7,13 +7,16 @@ export function templateText(element, selector, value) {
   }
 }
 
+// Nodes only. This used to accept a string and assign it to innerHTML, which
+// made it an unescaped sink for whatever any caller happened to pass. Callers
+// with text want templateText.
 export function templateHTML(element, selector, value) {
   let result = element.querySelector(`[data-template~=${selector}]`)
   if (result) {
-    if (typeof(value) === "object") {
+    if (typeof value === "object") {
       html(result, value)
     } else {
-      result.innerHTML = value
+      console.trace(`templateHTML got a string, use type "text": ${selector}`)
     }
   } else {
     console.trace(`templateHTML missing selector: ${selector}`)

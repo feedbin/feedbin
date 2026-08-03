@@ -70,7 +70,18 @@ class SiteController < ApplicationController
   # this stays a convenience and not an open redirect.
   def destination
     path = params[:path].to_s
-    path.start_with?("/") ? path : root_url
+    # start_with?("/") alone is true for "//evil.example.com", which is a
+    # protocol-relative url and not a relative path. A backslash after the slash
+    # is the same trick, since browsers normalise it to a second slash.
+    return root_url unless path.start_with?("/")
+    return root_url if path.start_with?("//", "/\\")
+
+    uri = Addressable::URI.parse(path)
+    return root_url if uri.nil? || uri.host.present? || uri.scheme.present?
+
+    path
+  rescue Addressable::URI::InvalidURIError
+    root_url
   end
 
   def check_user

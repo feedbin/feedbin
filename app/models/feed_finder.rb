@@ -85,7 +85,7 @@ class FeedFinder
   end
 
   def response
-    @response ||= Feedkit::Request.download(clean_url(url), username: @username, password: @password)
+    @response ||= Feedkit::Request.download(clean_url(url), username: @username, password: @password, block_ssrf: true)
   end
 
   def clean_url(url)

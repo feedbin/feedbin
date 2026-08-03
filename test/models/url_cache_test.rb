@@ -37,4 +37,13 @@ class UrlCacheTest < ActiveSupport::TestCase
 
     assert_equal({"content-type" => "text/html"}, cache.headers)
   end
+
+  # 127.0.0.1 reaches the real socket layer because WebMock is configured with
+  # allow_localhost, so this exercises the guard rather than a stub. Without it
+  # the connection is merely refused, which is a different exception.
+  test "refuses to fetch a private address" do
+    assert_raises Feedkit::PrivateNetworkAddress do
+      UrlCache.new("http://127.0.0.1:9/").body
+    end
+  end
 end
