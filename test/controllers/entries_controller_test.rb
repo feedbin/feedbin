@@ -318,6 +318,30 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "mark_direction_as_read rejects a collection type it does not handle" do
+    login_as @user
+    mark_unread(@user)
+    keep_id = @user.unread_entries.pluck(:entry_id).first
+
+    assert_no_difference -> { @user.unread_entries.count } do
+      post :mark_direction_as_read, params: {direction: "below", type: "queued_entries", data: "", ids: keep_id.to_s}, xhr: true
+    end
+
+    assert_response :bad_request
+  end
+
+  test "mark_direction_as_read rejects a saved search that is not there" do
+    login_as @user
+    mark_unread(@user)
+    keep_id = @user.unread_entries.pluck(:entry_id).first
+
+    assert_no_difference -> { @user.unread_entries.count } do
+      post :mark_direction_as_read, params: {direction: "below", type: "saved_search", data: "0", ids: keep_id.to_s}, xhr: true
+    end
+
+    assert_response :bad_request
+  end
+
   # ---- destroy ---------------------------------------------------------------
 
   test "destroy enqueues EntryDeleter when the feed is a pages feed" do

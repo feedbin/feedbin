@@ -180,7 +180,12 @@ class EntriesController < ApplicationController
       end
     end
 
-    entry_ids = unread_entries.map(&:entry_id)
+    # The cascade above does not assign for every collection the UI can be
+    # showing — queued_entries and recently_read among them — nor when the
+    # saved search is gone. Say so rather than raising, and rather than
+    # quietly marking nothing.
+    return head :bad_request if unread_entries.nil?
+
     unread_entries.delete_all
 
     get_feeds_list

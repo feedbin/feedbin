@@ -19,4 +19,14 @@ class AppStore::NotificationsV2ControllerTest < ActionController::TestCase
     end
     assert_response :bad_request
   end
+
+  test "should reject a hand-built payload whose header has no x5c" do
+    header = Base64.urlsafe_encode64({"alg" => "ES256"}.to_json, padding: false)
+    claims = Base64.urlsafe_encode64({}.to_json, padding: false)
+
+    assert_no_difference -> { AppStoreNotificationProcessor.jobs.size } do
+      post :create, params: {signedPayload: "#{header}.#{claims}.signature"}, as: :json, format: :json
+    end
+    assert_response :bad_request
+  end
 end

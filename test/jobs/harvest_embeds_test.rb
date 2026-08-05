@@ -49,6 +49,17 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal("image_url", @feed.reload.custom_icon)
   end
 
+  test "should survive a youtube response with no items" do
+    # The ordinary answer when every id in the batch has been deleted, made
+    # private, or region-blocked.
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/})
+      .to_return(body: "{}", headers: {content_type: "application/json"})
+
+    assert_nothing_raised do
+      HarvestEmbeds::Download.new.perform(["video_id"])
+    end
+  end
+
   test "should add provider_parent_id from existing embed" do
     Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
 
