@@ -28,6 +28,18 @@ class Subscription < ApplicationRecord
   enum :show_status, {not_show: 0, hidden: 1, subscribed: 2, bookmarked: 3}
   enum :fix_status, {none: 0, present: 1, ignored: 2}, prefix: :fix_suggestion
 
+  # The newsletter-sender switch is routed from two places that write these
+  # same rows, so the UI's idea of the current state and the server's drift
+  # apart. Depend only on the state being asked for, never on the difference
+  # between two states.
+  def self.set_subscribed(user, feed_id, subscribed)
+    if subscribed
+      user.subscriptions.find_or_create_by(feed_id: feed_id)
+    else
+      user.subscriptions.where(feed_id: feed_id).take&.destroy
+    end
+  end
+
   def self.create_multiple(feeds, user, valid_feed_ids)
     @subscriptions = feeds.each_with_object([]) { |(feed_id, subscription), array|
       feed = Feed.find(feed_id)

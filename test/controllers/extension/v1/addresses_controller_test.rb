@@ -78,6 +78,18 @@ class Extension::V1::AddressesControllerTest < ActionController::TestCase
     assert_match /^mycustomaddress123\.\d+$/, json["token"]
   end
 
+  test "should return error for preview when no address is available on the prefix" do
+    AuthenticationToken.stub(:exists?, true) do
+      post :create, params: {
+        button_action: "preview",
+        address: "taken",
+        page_token: @user.page_token
+      }, format: :json
+    end
+
+    assert_response :bad_request
+  end
+
   test "should return error for preview with empty address" do
     post :create, params: {
       button_action: "preview",

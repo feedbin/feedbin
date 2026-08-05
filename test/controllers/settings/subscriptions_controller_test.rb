@@ -100,6 +100,42 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     assert user.subscriptions.where(feed_id: feed_id).exists?
   end
 
+  test "should not fail when the newsletter sender is toggled on twice" do
+    user = users(:ben)
+    login_as user
+
+    user.newsletter_senders.create!(feed: user.feeds.first, full_token: user.newsletter_authentication_token, email: "example@example.com")
+    feed_id = user.newsletter_senders.first.feed_id
+    on = {id: feed_id, newsletter_sender: {feed_id: "1"}}
+
+    patch :newsletter_senders, params: on, xhr: true
+    assert_response :success
+
+    assert_no_difference -> { Subscription.count } do
+      patch :newsletter_senders, params: on, xhr: true
+    end
+    assert_response :success
+    assert user.subscriptions.where(feed_id: feed_id).exists?
+  end
+
+  test "should not fail when the newsletter sender is toggled off twice" do
+    user = users(:ben)
+    login_as user
+
+    user.newsletter_senders.create!(feed: user.feeds.first, full_token: user.newsletter_authentication_token, email: "example@example.com")
+    feed_id = user.newsletter_senders.first.feed_id
+    off = {id: feed_id, newsletter_sender: {feed_id: "0"}}
+
+    patch :newsletter_senders, params: off, xhr: true
+    assert_response :success
+
+    assert_no_difference -> { Subscription.count } do
+      patch :newsletter_senders, params: off, xhr: true
+    end
+    assert_response :success
+    assert_not user.subscriptions.where(feed_id: feed_id).exists?
+  end
+
   test "should not unsubscribe from normal feed" do
     login_as @user
     subscription = @user.subscriptions.first

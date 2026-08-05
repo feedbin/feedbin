@@ -46,9 +46,12 @@ class Settings::Newsletters::AddressesController < ApplicationController
       if params[:authentication_token][:type] == "random"
         @random = true
       elsif clean_token.present?
-        @token = AuthenticationToken.newsletters.generate_custom_token(clean_token)
-        @numbers = @token.split(".").last
-        @message = Rails.application.message_verifier(:address_token).generate(@token)
+        # nil when the prefix has no free address left, which create.js.erb
+        # handles by leaving the form invalid.
+        if @token = AuthenticationToken.newsletters.generate_custom_token(clean_token)
+          @numbers = @token.split(".").last
+          @message = Rails.application.message_verifier(:address_token).generate(@token)
+        end
       end
     end
   end

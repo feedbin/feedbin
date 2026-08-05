@@ -18,6 +18,19 @@ class DevicesControllerTest < ActionController::TestCase
     assert_equal "browser", device.device_type
   end
 
+  test "create moves a browser device registered by another account to this one" do
+    endpoint = "https://push.example.com/shared-browser-profile"
+    users(:ben).devices.create!(token: endpoint, device_type: Device.device_types[:browser])
+
+    login_as @user
+
+    assert_no_difference -> { Device.count } do
+      post :create, params: {device: {data: {endpoint: endpoint}}}
+    end
+    assert_response :ok
+    assert_equal @user, Device.find_by(token: endpoint).user
+  end
+
   test "create reuses an existing browser device with the same lowercased token" do
     login_as @user
     @user.devices.create!(token: "https://push.example.com/abc", device_type: Device.device_types[:browser])

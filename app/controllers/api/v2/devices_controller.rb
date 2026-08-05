@@ -8,12 +8,7 @@ module Api
 
       def create
         @user = current_user
-        @user
-          .devices
-          .create_with(device_params)
-          .where("lower(token) = ?", params.dig(:device, :token)&.downcase)
-          .first_or_create
-          .update(device_params)
+        Device.register(@user, device_params[:token], device_params)
         head :ok
       end
 

@@ -86,11 +86,7 @@ class Settings::SubscriptionsController < ApplicationController
     valid = @user.newsletter_senders.pluck(:feed_id)
     feed_id = params[:id].to_i
     if valid.include?(feed_id)
-      if params[:newsletter_sender][:feed_id] == "1"
-        @user.subscriptions.create!(feed_id: feed_id)
-      else
-        @user.subscriptions.where(feed_id: feed_id).take.destroy
-      end
+      Subscription.set_subscribed(@user, feed_id, params[:newsletter_sender][:feed_id] == "1")
     end
     flash[:notice] = "Settings updated."
     flash.discard

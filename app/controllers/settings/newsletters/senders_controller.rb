@@ -21,11 +21,9 @@ class Settings::Newsletters::SendersController < ApplicationController
   def update
     sender = @user.authentication_tokens.find_by_token(params[:newsletter_sender][:token])&.newsletter_senders&.find(params[:id])
 
-    if params[:newsletter_sender][:active] == "1"
-      @user.subscriptions.create!(feed_id: sender.feed_id)
-    else
-      @user.subscriptions.where(feed_id: sender.feed_id).take.destroy
-    end
+    head :not_found and return unless sender
+
+    Subscription.set_subscribed(@user, sender.feed_id, params[:newsletter_sender][:active] == "1")
 
     flash[:notice] = "Settings updated."
     flash.discard
