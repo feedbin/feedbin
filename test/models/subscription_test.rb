@@ -13,6 +13,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
   end
 
+  test "destroy clears the feed's updated entries" do
+    user = users(:ben)
+    subscription = user.subscriptions.first
+    entry = create_entry(subscription.feed)
+    UpdatedEntry.create_from_owners(user.id, entry)
+
+    subscription.destroy
+
+    assert_equal 0, user.updated_entries.where(feed_id: subscription.feed_id).count,
+      "updated_entries are subscription-scoped and should go with the subscription"
+  end
+
   test "should be media only" do
     user = users(:ben)
     feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex)

@@ -13,6 +13,7 @@ class Subscription < ApplicationRecord
 
   before_destroy :prevent_generated_destroy
   before_destroy :mark_as_read
+  before_destroy :clear_updated_entries
   before_destroy :untag
 
   after_create :refresh_favicon
@@ -57,6 +58,14 @@ class Subscription < ApplicationRecord
 
   def mark_as_read
     UnreadEntry.where(user_id: user_id, feed_id: feed_id).delete_all
+  end
+
+  # updated_entries is per-subscription state — whether it is written at all is
+  # the show_updates setting — so it goes when the subscription does. The other
+  # per-user entry tables are deliberately left alone: User#can_read_entry?
+  # grants access to those entries without a subscription.
+  def clear_updated_entries
+    UpdatedEntry.where(user_id: user_id, feed_id: feed_id).delete_all
   end
 
   def add_feed_to_action

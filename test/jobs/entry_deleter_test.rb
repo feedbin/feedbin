@@ -56,6 +56,31 @@ class EntryDeleterTest < ActiveSupport::TestCase
     end
   end
 
+  test "should remove RecentlyPlayedEntries" do
+    entry = @entries.first
+    RecentlyPlayedEntry.create!(user: @user, entry: entry)
+
+    EntryDeleter.new.delete_entries(@feed.id, entry.id)
+
+    assert_equal 0, RecentlyPlayedEntry.where(entry_id: entry.id).count,
+      "recently_played_entries has no foreign key, so a leftover row is an orphan"
+  end
+
+  test "should not partially delete when a statement fails" do
+    entry = @entries.first
+    UnreadEntry.create_from_owners(@user, entry)
+
+    raises = ->(*) { raise ActiveRecord::StatementInvalid, "boom" }
+    assert_raises(ActiveRecord::StatementInvalid) do
+      Entry.stub(:where, raises) do
+        EntryDeleter.new.delete_entries(@feed.id, entry.id)
+      end
+    end
+
+    assert_equal 1, UnreadEntry.where(entry_id: entry.id).count,
+      "the earlier deletes should roll back with the failed one"
+  end
+
   test "should enqueue Search::SearchIndexRemove" do
     assert_difference "Search::SearchIndexRemove.jobs.size", +1 do
       EntryDeleter.new.perform(@feed.id)
