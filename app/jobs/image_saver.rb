@@ -13,6 +13,11 @@ class ImageSaver
       unless already_uploaded? file
         upload file
       end
+    # Per image, not per entry: one unreachable host or one src this cannot be
+    # made sense of should cost that image, and leave the well-formed ones
+    # further down the document archived.
+    rescue HTTP::Error, Addressable::URI::InvalidURIError
+      next
     ensure
       file.delete if file
     end

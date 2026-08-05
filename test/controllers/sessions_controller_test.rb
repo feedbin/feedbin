@@ -12,6 +12,27 @@ class SessionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should get new on the api subdomain" do
+    # SessionsHelper is mixed into every view, and the api branch of
+    # current_user used to call a method that only exists on the controller.
+    @request.host = "api.example.com"
+
+    get :new
+
+    assert_response :success
+  end
+
+  test "should sign in over http basic on the api subdomain" do
+    @request.host = "api.example.com"
+    @request.headers["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic
+      .encode_credentials(@user.email, default_password)
+
+    get :new
+
+    assert_redirected_to root_url
+    assert_equal @user, @controller.send(:current_user)
+  end
+
   test "should create new session" do
     post :create, params: {email: @user.email, password: default_password}
     assert signed_in?

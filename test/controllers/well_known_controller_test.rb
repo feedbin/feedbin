@@ -12,6 +12,17 @@ class WellKnownControllerTest < ActionController::TestCase
     end
   end
 
+  test "apple_site_association renders an empty app list when the variable is unset" do
+    original = ENV.delete("APPLE_SITE_ASSOCIATION")
+    begin
+      get :apple_site_association
+      assert_response :success
+      assert_equal({"webcredentials" => {"apps" => []}}, parse_json)
+    ensure
+      ENV["APPLE_SITE_ASSOCIATION"] = original if original
+    end
+  end
+
   test "apple_pay renders the configured apple pay key as plain text" do
     ENV["APPLE_PAY_KEY"] = "the-key-content"
     begin

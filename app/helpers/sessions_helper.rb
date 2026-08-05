@@ -8,16 +8,31 @@ module SessionsHelper
     current_user.present?
   end
 
+  # `defined?` rather than `||=`: a signed-out request resolves to nil, which
+  # `||=` does not cache, so the lookup ran again on every call.
   def current_user
-    @current_user ||= begin
-      if request.subdomain == "api"
-        authenticate_with_http_basic do |username, password|
-          User.find_by_email(username).try(:authenticate, password)
-        end
-      else
-        User.find_by_auth_token(cookies.signed[:auth_token].to_s) if cookies.signed[:auth_token].respond_to?(:to_s)
-      end
+    return @current_user if defined?(@current_user)
+    @current_user = find_current_user
+  end
+
+  def find_current_user
+    if request.subdomain == "api"
+      http_basic_user
+    else
+      User.find_by_auth_token(cookies.signed[:auth_token].to_s) if cookies.signed[:auth_token].respond_to?(:to_s)
     end
+  end
+
+  # This module is mixed into every view as well as the controller, and
+  # authenticate_with_http_basic is a controller method -- so any view that
+  # asked for current_user on the api subdomain raised NoMethodError, which is
+  # every unauthenticated HTML request there. HttpAuthentication::Basic's own
+  # module functions read the same header and work from either side.
+  def http_basic_user
+    return nil unless ActionController::HttpAuthentication::Basic.has_basic_credentials?(request)
+    username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
+    user = User.find_by_email(username)
+    user if user&.authenticate(password)
   end
 
   def authorize

@@ -5,7 +5,11 @@ class WellKnownController < ApplicationController
   def apple_site_association
     render json: {
       "webcredentials": {
-        "apps": ENV["APPLE_SITE_ASSOCIATION"].split(",")
+        # A deployment without the variable set answers with a well-formed
+        # association claiming no apps, the way apple_pay below answers with an
+        # empty body -- rather than putting a NoMethodError on an
+        # unauthenticated, crawler-reachable route.
+        "apps": ENV["APPLE_SITE_ASSOCIATION"].to_s.split(",")
       }
     }
   end

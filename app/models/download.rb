@@ -44,8 +44,13 @@ class Download
     @extension ||= File.extname parsed_url.path
   end
 
+  # Addressable rather than URI: `url` is an <img src> lifted verbatim out of
+  # entry content, and URI.parse implements RFC 3986 strictly enough to reject
+  # things browsers accept without complaint -- an unescaped space in a
+  # filename, a scheme with no authority. Both start with "http", so both clear
+  # the only filter ImageSaver applies before handing them here.
   def parsed_url
-    URI.parse url
+    Addressable::URI.parse url
   end
 
   def key
