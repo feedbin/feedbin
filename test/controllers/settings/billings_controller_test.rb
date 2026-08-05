@@ -439,6 +439,30 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "edit renders when the user's price tier has no plans" do
+    @user.update_column(:price_tier, nil)
+    login_as @user
+
+    get :edit
+
+    assert_response :success
+    assert_empty assigns(:plans)
+    assert_nil assigns(:default_plan)
+    # An empty interpolation here is a JS syntax error, which takes the card
+    # form down just as thoroughly as the 500 did.
+    assert_includes @response.body, "new feedbin.Payments([], null)"
+  end
+
+  test "billing renders for a trial user whose price tier has no plans" do
+    @user.update_columns(plan_id: plans(:trial).id, price_tier: nil)
+    login_as @user
+
+    get :index
+
+    assert_response :success
+    assert_nil assigns(:default_plan)
+  end
+
   private
 
   # A signed-in user with a Stripe customer and a card already on file, set up so

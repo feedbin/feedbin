@@ -53,6 +53,16 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_not_includes @response.body, "Renamed"
   end
 
+  test "edit 404s for a feed the user is not subscribed to" do
+    login_as @user
+    feed = feeds(:kottke)
+    assert_nil @user.subscriptions.find_by_feed_id(feed.id)
+
+    assert_raises(ActiveRecord::RecordNotFound) do
+      get :edit, params: {id: feed.id}, xhr: true
+    end
+  end
+
   test "should destroy subscription" do
     login_as @user
     subscription = @user.subscriptions.first

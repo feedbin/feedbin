@@ -33,7 +33,7 @@ class SubscriptionsController < ApplicationController
 
   def edit
     @user = current_user
-    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
+    @subscription = @user.subscriptions.where(feed_id: params[:id]).take!
 
     taggings = TagEditor.taggings(@user)
 

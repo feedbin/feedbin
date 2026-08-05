@@ -15,6 +15,24 @@ class AccountMigrationsControllerTest < ActionController::TestCase
     assert_equal newer, assigns(:migration)
   end
 
+  test "index renders an empty state when the user has no migration" do
+    login_as @user
+    assert_equal 0, @user.account_migrations.count
+
+    get :index
+
+    assert_response :success
+  end
+
+  test "index renders an empty state for the js format when the user has no migration" do
+    login_as @user
+    assert_equal 0, @user.account_migrations.count
+
+    get :index, xhr: true
+
+    assert_response :success
+  end
+
   test "start moves a pending migration to started and enqueues setup" do
     migration = @user.account_migrations.create!(api_token: "tok")
     AccountMigrator::Setup.jobs.clear

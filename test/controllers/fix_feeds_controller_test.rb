@@ -36,6 +36,20 @@ class FixFeedsControllerTest < ActionController::TestCase
     assert_response :found
   end
 
+  test "index renders when a fixable feed has no title" do
+    login_as @user
+
+    titled = @user.subscriptions.first
+    untitled = @user.subscriptions.create!(feed: feeds(:kottke))
+    untitled.feed.update_column(:title, nil)
+
+    [titled, untitled].each(&:fix_suggestion_present!)
+
+    get :index
+
+    assert_response :success
+  end
+
   test "ignore suggestion" do
     login_as @user
     @subscription = @user.subscriptions.first

@@ -1,9 +1,13 @@
 <% content_for :head do %>
     <%= javascript_include_tag "https://js.stripe.com/v3/" %>
     <%= javascript_include_tag "payments" %>
+    <%# A user whose price tier matches no plan row has no plans to quote from, so
+        every producer of @default_plan hands back nil. Pass null rather than
+        raising: updatePaymentRequest already treats a plan it doesn't know as "no
+        wallet button" and reveals the card form, which still saves a card. %>
     <script>
         $(function() {
-            new feedbin.Payments(<%= raw json_escape(@plan_data.to_json) %>, <%= @default_plan.id %>);
+            new feedbin.Payments(<%= raw json_escape(@plan_data.to_json) %>, <%= raw json_escape(@default_plan&.id.to_json) %>);
         });
     </script>
 <% end %>
