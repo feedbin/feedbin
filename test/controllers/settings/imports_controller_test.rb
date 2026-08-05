@@ -30,6 +30,28 @@ class Settings::ImportsControllerTest < ActionController::TestCase
     assert_equal ["Tag One", "Tag Two"], item.details[:tag]
   end
 
+  test "should show a report whose OPML outlines had text but no title" do
+    login_as @user
+
+    import = @user.imports.new(filename: "subscriptions.opml")
+    import.import_items.new(status: :failed, details: {
+      title: "Has a title", text: "Has a title",
+      xml_url: "http://a.example.com/feed.xml", html_url: "http://a.example.com/"
+    })
+    # text is the required OPML attribute; title is optional.
+    import.import_items.new(status: :failed, details: {
+      text: "Only text",
+      xml_url: "http://b.example.com/feed.xml", html_url: "http://b.example.com/"
+    })
+    import.save!
+    import.update_column(:complete, true)
+
+    get :show, params: {id: import.id}
+
+    assert_response :success
+    assert_includes @response.body, "Only text"
+  end
+
   test "should show import error" do
     login_as @user
 

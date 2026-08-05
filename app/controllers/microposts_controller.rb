@@ -16,13 +16,23 @@ class MicropostsController < ApplicationController
       data = {
         micropost: Micropost.new(item),
         fully_qualified_url: item["url"],
-        published: Time.parse(item["date_published"]),
+        published: parse_published(item["date_published"]),
         content: item["content_html"],
         id: item["id"],
         media: []
       }
       OpenStruct.new(data)
     end
+  end
+
+  # date_published is an optional item field in both JSON Feed v1 and v1.1, so a
+  # conformant reply can omit it -- and Time.parse turns that, or anything Ruby
+  # cannot read, into an exception that fails the whole conversation rather than
+  # the one reply. The template renders a reply with no timestamp without one.
+  def parse_published(value)
+    Time.parse(value.to_s)
+  rescue ArgumentError
+    nil
   end
 
   def get_replies

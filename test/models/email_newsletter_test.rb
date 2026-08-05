@@ -73,6 +73,55 @@ class EmailNewsletterTest < ActiveSupport::TestCase
     end
   end
 
+  test "a From header with no usable address is invalid rather than a crash" do
+    sources = {
+      "display name only" => "From: Some Newsletter",
+      "empty angle addr" => "From: <>",
+      "empty From value" => "From: ",
+      "empty group" => "From: undisclosed-recipients:;",
+      "no From header" => nil
+    }
+
+    sources.each do |description, from|
+      source = [from, "To: token@newsletters.feedbin.com", "Subject: Hi", "", "body", ""].compact.join("\n")
+      newsletter = EmailNewsletter.new(Mail.from_source(source), "token")
+
+      assert_not newsletter.valid?, "#{description} should not be a usable newsletter"
+
+      %i[from_email from_name name from domain].each do |accessor|
+        assert_nothing_raised { newsletter.public_send(accessor) }
+      end
+    end
+  end
+
+  test "a From header with a real address is valid" do
+    source = <<~EMAIL
+      From: Ben Ubois <ben@benubois.com>
+      To: token@newsletters.feedbin.com
+      Subject: Hi
+      Date: Tue, 18 May 2021 14:16:22 -0700
+
+      body
+    EMAIL
+
+    assert EmailNewsletter.new(Mail.from_source(source), "token").valid?
+  end
+
+  test "a NUL byte in the body is removed, because Postgres cannot store one" do
+    # U+0000 is valid UTF-8, so valid_encoding? is true and scrub leaves it
+    # alone. Postgres rejects it anyway: the wire protocol is C strings.
+    source = "From: news@example.com\r\n" \
+             "To: token@newsletters.feedbin.com\r\n" \
+             "Subject: Hi\r\n" \
+             "Content-Type: text/plain; charset=UTF-8\r\n\r\n" \
+             "before\0after\r\n"
+
+    newsletter = EmailNewsletter.new(Mail.from_source(source), "token")
+
+    assert_equal "beforeafter\n", newsletter.text
+    assert_equal "beforeafter\n", newsletter.content
+  end
+
   test "text and content are nil when a multipart email has no text or html part" do
     # A multipart message with neither a text/plain nor a text/html part (here,
     # only an image attachment). Mail::Message#decoded raises NoMethodError on a

@@ -12,7 +12,13 @@ class NewsletterReceiver
 
     if @user && full_authentication_token&.active?
       @newsletter = parse_newsletter
-      if entry = create
+      # A newsletter with no usable sender has no feed to belong to -- see
+      # EmailNewsletter#valid?. Decline it here rather than letting the nil
+      # reach the sender and feed rows, where it is a NotNullViolation the job
+      # will retry twenty-five times without ever succeeding.
+      if !@newsletter.valid?
+        Sidekiq.logger.info "Newsletter declined, no usable sender url=#{url}"
+      elsif entry = create
         Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
       end
     else
@@ -150,27 +156,34 @@ class NewsletterReceiver
       feed.entries.create!(attributes).tap do |record|
         NewsletterSaver.perform_async(record.id)
       end
-    rescue ActiveRecord::StatementInvalid
-      ErrorService.context(invalid_encoding_attributes: invalid_encoding_attributes(attributes))
+    # ArgumentError as well as StatementInvalid: the adapter refuses a NUL in a
+    # bind parameter before the statement is ever sent, so that rejection never
+    # arrives wearing an ActiveRecord class.
+    rescue ActiveRecord::StatementInvalid, ArgumentError
+      ErrorService.context(unstorable_attributes: unstorable_attributes(attributes))
       raise
     end
   end
 
-  # Names the attributes whose strings are not valid UTF-8, so the failing
-  # column shows up in the error notice instead of just the raw byte sequence.
-  def invalid_encoding_attributes(attributes)
+  # Names the attributes Postgres will refuse, so the failing column shows up in
+  # the error notice instead of just the raw byte sequence.
+  def unstorable_attributes(attributes)
     attributes.flat_map do |key, value|
       if value.is_a?(Hash)
-        value.filter_map { |nested_key, nested_value| "#{key}.#{nested_key}" if invalid_utf8?(nested_value) }
-      elsif invalid_utf8?(value)
+        value.filter_map { |nested_key, nested_value| "#{key}.#{nested_key}" if unstorable?(nested_value) }
+      elsif unstorable?(value)
         key.to_s
       end
     end.compact
   end
 
-  def invalid_utf8?(value)
+  # Two separate rejections: bytes that are not valid UTF-8, and NUL, which is
+  # valid UTF-8 and still cannot cross a wire protocol built on C strings. The
+  # encoding test alone named nothing for the second, which is how a thousand
+  # NUL rejections went undiagnosed.
+  def unstorable?(value)
     return false unless value.is_a?(String)
     bytes = value.encoding == Encoding::UTF_8 ? value : value.dup.force_encoding(Encoding::UTF_8)
-    !bytes.valid_encoding?
+    !bytes.valid_encoding? || bytes.include?("\0")
   end
 end

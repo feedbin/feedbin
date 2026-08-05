@@ -10,13 +10,13 @@ module Settings
           .import_items
           .failed
           .includes(:discovered_feeds, :favicon)
-          .sort_by { _1.title }
+          .sort_by { _1.title.to_s }
 
         @fixable_items = @import
           .import_items
           .fixable
           .includes(:discovered_feeds, :favicon)
-          .sort_by { _1.title }
+          .sort_by { _1.title.to_s }
       end
 
       def view_template

@@ -31,4 +31,14 @@ class NewsletterSaverTest < ActiveSupport::TestCase
     NewsletterSaver.new.perform(entry.id)
     assert_requested request
   end
+
+  test "saves an email that carried no Subject" do
+    entry = create_entry(Feed.first)
+    entry.update_columns(title: nil, content: "<html><body><p>hi</p></body></html>")
+    request = stub_request(:put, /s3\.amazonaws\.com/)
+
+    NewsletterSaver.new.perform(entry.id)
+
+    assert_requested request
+  end
 end

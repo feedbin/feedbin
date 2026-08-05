@@ -140,7 +140,63 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert_equal feed.feed_type, "newsletter"
   end
 
-  test "invalid_encoding_attributes names attributes whose strings are not valid UTF-8" do
+  test "stores a newsletter whose body carries a NUL byte" do
+    url = "https://bucket.s3.amazonaws.com/path.to.nul.email"
+    stub_request(:get, url).to_return(status: 200, body: <<~EMAIL.gsub("\n", "\r\n"))
+      From: News <news@example.com>
+      To: #{@token}@newsletters.feedbin.com
+      Subject: Hi
+      Content-Type: text/plain; charset=UTF-8
+
+      before\0after
+    EMAIL
+    stub_request(:delete, url).to_return(status: 204)
+
+    assert_difference "Entry.count", +1 do
+      NewsletterReceiver.new.perform(@token, "s3://bucket/path.to.nul.email")
+    end
+
+    assert_requested :delete, url
+  end
+
+  test "stores a newsletter whose subject carries a NUL byte" do
+    url = "https://bucket.s3.amazonaws.com/path.to.nul.subject.email"
+    stub_request(:get, url).to_return(status: 200, body: <<~EMAIL.gsub("\n", "\r\n"))
+      From: News <news@example.com>
+      To: #{@token}@newsletters.feedbin.com
+      Subject: be\0fore
+      Content-Type: text/plain; charset=UTF-8
+
+      body
+    EMAIL
+    stub_request(:delete, url).to_return(status: 204)
+
+    assert_difference "Entry.count", +1 do
+      NewsletterReceiver.new.perform(@token, "s3://bucket/path.to.nul.subject.email")
+    end
+
+    assert_equal "before", Entry.last.title
+  end
+
+  test "declines a message with no usable sender rather than failing the job" do
+    url = "https://bucket.s3.amazonaws.com/path.to.senderless.email"
+    stub_request(:get, url).to_return(status: 200, body: <<~EMAIL.gsub("\n", "\r\n"))
+      From: Some Newsletter
+      To: #{@token}@newsletters.feedbin.com
+      Subject: Hi
+
+      body
+    EMAIL
+    stub_request(:delete, url).to_return(status: 204)
+
+    assert_no_difference ["Entry.count", "Feed.count"] do
+      NewsletterReceiver.new.perform(@token, "s3://bucket/path.to.senderless.email")
+    end
+
+    assert_requested :delete, url
+  end
+
+  test "unstorable_attributes names attributes whose strings are not valid UTF-8" do
     receiver = NewsletterReceiver.new
     binary = "Pe\xF1a".dup.force_encoding(Encoding::ASCII_8BIT)
     invalid_utf8 = "Pe\xF1a".dup.force_encoding(Encoding::UTF_8)
@@ -151,7 +207,7 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
       data: {newsletter_text: invalid_utf8, type: "newsletter"}
     }
 
-    assert_equal ["content", "data.newsletter_text"], receiver.send(:invalid_encoding_attributes, attributes)
+    assert_equal ["content", "data.newsletter_text"], receiver.send(:unstorable_attributes, attributes)
   end
 
   test "keeps the source email when the newsletter could not be stored" do
@@ -191,11 +247,18 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert_requested :delete, @file_url_html
   end
 
-  test "invalid_encoding_attributes is empty when every attribute is valid UTF-8" do
+  test "unstorable_attributes is empty when every attribute is storable" do
     receiver = NewsletterReceiver.new
     attributes = {author: "José", content: "<p>ok</p>", data: {newsletter_text: "fin"}}
 
-    assert_empty receiver.send(:invalid_encoding_attributes, attributes)
+    assert_empty receiver.send(:unstorable_attributes, attributes)
+  end
+
+  test "unstorable_attributes names an attribute carrying a NUL byte" do
+    receiver = NewsletterReceiver.new
+    attributes = {author: "Clean", title: "before\0after", data: {newsletter_text: "also\0bad"}}
+
+    assert_equal ["title", "data.newsletter_text"], receiver.send(:unstorable_attributes, attributes)
   end
 
   test "records the failing attributes and re-raises when an entry insert is rejected" do
@@ -210,7 +273,7 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
       end
     end
 
-    assert recorded.any? { |params| params.key?(:invalid_encoding_attributes) },
-      "expected ErrorService.context to be given :invalid_encoding_attributes"
+    assert recorded.any? { |params| params.key?(:unstorable_attributes) },
+      "expected ErrorService.context to be given :unstorable_attributes"
   end
 end

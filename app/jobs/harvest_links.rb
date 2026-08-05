@@ -58,9 +58,20 @@ class HarvestLinks
   def extract_candidate?(url)
     parsed = Addressable::URI.heuristic_parse(url)
     return false if parsed.path.length < 2 && parsed.query.nil?
-    return false if parsed.host =~ /(twitter.com)/
-    return false if parsed.host =~ /#{Regexp.escape(@entry.hostname)}/
+    return false if same_host?(parsed.host, "twitter.com")
+    # entries.url is nullable and Entry#hostname rescues to nil besides. An
+    # own-host we don't know cannot match anything, so nothing is excluded --
+    # Regexp.escape(nil) took the whole job down instead.
+    return false if @entry.hostname.present? && same_host?(parsed.host, @entry.hostname)
     true
+  end
+
+  # Both patterns used to be unanchored, with an unescaped dot, so example.com
+  # matched notexample.com and example.com.evil.test alike.
+  def same_host?(host, domain)
+    host = host.to_s.downcase
+    domain = domain.to_s.downcase
+    host == domain || host.end_with?(".#{domain}")
   end
 
 end
