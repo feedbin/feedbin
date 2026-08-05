@@ -17,7 +17,12 @@ class ImageSaver
       file.delete if file
     end
     @entry.update(archived_images: true)
-  rescue ActiveRecord::RecordNotFound, HTTP
+    # HTTP::Error, not HTTP. `rescue` matches with `===`, which for a Module is
+    # `is_a?`, and lexical nesting inside a namespace creates no ancestry -- so
+    # naming the gem's top-level module read as a broad catch and caught
+    # nothing. HTTP::Error is the base class this meant, and is what every other
+    # rescue of this gem in the app names.
+  rescue ActiveRecord::RecordNotFound, HTTP::Error
   end
 
   private
