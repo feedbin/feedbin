@@ -1,6 +1,8 @@
 module Api
   module V2
     class ApiController < ApplicationController
+      MAX_PER_PAGE = 1_000
+
       skip_before_action :verify_authenticity_token
       before_action :valid_user, if: :signed_in?
 
@@ -17,12 +19,19 @@ module Api
           @page_query = @page_query.where.not(id: @user.starred_entries.select(:entry_id))
         end
 
-        if time = Time.iso8601(params[:since]) rescue nil
-          @page_query = @page_query.where("entries.created_at > :time", time: time)
+        return status_bad_request([{since: "Invalid ISO 8601 timestamp"}]) if invalid_since?
+
+        if since_time
+          @page_query = @page_query.where("entries.created_at > :time", time: since_time)
         end
 
-        if params.key?(:per_page) && params[:per_page].respond_to?(:to_i)
-          @page_query = @page_query.per_page(params[:per_page].to_i)
+        if params.key?(:per_page)
+          # will_paginate divides by this, so a zero — which is also what a
+          # non-numeric value coerces to — makes total_pages Infinity and
+          # out_of_bounds? raise FloatDomainError.
+          per_page = params[:per_page].to_i
+          return status_bad_request([{per_page: "Must be a positive integer"}]) if per_page < 1
+          @page_query = @page_query.per_page([per_page, MAX_PER_PAGE].min)
         end
 
         ids = @page_query.pluck(:id)
@@ -84,6 +93,23 @@ module Api
 
       private
 
+      # Time.iso8601 demands second precision, but "2016-02-01T12:30Z" and
+      # "2016-02-01" are both valid ISO 8601 and both what clients send.
+      # Parse once, so the filter and the Link header cannot disagree about
+      # whether the value was usable.
+      def since_time
+        return @since_time if defined?(@since_time)
+        @since_time = begin
+          Time.zone.iso8601(params[:since]) if params[:since].present?
+        rescue ArgumentError
+          nil
+        end
+      end
+
+      def invalid_since?
+        params[:since].present? && since_time.nil?
+      end
+
       def status_not_found
         @error = {status: 404, errors: []}
         render partial: "api/v2/shared/api_error", status: :not_found
@@ -126,7 +152,7 @@ module Api
         link_template = '<%s>; rel="%s"'
 
         options = {format: :json}
-        options[:since]           = Time.iso8601(params[:since]).iso8601(6) if params[:since]
+        options[:since]           = since_time.iso8601(6)                   if since_time
         options[:read]            = params[:read]                           if params[:read]
         options[:starred]         = params[:starred]                        if params[:starred]
         options[:ids]             = params[:ids]                            if params[:ids]

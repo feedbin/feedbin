@@ -15,9 +15,9 @@ module Api
           respond_to do |format|
             format.json do
               @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")
-              if params.key?(:since)
-                time = Time.iso8601(params[:since])
-                @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: time})
+              next status_bad_request([{since: "Invalid ISO 8601 timestamp"}]) if invalid_since?
+              if since_time
+                @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: since_time})
               end
               if @subscriptions.present?
                 fresh_when(etag: @subscriptions.map(&:id), last_modified: @subscriptions.maximum(:updated_at))

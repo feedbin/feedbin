@@ -22,7 +22,7 @@ class WebSubController < ApplicationController
 
   def publish
     content_type = request.headers["CONTENT_TYPE"]
-    encoding = HTTP::ContentType.parse(request.headers["CONTENT_TYPE"]).charset || "UTF-8"
+    encoding = resolve_encoding(HTTP::ContentType.parse(request.headers["CONTENT_TYPE"]).charset)
     body = request.raw_post
     if signature_valid?(body)
       body = body.force_encoding(encoding)
@@ -47,6 +47,17 @@ class WebSubController < ApplicationController
   end
 
   private
+
+  # The charset is whatever the hub put in its Content-Type, and force_encoding
+  # only accepts names Ruby knows — "utf8" without the hyphen is common in the
+  # wild and is not one of them. The || "UTF-8" this replaces only covered a
+  # missing charset, not an unrecognised one.
+  def resolve_encoding(charset)
+    return Encoding::UTF_8 if charset.blank?
+    Encoding.find(charset)
+  rescue ArgumentError
+    Encoding::UTF_8
+  end
 
   def signature_valid?(body)
     valid_algorithms = ["sha1", "sha256", "sha384", "sha512"]

@@ -5,6 +5,15 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     @user = users(:ben)
   end
 
+  test "should get index with a page number that cannot be paginated" do
+    login_as @user
+
+    ["0", "-1", "abc"].each do |page|
+      get :index, params: {page: page}
+      assert_response :success, "page=#{page}"
+    end
+  end
+
   test "should get index" do
     user = users(:new)
     feeds = create_feeds(user)

@@ -4,7 +4,11 @@ class Settings::SubscriptionsController < ApplicationController
     if @user.setting_on?(:fix_feeds_available)
       @user.setting_off!(:fix_feeds_available)
     end
-    @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 50)
+    # This paginates an Array, so will_paginate validates the page number in
+    # the constructor and raises RangeError/ArgumentError rather than returning
+    # an empty page. Clamp instead of handing it whatever the URL carried.
+    page = [params[:page].to_i, 1].max
+    @subscriptions = subscriptions_with_sort_data.paginate(page: page, per_page: 50)
     store_location
 
     respond_to do |format|

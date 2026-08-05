@@ -30,6 +30,29 @@ class Api::V2::TaggingsControllerTest < ApiControllerTestCase
     end
   end
 
+  test "should reject a blank name rather than failing after deciding it succeeded" do
+    api_content_type
+    login_as @user
+
+    assert_no_difference "Tagging.count" do
+      post :create, params: {feed_id: @user.feeds.first.id, name: "   "}, format: :json
+    end
+
+    assert_response :bad_request
+    assert parse_json["errors"].any? { |error| error.key?("name") }, parse_json.inspect
+  end
+
+  test "should reject a name that is not a string" do
+    api_content_type
+    login_as @user
+
+    assert_no_difference "Tagging.count" do
+      post :create, params: {feed_id: @user.feeds.first.id, name: {a: "b"}}, format: :json
+    end
+
+    assert_response :bad_request
+  end
+
   test "should destroy tagging" do
     login_as @user
 

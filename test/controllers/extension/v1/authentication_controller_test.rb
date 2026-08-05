@@ -11,6 +11,11 @@ class Extension::V1::AuthenticationControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "authenticates with an email the user capitalised" do
+    post :index, params: {email: @user.email.upcase, password: default_password}, format: :json
+    assert_response :success
+  end
+
   test "authenticates with page token" do
     post :index, params: {page_token: @user.page_token}, format: :json
     assert_response :success

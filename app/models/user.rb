@@ -116,6 +116,25 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
 
+  # Email is case-insensitive for identity here — index_users_on_lower_email
+  # enforces it — so every lookup has to fold both sides. This overrides the
+  # dynamic finder of the same name, which compares exactly.
+  def self.find_by_email(email)
+    email = normalize_email(email)
+    return nil if email.nil?
+    where("lower(email) = ?", email).take
+  end
+
+  # Base64-decoded HTTP Basic usernames arrive as arbitrary bytes. Postgres
+  # rejects a text parameter that is not valid UTF-8 before the query runs,
+  # and no stored address can hold those bytes anyway.
+  def self.normalize_email(email)
+    return nil unless email.is_a?(String)
+    bytes = (email.encoding == Encoding::UTF_8) ? email : email.dup.force_encoding(Encoding::UTF_8)
+    return nil unless bytes.valid_encoding?
+    bytes.strip.downcase
+  end
+
   def newsletter_senders
     NewsletterSender.where(token: newsletter_authentication_token.token).order(name: :asc)
   end

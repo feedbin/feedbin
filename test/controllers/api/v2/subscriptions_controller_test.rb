@@ -14,6 +14,25 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
     assert_response :success
   end
 
+  test "should accept a minute-precision since" do
+    login_as @user
+    since = 10.years.ago.utc.strftime("%Y-%m-%dT%H:%MZ")
+
+    get :index, params: {since: since}, format: :json
+
+    assert_response :success
+    assert_equal @user.subscriptions.count, parse_json.count
+  end
+
+  test "should say which parameter is wrong when since cannot be parsed" do
+    login_as @user
+
+    get :index, params: {since: "yesterday"}, format: :json
+
+    assert_response :bad_request
+    assert parse_json["errors"].any? { |error| error.key?("since") }, parse_json.inspect
+  end
+
   test "should show subscription" do
     login_as @user
     get :index, params: {id: @user.subscriptions.first}, format: :json

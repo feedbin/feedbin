@@ -17,7 +17,7 @@ module Extension
           elsif params[:page_token]
             User.find_by_page_token(params[:page_token])
           else
-            User.where("lower(email) = ?", params[:email]).take.try(:authenticate, params[:password])
+            User.find_by_email(params[:email]).try(:authenticate, params[:password])
           end
         end
 

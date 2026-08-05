@@ -43,8 +43,8 @@ module Searchable
 
     def self.scoped_search(params, user)
       data     = params.clone
-      per_page = data.delete(:per_page) || WillPaginate.per_page
-      page     = data.delete(:page) || 1
+      per_page = data.delete(:per_page).presence&.to_i || WillPaginate.per_page
+      page     = data.delete(:page).presence&.to_i || 1
       query    = build_query(user: user, query: data[:query], feed_ids: data[:feed_ids])
 
       result = Search.client { _1.validate(Search.index_name(Entry.table_name), query: {query: query[:query]}) }

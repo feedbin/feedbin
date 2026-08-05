@@ -12,6 +12,10 @@ module Search
       alias:    "/_alias/%{name}",
     }
 
+    # Elasticsearch rejects a from + size above index.max_result_window, so
+    # there is no point honouring a larger page than this.
+    MAX_PER_PAGE = 1_000
+
     def initialize(url, username: nil, password: nil)
       @url = url
       @username = username
@@ -19,10 +23,15 @@ module Search
     end
 
     def search(index, query:, page: 1, per_page: WillPaginate.per_page)
+      # Both arrive straight from the query string on most paths, so coerce
+      # here rather than relying on every caller to have done it.
+      page = page.to_i.clamp(1, Float::INFINITY).to_i
+      per_page = per_page.to_i.clamp(1, MAX_PER_PAGE)
+
       path = PATHS[:search] % {index:}
       data = request(:get, path, json: query, params: {
         :_source => false,
-        :from    => (page.to_i - 1) * per_page,
+        :from    => (page - 1) * per_page,
         :size    => per_page
       })
       Response.new(data, page: page, per_page: per_page)

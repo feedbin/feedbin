@@ -25,7 +25,10 @@ class SavedSearchesController < ApplicationController
 
   def create
     @user = current_user
-    @saved_search = @user.saved_searches.create(saved_search_params)
+    @saved_search = @user.saved_searches.new(saved_search_params)
+    unless @saved_search.save
+      return render_save_failure
+    end
     get_feeds_list
   end
 
@@ -36,7 +39,9 @@ class SavedSearchesController < ApplicationController
   def update
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
-    @saved_search.update(saved_search_params)
+    unless @saved_search.update(saved_search_params)
+      return render_save_failure
+    end
     get_feeds_list
   end
 
@@ -53,6 +58,14 @@ class SavedSearchesController < ApplicationController
   end
 
   private
+
+  # Both views address the record by id, so there is nothing for them to render
+  # when it was never saved. Show the user why instead.
+  def render_save_failure
+    flash[:error] = @saved_search.errors.full_messages.join(". ")
+    flash.discard
+    render partial: "shared/message_flash", locals: {flash: flash}
+  end
 
   def saved_search_params
     params.require(:saved_search).permit(:query, :name)

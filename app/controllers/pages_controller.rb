@@ -31,7 +31,7 @@ class PagesController < ApplicationController
         User.find_by_page_token!(params[:page_token])
       else
         authenticate_or_request_with_http_basic("Feedbin") do |username, password|
-          User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password)
+          User.find_by_email(username).try(:authenticate, password)
         end
       end
     end

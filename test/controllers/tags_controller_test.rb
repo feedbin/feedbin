@@ -31,6 +31,22 @@ class TagsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should not fail when the tag key is missing" do
+    login_as @user
+    assert_no_difference "Tag.count" do
+      post :update, params: {id: @tag}, xhr: true
+    end
+    assert_response :success
+  end
+
+  test "should not fail when the new name is empty after normalising" do
+    login_as @user
+    assert_no_difference "Tag.count" do
+      post :update, params: {id: @tag, tag: {name: " , "}}, xhr: true
+    end
+    assert_response :success
+  end
+
   test "should destroy tag" do
     login_as @user
     assert_difference "Tagging.count", -1 do

@@ -36,7 +36,7 @@ class TagsController < ApplicationController
     user = current_user
 
     tag = Tag.find(params[:id])
-    @new_tag = Tag.rename(user, tag, params[:tag][:name])
+    @new_tag = Tag.rename(user, tag, params.dig(:tag, :name))
 
     if @new_tag
       visibility = user.tag_visibility[tag.id.to_s] || false
