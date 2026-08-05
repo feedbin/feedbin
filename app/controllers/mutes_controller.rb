@@ -12,7 +12,10 @@ class MutesController < ApplicationController
     @action = @user.actions.new(
       query: params[:query],
       all_feeds: params[:all_feeds] == "true" ? true : false,
-      feed_ids: [params[:feed_id]],
+      # Array() rather than [], which turns a missing parameter into [nil] --
+      # a NULL that compute_feed_ids drops with blank? and the preview template
+      # then calls empty? on.
+      feed_ids: Array(params[:feed_id]),
       action_type: Action.action_types[:mute],
       actions: ["mark_read"],
       apply_action: "1"

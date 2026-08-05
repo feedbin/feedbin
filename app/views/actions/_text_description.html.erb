@@ -1,5 +1,7 @@
 
-<% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.empty? } %>
+<%# blank? rather than empty?, matching compute_feed_ids: feed_ids is a text[]
+    and a NULL element from any writer took the page down on the reject. %>
+<% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.blank? } %>
 <% tag_ids = action.tag_ids.reject{ |tag_id| tag_id.blank? } %>
 If an article is published
 <% if action.query.present? %>

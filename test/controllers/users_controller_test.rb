@@ -29,6 +29,15 @@ class UsersControllerTest < ActionController::TestCase
     assert user.reload.authenticate(new_password)
   end
 
+  test "update without a user param is a client error, not a crash" do
+    user = users(:ben)
+    login_as user
+
+    assert_raises(ActionController::ParameterMissing) do
+      patch :update, params: {id: user}
+    end
+  end
+
   test "should change plan" do
     StripeMock.start
     user = users(:ann)

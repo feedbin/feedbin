@@ -23,6 +23,15 @@ class MutesControllerTest < ActionController::TestCase
     assert_includes assigns(:mutes), @mute
   end
 
+  test "POST create renders the preview when feed_id was not sent" do
+    login_as @user
+
+    post :create, params: {query: "spam", all_feeds: "true"}, xhr: true
+
+    assert_response :success
+    assert_empty assigns(:action).feed_ids
+  end
+
   test "POST create with button_action=save persists a mute" do
     login_as @user
     assert_difference -> { @user.actions.mute.count }, +1 do

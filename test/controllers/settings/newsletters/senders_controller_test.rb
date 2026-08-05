@@ -13,6 +13,33 @@ class Settings::Newsletters::SendersControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  # "to:" on its own is what the field holds between typing the prefix and
+  # typing the address, so an incremental search fires exactly this request.
+  test "should search senders for a bare to: prefix" do
+    login_as users(:new)
+
+    get :index, params: {q: "to:"}
+
+    assert_response :success
+  end
+
+  test "should not take the to: branch for a sender whose name merely contains it" do
+    user = users(:new)
+    token = user.newsletter_authentication_token
+    feed = Feed.create!(feed_url: SecureRandom.hex, feed_type: :newsletter)
+    sender = NewsletterSender.create!(
+      feed: feed, token: token.token, full_token: token.token,
+      email: "news@example.com", name: "Sent to: subscribers", active: true
+    )
+
+    login_as user
+    get :index, params: {q: "Sent to: subscribers"}
+
+    assert_response :success
+    assert_includes assigns(:senders), sender,
+      "include?(\"to:\") matches the substring anywhere, so this took the prefix branch"
+  end
+
   test "should update sender" do
     user = users(:new)
     feeds = create_feeds(user)

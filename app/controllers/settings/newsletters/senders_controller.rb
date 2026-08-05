@@ -32,10 +32,19 @@ class Settings::Newsletters::SendersController < ApplicationController
   private
 
   def search_senders
-    query = params[:q]
-    tokens = if query.include?("to:")
-      query = query.delete_prefix("to:").split("@").first.strip
-      @user.newsletter_addresses.where(token: query).pluck(:token)
+    query = params[:q].to_s
+    # start_with?, not include?: a sender whose own name contains "to:" was
+    # taking the prefix branch and being searched for as an address.
+    tokens = if query.start_with?("to:")
+      # "to:" on its own is what the field holds between typing the prefix and
+      # typing the address, and split("@") on the empty string is [], not [""].
+      # An address that is not there yet narrows nothing.
+      query = query.delete_prefix("to:").split("@").first.to_s.strip
+      if query.empty?
+        @user.newsletter_addresses.pluck(:token)
+      else
+        @user.newsletter_addresses.where(token: query).pluck(:token)
+      end
     else
       @user.newsletter_addresses.pluck(:token)
     end

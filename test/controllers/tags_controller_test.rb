@@ -17,6 +17,23 @@ class TagsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should get index with no query" do
+    login_as @user
+
+    get :index, format: :json
+
+    assert_response :success
+    assert_includes JSON.parse(@response.body)["suggestions"].map { it["value"] }, @tag.name
+  end
+
+  test "should get index when query is not a string" do
+    login_as @user
+
+    get :index, params: {query: ["x"]}, format: :json
+
+    assert_response :success
+  end
+
   test "should show tag" do
     login_as @user
     get :show, params: {id: @tag}, xhr: true
