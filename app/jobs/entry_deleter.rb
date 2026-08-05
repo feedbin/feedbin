@@ -39,8 +39,6 @@ class EntryDeleter
     if entry_ids.present?
       Search::SearchIndexRemove.perform_async(entry_ids)
 
-      # None of these tables has a foreign key to entries, so a statement that
-      # never runs leaves rows pointing at an entry id that is gone.
       ActiveRecord::Base.transaction do
         UnreadEntry.where(entry_id: entry_ids).delete_all
         UpdatedEntry.where(entry_id: entry_ids).delete_all
