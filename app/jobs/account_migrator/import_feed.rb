@@ -48,14 +48,17 @@ module AccountMigrator
 
       @item.message = message
       @item.complete!
-
-      mark_complete
     rescue ApiClient::Error => exception
       failed! "API Error: #{exception.message}"
-      mark_complete
     rescue => exception
       failed! "Unknown error"
       raise exception
+    ensure
+      # This job is the only thing that ever moves a migration out of
+      # processing, and the "no feed found" return above is the likeliest
+      # outcome for an item. Re-evaluate on every exit, including the ones that
+      # raise: mark_complete takes with_lock and is idempotent.
+      mark_complete if @migration
     end
 
     def mark_complete

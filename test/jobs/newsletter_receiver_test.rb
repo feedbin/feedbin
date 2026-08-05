@@ -154,6 +154,43 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert_equal ["content", "data.newsletter_text"], receiver.send(:invalid_encoding_attributes, attributes)
   end
 
+  test "keeps the source email when the newsletter could not be stored" do
+    losing_race = -> { raise ActiveRecord::RecordNotUnique, "PG::UniqueViolation" }
+
+    assert_no_difference -> { Entry.count } do
+      NewsletterReceiver.stub_any_instance(:subscribe, losing_race) do
+        assert_raises(ActiveRecord::RecordNotUnique) do
+          NewsletterReceiver.new.perform(@token, @s3_url_html)
+        end
+      end
+    end
+
+    assert_not_requested :delete, @file_url_html
+  end
+
+  test "deletes the source email when the same newsletter is already stored" do
+    newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_html), @token)
+    feeds(:daring_fireball).entries.create!(
+      title: "Stored by the delivery that arrived first",
+      public_id: newsletter.entry_id,
+      url: "https://example.com/first"
+    )
+
+    assert_no_difference -> { Entry.count } do
+      NewsletterReceiver.new.perform(@token, @s3_url_html)
+    end
+
+    assert_requested :delete, @file_url_html
+  end
+
+  test "deletes the source email for a token that is not active" do
+    @user.newsletter_authentication_token.update!(active: false)
+
+    NewsletterReceiver.new.perform(@token, @s3_url_html)
+
+    assert_requested :delete, @file_url_html
+  end
+
   test "invalid_encoding_attributes is empty when every attribute is valid UTF-8" do
     receiver = NewsletterReceiver.new
     attributes = {author: "José", content: "<p>ok</p>", data: {newsletter_text: "fin"}}

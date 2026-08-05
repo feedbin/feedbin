@@ -3,8 +3,11 @@ module Search
     include Sidekiq::Worker
     sidekiq_options queue: :network_search
 
+    # Enqueued from an after_commit, so a create followed quickly by a destroy
+    # leaves a job for an id that is already gone. PercolateDestroy has its own
+    # job; there is nothing to do here.
     def perform(action_id)
-      @action = Action.find(action_id)
+      return unless @action = Action.find_by(id: action_id)
 
       if @action.computed_feed_ids.empty?
         percolate_destroy

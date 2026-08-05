@@ -29,8 +29,12 @@ class SavePage
       )
     end
 
-    ImageSaver.perform_async(entry.id)
-    FaviconCrawler::Finder.perform_async(host)
+    # A retry that still cannot parse produces nothing new to crawl, and this
+    # runs about two dozen times over three weeks for one unreadable page.
+    if entry.previously_new_record? || parsed_result
+      ImageSaver.perform_async(entry.id)
+      FaviconCrawler::Finder.perform_async(host)
+    end
 
     if parsed_result.nil?
       raise MissingPage.new("Missing page, retrying", entry)
@@ -54,8 +58,14 @@ class SavePage
 
   def create_webpage_entry
     user.subscriptions.create_with(kind: Subscription.kinds[:generated]).find_or_create_by!(feed: pages_feed)
-    entry = pages_feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
-    entry.update(build_entry)
+    attributes = build_entry
+    entry = pages_feed.entries.create_with(attributes).find_or_create_by!(public_id: public_id)
+    unless entry.previously_new_record?
+      # published falls back to Time.now whenever the parse failed, and the
+      # Pages list is sorted by it — so a retry that still cannot read the page
+      # would float it back to the top. Only the first save sets it.
+      entry.update(attributes.except(:published))
+    end
     entry
   end
 

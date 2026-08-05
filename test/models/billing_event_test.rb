@@ -5,6 +5,9 @@ class BillingEventTest < ActiveSupport::TestCase
     StripeMock.start
     @user = users(:ben)
     ActionMailer::Base.deliveries.clear
+    # invoice_created? reads jobs.first, so a job any earlier test in this
+    # process left behind would be the one it asserts against.
+    Sidekiq::Worker.clear_all
   end
 
   teardown do

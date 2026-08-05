@@ -18,6 +18,9 @@ class NewsletterReceiver
     else
       Sidekiq.logger.info "Newsletter skipped user_id=#{@user&.id} address=#{address} url=#{url}"
     end
+    # Only reached when the message was stored or deliberately declined. An
+    # unexpected failure above must leave the source in place, because it is
+    # the only copy of the email and Sidekiq is going to retry.
     storage_client.delete_object(@url.host, storage_path)
   end
 
@@ -29,8 +32,15 @@ class NewsletterReceiver
       subscribe
       tag
     end
-    create_entry
-  rescue ActiveRecord::RecordNotUnique
+    begin
+      create_entry
+    rescue ActiveRecord::RecordNotUnique
+      # public_id is SHA1(feed_id + subject + content), so a collision means
+      # this exact message is already stored — a redelivery, or the worker that
+      # won the race. Nothing left to do, and the source can go.
+      Sidekiq.logger.info "Newsletter already stored public_id=#{newsletter.entry_id}"
+      nil
+    end
   end
 
   def subscribe

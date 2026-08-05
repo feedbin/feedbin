@@ -20,6 +20,22 @@ class UserDeleterTest < ActiveSupport::TestCase
     StripeMock.stop
   end
 
+  test "should delete user when the account closed email is permanently rejected" do
+    StripeMock.start
+    user = users(:ben)
+
+    rejected = ->(_user_id, _opml) {
+      raise Postmark::InvalidEmailRequestError.new(300, "", {"Message" => "Error parsing 'To': Illegal email address 'pricing'."})
+    }
+
+    UserMailer.stub :account_closed, rejected do
+      UserDeleter.new.perform(user.id)
+    end
+
+    assert_nil User.find_by(id: user.id), "the account must be deleted even when it cannot be emailed"
+    StripeMock.stop
+  end
+
   test "should refund charge" do
     StripeMock.start
     setup_data

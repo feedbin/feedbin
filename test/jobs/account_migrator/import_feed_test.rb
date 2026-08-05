@@ -44,6 +44,38 @@ module AccountMigrator
       assert_equal ["Favorites", "Videos"], @user.feed_tags.map(&:name)
     end
 
+    test "a feed that cannot be found still finishes the migration" do
+      stub_request(:get, @item.fw_feed&.safe_dig("feed_url")).to_return(status: 404, body: "")
+      stub_request_file("migration_empty_response.json", /#{ENV["ACCOUNT_HOST"]}\/api\/v2\/feed_items\/list/,
+        headers: {
+          "Content-Type" => "application/json; charset=utf-8"
+        }
+      )
+
+      AccountMigrator::ImportFeed.new.perform(@item.id)
+
+      assert @item.reload.failed?, "the item should be marked failed"
+      assert @migration.reload.complete?, "a migration with nothing left pending must not stay in processing"
+    end
+
+    test "an unexpected failure still finishes the migration" do
+      stub_request_file("atom.xml", @item.fw_feed&.safe_dig("feed_url"))
+      stub_request_file("migration_empty_response.json", /#{ENV["ACCOUNT_HOST"]}\/api\/v2\/feed_items\/list/,
+        headers: {
+          "Content-Type" => "application/json; charset=utf-8"
+        }
+      )
+
+      AccountMigrator::ImportFeed.stub_any_instance(:import_starred, -> (*) { raise "boom" }) do
+        assert_raises(RuntimeError) do
+          AccountMigrator::ImportFeed.new.perform(@item.id)
+        end
+      end
+
+      assert @item.reload.failed?, "the item should be marked failed"
+      assert @migration.reload.complete?, "a migration with nothing left pending must not stay in processing"
+    end
+
     test "API error should mark as failed" do
       stub_request_file("atom.xml", @item.fw_feed&.safe_dig("feed_url"))
       stub_request_file("migration_error_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list/,
