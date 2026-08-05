@@ -27,7 +27,7 @@ class Settings::ImportsControllerTest < ActionController::TestCase
     end
     assert_redirected_to settings_import_url(Import.last)
     item = ImportItem.last
-    assert_equal "Tag One,Tag Two", item.details[:tag]
+    assert_equal ["Tag One", "Tag Two"], item.details[:tag]
   end
 
   test "should show import error" do

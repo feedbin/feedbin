@@ -26,8 +26,14 @@ class Settings::SubscriptionsController < ApplicationController
   end
 
   def destroy
-    destroy_subscription(params[:id])
-    flash[:notice] = "You have successfully unsubscribed."
+    # prevent_generated_destroy throws :abort, which makes destroy return
+    # false rather than raise — so an unconditional success flash told the
+    # user a subscription was gone that is still there.
+    if destroy_subscription(params[:id])
+      flash[:notice] = "You have successfully unsubscribed."
+    else
+      flash[:alert] = "That subscription can not be removed."
+    end
     @redirect = clear_location || settings_subscriptions_url
   end
 
@@ -65,13 +71,22 @@ class Settings::SubscriptionsController < ApplicationController
         ids = subscriptions_with_sort_data.map(&:id)
         subscriptions = @user.subscriptions.where(id: ids)
       elsif params[:include_all]
-        subscriptions = @user.subscriptions
+        # The checkbox summarises the list on screen, which is the default
+        # scope — not every row the association holds.
+        subscriptions = @user.subscriptions.default
       else
         subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
       end
       if params[:operation] == "unsubscribe"
-        subscriptions.destroy_all
-        notice = "You have unsubscribed."
+        selected = subscriptions.count
+        removed = subscriptions.destroy_all.count(&:destroyed?)
+        notice = if removed == selected
+          "You have unsubscribed."
+        elsif removed.zero?
+          "None of those subscriptions could be removed."
+        else
+          "Unsubscribed from #{removed} of #{selected} feeds."
+        end
       elsif params[:operation] == "show_updates"
         subscriptions.update_all(show_updates: true, updated_at: Time.now)
       elsif params[:operation] == "hide_updates"

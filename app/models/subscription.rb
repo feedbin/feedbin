@@ -19,8 +19,10 @@ class Subscription < ApplicationRecord
 
   validate :reject_title_changes, on: :update, if: :generated?
 
+  # errors[:title] returns a freshly built array, so pushing onto it mutated a
+  # temporary and the validation always passed.
   def reject_title_changes
-    errors[:title] << "can not be changed" if title_changed?
+    errors.add(:title, "can not be changed") if title_changed?
   end
 
   enum :kind, {default: 0, generated: 1}
@@ -45,14 +47,22 @@ class Subscription < ApplicationRecord
       feed = Feed.find(feed_id)
       if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
         record = user.subscriptions.find_or_create_by(feed: feed)
-        record.update(title: subscription["title"].strip, media_only: subscription["media_only"])
+        # Leaving the box empty means "use the feed's own name", so store nil
+        # rather than "" — the fallback in #title only fires on nil. And an
+        # empty box must not wipe a title the user set on an earlier visit,
+        # since find_or_create_by hands back the existing row.
+        attributes = {media_only: subscription["media_only"]}
+        title = subscription["title"].to_s.strip.presence
+        attributes[:title] = title if title || record.previously_new_record?
+        record.update(attributes)
         array.push(record)
       end
     }
   end
 
+  # presence, not ||, so the rows already carrying "" recover too.
   def title
-    self[:title] || feed&.title
+    self[:title].presence || feed&.title
   end
 
   def mark_as_unread

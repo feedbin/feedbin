@@ -5,12 +5,17 @@ class PagesController < ApplicationController
   after_action :cors_headers, only: [:create, :options]
 
   def create
+    return head :bad_request if params[:url].blank?
     save_page
   end
 
   def fallback
-    save_page
-    redirect_to root_url, notice: "Page saved!"
+    if params[:url].blank?
+      redirect_to root_url, alert: "That page could not be saved, because no address was sent."
+    else
+      save_page
+      redirect_to root_url, notice: "Page saved!"
+    end
   end
 
   def options

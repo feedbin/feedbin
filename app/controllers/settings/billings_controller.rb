@@ -34,8 +34,14 @@ class Settings::BillingsController < ApplicationController
     @user = current_user
     plan = Plan.find(params[:plan])
     @user.plan = plan
-    @user.save
-    redirect_to settings_billing_url, notice: "Plan successfully changed."
+    # plan_type_valid rejects a plan outside the user's price tier without
+    # raising, so an unchecked save told the user their plan had changed while
+    # they went on being billed for the old one.
+    if @user.save
+      redirect_to settings_billing_url, notice: "Plan successfully changed."
+    else
+      redirect_to settings_billing_url, alert: @user.errors.full_messages.to_sentence.presence || "Plan could not be changed."
+    end
   rescue Stripe::CardError
     redirect_to settings_billing_url, alert: "Your card was declined, please update your billing information."
   end

@@ -13,6 +13,10 @@ class SavePage
   attr_reader :user, :url, :title, :path
 
   def perform(user_id, url, title, path = nil)
+    # public_id concatenates the url, so a blank one is a TypeError on every
+    # one of the 25 retries. Nothing here can succeed without it.
+    return if url.blank?
+
     @user = User.find(user_id)
     @url = url
     @title = title

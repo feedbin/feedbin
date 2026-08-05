@@ -33,7 +33,10 @@ class Import < ApplicationRecord
     end.map do |_, feed|
       tags = feed.delete(:tags)
       if !tags.empty?
-        feed[:tag] = tags.join(",")
+        # Feed#tag splits a String on commas, so joining folder names with one
+        # turned "News, Sports" back into two folders. details is a serialized
+        # Hash and Feed#tag already accepts an Array, so keep the list a list.
+        feed[:tag] = tags
       end
       feed
     end

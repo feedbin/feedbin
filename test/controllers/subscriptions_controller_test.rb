@@ -42,6 +42,17 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert(subscription.media_only, "Subscription should be media only")
   end
 
+  test "should not report a rename the model rejected" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    subscription = @user.subscriptions.create!(feed: feed, kind: :generated, title: "Pages")
+
+    patch :update, params: {id: subscription.id, subscription: {title: "Renamed"}}, xhr: true
+
+    assert_equal "Pages", subscription.reload.title
+    assert_not_includes @response.body, "Renamed"
+  end
+
   test "should destroy subscription" do
     login_as @user
     subscription = @user.subscriptions.first

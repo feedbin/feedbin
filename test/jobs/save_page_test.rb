@@ -86,6 +86,14 @@ class SavePageTest < ActiveSupport::TestCase
     assert_equal favicons, FaviconCrawler::Finder.jobs.count
   end
 
+  test "discards a save with no url instead of retrying it for three weeks" do
+    assert_nothing_raised do
+      assert_no_difference "Entry.count" do
+        SavePage.new.perform(@user.id, nil, nil)
+      end
+    end
+  end
+
   test "should save YouTube video" do
     stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
     youtube_video_id = "video_id"

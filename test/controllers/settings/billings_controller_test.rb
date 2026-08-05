@@ -64,6 +64,27 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "should not report success when the plan change was rejected" do
+    StripeMock.start
+    stripe_helper = StripeMock.create_test_helper
+
+    original = plans(:basic_monthly_3)
+    rejected = plans(:basic_monthly_4)
+    [original, rejected].each { create_stripe_plan(_1) }
+
+    customer = Stripe::Customer.create({email: @user.email, plan: original.stripe_id, source: stripe_helper.generate_card_token})
+    @user.update(customer_id: customer.id, plan: original)
+    @user.reload.inspect
+
+    login_as @user
+    post :update_plan, params: {plan: rejected.id}
+
+    assert_equal original, @user.reload.plan, "the plan is outside the user's price tier"
+    assert_nil flash[:notice], "the user must not be told a change went through that did not"
+    assert flash[:alert].present?, "the user should be told why"
+    StripeMock.stop
+  end
+
   test "should update credit card" do
     StripeMock.start
     plan = plans(:trial)

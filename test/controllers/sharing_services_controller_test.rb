@@ -16,6 +16,15 @@ class SharingServicesControllerTest < ActionController::TestCase
     assert_equal @services.length, assigns(:active_sharing_services).length
   end
 
+  test "should render the email service's inputs so it can be configured" do
+    login_as @user
+    get :index
+    assert_response :success
+
+    assert_select "input[name='supported_sharing_service[email_name]']", 1
+    assert_select "input[name='supported_sharing_service[email_address]']", 1
+  end
+
   test "should create sharing service" do
     login_as @user
     assert_difference "SharingService.count", 1 do

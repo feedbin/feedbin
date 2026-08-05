@@ -121,8 +121,13 @@ class EmailNewsletter
     @email.content_type&.strip
   end
 
+  # "Foo, Inc. <news@foo.com>" is a comma-separated list to an RFC 5322 parser,
+  # so the first address is the display-name fragment "Foo", with no domain at
+  # all — and site_url, feed_url and feed_id are all derived from it. Take the
+  # first address that actually names a host.
   def parsed_from
-    @email[:from].element.addresses.first
+    addresses = @email[:from].element.addresses
+    addresses.find { _1.domain.present? } || addresses.first
   end
 
   def parsed_to

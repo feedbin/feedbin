@@ -10,6 +10,18 @@ class EntryMailer < ApplicationMailer
     if subject.blank?
       subject = @entry.title
     end
-    mail(to: to, subject: subject, reply_to: reply_to, from: "#{email_name} <#{ENV["NOTIFICATION_EMAIL"]}>")
+    mail(to: to, subject: subject, reply_to: reply_to, from: from_address(email_name))
+  end
+
+  private
+
+  # email_name is the user's own "Full Name" setting. A comma is the address
+  # separator in this header, so interpolating the name produced a list —
+  # "Ubois, Ben <addr>" parses as the address "Ubois" plus the real one.
+  # Mail::Address quotes the display name when it needs quoting.
+  def from_address(email_name)
+    address = Mail::Address.new(ENV["NOTIFICATION_EMAIL"])
+    address.display_name = email_name if email_name.present?
+    address.format
   end
 end

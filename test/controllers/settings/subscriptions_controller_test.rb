@@ -5,6 +5,38 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     @user = users(:ben)
   end
 
+  test "should not report an unsubscribe the model refused" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    subscription = @user.subscriptions.create!(feed: feed, kind: :generated)
+
+    delete :destroy, params: {id: subscription.id}, xhr: true
+
+    assert Subscription.exists?(subscription.id), "generated subscriptions cannot be destroyed"
+    assert_nil flash[:notice], "the user must not be told a subscription is gone when it is not"
+  end
+
+  test "should not report a bulk unsubscribe that removed nothing" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    subscription = @user.subscriptions.create!(feed: feed, kind: :generated)
+
+    patch :update_multiple, params: {operation: "unsubscribe", subscription_ids: [subscription.id]}
+
+    assert Subscription.exists?(subscription.id)
+    assert_not_equal "You have unsubscribed.", flash[:notice]
+  end
+
+  test "a bulk operation only touches the subscriptions the list showed" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    generated = @user.subscriptions.create!(feed: feed, kind: :generated)
+
+    patch :update_multiple, params: {operation: "mute", include_all: "true"}
+
+    assert_not generated.reload.muted?, "the Pages feed is not in the list the checkbox summarises"
+  end
+
   test "should get index with a page number that cannot be paginated" do
     login_as @user
 

@@ -15,6 +15,24 @@ class EmailNewsletterTest < ActiveSupport::TestCase
     assert_nil newsletter.to_email
   end
 
+  test "takes the sender from a From name containing an unquoted comma" do
+    source = <<~EMAIL
+      From: Foo, Inc. <news@foo.com>
+      To: token@newsletters.feedbin.com
+      Subject: Hi
+      Date: Tue, 18 May 2021 14:16:22 -0700
+
+      body
+    EMAIL
+
+    newsletter = EmailNewsletter.new(Mail.from_source(source), "token")
+
+    assert_equal "news@foo.com", newsletter.from_email,
+      "a comma is the address separator, so addresses.first is the display-name fragment"
+    assert_equal "foo.com", newsletter.domain
+    assert_equal "http://foo.com", newsletter.site_url
+  end
+
   test "to_email returns the address when To header is present" do
     source = <<~EMAIL
       From: Ben Ubois <ben@benubois.com>
