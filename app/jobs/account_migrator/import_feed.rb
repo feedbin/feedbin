@@ -82,11 +82,22 @@ module AccountMigrator
       end
 
       result = StarredEntry.import(records, validate: false, on_duplicate_key_ignore: true)
+      increment_starred_counter_cache(result.ids)
 
       expected_count = feed_items.count
       actual_count = result.ids.count
 
       build_message(expected_count, actual_count, "starred")
+    end
+
+    # activerecord-import skips callbacks, so the counter cache
+    # StarredEntry maintains on create is never updated. EntryDeleter uses that
+    # counter to decide what is safe to prune, so leaving it at zero means an
+    # imported star does not protect its entry from deletion.
+    def increment_starred_counter_cache(starred_entry_ids)
+      return if starred_entry_ids.blank?
+      entry_ids = StarredEntry.where(id: starred_entry_ids).pluck(:entry_id)
+      Entry.where(id: entry_ids).update_all("starred_entries_count = starred_entries_count + 1")
     end
 
     def build_entry(feed_item)
