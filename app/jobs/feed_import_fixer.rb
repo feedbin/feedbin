@@ -27,5 +27,12 @@ class FeedImportFixer
 
     user.subscriptions.create_with(title: import_item.details[:title]).find_or_create_by(feed: feed)
     feed.tag(import_item.details[:tag], user, false) if import_item.details[:tag]
+
+    # Completing the item is what removes it from the Fixable tab, so it can
+    # only happen once the subscription exists. The early returns above leave
+    # it fixable, which is what lets the user try the other suggestion -- these
+    # are feeds whose original url already failed once, so the replacement
+    # failing to fetch is the ordinary case.
+    import_item.complete!
   end
 end

@@ -52,6 +52,24 @@ class Settings::ImportsControllerTest < ActionController::TestCase
     assert_includes @response.body, "Only text"
   end
 
+  test "replace_all leaves the items fixable until the jobs have run" do
+    login_as @user
+
+    import = @user.imports.new(filename: "subscriptions.opml")
+    item = import.import_items.new(status: :fixable, details: {
+      title: "Example",
+      xml_url: "http://example.com/feed.xml", html_url: "http://example.com/"
+    })
+    import.save!
+    DiscoveredFeed.create!(site_url: item.site_url, feed_url: "http://example.com/alternative.xml")
+
+    assert_difference -> { FeedImportFixer.jobs.size }, +1 do
+      post :replace_all, params: {id: import.id}
+    end
+
+    assert item.reload.fixable?
+  end
+
   test "should show import error" do
     login_as @user
 
