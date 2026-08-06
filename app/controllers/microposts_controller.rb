@@ -5,6 +5,10 @@ class MicropostsController < ApplicationController
     @microposts = Rails.cache.fetch("microblog_thread:#{@entry.id}", expires_in: 2.minutes) {
       build_microposts
     }
+  # Outside the cache block, so a micro.blog outage renders as an empty
+  # conversation without being cached as one — the next request retries.
+  rescue HTTP::Error, JSON::ParserError
+    @microposts = []
   end
 
   private

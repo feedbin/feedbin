@@ -21,6 +21,17 @@ class MicropostsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "renders an empty conversation when micro.blog is unreachable" do
+    login_as @user
+    entry = @entries.first
+    stub_request(:get, "https://micro.blog/posts/conversation?id=#{entry.entry_id}").to_timeout
+
+    get :thread, params: {id: entry.id}, xhr: true
+
+    assert_response :success
+    assert_equal [], assigns(:microposts)
+  end
+
   test "should not get thread for an entry the user cannot read" do
     entry = create_entry(feeds(:kottke))
     refute @user.can_read_entry?(entry.id), "precondition: user cannot read this entry"
