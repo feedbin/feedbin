@@ -66,9 +66,12 @@ class MakeEpub
     end
 
     UserMailer.kindle(@address, @content.plain_title_with_default, epub_path).deliver_now
+  # Both cleanups are guarded on their target existing rather than rescued: a
+  # raise here would discard whatever exception is on its way out, and that is
+  # what the error tracker would go on to show instead of the real failure.
   ensure
-    FileUtils.remove_entry(@directory)
-    FileUtils.remove_entry(epub_path) rescue Errno::ENOENT
+    FileUtils.remove_entry(@directory) if @directory
+    File.unlink(epub_path) if epub_path && File.exist?(epub_path)
   end
 
   def select_content

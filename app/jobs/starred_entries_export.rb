@@ -7,9 +7,13 @@ class StarredEntriesExport
     build_file(user, file)
     upload_url = upload_file(file)
     UserMailer.starred_export_download(user_id, upload_url).deliver_now
+  # The lookup runs before the tempfile exists, and a user who exports and then
+  # closes their account is the ordinary way it fails -- so the cleanup has to
+  # survive being reached with nothing to clean up, or it discards the
+  # RecordNotFound on its way out.
   ensure
-    file.close
-    file.unlink
+    file&.close
+    file&.unlink
   end
 
   def build_file(user, file)

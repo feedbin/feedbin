@@ -193,6 +193,42 @@ module FaviconCrawler
       assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
     end
 
+    # The crawl runs across the whole host table on a schedule, so anything it
+    # leaves in the worker's tmpdir accumulates on every box until something
+    # else sweeps /tmp.
+    test "should remove the files it downloaded and resized" do
+      body = <<-eot
+      <html>
+          <head>
+              <link rel="icon" href="#{@icon_url.path}">
+          </head>
+      </html>
+      eot
+
+      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
+      stub_request(:get, @page_url)
+        .to_return(body: body, status: 200)
+
+      stub_request_file("favicon.ico", @icon_url)
+
+      downloaded = nil
+      build_processor = Processor.method(:new)
+      capture = ->(favicon, host) {
+        downloaded = favicon
+        build_processor.call(favicon, host)
+      }
+
+      Processor.stub(:new, capture) do
+        Finder.new.perform(@page_url.host)
+      end
+
+      assert_not_nil downloaded, "the crawl should have found a favicon to process"
+      assert_not File.exist?(downloaded[:original]), "the downloaded favicon should not be left on disk"
+      assert_not File.exist?(downloaded[:resized].to_path), "the resized favicon should not be left on disk"
+    end
+
     test "should not save a favicon when nothing served is an image" do
       stub_request(:get, @page_url)
         .to_return(body: "<html><head></head></html>", status: 200)

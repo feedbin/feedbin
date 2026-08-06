@@ -3,7 +3,7 @@ class Download
 
   def initialize(url, directory = nil)
     @url = url
-    @directory = directory || Dir.tmpdir
+    @directory = directory
   end
 
   def filename
@@ -15,7 +15,7 @@ class Download
   end
 
   def file_path
-    @file_path ||= Pathname.new(File.join(@directory, filename))
+    @file_path ||= Pathname.new(File.join(@directory || Dir.tmpdir, local_filename))
   end
 
   def download
@@ -39,6 +39,16 @@ class Download
   end
 
   private
+
+  # `filename` is a pure function of the url, which is what the remote storage
+  # path wants and what a caller that supplies its own directory wants -- it
+  # links to the file by that name afterwards. In the shared process tmpdir it
+  # is the wrong name: every job downloading that url computes the same
+  # absolute path, and `download` truncates while `delete` unlinks, so they
+  # corrupt and remove each other's files. Own the temp dir, own the name.
+  def local_filename
+    @local_filename ||= @directory ? filename : "#{key}-#{SecureRandom.hex}#{extension}"
+  end
 
   def extension
     @extension ||= File.extname parsed_url.path

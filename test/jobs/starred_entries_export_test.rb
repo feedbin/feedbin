@@ -16,4 +16,14 @@ class StarredEntriesExportTest < ActiveSupport::TestCase
       end
     end
   end
+
+  # Closing the account between requesting an export and the job running is the
+  # ordinary way this fails. The tempfile does not exist yet at that point, so
+  # an unguarded ensure raises over the top of RecordNotFound and the failure
+  # arrives in the error tracker as an unexplained crash instead.
+  test "a deleted account fails as RecordNotFound" do
+    assert_raises(ActiveRecord::RecordNotFound) do
+      StarredEntriesExport.new.perform(0)
+    end
+  end
 end
