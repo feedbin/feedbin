@@ -90,23 +90,28 @@ class Tweet
     text
   end
 
+  # tweet.to_h is the Twitter::Tweet's own attrs hash, not a copy, so editing it
+  # here would prune the tweet's entities permanently and shift their indices
+  # again on every later render. Build a new hash instead and leave the tweet
+  # as it was found.
   def remove_entities(hash)
-    if hash[:display_text_range]
-      text_start = hash[:display_text_range].first
-      text_end = hash[:display_text_range].last
-      hash[:entities].each do |entity, values|
-        hash[:entities][entity] = values.reject { |value|
-          value[:indices].last < text_start || value[:indices].first > text_end
-        }
-        hash[:entities][entity].each_with_index do |value, index|
-          hash[:entities][entity][index][:indices] = [
-            value[:indices][0] - text_start,
-            value[:indices][1] - text_start
-          ]
-        end
-      end
+    return hash unless hash[:display_text_range]
+
+    text_start = hash[:display_text_range].first
+    text_end = hash[:display_text_range].last
+
+    entities = hash[:entities].each_with_object({}) do |(entity, values), result|
+      result[entity] = values.reject { |value|
+        value[:indices].last < text_start || value[:indices].first > text_end
+      }.map { |value|
+        value.merge(indices: [
+          value[:indices][0] - text_start,
+          value[:indices][1] - text_start
+        ])
+      }
     end
-    hash
+
+    hash.merge(entities: entities)
   end
 
   def strip_trailing_link?

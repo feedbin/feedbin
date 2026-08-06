@@ -57,6 +57,30 @@ class Onboarding::SubscriptionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should skip a url whose host will not respond" do
+    login_as @user
+    url = "http://down.example.com/feed.xml"
+    stub_request(:get, url).to_return(status: 500, body: "")
+
+    assert_no_difference "Subscription.count" do
+      patch :update, params: {feed_url: {url => url}}, xhr: true
+    end
+    assert_response :success
+  end
+
+  test "should still subscribe the good feeds when one url fails" do
+    login_as @user
+    new_feed = Feed.create!(feed_url: "http://example.com/feed.xml")
+    bad_url = "http://down.example.com/feed.xml"
+    stub_request(:get, bad_url).to_return(status: 500, body: "")
+
+    assert_difference "Subscription.count", +1 do
+      patch :update, params: {feed_url: {bad_url => bad_url, new_feed.feed_url => new_feed.feed_url}}, xhr: true
+    end
+    assert_response :success
+    assert @user.subscriptions.exists?(feed: new_feed)
+  end
+
   test "should handle empty params" do
     login_as @user
     assert_no_difference "Subscription.count" do

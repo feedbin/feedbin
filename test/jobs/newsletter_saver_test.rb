@@ -32,6 +32,18 @@ class NewsletterSaverTest < ActiveSupport::TestCase
     assert_requested request
   end
 
+  test "saves an email nested past the HTML5 tree depth limit" do
+    entry = create_entry(Feed.first)
+    nested = ("<div>" * 450) + "newsletter body" + ("</div>" * 450)
+    entry.update_columns(content: nested)
+    request = stub_request(:put, /s3\.amazonaws\.com/)
+      .with { |request| ActiveSupport::Gzip.decompress(request.body).include?("newsletter body") }
+
+    NewsletterSaver.new.perform(entry.id)
+
+    assert_requested request
+  end
+
   test "saves an email that carried no Subject" do
     entry = create_entry(Feed.first)
     entry.update_columns(title: nil, content: "<html><body><p>hi</p></body></html>")

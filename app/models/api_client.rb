@@ -2,6 +2,8 @@ class ApiClient
   class Error < StandardError
   end
 
+  PAGE_SIZE = 100
+
   def initialize(access_token)
     @access_token = access_token
   end
@@ -29,13 +31,16 @@ class ApiClient
     all = []
     loop do
       response = request(path: path, params: params)
-      result = response.safe_dig("feed_items")
+      result = response.safe_dig("feed_items") || []
       break if result.count == 0
       all += result
-      params[:offset] += 100
-      break if !limit.nil? && params[:offset] == limit
+      params[:offset] += PAGE_SIZE
+      # The offset only ever lands on a multiple of the page size, so an
+      # equality test here silently fetches the whole collection for any other
+      # limit.
+      break if !limit.nil? && params[:offset] >= limit
     end
-    all
+    limit.nil? ? all : all.first(limit)
   end
 
   def request(path:, params: {})

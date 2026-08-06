@@ -289,9 +289,33 @@ class ContentFormatter
   def self.document(html)
     Loofah.html5_fragment(html)
   rescue => exception
-    if exception.message =~ /Document tree depth limit exceeded|stack level too deep/i
+    if depth_limit?(exception)
       return Loofah.html4_fragment(html)
     end
     raise
+  end
+
+  # Gumbo stops at 400 levels of nesting. HTML email is the worst case for that
+  # limit — mail templates lay a message out by nesting tables inside tables —
+  # so retry past it rather than let the newsletter fail to render at all.
+  #
+  # The retry raises the same parser's limit instead of dropping to HTML4: HTML4
+  # survives the depth by discarding the body, which loses the newsletter.
+  HTML5_MAX_TREE_DEPTH = 10_000
+
+  def self.html_document(html)
+    Nokogiri::HTML5(html)
+  rescue => exception
+    raise unless depth_limit?(exception)
+    begin
+      Nokogiri::HTML5(html, max_tree_depth: HTML5_MAX_TREE_DEPTH)
+    rescue => exception
+      raise unless depth_limit?(exception)
+      Nokogiri::HTML4(html)
+    end
+  end
+
+  def self.depth_limit?(exception)
+    exception.message =~ /Document tree depth limit exceeded|stack level too deep/i
   end
 end

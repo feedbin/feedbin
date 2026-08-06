@@ -144,4 +144,42 @@ class TweetTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "tweet_text leaves the tweet's own entities alone" do
+    tweet = make_tweet
+    before = tweet.main_tweet.to_h[:entities][:urls].map { _1[:url] }
+
+    tweet.tweet_text(tweet.main_tweet)
+
+    assert_equal before, tweet.main_tweet.to_h[:entities][:urls].map { _1[:url] }
+  end
+
+  test "urls are still readable after the tweet has been rendered" do
+    untouched = make_tweet
+    expected = untouched.main_tweet.urls.map { _1.url.to_s }
+
+    rendered = make_tweet
+    rendered.tweet_text(rendered.main_tweet)
+
+    assert_equal expected, rendered.main_tweet.urls.map { _1.url.to_s }
+  end
+
+  test "tweet_text renders a reply the same way twice" do
+    reply = load_tweet("one")
+    reply["full_text"] = "hello https://t.co/abcdefghij"
+    reply["display_text_range"] = [0, 29]
+    reply["entities"] = {"urls" => [{
+      "url" => "https://t.co/abcdefghij",
+      "expanded_url" => "https://example.com/story",
+      "display_url" => "example.com/story",
+      "indices" => [6, 29]
+    }]}
+    reply["display_text_range"] = [6, 29]
+    tweet = Tweet.new({"tweet" => reply}, nil)
+
+    first = tweet.tweet_text(tweet.main_tweet)
+    second = tweet.tweet_text(tweet.main_tweet)
+
+    assert_equal first, second
+  end
 end

@@ -19,7 +19,7 @@ class NewsletterSaver
     title = document_title(entry)
 
     document = if entry.content_format == "text"
-      document = Nokogiri::HTML5(ContentFormatter.text_email(entry.content))
+      document = ContentFormatter.html_document(ContentFormatter.text_email(entry.content))
 
       heading = document.create_element("h1", title)
       document.at("body").prepend_child(heading)
@@ -29,7 +29,7 @@ class NewsletterSaver
 
       document
     else
-      Nokogiri::HTML5(entry.content)
+      ContentFormatter.html_document(entry.content)
     end
 
     if document.title.blank?

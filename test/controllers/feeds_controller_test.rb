@@ -55,4 +55,17 @@ class FeedsControllerTest < ActionController::TestCase
     get :auto_update, xhr: true
     assert_response :success
   end
+
+  test "the sidebar shows the user's title for an untagged feed" do
+    login_as @user
+    feed = @user.feeds.where.not(id: @user.taggings.select(:feed_id)).first
+    @user.subscriptions.where(feed: feed).first.update!(title: "MY-CUSTOM-TITLE")
+
+    get :auto_update, params: {subscriptions_hash: "stale"}, xhr: true
+
+    assert_match "data-title=\\\"MY-CUSTOM-TITLE\\\"", @response.body
+    assert_match ">MY-CUSTOM-TITLE<", @response.body
+    # the rename UI needs the publisher's title to know a custom one exists
+    assert_match "data-original-title=\\\"#{feed.title}\\\"", @response.body
+  end
 end

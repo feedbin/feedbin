@@ -37,4 +37,31 @@ class UrlCacheTest < ActiveSupport::TestCase
 
     assert_equal({"content-type" => "text/html"}, cache.headers)
   end
+
+  test "a failed response is not cached, so a later success is returned" do
+    url = "http://example.com/oembed-#{SecureRandom.hex(6)}"
+
+    stub_request(:get, url).to_return(status: 503, body: "<html>503 Service Unavailable</html>")
+    UrlCache.new(url).body
+
+    stub_request(:get, url).to_return(status: 200, body: "the real page")
+    assert_equal "the real page", UrlCache.new(url).body
+  end
+
+  test "body is nil when the response failed" do
+    url = "http://example.com/oembed-#{SecureRandom.hex(6)}"
+    stub_request(:get, url).to_return(status: 404, body: "not found")
+
+    assert_nil UrlCache.new(url).body
+  end
+
+  test "a successful response is cached" do
+    url = "http://example.com/oembed-#{SecureRandom.hex(6)}"
+    stub_request(:get, url).to_return(status: 200, body: "the real page")
+
+    assert_equal "the real page", UrlCache.new(url).body
+
+    stub_request(:get, url).to_return(status: 200, body: "a different page")
+    assert_equal "the real page", UrlCache.new(url).body
+  end
 end
