@@ -151,6 +151,11 @@ module Searchable
 
         request[:fields] = ["id"]
 
+        # Elasticsearch otherwise stops counting at 10,000 and reports the cap
+        # as the total, which the UI renders as a fact -- "Mark 10,000 articles
+        # as read?" for a search matching forty thousand.
+        request[:track_total_hits] = true
+
         if size
           request[:from] = 0
           request[:size] = size
