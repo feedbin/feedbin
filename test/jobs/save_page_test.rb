@@ -86,6 +86,25 @@ class SavePageTest < ActiveSupport::TestCase
     assert_equal favicons, FaviconCrawler::Finder.jobs.count
   end
 
+  # A YouTube page is the ordinary case: the extractor has nothing to say
+  # about a watch page, but the embed already filled the entry in. Nothing is
+  # missing, so there is nothing to retry — or to report.
+  test "does not raise when the embed already supplied the content" do
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+    youtube_video_id = "video_id"
+    videos = {items: [{id: youtube_video_id, snippet: {title: "Title", description: "Description", channelTitle: "Author", channelId: "channel_id"}}]}
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
+      .to_return body: videos.to_json, headers: {content_type: "application/json"}
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/channels})
+      .to_return body: {items: [{id: "channel_id"}]}.to_json, headers: {content_type: "application/json"}
+
+    url = "https://www.youtube.com/watch?v=#{youtube_video_id}"
+    assert_nothing_raised do
+      SavePage.new.perform(@user.id, url, nil)
+    end
+    assert_equal "Description", Entry.find_by_url(url).content
+  end
+
   test "discards a save with no url instead of retrying it for three weeks" do
     assert_nothing_raised do
       assert_no_difference "Entry.count" do

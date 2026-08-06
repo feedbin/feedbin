@@ -18,15 +18,19 @@ class SavePageFromExtensionTest < ActiveSupport::TestCase
     assert_not File.exist?(captured_page), "the captured page should not be left on disk"
   end
 
-  # `retry: false`, so an unparseable page is not coming back for another run
-  # to clean up after it.
-  test "removes the file the extension captured when the page cannot be parsed" do
+  # `retry: false`, so an unparseable capture is not coming back for another
+  # run — raising MissingPage here could only land in the error tracker. Hand
+  # the retry to the worker that has one: a url crawl needs no captured file.
+  test "falls back to a url crawl when the captured page cannot be parsed" do
     stub_request(:post, /extract\.example\.com/).to_return(status: 500)
 
-    assert_raises(SavePage::MissingPage) do
-      SavePageFromExtension.new.perform(@user.id, @url, "Title", captured_page)
+    assert_nothing_raised do
+      assert_difference "SavePage.jobs.size", +1 do
+        SavePageFromExtension.new.perform(@user.id, @url, "Title", captured_page)
+      end
     end
 
+    assert_equal [@user.id, @url, "Title"], SavePage.jobs.last["args"]
     assert_not File.exist?(captured_page), "the captured page should not be left on disk"
   end
 

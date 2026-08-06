@@ -40,7 +40,9 @@ class SavePage
       FaviconCrawler::Finder.perform_async(host)
     end
 
-    if parsed_result.nil?
+    # Not when the embed answered: the extractor has nothing to say about a
+    # watch page, but the entry is already filled in — nothing is missing.
+    if parsed_result.nil? && embed.blank?
       raise MissingPage.new("Missing page, retrying", entry)
     end
 
