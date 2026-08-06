@@ -27,6 +27,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # entries and tags are global tables, so an id out of params is not by itself
+  # permission to read the row: newsletter and pages feeds are per-user private
+  # content, and tags rows are shared by name across every account. Resolve both
+  # through these, never through a bare Entry.find/Tag.find. They render 404 and
+  # return nil when the record is not the caller's to see.
+  def authorized_entry(id = params[:id])
+    entry = Entry.find_by(id: id)
+    return entry if entry && current_user&.can_read_entry?(entry.id)
+    render_404
+    nil
+  end
+
+  def authorized_tag(id = params[:id])
+    tag = Tag.where(id: current_user.taggings.select(:tag_id)).find_by(id: id)
+    return tag if tag
+    render_404
+    nil
+  end
+
   def logged_in
     clear_location
     get_feeds_list
@@ -36,7 +55,10 @@ class ApplicationController < ActionController::Base
 
     user_titles = subscriptions.includes(:feed).each_with_object({}) { |subscription, hash|
       if subscription.title.present?
-        hash[subscription.feed_id] = ERB::Util.html_escape_once(subscription.title)
+        # Plain text. Every consumer renders it with textContent or .text(), so
+        # escaping here would show up as literal entities rather than protect
+        # anything.
+        hash[subscription.feed_id] = subscription.title
       end
     }
 

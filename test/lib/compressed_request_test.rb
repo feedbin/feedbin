@@ -8,9 +8,20 @@ class CompressedRequestTest < ActiveSupport::TestCase
     @middleware = CompressedRequest.new(@app)
   end
 
+  test "passes through a request with no path" do
+    # PATH_INFO is the only path key Rack guarantees, and even that is worth a
+    # nil guard: this runs in the middleware stack, so raising here fails the
+    # request before it reaches a controller.
+    env = {"rack.input" => StringIO.new("test body")}
+
+    status, _headers, _body = @middleware.call(env)
+
+    assert_equal 200, status
+  end
+
   test "passes through non-extension requests unchanged" do
     env = {
-      "REQUEST_PATH" => "/api/v2/entries",
+      "PATH_INFO" => "/api/v2/entries",
       "rack.input" => StringIO.new("test body")
     }
 
@@ -23,7 +34,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
 
   test "passes through extension requests without gzip encoding unchanged" do
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "rack.input" => StringIO.new("test body")
     }
 
@@ -40,7 +51,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
     Zlib::GzipWriter.wrap(compressed_body) { |gz| gz.write(original_body) }
 
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "HTTP_CONTENT_ENCODING" => "gzip",
       "rack.input" => StringIO.new(compressed_body.string),
       "CONTENT_LENGTH" => compressed_body.string.bytesize.to_s
@@ -59,7 +70,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
     Zlib::GzipWriter.wrap(empty_gzip) { |gz| }
 
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "HTTP_CONTENT_ENCODING" => "gzip",
       "rack.input" => StringIO.new(empty_gzip.string),
       "CONTENT_LENGTH" => empty_gzip.string.bytesize.to_s
@@ -80,7 +91,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
     Zlib::GzipWriter.wrap(compressed_body) { |gz| gz.write(large_body) }
 
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "HTTP_CONTENT_ENCODING" => "gzip",
       "rack.input" => StringIO.new(compressed_body.string)
     }
@@ -95,7 +106,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
     invalid_gzip = "\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\x00corrupted"
 
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "HTTP_CONTENT_ENCODING" => "gzip",
       "rack.input" => StringIO.new(invalid_gzip)
     }
@@ -114,7 +125,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
     Zlib::GzipWriter.wrap(compressed_body) { |gz| gz.write(original_body) }
 
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "HTTP_CONTENT_ENCODING" => "gzip",
       "rack.input" => StringIO.new(compressed_body.string)
     }
@@ -137,7 +148,7 @@ class CompressedRequestTest < ActiveSupport::TestCase
     body = "Test body"
 
     env = {
-      "REQUEST_PATH" => "/extension/v1/pages",
+      "PATH_INFO" => "/extension/v1/pages",
       "HTTP_CONTENT_ENCODING" => "GZIP",
       "rack.input" => StringIO.new(body)
     }

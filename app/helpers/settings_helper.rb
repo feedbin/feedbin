@@ -33,8 +33,20 @@ module SettingsHelper
           script.setAttribute("data-feedbin-token", "#{@user.page_token}");
           script.setAttribute("data-original-title", title);
           script.onerror = function() {
-             window.location = "#{pages_url}?url=" + encodeURIComponent(window.location.href) + "&title=" + encodeURIComponent(title) + "&page_token=#{@user.page_token}";
              document.title = title;
+             var form = document.createElement("form");
+             form.method = "POST";
+             form.action = "#{pages_url}";
+             var values = {url: window.location.href, title: title, page_token: "#{@user.page_token}"};
+             Object.keys(values).forEach(function(name) {
+                 var input = document.createElement("input");
+                 input.type = "hidden";
+                 input.name = name;
+                 input.value = values[name];
+                 form.appendChild(input);
+             });
+             body.appendChild(form);
+             form.submit();
           };
           body.appendChild(script);
       })();

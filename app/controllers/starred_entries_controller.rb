@@ -25,7 +25,7 @@ class StarredEntriesController < ApplicationController
 
   def update
     @user = current_user
-    @entry = Entry.find(params[:id])
+    @entry = authorized_entry or return
     starred_entry = StarredEntry.where(user: @user, entry: @entry)
 
     if starred_entry.present?

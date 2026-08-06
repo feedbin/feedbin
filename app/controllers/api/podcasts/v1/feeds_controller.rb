@@ -7,7 +7,7 @@ module Api
 
         def show
           url = hex_decode(params[:id])
-          @feed = Feed.find_by_feed_url(url)
+          @feed = Feed.xml.find_by_feed_url(url)
           if @feed.present?
             if @feed.standalone_request_at.blank?
               FeedStatus.new.perform(@feed.id)

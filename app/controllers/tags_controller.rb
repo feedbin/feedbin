@@ -1,6 +1,4 @@
 class TagsController < ApplicationController
-  before_action :user_owns_tag, only: [:show]
-
   def index
     @user = current_user
     @tags = @user.feed_tags.pluck(:name)
@@ -12,13 +10,13 @@ class TagsController < ApplicationController
   end
 
   def edit
-    @tag = Tag.find(params[:id])
+    @tag = authorized_tag or return
   end
 
   def show
     @user = current_user
 
-    @tag = Tag.find(params[:id])
+    @tag = authorized_tag or return
     @feed_ids = Tagging.where(tag_id: @tag, user_id: @user).pluck(:feed_id)
 
     feeds_response
@@ -35,7 +33,7 @@ class TagsController < ApplicationController
 
     user = current_user
 
-    tag = Tag.find(params[:id])
+    tag = authorized_tag or return
     @new_tag = Tag.rename(user, tag, params[:tag][:name])
 
     if @new_tag
@@ -48,7 +46,7 @@ class TagsController < ApplicationController
 
   def destroy
     @user = current_user
-    tag = Tag.find(params[:id])
+    tag = authorized_tag or return
 
     Tag.destroy(@user, tag)
 
@@ -56,16 +54,6 @@ class TagsController < ApplicationController
 
     respond_to do |format|
       format.js
-    end
-  end
-
-  private
-
-  def user_owns_tag
-    @user = current_user
-    tags = Tagging.where(user_id: @user, tag_id: params[:id].to_i)
-    if tags.count.zero?
-      render_404
     end
   end
 end

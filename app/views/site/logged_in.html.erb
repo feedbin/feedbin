@@ -135,7 +135,7 @@
               container: null
             }
             $.extend(feedbin.entries, <%= @entries.to_json.html_safe %>);
-            feedbin.showEntry(<%= params[:id] %>);
+            feedbin.showEntry(<%= params[:id].to_i %>);
             $('[data-behavior~=toggle_full_screen]')[0]?.click()
         })
     </script>

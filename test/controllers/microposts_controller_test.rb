@@ -20,4 +20,18 @@ class MicropostsControllerTest < ActionController::TestCase
     assert assigns(:microposts)
     assert_response :success
   end
+
+  test "should not get thread for an entry the user cannot read" do
+    entry = create_entry(feeds(:kottke))
+    refute @user.can_read_entry?(entry.id), "precondition: user cannot read this entry"
+
+    login_as @user
+
+    # No micro.blog stub: WebMock fails the test if the action makes the
+    # outbound request anyway.
+    get :thread, params: {id: entry.id}, xhr: true
+
+    assert_response :not_found
+    assert_nil assigns(:microposts)
+  end
 end

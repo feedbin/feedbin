@@ -1,7 +1,7 @@
 class UnreadEntriesController < ApplicationController
   def update
     @user = current_user
-    @entry = Entry.find(params[:id])
+    @entry = authorized_entry or return
     unread_entry = UnreadEntry.where(user: @user, entry: @entry)
 
     if unread_entry.present?

@@ -121,8 +121,12 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
       })
       .to_return(status: 200, body: token_response.to_json, headers: {content_type: "application/json"})
 
+    state = session[:oauth2_state]
+    assert state.present?, "authorize should have issued a state nonce"
+    assert_match %r{state=#{state}}, CGI.unescape(@response.redirect_url)
+
     assert_difference -> { SupportedSharingService.count }, +1 do
-      get :oauth2_response, params: {id: service_id, code: code, mastodon_host: mastodon_host}
+      get :oauth2_response, params: {id: service_id, code: code, state: state, mastodon_host: mastodon_host}
       assert_redirected_to sharing_services_url
     end
 
@@ -140,7 +144,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
         })
         .to_return(status: 200)
 
-    entry = create_entry(Feed.first)
+    entry = create_entry(feeds(:daring_fireball))
     share = SupportedSharingService.last
     post :share, params: {id: share, entry_id: entry.id}.merge(share_data), xhr: true
     assert_response :success
@@ -148,11 +152,32 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
 
   test "should share" do
     Sidekiq::Worker.clear_all
+    entry = create_entry(feeds(:daring_fireball))
     @service.update(kindle_address: "example@example.com")
     login_as @user
     assert_difference "MakeEpub.jobs.size", +1 do
-      post :share, params: {id: @service, entry_id: 1}, xhr: true
+      post :share, params: {id: @service, entry_id: entry.id}, xhr: true
       assert_response :success
     end
+  end
+
+  test "should not share an entry the user cannot read" do
+    Sidekiq::Worker.clear_all
+    entry = create_entry(feeds(:kottke))
+    refute @user.can_read_entry?(entry.id), "precondition: ben cannot read this entry"
+    @service.update(kindle_address: "attacker@kindle.example")
+    login_as @user
+    assert_no_difference "MakeEpub.jobs.size" do
+      post :share, params: {id: @service, entry_id: entry.id}, xhr: true
+    end
+    assert_response :not_found
+  end
+
+  test "should not complete an oauth2 link without the state it issued" do
+    login_as @user
+    assert_no_difference "SupportedSharingService.count" do
+      get :oauth2_response, params: {id: "mastodon", code: "attacker_code", mastodon_host: "attacker.example"}
+    end
+    assert_redirected_to sharing_services_url
   end
 end

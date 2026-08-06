@@ -22,11 +22,12 @@ class Share::RaindropTest < ActiveSupport::TestCase
     assert_match %r{/supported_sharing_services/raindrop/oauth2_response}, s.redirect_uri
   end
 
-  test "authorize_redirect produces an authorize URL with the redirect_uri query" do
+  test "authorize_redirect produces an authorize URL with the redirect_uri and state queries" do
     s = Share::Raindrop.new
-    url = s.authorize_redirect({})
+    url = s.authorize_redirect({}, "state-nonce")
     assert_match %r{/v1/oauth/authorize}, url
     assert_match %r{redirect_uri=}, url
+    assert_match %r{state=state-nonce}, url
   end
 
   test "request_access exchanges a code for an oauth2_token hash" do

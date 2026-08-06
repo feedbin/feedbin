@@ -202,6 +202,9 @@ class EntryPresenter < BasePresenter
     HTMLEntities.new.decode(entry.tweet.tweet_summary(entry.tweet.main_tweet.quoted_status))
   end
 
+  # Returns markup when the entry has no title of its own, so it belongs in
+  # element content only. Anything putting the title in an attribute wants
+  # entry_view_title_text.
   def entry_view_title
     @entry_view_title ||= begin
       text = sanitized_title
@@ -209,6 +212,13 @@ class EntryPresenter < BasePresenter
         text = @template.content_tag(:span, entry.feed.title, data: {behavior: "user_title", feed_id: entry.feed_id}).html_safe
       end
       text
+    end
+  end
+
+  def entry_view_title_text
+    @entry_view_title_text ||= begin
+      text = sanitized_title
+      text.presence || @template.strip_tags(entry.feed.title)
     end
   end
 
@@ -342,8 +352,15 @@ class EntryPresenter < BasePresenter
     enclosure_url.present?
   end
 
+  # rebase_url resolves a relative url, it does not validate one. The value is
+  # copied verbatim out of a feed's <enclosure url>, and it reaches an href, an
+  # audio/video src and the API, so the scheme is checked once here rather than
+  # at each of those four places.
   def enclosure_url
-    entry.rebase_url(entry.data["enclosure_url"])
+    url = entry.rebase_url(entry.data["enclosure_url"])
+    return nil if url.blank?
+    return nil unless %w[http https].include?(Addressable::URI.parse(url).scheme&.downcase)
+    url
   rescue
     nil
   end

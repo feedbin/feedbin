@@ -18,7 +18,7 @@ class CompressedRequest
   private
 
   def extension?(env)
-    env["REQUEST_PATH"].start_with?("/extension/v1/pages")
+    env["PATH_INFO"].to_s.start_with?("/extension/v1/pages")
   end
 
   def gzipped?(env)

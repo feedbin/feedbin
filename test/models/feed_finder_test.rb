@@ -30,4 +30,13 @@ class FeedFinderTest < ActiveSupport::TestCase
 
     assert_equal [boom], notified, "expected genuine bugs to still be reported"
   end
+
+  # 127.0.0.1 reaches the real socket layer because WebMock is configured with
+  # allow_localhost, so this exercises the guard rather than a stub. Unguarded,
+  # the same call raises Feedkit::ConnectionError instead.
+  test "refuses to discover a feed at a private address" do
+    assert_raises Feedkit::PrivateNetworkAddress do
+      FeedFinder.new("http://127.0.0.1:9/").response
+    end
+  end
 end

@@ -37,6 +37,7 @@ class SupportedSharingServicesController < ApplicationController
 
   def share
     @user = current_user
+    authorized_entry(params[:entry_id]) or return
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
     Librato.increment("supported_sharing_services.share", source: sharing_service.service_id)
     @response = sharing_service.share(params.to_unsafe_h)
@@ -80,7 +81,15 @@ class SupportedSharingServicesController < ApplicationController
     @user = current_user
     service_info = SupportedSharingService.info!(params[:id])
     klass = service_info[:klass].constantize.new
-    if params[:code]
+    state = session.delete(:oauth2_state)
+    if params[:code].blank?
+      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
+    elsif state.blank? || !ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, state)
+      # The callback is a GET, so protect_from_forgery does not cover it. Without
+      # this the callback is unbound from the browser that started the flow and
+      # anyone can link their own token to a signed-in user's account.
+      redirect_to sharing_services_url, alert: "Could not verify the #{service_info[:label]} authorization. Please try again."
+    else
       data = klass.request_access(params)
       supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
       supported_sharing_service.update(data)
@@ -91,8 +100,6 @@ class SupportedSharingServicesController < ApplicationController
         supported_sharing_service.try(:after_activate)
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       end
-    else
-      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
     end
   end
 
@@ -168,7 +175,8 @@ class SupportedSharingServicesController < ApplicationController
   def oauth2_request(service_id)
     service_info = SupportedSharingService.info!(service_id)
     klass = service_info[:klass].constantize.new
-    redirect_to klass.authorize_redirect(params), allow_other_host: true
+    session[:oauth2_state] = SecureRandom.urlsafe_base64(32)
+    redirect_to klass.authorize_redirect(params, session[:oauth2_state]), allow_other_host: true
   rescue Share::Service::AuthError => exception
     redirect_to sharing_services_url, alert: exception.message
   rescue => exception

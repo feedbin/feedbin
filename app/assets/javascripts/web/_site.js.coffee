@@ -783,8 +783,11 @@ $.extend feedbin,
       date = new Date(date)
       $(@).text(date.format("%B %e, %Y at %l:%M %p"))
 
+  # user_titles arrives as plain text, so it is written as text. It used to be
+  # HTML-escaped server side and written with .html(); that made this the only
+  # consumer that could not be fed a title as-is, and it left the escaped form
+  # visible anywhere the value was rendered as text.
   applyUserTitles: (cached = true) ->
-    textarea = document.createElement("textarea")
     selector = '[data-behavior~=user_title]'
     selector = "#{selector}:not(.renamed)" if cached
     $(selector).each ->
@@ -793,8 +796,7 @@ $.extend feedbin,
       if (feed of feedbin.data.user_titles)
         newTitle = feedbin.data.user_titles[feed]
         if element.prop('tagName') == "INPUT"
-          textarea.innerHTML = newTitle
-          element.val(textarea.value)
+          element.val(newTitle)
         else if element.is('[data-behavior~=feed_link]')
           data = element.data('mark-read')
           data.message = "Mark #{newTitle} as read?"
@@ -802,7 +804,7 @@ $.extend feedbin,
         else if element.is('[data-behavior~=rename_target]')
           element.data('title', newTitle)
         else
-          element.html(newTitle)
+          element.text(newTitle)
       element.addClass('renamed')
 
   queryString: (name) ->
