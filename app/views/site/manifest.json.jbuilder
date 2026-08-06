@@ -10,6 +10,10 @@ json.icons @icons do |icon|
 end
 json.share_target do
   json.action pages_path
+  # POST outright: share_target defaults to GET, and saving a page is a state
+  # change — /pages stopped routing GET when the bookmarklet fallback did.
+  json.method "POST"
+  json.enctype "application/x-www-form-urlencoded"
   json.params do
     json.title "title"
     json.text "url"

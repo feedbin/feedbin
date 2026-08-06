@@ -8,6 +8,13 @@ class PagesController < ApplicationController
   def create
     return head :bad_request if params[:url].blank?
     SavePage.perform_async(current_user.id, params[:url], params[:title])
+    respond_to do |format|
+      # The share target and the bookmarklet fallback both arrive as full-page
+      # form navigations, so leave the user somewhere rather than on a blank
+      # response.
+      format.html { redirect_to root_url, notice: "Page saved!" }
+      format.any { head :ok }
+    end
   end
 
   def options
@@ -20,7 +27,16 @@ class PagesController < ApplicationController
   # credential rather than a forgery token. A request that authenticated on the
   # session cookie alone gets the normal check.
   def verify_authenticity_token
-    super if params[:page_token].blank? && request.authorization.blank?
+    super if params[:page_token].blank? && request.authorization.blank? && !browser_initiated?
+  end
+
+  # A Web Share Target launch is a browser-initiated top-level POST: like the
+  # address bar it has no initiating origin, so the browser marks it
+  # Sec-Fetch-Site: none and it cannot carry a forgery token. A cross-site form
+  # post arrives marked cross-site and takes the forgery check as before, and
+  # every browser that implements share targets sends the header.
+  def browser_initiated?
+    request.headers["Sec-Fetch-Site"] == "none"
   end
 
   def authorize
