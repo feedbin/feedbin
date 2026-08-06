@@ -3,6 +3,15 @@ class Favicon < ApplicationRecord
 
   validates :url, presence: true
 
+  # Pages entries are looked up by the entry's own host rather than the feed's,
+  # so there is no association to preload. Resolve the whole collection in one
+  # query instead of one per rendered row.
+  def self.for_entries(entries)
+    hosts = Array(entries).filter_map { _1.hostname if _1.feed&.pages? }.uniq
+    return {} if hosts.empty?
+    where(host: hosts).index_by(&:host)
+  end
+
   after_commit :touch_owners
 
   def touch_owners

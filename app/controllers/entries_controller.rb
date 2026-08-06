@@ -123,7 +123,10 @@ class EntriesController < ApplicationController
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
     end
 
-    if params[:date].present? && unread_entries.present?
+    # exists?, not present? -- Relation#present? is records.blank? inverted, so
+    # it loads every unread row the user has just to decide whether to add a
+    # WHERE clause, and this is the path the largest accounts take.
+    if params[:date].present? && unread_entries&.exists?
       unread_entries = unread_entries.where("created_at <= :last_unread_date", {last_unread_date: params[:date]})
     end
 
@@ -204,7 +207,7 @@ class EntriesController < ApplicationController
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
-    @entries = result.records(Entry).includes(:feed)
+    @entries = result.records(Entry).includes(feed: [:favicon])
     @page_query = result.pagination
     @total_results = result.total
 

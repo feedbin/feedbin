@@ -1,4 +1,4 @@
-<% present entry do |entry_presenter| %>
+<% present entry, {favicons: local_assigns[:favicons]} do |entry_presenter| %>
     <%= entry_presenter.entry_summary do %>
         <%= entry_presenter.entry_link do %>
             <div class="entry-summary-inner">

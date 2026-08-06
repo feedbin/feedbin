@@ -371,4 +371,19 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  # Relation#present? is records.blank? inverted -- it materializes the whole
+  # relation to answer. This is the path an account with tens of thousands of
+  # unread entries takes when it reaches for "mark all read".
+  test "marking all read with a date does not load the unread rows" do
+    login_as @user
+
+    statements = capture_sql do
+      post :mark_all_as_read, params: {type: "unread", date: 1.day.from_now.iso8601}, xhr: true
+    end
+
+    assert_response :success
+    loads = statements.select { _1.match?(/SELECT\s+"#{UnreadEntry.table_name}"\.\*/i) }
+    assert_empty loads, "the unread rows were materialized: #{loads.inspect}"
+  end
+
 end

@@ -27,7 +27,7 @@ json.podcast do
   end
 end
 
-json.items @feed.entries.order(published: :desc) do |entry|
+json.items @entries do |entry|
   json.id             entry.id
   json.title          entry.try(:title).clean(transform: [:to_plain_text])
   json.url            entry.try(:url).clean

@@ -15,7 +15,7 @@
   <% end %>
 </div>
 
-<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "mb-4" do |group| %>
   <% @users.each do |user| %>
     <% group.item do %>
       <div data-behavior="<%= user.customer_id %>">
@@ -23,4 +23,28 @@
       </div>
     <% end %>
   <% end %>
+<% end %>
+
+<div class="mb-14">
+  <%= will_paginate @users %>
+</div>
+
+<% if @deleted_users.present? %>
+  <%= render Settings::H1Component.new do %>
+    Deleted
+  <% end %>
+
+  <%= render Settings::ControlGroupComponent.new class: "mb-4" do |group| %>
+    <% @deleted_users.each do |user| %>
+      <% group.item do %>
+        <div data-behavior="<%= user.customer_id %>">
+          <%= render partial: "user", locals: {user: user} %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <div class="mb-14">
+    <%= will_paginate @deleted_users %>
+  </div>
 <% end %>

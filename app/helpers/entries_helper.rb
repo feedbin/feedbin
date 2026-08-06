@@ -1,4 +1,17 @@
 module EntriesHelper
+  # The entry summary renders the feed's title as well as its icon and favicon,
+  # so key on the feed record rather than enumerating the attributes the
+  # partial happens to use today. feeds.updated_at covers all of them, and it
+  # costs no extra query when :feed is preloaded -- which reaching through to
+  # feed.favicon did not.
+  def self.entries_cache_key(entry)
+    [entry, entry.feed, "v7"]
+  end
+
+  def entries_cache_key(entry)
+    EntriesHelper.entries_cache_key(entry)
+  end
+
   def format_text(text)
     text ||= ""
     decoder = HTMLEntities.new

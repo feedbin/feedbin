@@ -16,6 +16,34 @@ class EntriesSearchControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:page_query).total_entries
   end
 
+  # shared/_entries.js.erb is the one template every entry list renders, and it
+  # reaches for the feed's favicon. Every other caller preloads it; the two
+  # search paths stopped at the feed.
+  test "search results preload the favicon the shared template renders" do
+    login_as @user
+    token = "faviconpreloadtoken"
+    # One feed per entry: the preloader shares a Feed instance between entries
+    # of the same feed, so the association cache hides the extra queries when
+    # every result comes from one source.
+    feeds = 5.times.map { |index|
+      feed = Feed.create!(feed_url: "http://preload#{index}.example.com/feed.xml", host: "preload#{index}.example.com", title: "Feed #{index}")
+      @user.subscriptions.create!(feed: feed)
+      feed
+    }
+    entries = feeds.map { create_entry(_1).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
+    Search.client { _1.refresh }
+
+    statements = capture_sql do
+      get :search, params: {query: token}, xhr: true
+    end
+
+    assert_response :success
+    assert_operator assigns(:entries).to_a.size, :>=, 5
+    favicons = statements.select { _1.match?(/FROM "favicons"/i) }
+    assert_operator favicons.count, :<=, 1, "one favicon query per result: #{favicons.count}"
+  end
+
   test "should handle complex query with multiple conditions" do
     @entry.update!(title: "Cat Story", content: "About cats", published: Date.parse("2023-06-15"))
     reindex_search

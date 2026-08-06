@@ -190,6 +190,19 @@ class ActiveSupport::TestCase
   end
 
 
+  # Every SELECT issued during the block, so a test can assert on the shape of
+  # the query rather than only on the answer it produced.
+  def capture_sql
+    statements = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_, _, _, _, payload|
+      statements << payload[:sql] unless payload[:name] == "SCHEMA"
+    end
+    yield
+    statements
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
+
   def stub_request_file(file, url, response_options = {}, method = :get)
     options = {body: File.new(support_file(file)), status: 200}.merge(response_options)
     stub_request(method, url)

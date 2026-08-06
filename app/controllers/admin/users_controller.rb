@@ -1,10 +1,20 @@
 class Admin::UsersController < ApplicationController
   def index
-    @users = if params.key?(:q)
-      User.page(params[:page]).where("email ILIKE :query", query: "%#{params[:q]}%") + DeletedUser.page(params[:page]).where("email ILIKE :query", query: "%#{params[:q]}%")
-    else
-      User.page(params[:page]) + DeletedUser.page(params[:page])
+    # Relation#+ is Array#+: it loads both relations and returns a plain Array,
+    # which drops the pagination metadata the view needs to offer a next page.
+    # Paginate the two lists separately so each keeps its own.
+    users = User.all
+    deleted_users = DeletedUser.all
+
+    if params.key?(:q)
+      # Without escaping, a % or _ an operator types acts as a wildcard.
+      pattern = "%#{ActiveRecord::Base.sanitize_sql_like(params[:q].to_s)}%"
+      users = users.where("email ILIKE :query", query: pattern)
+      deleted_users = deleted_users.where("email ILIKE :query", query: pattern)
     end
+
+    @users = users.page(params[:page])
+    @deleted_users = deleted_users.page(params[:page])
     render layout: "settings"
   end
 
