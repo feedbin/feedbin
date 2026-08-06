@@ -28,6 +28,14 @@ class PasswordResetsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should create password reset for an email the user capitalised" do
+    assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        post :create, params: {email: @user.email.upcase}
+      end
+    end
+  end
+
   test "should get edit" do
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.save

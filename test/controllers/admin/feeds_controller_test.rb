@@ -24,4 +24,10 @@ class Admin::FeedsControllerTest < ActionController::TestCase
     get :index, params: {q: @feed.id.to_s}
     assert_response :success
   end
+
+  test "GET index survives a query that is not a scalar" do
+    login_as @user
+    get :index, params: {q: ["1"]}
+    assert_response :success
+  end
 end

@@ -14,13 +14,16 @@ module FaviconCrawler
     private
 
     def update
+      downloaded = []
       new_favicon = nil
       all_favicon_urls.each do |url|
         response = download_favicon(url)
         next if response.blank?
+        downloaded.push(response.path)
         break if response.not_modified?
         resized = Image.resize(response.path)
         next if resized.blank?
+        downloaded.push(resized)
 
         new_favicon = {resized: resized, original: response.path, response: response}
 
@@ -44,9 +47,14 @@ module FaviconCrawler
       end
 
       @favicon.save
+    # Every url that got as far as a file on disk, not just the one that won:
+    # a candidate rejected for being unreadable, or a 304 arriving before any
+    # resize, has already been written to the worker's tmpdir by then.
     ensure
-      File.unlink(favicon[:original]) rescue Errno::ENOENT
-      File.unlink(favicon[:resized]) rescue Errno::ENOENT
+      downloaded.each do |file|
+        File.unlink(file)
+      rescue Errno::ENOENT
+      end
     end
 
     def all_favicon_urls

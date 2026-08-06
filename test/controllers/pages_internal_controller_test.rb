@@ -12,4 +12,26 @@ class PagesInternalControllerTest < ActionController::TestCase
     end
     assert_response :success
   end
+
+  test "renders instead of raising when the extractor cannot parse the page" do
+    user = users(:ben)
+    login_as user
+
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+
+    post :create, params: {url: "http://example.com/paywalled"}, xhr: true
+
+    assert_response :success
+  end
+
+  test "enqueues a retry when the extractor cannot parse the page" do
+    user = users(:ben)
+    login_as user
+
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+
+    assert_difference "SavePage.jobs.size", +1 do
+      post :create, params: {url: "http://example.com/paywalled"}, xhr: true
+    end
+  end
 end

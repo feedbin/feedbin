@@ -54,11 +54,14 @@ module FixFeeds
       form_with(model: @replaceable, url: @replaceable.replaceable_path, data: {remote: @remote, behavior: "disable_on_submit"}, class: "ml-[30px]") do |form|
         form.hidden_field :redirect_to, value: @redirect
         render Settings::ControlGroupComponent.new class: "group", data: {item_capsule: "true"} do |group|
-          discovered_feeds = @source.discovered_feeds.order(created_at: :asc)
+          # sort_by and size read the preloaded target; chaining .order builds a
+          # new relation and .count issues its own SELECT, so the caller's
+          # includes(:discovered_feeds) bought nothing.
+          discovered_feeds = @source.discovered_feeds.sort_by(&:created_at)
           discovered_feeds.each_with_index do |discovered_feed, index|
             group.item do
               div class: "grow #{index != 0 ? "mt-[8px]" : ""}" do
-                suggestion(discovered_feed: discovered_feed, checked: index == 0, show_radio: @source.discovered_feeds.count > 1)
+                suggestion(discovered_feed: discovered_feed, checked: index == 0, show_radio: discovered_feeds.size > 1)
               end
             end
           end

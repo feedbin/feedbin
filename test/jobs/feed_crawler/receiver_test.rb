@@ -83,7 +83,7 @@ module FeedCrawler
         "entries" => [update]
       }
       Receiver.new.perform(params)
-      update.each do |attribute, value|
+      update.except("update").each do |attribute, value|
         assert_equal value, entry.reload.send(attribute), "entry.#{attribute} didn't match"
       end
     end
@@ -123,6 +123,39 @@ module FeedCrawler
       @user.unread_entries.delete_all
       @subscription.update(show_updates: false)
       assert_no_difference -> { @user.updated_entries.count } do
+        Receiver.new.perform(params)
+      end
+    end
+
+    # The Sidekiq path JSON round-trips the payload, so the keys arrive as
+    # strings. The import path calls perform in-process and the keys stay
+    # symbols, which made every lookup here miss.
+    test "should update entry given symbol keys" do
+      public_id = SecureRandom.hex
+      entry = @feed.entries.create!(url: "url", public_id: public_id, content: "content")
+      update = build_entry(entry.public_id, true).deep_symbolize_keys
+      params = {
+        feed: {id: @feed.id},
+        entries: [update]
+      }
+
+      assert_no_difference "Entry.count" do
+        Receiver.new.perform(params)
+      end
+
+      assert_equal update[:title], entry.reload.title
+    end
+
+    test "should not create a duplicate entry given symbol keys" do
+      public_id = SecureRandom.hex
+      entry = build_entry(public_id).deep_symbolize_keys
+      params = {
+        feed: {id: @feed.id},
+        entries: [entry]
+      }
+      FeedbinUtils.update_public_id_cache(entry[:data][:public_id_alt], "")
+
+      assert_no_difference "Entry.count" do
         Receiver.new.perform(params)
       end
     end

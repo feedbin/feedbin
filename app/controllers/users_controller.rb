@@ -30,9 +30,14 @@ class UsersController < ApplicationController
   def update
     old_plan_name = @user.plan.stripe_id
     @user.update_auth_token = true
+    # user_params first: params.require(:user) answers a missing param with the
+    # framework's 400, where reading params[:user][:old_password] ahead of it
+    # was a NoMethodError. The guard three lines down knew the param was
+    # optional; it just arrived after the dereference.
+    attributes = user_params
     @user.old_password_valid = @user.authenticate(params[:user][:old_password])
-    @user.attributes = user_params
-    if params[:user] && params[:user][:password]
+    @user.attributes = attributes
+    if params[:user][:password]
       @user.password_confirmation = params[:user][:password]
     end
     if @user.save

@@ -1,5 +1,7 @@
 
-<% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.empty? } %>
+<%# blank? rather than empty?, matching compute_feed_ids: feed_ids is a text[]
+    and a NULL element from any writer took the page down on the reject. %>
+<% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.blank? } %>
 <% tag_ids = action.tag_ids.reject{ |tag_id| tag_id.blank? } %>
 If an article is published
 <% if action.query.present? %>
@@ -8,7 +10,7 @@ If an article is published
 <% if action.all_feeds %>
     in <strong>any</strong> feed
 <% elsif feed_ids.present? %>
-    in the feed<%= feed_ids.length > 1 ? 's' : '' %> <strong><%= action_feed_names(action) %></strong>
+    in the feed<%= feed_ids.length > 1 ? 's' : '' %> <strong><%= action_feed_names(action, @user) %></strong>
 <% end %>
 <% if tag_ids.present? %>
     in the <%= 'tag'.pluralize(tag_ids.length) %> <strong><%= action_tag_names(action) %></strong>

@@ -1,7 +1,7 @@
 class Source::BodyLinks < Source
 
   def options
-    return unless document?
+    return [] unless document?
 
     urls = document.css("a").each_with_object([]) do |anchor, array|
       if is_candidate?(anchor)

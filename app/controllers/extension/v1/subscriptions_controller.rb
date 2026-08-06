@@ -6,6 +6,14 @@ module Extension
         @feeds = FeedFinder.feeds(params[:url])
         @subscriptions = @user.existing_subscriptions(@feeds)
         @tag_names = tag_names
+      # The extension asks about whatever page the user happens to be looking
+      # at, so "no feed here" is the commonest answer by a wide margin, and a
+      # host that will not answer is close behind. Neither is a server failure.
+      # Anything Feedkit does not raise is still unrescued and still tracked.
+      rescue Feedkit::Error
+        @feeds = []
+        @subscriptions = {}
+        @tag_names = {}
       end
 
       def create

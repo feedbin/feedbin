@@ -3,7 +3,11 @@ class TagsController < ApplicationController
     @user = current_user
     @tags = @user.feed_tags.pluck(:name)
 
-    @tags = @tags.find_all { |tag| tag.downcase.include?(params[:query].downcase) }.first(3)
+    # No query is the ordinary first request from an autocomplete, before the
+    # user has typed anything, and an empty query matching everything is the
+    # answer a suggestion endpoint owes it. `.first(3)` already bounds the reply.
+    query = params[:query].to_s.downcase
+    @tags = @tags.find_all { |tag| tag.downcase.include?(query) }.first(3)
     respond_to do |format|
       format.json { render json: {suggestions: @tags.map { |tag| {value: tag, data: tag} }}.to_json }
     end
@@ -34,7 +38,7 @@ class TagsController < ApplicationController
     user = current_user
 
     tag = authorized_tag or return
-    @new_tag = Tag.rename(user, tag, params[:tag][:name])
+    @new_tag = Tag.rename(user, tag, params.dig(:tag, :name))
 
     if @new_tag
       visibility = user.tag_visibility[tag.id.to_s] || false

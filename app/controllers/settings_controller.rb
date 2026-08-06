@@ -77,20 +77,25 @@ class SettingsController < ApplicationController
     @user.update!(new_settings)
   end
 
+  # Entries are readable without a subscription -- starred, queued, recently read
+  # -- so both of these are reachable for a feed the user has since unsubscribed
+  # from. There is nowhere to record the preference in that case, and nothing for
+  # the client to update either, so answer with an empty body rather than
+  # rendering a template that dereferences the subscription that isn't there.
   def sticky
     @user = current_user
     @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first
-    if @subscription.present?
-      @subscription.update(view_inline: !@subscription.view_inline)
-    end
+    return head :ok if @subscription.nil?
+
+    @subscription.update(view_inline: !@subscription.view_inline)
   end
 
   def subscription_view_mode
     @user = current_user
     @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first
-    if @subscription.present?
-      @subscription.update(subscription_view_mode_params)
-    end
+    return head :ok if @subscription.nil?
+
+    @subscription.update(subscription_view_mode_params)
   end
 
   def now_playing

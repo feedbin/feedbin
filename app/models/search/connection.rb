@@ -10,7 +10,22 @@ module Search
       bulk:     "/_bulk",
       aliases:  "/_aliases",
       alias:    "/_alias/%{name}",
+      pit:       "/%{index}/_pit",
+      pit_close: "/_pit",
+      # A point-in-time search names its index in the body, not the path.
+      pit_search: "/_search",
     }
+
+    # Long enough to walk a large match set, short enough that an abandoned
+    # cursor releases its segments promptly.
+    PIT_KEEP_ALIVE = "2m"
+
+    # Elasticsearch rejects a from + size above index.max_result_window, so
+    # there is no point honouring a larger page than this.
+    MAX_PER_PAGE = 1_000
+
+    # How many hits all_matches walks at a time.
+    ALL_MATCHES_PER_PAGE = 1_000
 
     def initialize(url, username: nil, password: nil)
       @url = url
@@ -19,10 +34,15 @@ module Search
     end
 
     def search(index, query:, page: 1, per_page: WillPaginate.per_page)
+      # Both arrive straight from the query string on most paths, so coerce
+      # here rather than relying on every caller to have done it.
+      page = page.to_i.clamp(1, Float::INFINITY).to_i
+      per_page = per_page.to_i.clamp(1, MAX_PER_PAGE)
+
       path = PATHS[:search] % {index:}
       data = request(:get, path, json: query, params: {
         :_source => false,
-        :from    => (page.to_i - 1) * per_page,
+        :from    => (page - 1) * per_page,
         :size    => per_page
       })
       Response.new(data, page: page, per_page: per_page)
@@ -81,14 +101,56 @@ module Search
       request(:delete, "/#{index}")
     end
 
+    # Walks the whole match set with search_after rather than from/size.
+    #
+    # Paginating could not do this job. The page count came from the reported
+    # total, which Elasticsearch caps at track_total_hits and reports as fact,
+    # so anything past the cap was dropped with no indication it had stopped
+    # early -- and past index.max_result_window from/size would have been
+    # rejected outright. search_after has neither ceiling.
     def all_matches(index, query:)
-      callback = proc do |page|
-        search(index, query: query, page: page, per_page: 1_000)
+      pit_id = open_pit(index)
+
+      # _shard_doc is the tiebreaker a point-in-time provides, so this needs
+      # nothing from the index's own mapping -- the entries and actions
+      # indexes do not share a sortable field.
+      body = query.deep_dup.except(:from, "from", :sort, "sort").merge(
+        pit: {id: pit_id, keep_alive: PIT_KEEP_ALIVE},
+        sort: [{_shard_doc: "asc"}],
+        size: ALL_MATCHES_PER_PAGE,
+        track_total_hits: false
+      )
+
+      ids = []
+      loop do
+        data = request(:get, PATHS[:pit_search], json: body, params: {:_source => false})
+        hits = data.safe_dig("hits", "hits") || []
+        break if hits.empty?
+
+        ids.concat hits.map { _1["_id"].to_i }
+        break if hits.length < ALL_MATCHES_PER_PAGE
+
+        # The pit id can be rotated between requests.
+        body = body.merge(
+          pit: {id: data["pit_id"] || pit_id, keep_alive: PIT_KEEP_ALIVE},
+          search_after: hits.last["sort"]
+        )
       end
-      result = callback.call(1)
-      2.upto(result.pagination.total_pages).each_with_object(result.ids) do |page, ids|
-        ids.concat callback.call(page).ids
-      end
+      ids
+    ensure
+      close_pit(pit_id) if pit_id
+    end
+
+    def open_pit(index)
+      path = PATHS[:pit] % {index:}
+      request(:post, path, params: {keep_alive: PIT_KEEP_ALIVE})["id"]
+    end
+
+    def close_pit(pit_id)
+      request(:delete, PATHS[:pit_close], json: {id: pit_id})
+    rescue
+      # The keep_alive expires on its own; a failure to close is not worth
+      # replacing the caller's result with an exception.
     end
 
     def add_alias(index, alias_name:)

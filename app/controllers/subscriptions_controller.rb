@@ -34,7 +34,7 @@ class SubscriptionsController < ApplicationController
 
   def edit
     @user = current_user
-    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
+    @subscription = @user.subscriptions.where(feed_id: params[:id]).take!
 
     taggings = TagEditor.taggings(@user)
 
@@ -45,7 +45,10 @@ class SubscriptionsController < ApplicationController
   def update
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
-    @subscription.update(subscription_params)
+    # A rejected update leaves the invalid value on the in-memory record, and
+    # the view echoes the title straight back — so without this the UI shows a
+    # rename the database refused.
+    @subscription.reload unless @subscription.update(subscription_params)
     @taggings = @subscription.feed.tag_with_params(params, @user)
     if params[:app]
       if @taggings.present?

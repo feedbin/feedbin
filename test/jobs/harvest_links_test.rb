@@ -59,4 +59,39 @@ class HarvestLinksTest < ActiveSupport::TestCase
 
     assert_nil entry.reload.data["saved_pages"], "Links to the entry's own host should be ignored"
   end
+
+  test "should harvest links when the entry has no parseable host" do
+    xml = File.read(support_file("microposts.xml"))
+    parsed = Feedkit::Parser::XMLFeed.new(xml, "http://example.com")
+    feed = Feed.create_from_parsed_feed(parsed)
+
+    entry = feed.entries.first
+    # entries.url is nullable, and Entry#hostname rescues to nil besides.
+    entry.update_column(:url, nil)
+
+    article_url = "https://chriscoyier.net/2022/12/14/behooves/"
+    url = "https://extract.example.com/parser/user/33177dd530b122f53cc426423d4155dc70345319?base64_url=aHR0cHM6Ly9jaHJpc2NveWllci5uZXQvMjAyMi8xMi8xNC9iZWhvb3Zlcy8="
+    stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
+
+    HarvestLinks.new.perform(entry.id)
+
+    assert entry.reload.data["saved_pages"].key?(article_url),
+      "an unknown own-host cannot match, so nothing should be excluded"
+  end
+
+  test "should only treat the entry's own host and its subdomains as its own" do
+    entry = create_tweet_entry(@user.feeds.first)
+    entry.update_column(:url, "https://example.com/post")
+    job = HarvestLinks.new
+    job.instance_variable_set(:@entry, entry)
+
+    assert_not job.extract_candidate?("https://example.com/story")
+    assert_not job.extract_candidate?("https://www.example.com/story")
+    assert_not job.extract_candidate?("https://twitter.com/someone/status/1")
+    assert_not job.extract_candidate?("https://mobile.twitter.com/someone/status/1")
+
+    assert job.extract_candidate?("https://notexample.com/story")
+    assert job.extract_candidate?("https://example.com.evil.test/story")
+    assert job.extract_candidate?("https://twitter.company.example/story")
+  end
 end

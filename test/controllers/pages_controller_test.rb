@@ -40,6 +40,16 @@ class PagesControllerTest < ActionController::TestCase
     end
   end
 
+  test "does not enqueue a save that cannot succeed" do
+    user = users(:ben)
+
+    Sidekiq::Worker.clear_all
+    assert_no_difference "SavePage.jobs.size" do
+      post :create, params: {page_token: user.page_token}
+    end
+    assert_response :bad_request
+  end
+
   private
 
   def with_forgery_protection

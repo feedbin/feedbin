@@ -6,7 +6,7 @@ class Onboarding::SubscriptionsController < ApplicationController
     deselected_urls = feed_urls.select { |url, value| value == "0" }.keys
 
     selected_urls.each do |feed_url|
-      feed = Feed.where(feed_url: feed_url).take || FeedFinder.feeds(feed_url, import_mode: true)&.first
+      feed = Feed.where(feed_url: feed_url).take || find_feed(feed_url)
       @user.subscriptions.find_or_create_by(feed: feed) if feed
     end
 
@@ -28,5 +28,18 @@ class Onboarding::SubscriptionsController < ApplicationController
     return {} if submitted.blank?
     allowed = Feedbin::Application.config.onboarding_feeds.map { it[:feed_url] }
     submitted.slice(*allowed)
+  end
+
+  # import_mode makes FeedFinder re-raise instead of swallowing, so one slow or
+  # broken host would otherwise 500 the first screen a new account sees — and
+  # take the rest of the selection down with it, since the loop is not
+  # transactional. Skip the url that failed and keep going.
+  def find_feed(feed_url)
+    FeedFinder.feeds(feed_url, import_mode: true)&.first
+  rescue Feedkit::Error
+    nil
+  rescue => exception
+    ErrorService.notify(exception)
+    nil
   end
 end

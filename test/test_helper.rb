@@ -55,6 +55,29 @@ WebMock.disable_net_connect!(allow_localhost: true, allow: ENV['WEBMOCK_ALLOWED_
 Sidekiq.logger.level = Logger::WARN
 
 
+# Writer for ActiveSupport::TestCase#outside_transaction. Its own connection
+# pool, named so that skip_transactional_tests_for_database can keep the
+# fixture machinery from wrapping it in the test's transaction.
+class OutsideTransaction < ActiveRecord::Base
+  self.abstract_class = true
+
+  DATABASE_NAME = "outside_transaction"
+
+  # Until this class has a pool of its own it inherits ActiveRecord::Base's,
+  # which is the pinned one the test runs in — so check the pool, not
+  # connected?, which is true from the moment Base connects.
+  def self.connect!
+    return if connection_pool.db_config.name == DATABASE_NAME
+    establish_connection(ActiveRecord::DatabaseConfigurations::HashConfig.new(
+      Rails.env, DATABASE_NAME, ActiveRecord::Base.connection_pool.db_config.configuration_hash
+    ))
+  end
+
+  def self.execute(sql, *binds)
+    connection.execute(sanitize_sql_array([sql, *binds]))
+  end
+end
+
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
@@ -92,6 +115,10 @@ class ActiveSupport::TestCase
 
   fixtures :all
 
+  # Keep the outside_transaction pool out of the fixture transaction, which
+  # otherwise wraps every pool established during a test.
+  skip_transactional_tests_for_database(OutsideTransaction::DATABASE_NAME.to_sym)
+
   # Phlex testing helpers
   def render(...)
     view_context.render(...)
@@ -122,6 +149,18 @@ class ActiveSupport::TestCase
     JSON.parse(@response.body)
   end
 
+  # Yields a writer on its own connection pool, outside the transaction the
+  # test runs in, for reproducing races against a unique index — the losing
+  # INSERT only raises if the winning row is committed by someone else.
+  #
+  # Rows written here are committed and outlive the test's rollback, so the
+  # caller must clean them up from after_teardown — a DELETE issued while the
+  # test still holds uncommitted rows for the same key waits on them.
+  def outside_transaction
+    OutsideTransaction.connect!
+    yield OutsideTransaction
+  end
+
   def support_file(file)
     File.join(Rails.root, "test/support/www", file)
   end
@@ -150,6 +189,19 @@ class ActiveSupport::TestCase
     EOT
   end
 
+
+  # Every SELECT issued during the block, so a test can assert on the shape of
+  # the query rather than only on the answer it produced.
+  def capture_sql
+    statements = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_, _, _, _, payload|
+      statements << payload[:sql] unless payload[:name] == "SCHEMA"
+    end
+    yield
+    statements
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
 
   def stub_request_file(file, url, response_options = {}, method = :get)
     options = {body: File.new(support_file(file)), status: 200}.merge(response_options)

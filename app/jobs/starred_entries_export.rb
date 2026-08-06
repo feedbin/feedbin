@@ -7,24 +7,32 @@ class StarredEntriesExport
     build_file(user, file)
     upload_url = upload_file(file)
     UserMailer.starred_export_download(user_id, upload_url).deliver_now
+  # The lookup runs before the tempfile exists, and a user who exports and then
+  # closes their account is the ordinary way it fails -- so the cleanup has to
+  # survive being reached with nothing to clean up, or it discards the
+  # RecordNotFound on its way out.
   ensure
-    file.close
-    file.unlink
+    file&.close
+    file&.unlink
   end
 
+  # The separator goes before every entry but the first, so nothing has to be
+  # truncated off the end afterwards. Trimming the trailing ",\n" by byte count
+  # asked the kernel to truncate to -1 whenever no entry was written -- an
+  # account with nothing starred, or one whose stars have all aged out of the
+  # entries table.
   def build_file(user, file)
     starred_ids = user.starred_entries.order("created_at desc").pluck(:entry_id)
     file.write("[")
+    first = true
     starred_ids.each_slice(100) do |entry_ids|
       entries = Entry.where(id: entry_ids).includes(:feed)
       entries.each do |entry|
-        json = JSON.generate(build_hash(entry))
-        file.write("#{json},\n")
+        file.write(",\n") unless first
+        file.write(JSON.generate(build_hash(entry)))
+        first = false
       end
     end
-    file.close
-    File.truncate(file.path, File.size(file.path) - 2)
-    file = File.open(file.path, "a")
     file.write("]")
     file.close
   end

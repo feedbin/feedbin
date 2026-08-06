@@ -50,10 +50,15 @@ class HarvestEmbeds
       items = []
 
       videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
-      channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
+      # No "items" key is the ordinary answer for ids that have been deleted,
+      # made private or region-blocked. Normalise once: a&.b.c only guards the
+      # first call, so the nil landed on .uniq and concat a few lines down.
+      video_items = videos.safe_dig("items") || []
+      channel_ids = video_items.map { |video| video.safe_dig("snippet", "channelId") }.uniq
       channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
+      channel_items = channels.safe_dig("items") || []
 
-      video_embeds = videos.safe_dig("items")&.map do
+      video_embeds = video_items.map do
         Embed.new(
           data: it,
           provider_id: it.safe_dig("id"),
@@ -62,7 +67,7 @@ class HarvestEmbeds
         )
       end
 
-      channel_embeds = channels.safe_dig("items")&.map do
+      channel_embeds = channel_items.map do
         Embed.new(
           data: it,
           provider_id: it.safe_dig("id"),

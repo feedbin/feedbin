@@ -7,7 +7,7 @@ class AppStoreNotificationTest < ActiveSupport::TestCase
     @purchase_date_ms = 1705320000000
   end
 
-  def build_notification(product_id:)
+  def build_notification(product_id:, transaction: {})
     @user.app_store_notifications.create!(
       original_transaction_id: "txn-#{SecureRandom.hex(4)}",
       notification_id: SecureRandom.uuid,
@@ -18,7 +18,7 @@ class AppStoreNotificationTest < ActiveSupport::TestCase
           "signedTransactionInfo" => {
             "productId" => product_id,
             "purchaseDate" => @purchase_date_ms
-          }
+          }.merge(transaction)
         }
       }
     )
@@ -62,6 +62,32 @@ class AppStoreNotificationTest < ActiveSupport::TestCase
   test "currency is USD" do
     notification = build_notification(product_id: "monthly_pro_v1")
     assert_equal "USD", notification.currency
+  end
+
+  # Only two of the seven product ids the apps sell were handled, and neither
+  # method had an else -- so every podcast subscriber's receipt rendered with a
+  # blank amount and a blank description.
+  test "every shipping product has a receipt description" do
+    blank = AppStoreNotificationProcessor::PRODUCTS.keys.reject { |product_id|
+      build_notification(product_id: product_id).receipt_description.present?
+    }
+    assert_empty blank
+  end
+
+  test "receipt_amount comes from the transaction when Apple sends a price" do
+    notification = build_notification(
+      product_id: "yearly_podcast_v4",
+      transaction: {"price" => 29_990, "currency" => "USD"}
+    )
+    assert_equal 29.99, notification.receipt_amount
+  end
+
+  test "currency comes from the transaction when Apple sends one" do
+    notification = build_notification(
+      product_id: "yearly_podcast_v4",
+      transaction: {"price" => 29_990, "currency" => "EUR"}
+    )
+    assert_equal "EUR", notification.currency
   end
 
   test "purchase_date converts the millisecond timestamp into a Time" do

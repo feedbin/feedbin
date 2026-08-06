@@ -4,14 +4,26 @@ class SendStats
 
   MEGABYTE = 1024.0 * 1024.0
 
+  MEASUREMENTS = [
+    :redis_stats,
+    :postgres_stats,
+    :plan_count,
+    :active_users_count,
+    :clear_empty_jobs,
+    :sidekiq_queue_depth,
+    :sidekiq_latency
+  ]
+
+  # retry: false means a raised run is simply discarded, and clock.rb schedules
+  # this every minute, so one measurement that always fails would take every
+  # measurement after it offline permanently. Report and carry on instead.
   def perform
-    redis_stats
-    postgres_stats
-    plan_count
-    active_users_count
-    clear_empty_jobs
-    sidekiq_queue_depth
-    sidekiq_latency
+    MEASUREMENTS.each do |measurement|
+      send(measurement)
+    rescue => exception
+      ErrorService.context(measurement: measurement)
+      ErrorService.notify(exception)
+    end
   end
 
   def yjit_stats
@@ -46,7 +58,10 @@ class SendStats
     counts = User.where(suspended: false).group(:plan_id).count
     plans = Plan.all.index_by(&:id)
     counts.each do |plan_id, count|
-      Librato.measure("plan_count", (plans[plan_id].price * count).to_i, source: plans[plan_id].stripe_id)
+      # users.plan_id is nullable and has no foreign key, so GROUP BY produces
+      # a bucket for NULL and for any plan that has since been deleted.
+      next unless plan = plans[plan_id]
+      Librato.measure("plan_count", (plan.price * count).to_i, source: plan.stripe_id)
     end
   end
 

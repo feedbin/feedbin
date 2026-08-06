@@ -64,6 +64,27 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "should not report success when the plan change was rejected" do
+    StripeMock.start
+    stripe_helper = StripeMock.create_test_helper
+
+    original = plans(:basic_monthly_3)
+    rejected = plans(:basic_monthly_4)
+    [original, rejected].each { create_stripe_plan(_1) }
+
+    customer = Stripe::Customer.create({email: @user.email, plan: original.stripe_id, source: stripe_helper.generate_card_token})
+    @user.update(customer_id: customer.id, plan: original)
+    @user.reload.inspect
+
+    login_as @user
+    post :update_plan, params: {plan: rejected.id}
+
+    assert_equal original, @user.reload.plan, "the plan is outside the user's price tier"
+    assert_nil flash[:notice], "the user must not be told a change went through that did not"
+    assert flash[:alert].present?, "the user should be told why"
+    StripeMock.stop
+  end
+
   test "should update credit card" do
     StripeMock.start
     plan = plans(:trial)
@@ -416,6 +437,30 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "No payment info", assigns(:message)
     StripeMock.stop
+  end
+
+  test "edit renders when the user's price tier has no plans" do
+    @user.update_column(:price_tier, nil)
+    login_as @user
+
+    get :edit
+
+    assert_response :success
+    assert_empty assigns(:plans)
+    assert_nil assigns(:default_plan)
+    # An empty interpolation here is a JS syntax error, which takes the card
+    # form down just as thoroughly as the 500 did.
+    assert_includes @response.body, "new feedbin.Payments([], null)"
+  end
+
+  test "billing renders for a trial user whose price tier has no plans" do
+    @user.update_columns(plan_id: plans(:trial).id, price_tier: nil)
+    login_as @user
+
+    get :index
+
+    assert_response :success
+    assert_nil assigns(:default_plan)
   end
 
   private

@@ -2,6 +2,9 @@ module Search
   class ReindexFeeds
     include Sidekiq::Worker
 
+    # How many feeds are held in memory at once.
+    SLICE_SIZE = 100
+
     def perform
       Search.client(mirror: true) do |client|
         client.reindex(Search.index_name(Feed.table_name), mappings: $search[:config][:mappings][:feeds]) do |new_index|
@@ -13,13 +16,15 @@ module Search
     private
 
     def reindex(new_index)
-      threshold = ENV.fetch("FEEDS_SEARCHABLE_THRESHOLD") { 0 }.to_i
-      feeds = Feed.xml.order(subscriptions_count: :desc).where("subscriptions_count > ?", threshold).reject { _1.crawl_error? }
-      feeds.uniq! { _1.self_url.nil? ? SecureRandom.hex : _1.self_url }
-      feeds.uniq! { "#{_1.title}#{_1.site_url&.delete_suffix("/")}" }
-      feeds.reject! { _1.feed_url.include?("feedbin.com/starred") ||  _1.feed_url.include?("feedbin.me/starred")}
+      feed_ids = searchable_feed_ids
 
-      feeds.each_slice(100) do |feeds|
+      # The dedup below needs the whole set, but it only needs four columns to
+      # do it. Resolving ids first and loading the full records a slice at a
+      # time keeps the peak at one slice rather than the entire searchable
+      # corpus -- every settings, options and crawl_data blob included -- inside
+      # a long-lived worker.
+      feed_ids.each_slice(SLICE_SIZE) do |ids|
+        feeds = Feed.where(id: ids).to_a
         authors = Entry.last_n_per_feed(50, feeds.map(&:id)).pluck(:feed_id, :author).each_with_object({}) do |(feed_id, author), hash|
           hash[feed_id] ||= Set.new
           hash[feed_id].add(author.to_s.downcase.to_plain_text)
@@ -40,6 +45,27 @@ module Search
           "class" => FeedMetadataFinder
         )
       end
+    end
+
+    # Ordered by subscriptions_count like the original, so the dedup keeps the
+    # most-subscribed feed of each duplicate group.
+    def searchable_feed_ids
+      threshold = ENV.fetch("FEEDS_SEARCHABLE_THRESHOLD") { 0 }.to_i
+
+      rows = Feed.xml
+        .where("subscriptions_count > ?", threshold)
+        .where.not("feed_url LIKE ? OR feed_url LIKE ?", "%feedbin.com/starred%", "%feedbin.me/starred%")
+        .order(subscriptions_count: :desc)
+        .pluck(:id, :self_url, :title, :site_url, :crawl_data)
+
+      rows = rows.reject { |_id, _self_url, _title, _site_url, crawl_data| crawl_error?(crawl_data) }
+      rows.uniq! { |_id, self_url, _title, _site_url, _crawl_data| self_url.nil? ? SecureRandom.hex : self_url }
+      rows.uniq! { |_id, _self_url, title, site_url, _crawl_data| "#{title}#{site_url&.delete_suffix("/")}" }
+      rows.map(&:first)
+    end
+
+    def crawl_error?(crawl_data)
+      crawl_data.respond_to?(:error_count) && crawl_data.error_count > 23
     end
   end
 end

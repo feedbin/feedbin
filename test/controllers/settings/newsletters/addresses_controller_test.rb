@@ -115,4 +115,16 @@ class Settings::Newsletters::AddressesControllerTest < ActionController::TestCas
     assert assigns(:numbers)
     assert assigns(:message)
   end
+
+  test "should preview custom when no address is available on the prefix" do
+    user = users(:new)
+    login_as user
+
+    AuthenticationToken.stub(:exists?, true) do
+      post :create, params: {authentication_token: {type: "custom", token: "taken"}}, xhr: true
+    end
+
+    assert_response :success
+    assert_nil assigns(:token)
+  end
 end

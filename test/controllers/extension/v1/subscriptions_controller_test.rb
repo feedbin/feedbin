@@ -17,6 +17,22 @@ class Extension::V1::SubscriptionsControllerTest < ActionController::TestCase
     assert_equal @user, assigns(:user)
   end
 
+  test "reports no feeds rather than a server error when discovery fails" do
+    failures = {
+      "connection refused" => -> { raise Feedkit::ConnectionError.new(HTTP::ConnectionError.new("refused")) },
+      "not a feed" => -> { raise Feedkit::NotFeed.new("nope") }
+    }
+
+    failures.each do |description, raiser|
+      FeedFinder.stub(:feeds, ->(*) { raiser.call }) do
+        post :new, params: {url: "http://unreachable.example.com/", page_token: @user.page_token}, format: :json
+      end
+
+      assert_response :success, description
+      assert_empty JSON.parse(@response.body)["feeds"], description
+    end
+  end
+
   test "requires authentication for new" do
     post :new, params: {url: "http://example.com"}, format: :json
     assert_response :unauthorized

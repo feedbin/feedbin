@@ -79,6 +79,15 @@ class IframeEmbed::TwitterTest < ActiveSupport::TestCase
     end
   end
 
+  test "profile_image_url falls back to the default favicon when the stored user has no image" do
+    embed = IframeEmbed::Twitter.new("https://twitter.com/alice/status/12345")
+    TwitterUser.create!(screen_name: "alice", data: {"id" => 1, "screen_name" => "alice"})
+
+    stub_url_cache(default: JSON.dump(oembed_payload)) do
+      assert_includes embed.profile_image_url, "favicon-profile-default"
+    end
+  end
+
   test "profile_image_url falls back to the default favicon when user is unknown" do
     embed = IframeEmbed::Twitter.new("https://twitter.com/unknownuser/status/9999")
     payload = oembed_payload.merge("author_url" => "https://twitter.com/unknownuser")

@@ -150,4 +150,26 @@ class SettingsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "extract", @user.subscriptions.where(feed_id: feed.id).first.view_mode
   end
+
+  test "sticky renders when the user has no subscription for the feed" do
+    login_as @user
+    feed = @user.feeds.first
+    @user.subscriptions.where(feed_id: feed.id).delete_all
+
+    post :sticky, params: {feed_id: feed.id}, xhr: true
+
+    assert_response :success
+    assert_empty @response.body
+  end
+
+  test "subscription_view_mode renders when the user has no subscription for the feed" do
+    login_as @user
+    feed = @user.feeds.first
+    @user.subscriptions.where(feed_id: feed.id).delete_all
+
+    post :subscription_view_mode, params: {feed_id: feed.id, subscription: {view_mode: "extract"}}, xhr: true
+
+    assert_response :success
+    assert_empty @response.body
+  end
 end

@@ -4,10 +4,18 @@ class Tag < ApplicationRecord
   has_many :taggings
   has_many :feeds, through: :taggings
 
+  # tags.name is varchar(255), and first_or_create below would otherwise write
+  # a nameless row — one that renders as a blank line in the sidebar, with
+  # nothing on screen to rename it back.
+  validates :name, presence: true, length: {maximum: 255}
+
+  # Returns nil when the name cannot be used, so the caller can tell the
+  # rename did not happen rather than moving taggings onto a junk tag.
   def self.rename(user, old_tag, new_name)
-    new_name = new_name.strip.delete(",")
+    new_name = new_name.to_s.strip.delete(",")
 
     new_tag = Tag.where(name: new_name).first_or_create
+    return nil unless new_tag.persisted?
 
     unless new_tag.id == old_tag.id
       # taggings has no unique index, so a feed carrying both tags would end up

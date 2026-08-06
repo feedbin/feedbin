@@ -26,6 +26,25 @@ class Admin::UsersControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  # Relation#+ is Array#+: it loads both relations and hands the view a plain
+  # Array, so the pagination metadata is gone and the page simply ends. On a
+  # production table that silently hides every account past the first screen.
+  test "GET index gives the view something it can paginate" do
+    login_as @user
+    get :index
+    assert_respond_to assigns(:users), :total_pages
+  end
+
+  test "GET index treats a percent in the search as a literal" do
+    login_as @user
+    users(:new).update_columns(email: "wildcard%test@example.com")
+
+    get :index, params: {q: "%"}
+
+    assert_response :success
+    assert_equal 1, assigns(:users).count
+  end
+
   test "DELETE destroy enqueues UserDeleter for the target user" do
     login_as @user
     target = users(:new)

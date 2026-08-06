@@ -57,6 +57,37 @@ class TagTest < ActiveSupport::TestCase
     assert_equal 1, @user.taggings.where(tag: tag).count
   end
 
+  test "a name is required" do
+    refute Tag.new(name: "").valid?
+    refute Tag.new(name: "   ").valid?
+  end
+
+  test "a name longer than the column is rejected" do
+    refute Tag.new(name: "x" * 300).valid?, "tags.name is varchar(255) and truncation raises"
+  end
+
+  test "rename leaves the taggings alone when the new name is empty after normalising" do
+    old_tag = Tag.create!(name: "OldTag")
+    @user.taggings.create!(tag: old_tag, feed: @feed)
+
+    assert_no_difference -> { Tag.count } do
+      assert_nil Tag.rename(@user, old_tag, " , ")
+    end
+
+    assert_equal 1, @user.taggings.where(tag: old_tag).count, "the taggings must not move onto a nameless tag"
+  end
+
+  test "rename leaves the taggings alone when the new name is too long" do
+    old_tag = Tag.create!(name: "OldTag")
+    @user.taggings.create!(tag: old_tag, feed: @feed)
+
+    assert_nothing_raised do
+      assert_nil Tag.rename(@user, old_tag, "x" * 300)
+    end
+
+    assert_equal 1, @user.taggings.where(tag: old_tag).count
+  end
+
   test "destroy removes the user's taggings for the given tag" do
     tag = Tag.create!(name: "ToDelete")
     @user.taggings.create!(tag: tag, feed: @feed)

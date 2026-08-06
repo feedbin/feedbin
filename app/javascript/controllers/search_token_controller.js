@@ -108,6 +108,13 @@ export default class extends Controller {
       if (item.type === "feed") {
         item["title"] = userTitle(item.id, item.title)
       }
+      // feeds.title is nullable and a JSON Feed that omits its title persists
+      // NULL, so one untitled feed can reach this with no title at all. Throwing
+      // here would abort the whole filter pass and leave the panel empty for
+      // every source, so skip the row instead: there is nothing to match on.
+      if (!item.title) {
+        return false
+      }
       const titleFolded = item.title.foldToASCII()
       const queryFolded = this.queryTarget.value.foldToASCII()
       item.score = titleFolded.score(queryFolded)

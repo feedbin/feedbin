@@ -48,7 +48,10 @@
                   <%= render App::SearchButtonComponent.new %>
                 </div>
             </div>
-            <div class="entries" data-action="scroll->toolbar#scroll" data-toolbar-section-value="entries-column" data-action="click->toolbar#show mousemove->toolbar#mousing" >
+            <%# One data-action: a repeated attribute is a parse error and the
+                duplicate is discarded, which silently dropped mousing -- the
+                only way back to a toolbar that scroll had hidden. %>
+            <div class="entries" data-action="scroll->toolbar#scroll click->toolbar#show mousemove->toolbar#mousing" data-toolbar-section-value="entries-column">
                 <%= render App::SearchFormComponent.new(params: params) %>
                 <ul data-behavior="entries_target" class="entries-target"></ul>
             </div>

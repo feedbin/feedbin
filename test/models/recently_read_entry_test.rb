@@ -25,4 +25,18 @@ class RecentlyReadEntryTest < ActiveSupport::TestCase
     other = RecentlyReadEntry.new(user: users(:ben), entry: @entry)
     assert other.valid?
   end
+
+  test "create_from_owners records the entry" do
+    assert_difference -> { RecentlyReadEntry.count }, +1 do
+      RecentlyReadEntry.create_from_owners(@user, @entry.id)
+    end
+  end
+
+  test "create_from_owners does not raise or duplicate when the entry is already recorded" do
+    RecentlyReadEntry.create!(user: @user, entry: @entry)
+
+    assert_no_difference -> { RecentlyReadEntry.count } do
+      RecentlyReadEntry.create_from_owners(@user, @entry.id)
+    end
+  end
 end

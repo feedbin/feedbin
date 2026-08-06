@@ -22,6 +22,18 @@ class ShareRetryTest < ActiveSupport::TestCase
     end
   end
 
+  test "marks the service as needing re-authentication instead of retrying a 401" do
+    @service.stub :service, fake_service_returning(401) do
+      SupportedSharingService.stub :find, ->(_) { @service } do
+        assert_nothing_raised do
+          ShareRetry.new.perform(@service.id, {entry_id: 1})
+        end
+      end
+    end
+
+    assert @service.reload.auth_error?, "an expired token cannot be fixed by retrying"
+  end
+
   test "succeeds quietly when the service add returns 200" do
     @service.stub :service, fake_service_returning(200) do
       SupportedSharingService.stub :find, ->(_) { @service } do

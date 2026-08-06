@@ -66,18 +66,30 @@ class MakeEpub
     end
 
     UserMailer.kindle(@address, @content.plain_title_with_default, epub_path).deliver_now
+  # Both cleanups are guarded on their target existing rather than rescued: a
+  # raise here would discard whatever exception is on its way out, and that is
+  # what the error tracker would go on to show instead of the real failure.
   ensure
-    FileUtils.remove_entry(@directory)
-    FileUtils.remove_entry(epub_path) rescue Errno::ENOENT
+    FileUtils.remove_entry(@directory) if @directory
+    File.unlink(epub_path) if epub_path && File.exist?(epub_path)
   end
 
   def select_content
-    content = @entry
-    if @extract
-      content = MercuryParser.parse(@entry.fully_qualified_url) rescue content
-      @feed_title = content&.domain || @feed_title
+    return @entry unless @extract
+
+    # The modifier rescue only covered the parse. The next line then called
+    # domain on whatever content held, and Entry has no such method -- so the
+    # fallback that exists to survive a failed extraction was the thing that
+    # killed the job.
+    parsed = begin
+      MercuryParser.parse(@entry.fully_qualified_url)
+    rescue
+      nil
     end
-    content
+    return @entry if parsed.nil?
+
+    @feed_title = parsed.domain || @feed_title
+    parsed
   end
 
   def render_to_file(path:, template:, formats:, locals: {})
@@ -107,7 +119,17 @@ class MakeEpub
       if file = download(src)
         unless @images.find { _1.filename == file.filename }
           total_size = @images.sum(&:size) + file.size
-          break if total_size > max_size
+          if total_size > max_size
+            # download has already written the bytes into the directory the
+            # archive is built from, so dropping it from @images is not enough:
+            # the file would be zipped anyway, and with no <item> in the
+            # manifest, which makes the epub invalid. Skip this image and keep
+            # going -- break would leave every later image pointing at a remote
+            # url.
+            file.delete
+            image.remove
+            next
+          end
           @images.push(file)
         end
         image["src"] = "images/#{file.filename}"

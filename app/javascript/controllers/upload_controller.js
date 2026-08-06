@@ -95,7 +95,10 @@ export default class extends Controller {
     reader.onload = (event) => {
       const text = event.target.result
 
-      if (!text.trimStart().startsWith("<?xml")) {
+      // The XML declaration is optional, so testing for it rejected valid OPML
+      // the server parses happily. Make the same judgement Nokogiri makes.
+      const parsed = new DOMParser().parseFromString(text, "text/xml")
+      if (parsed.querySelector("parsererror")) {
         this.error("Invalid file format. File must be XML/OPML.")
         return
       }

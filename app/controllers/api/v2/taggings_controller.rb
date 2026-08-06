@@ -23,13 +23,19 @@ module Api
 
       def create
         @user = current_user
+        name = params[:name]
+        return status_bad_request([{name: "Must be a non-blank string"}]) unless name.is_a?(String) && name.strip.present?
+
         @feed = @user.feeds.where(id: params[:feed_id]).first
         if @feed.present?
-          @tagging = Tagging.joins(:tag).where(taggings: {feed_id: params[:feed_id], user_id: @user.id}, tags: {name: params[:name].strip}).first
+          @tagging = Tagging.joins(:tag).where(taggings: {feed_id: params[:feed_id], user_id: @user.id}, tags: {name: name.strip}).first
           if @tagging.present?
             status = :found
           else
-            @tagging = @feed.tag(params[:name], @user, false).first
+            # Feed#tag can still come back empty, and the location header needs
+            # an id — so decide the status from the record, not before it.
+            @tagging = @feed.tag(name, @user, false).first
+            return status_bad_request([{name: "Could not be used as a tag"}]) if @tagging.blank?
             status = :created
           end
           render status: status, location: api_v2_tagging_url(@tagging, format: :json)

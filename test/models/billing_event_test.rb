@@ -5,6 +5,9 @@ class BillingEventTest < ActiveSupport::TestCase
     StripeMock.start
     @user = users(:ben)
     ActionMailer::Base.deliveries.clear
+    # invoice_created? reads jobs.first, so a job any earlier test in this
+    # process left behind would be the one it asserts against.
+    Sidekiq::Worker.clear_all
   end
 
   teardown do
@@ -109,6 +112,33 @@ class BillingEventTest < ActiveSupport::TestCase
 
     assert_nil billing_event.billable
     assert_not billing_event.payment_action_required?
+  end
+
+  # A Stripe customer with no Feedbin user: a deleted account whose customer
+  # outlived it, one made by hand in the dashboard, or a replayed webhook.
+  test "subscription deactivation is a no-op for a customer with no user" do
+    event = StripeMock.mock_webhook_event("customer.subscription.updated", customer: "cus_not_a_feedbin_user")
+    event["data"]["object"]["status"] = "unpaid"
+    billing_event = BillingEvent.new(info: event.as_json)
+    billing_event.validate
+
+    assert_nil billing_event.billable
+    assert billing_event.subscription_deactivated?
+
+    assert_nothing_raised { billing_event.save! }
+  end
+
+  test "subscription reactivation is a no-op for a customer with no user" do
+    event = StripeMock.mock_webhook_event("customer.subscription.updated", customer: "cus_not_a_feedbin_user")
+    event["data"]["object"]["status"] = "active"
+    event["data"]["previous_attributes"] = {"status" => "unpaid"}
+    billing_event = BillingEvent.new(info: event.as_json)
+    billing_event.validate
+
+    assert_nil billing_event.billable
+    assert billing_event.subscription_reactivated?
+
+    assert_nothing_raised { billing_event.save! }
   end
 
   private

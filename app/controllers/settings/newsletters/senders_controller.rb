@@ -21,11 +21,9 @@ class Settings::Newsletters::SendersController < ApplicationController
   def update
     sender = @user.authentication_tokens.find_by_token(params[:newsletter_sender][:token])&.newsletter_senders&.find(params[:id])
 
-    if params[:newsletter_sender][:active] == "1"
-      @user.subscriptions.create!(feed_id: sender.feed_id)
-    else
-      @user.subscriptions.where(feed_id: sender.feed_id).take.destroy
-    end
+    head :not_found and return unless sender
+
+    Subscription.set_subscribed(@user, sender.feed_id, params[:newsletter_sender][:active] == "1")
 
     flash[:notice] = "Settings updated."
     flash.discard
@@ -34,10 +32,19 @@ class Settings::Newsletters::SendersController < ApplicationController
   private
 
   def search_senders
-    query = params[:q]
-    tokens = if query.include?("to:")
-      query = query.delete_prefix("to:").split("@").first.strip
-      @user.newsletter_addresses.where(token: query).pluck(:token)
+    query = params[:q].to_s
+    # start_with?, not include?: a sender whose own name contains "to:" was
+    # taking the prefix branch and being searched for as an address.
+    tokens = if query.start_with?("to:")
+      # "to:" on its own is what the field holds between typing the prefix and
+      # typing the address, and split("@") on the empty string is [], not [""].
+      # An address that is not there yet narrows nothing.
+      query = query.delete_prefix("to:").split("@").first.to_s.strip
+      if query.empty?
+        @user.newsletter_addresses.pluck(:token)
+      else
+        @user.newsletter_addresses.where(token: query).pluck(:token)
+      end
     else
       @user.newsletter_addresses.pluck(:token)
     end

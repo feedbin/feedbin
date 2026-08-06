@@ -318,6 +318,30 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "mark_direction_as_read rejects a collection type it does not handle" do
+    login_as @user
+    mark_unread(@user)
+    keep_id = @user.unread_entries.pluck(:entry_id).first
+
+    assert_no_difference -> { @user.unread_entries.count } do
+      post :mark_direction_as_read, params: {direction: "below", type: "queued_entries", data: "", ids: keep_id.to_s}, xhr: true
+    end
+
+    assert_response :bad_request
+  end
+
+  test "mark_direction_as_read rejects a saved search that is not there" do
+    login_as @user
+    mark_unread(@user)
+    keep_id = @user.unread_entries.pluck(:entry_id).first
+
+    assert_no_difference -> { @user.unread_entries.count } do
+      post :mark_direction_as_read, params: {direction: "below", type: "saved_search", data: "0", ids: keep_id.to_s}, xhr: true
+    end
+
+    assert_response :bad_request
+  end
+
   # ---- destroy ---------------------------------------------------------------
 
   test "destroy enqueues EntryDeleter when the feed is a pages feed" do
@@ -345,6 +369,21 @@ class EntriesControllerTest < ActionController::TestCase
       get :newsletter, params: {id: entry.public_id}
     end
     assert_response :success
+  end
+
+  # Relation#present? is records.blank? inverted -- it materializes the whole
+  # relation to answer. This is the path an account with tens of thousands of
+  # unread entries takes when it reaches for "mark all read".
+  test "marking all read with a date does not load the unread rows" do
+    login_as @user
+
+    statements = capture_sql do
+      post :mark_all_as_read, params: {type: "unread", date: 1.day.from_now.iso8601}, xhr: true
+    end
+
+    assert_response :success
+    loads = statements.select { _1.match?(/SELECT\s+"#{UnreadEntry.table_name}"\.\*/i) }
+    assert_empty loads, "the unread rows were materialized: #{loads.inspect}"
   end
 
 end

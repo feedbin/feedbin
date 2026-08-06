@@ -38,8 +38,11 @@ class ImportItem < ApplicationRecord
   rescue
   end
 
+  # `text` is the required OPML attribute and `title` is the optional one, so a
+  # producer that emits only `text=` leaves details[:title] nil. Opml::Parser
+  # already falls back this way for folder names.
   def title
-    details[:title]
+    details[:title].presence || details[:text]
   end
 
   def last_published_entry

@@ -16,25 +16,37 @@ class NewsletterSaver
   end
 
   def build_document(entry)
-    document = if entry.content_format == "text"
-      document = Nokogiri::HTML5(ContentFormatter.text_email(entry.content))
+    title = document_title(entry)
 
-      title = document.create_element("h1", entry.title)
-      document.at("body").prepend_child(title)
+    document = if entry.content_format == "text"
+      document = ContentFormatter.html_document(ContentFormatter.text_email(entry.content))
+
+      heading = document.create_element("h1", title)
+      document.at("body").prepend_child(heading)
 
       style = document.create_element("style", text_email_css)
       document.at("head").add_child(style)
 
       document
     else
-      Nokogiri::HTML5(entry.content)
+      ContentFormatter.html_document(entry.content)
     end
 
     if document.title.blank?
-      document.title = entry.title
+      document.title = title
     end
 
     document
+  end
+
+  # The guard used to test the document and assign the entry without checking
+  # that the entry had anything to give. entry.title is the email's Subject and
+  # is nil when the message carried no Subject: header, which Nokogiri's title=
+  # rejects outright. Name it the way a mail client does instead.
+  def document_title(entry)
+    entry.title.presence ||
+      [entry.author.presence, entry.published&.to_formatted_s(:date)].compact.join(" — ").presence ||
+      "Newsletter"
   end
 
   def text_email_css

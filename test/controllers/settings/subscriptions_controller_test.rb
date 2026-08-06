@@ -5,6 +5,47 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     @user = users(:ben)
   end
 
+  test "should not report an unsubscribe the model refused" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    subscription = @user.subscriptions.create!(feed: feed, kind: :generated)
+
+    delete :destroy, params: {id: subscription.id}, xhr: true
+
+    assert Subscription.exists?(subscription.id), "generated subscriptions cannot be destroyed"
+    assert_nil flash[:notice], "the user must not be told a subscription is gone when it is not"
+  end
+
+  test "should not report a bulk unsubscribe that removed nothing" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    subscription = @user.subscriptions.create!(feed: feed, kind: :generated)
+
+    patch :update_multiple, params: {operation: "unsubscribe", subscription_ids: [subscription.id]}
+
+    assert Subscription.exists?(subscription.id)
+    assert_not_equal "You have unsubscribed.", flash[:notice]
+  end
+
+  test "a bulk operation only touches the subscriptions the list showed" do
+    login_as @user
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex, title: "Pages")
+    generated = @user.subscriptions.create!(feed: feed, kind: :generated)
+
+    patch :update_multiple, params: {operation: "mute", include_all: "true"}
+
+    assert_not generated.reload.muted?, "the Pages feed is not in the list the checkbox summarises"
+  end
+
+  test "should get index with a page number that cannot be paginated" do
+    login_as @user
+
+    ["0", "-1", "abc"].each do |page|
+      get :index, params: {page: page}
+      assert_response :success, "page=#{page}"
+    end
+  end
+
   test "should get index" do
     user = users(:new)
     feeds = create_feeds(user)
@@ -98,6 +139,42 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     patch :newsletter_senders, params: {id: feed_id, newsletter_sender: {feed_id: "1"}}, xhr: true
 
     assert user.subscriptions.where(feed_id: feed_id).exists?
+  end
+
+  test "should not fail when the newsletter sender is toggled on twice" do
+    user = users(:ben)
+    login_as user
+
+    user.newsletter_senders.create!(feed: user.feeds.first, full_token: user.newsletter_authentication_token, email: "example@example.com")
+    feed_id = user.newsletter_senders.first.feed_id
+    on = {id: feed_id, newsletter_sender: {feed_id: "1"}}
+
+    patch :newsletter_senders, params: on, xhr: true
+    assert_response :success
+
+    assert_no_difference -> { Subscription.count } do
+      patch :newsletter_senders, params: on, xhr: true
+    end
+    assert_response :success
+    assert user.subscriptions.where(feed_id: feed_id).exists?
+  end
+
+  test "should not fail when the newsletter sender is toggled off twice" do
+    user = users(:ben)
+    login_as user
+
+    user.newsletter_senders.create!(feed: user.feeds.first, full_token: user.newsletter_authentication_token, email: "example@example.com")
+    feed_id = user.newsletter_senders.first.feed_id
+    off = {id: feed_id, newsletter_sender: {feed_id: "0"}}
+
+    patch :newsletter_senders, params: off, xhr: true
+    assert_response :success
+
+    assert_no_difference -> { Subscription.count } do
+      patch :newsletter_senders, params: off, xhr: true
+    end
+    assert_response :success
+    assert_not user.subscriptions.where(feed_id: feed_id).exists?
   end
 
   test "should not unsubscribe from normal feed" do

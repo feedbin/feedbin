@@ -4,7 +4,11 @@ class Settings::SubscriptionsController < ApplicationController
     if @user.setting_on?(:fix_feeds_available)
       @user.setting_off!(:fix_feeds_available)
     end
-    @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 50)
+    # This paginates an Array, so will_paginate validates the page number in
+    # the constructor and raises RangeError/ArgumentError rather than returning
+    # an empty page. Clamp instead of handing it whatever the URL carried.
+    page = [params[:page].to_i, 1].max
+    @subscriptions = subscriptions_with_sort_data.paginate(page: page, per_page: 50)
     store_location
 
     respond_to do |format|
@@ -22,8 +26,14 @@ class Settings::SubscriptionsController < ApplicationController
   end
 
   def destroy
-    destroy_subscription(params[:id])
-    flash[:notice] = "You have successfully unsubscribed."
+    # prevent_generated_destroy throws :abort, which makes destroy return
+    # false rather than raise — so an unconditional success flash told the
+    # user a subscription was gone that is still there.
+    if destroy_subscription(params[:id])
+      flash[:notice] = "You have successfully unsubscribed."
+    else
+      flash[:alert] = "That subscription can not be removed."
+    end
     @redirect = clear_location || settings_subscriptions_url
   end
 
@@ -61,13 +71,22 @@ class Settings::SubscriptionsController < ApplicationController
         ids = subscriptions_with_sort_data.map(&:id)
         subscriptions = @user.subscriptions.where(id: ids)
       elsif params[:include_all]
-        subscriptions = @user.subscriptions
+        # The checkbox summarises the list on screen, which is the default
+        # scope — not every row the association holds.
+        subscriptions = @user.subscriptions.default
       else
         subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
       end
       if params[:operation] == "unsubscribe"
-        subscriptions.destroy_all
-        notice = "You have unsubscribed."
+        selected = subscriptions.count
+        removed = subscriptions.destroy_all.count(&:destroyed?)
+        notice = if removed == selected
+          "You have unsubscribed."
+        elsif removed.zero?
+          "None of those subscriptions could be removed."
+        else
+          "Unsubscribed from #{removed} of #{selected} feeds."
+        end
       elsif params[:operation] == "show_updates"
         subscriptions.update_all(show_updates: true, updated_at: Time.now)
       elsif params[:operation] == "hide_updates"
@@ -86,11 +105,7 @@ class Settings::SubscriptionsController < ApplicationController
     valid = @user.newsletter_senders.pluck(:feed_id)
     feed_id = params[:id].to_i
     if valid.include?(feed_id)
-      if params[:newsletter_sender][:feed_id] == "1"
-        @user.subscriptions.create!(feed_id: feed_id)
-      else
-        @user.subscriptions.where(feed_id: feed_id).take.destroy
-      end
+      Subscription.set_subscribed(@user, feed_id, params[:newsletter_sender][:feed_id] == "1")
     end
     flash[:notice] = "Settings updated."
     flash.discard

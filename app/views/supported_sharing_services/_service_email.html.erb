@@ -30,7 +30,7 @@
               <%= f.label :email_name, "Full Name"%>
             <% end %>
             <% text.input do %>
-              <% f.text_field :email_name, class: "peer text-input"  %>
+              <%= f.text_field :email_name, class: "peer text-input" %>
             <% end %>
           <% end %>
         </div>
@@ -40,7 +40,7 @@
             <%= f.label :email_address, "Reply-To" %>
           <% end %>
           <% text.input do %>
-            <% f.email_field :email_address, class: "peer text-input" %>
+            <%= f.email_field :email_address, class: "peer text-input" %>
           <% end %>
         <% end %>
 

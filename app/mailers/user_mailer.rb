@@ -60,10 +60,12 @@ class UserMailer < ApplicationMailer
     mail to: @user.email, subject: "[Feedbin] Starred Items Export Complete", body: ""
   end
 
-  def account_closed(user_id, opml)
-    @user = User.find(user_id)
+  # Takes the address rather than a user id: it is sent after the account has
+  # been deleted, so there is no record left to look up.
+  def account_closed(email, opml)
+    @email = email
     attachments["subscriptions.xml"] = opml
-    mail to: @user.email, subject: "[Feedbin] Account Closed"
+    mail to: @email, subject: "[Feedbin] Account Closed"
   end
 
   def onboarding_health_alert(unhealthy_feeds)

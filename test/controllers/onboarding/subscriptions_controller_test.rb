@@ -62,6 +62,37 @@ class Onboarding::SubscriptionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  # These have to be urls the onboarding form actually offers: anything else is
+  # dropped by the allowlist before it reaches the fetch, which would make the
+  # test pass without exercising the rescue at all.
+  def configured_urls
+    Feedbin::Application.config.onboarding_feeds.map { it[:feed_url] }
+  end
+
+  test "should skip a url whose host will not respond" do
+    login_as @user
+    url = configured_urls.first
+    stub_request(:get, url).to_return(status: 500, body: "")
+
+    assert_no_difference "Subscription.count" do
+      patch :update, params: {feed_url: {url => url}}, xhr: true
+    end
+    assert_response :success
+  end
+
+  test "should still subscribe the good feeds when one url fails" do
+    login_as @user
+    bad_url, good_url = configured_urls.first(2)
+    new_feed = Feed.create!(feed_url: good_url)
+    stub_request(:get, bad_url).to_return(status: 500, body: "")
+
+    assert_difference "Subscription.count", +1 do
+      patch :update, params: {feed_url: {bad_url => bad_url, good_url => good_url}}, xhr: true
+    end
+    assert_response :success
+    assert @user.subscriptions.exists?(feed: new_feed)
+  end
+
   test "should handle empty params" do
     login_as @user
     assert_no_difference "Subscription.count" do

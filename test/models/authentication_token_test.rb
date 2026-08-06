@@ -54,6 +54,12 @@ class AuthenticationTokenTest < ActiveSupport::TestCase
     assert_match(/\Ahello\.\d{3}\z/, token)
   end
 
+  test "generate_custom_token returns nil rather than a taken token when the prefix is exhausted" do
+    AuthenticationToken.stub(:exists?, true) do
+      assert_nil AuthenticationToken.generate_custom_token("hello")
+    end
+  end
+
   test "description and newsletter_tag are stored in data" do
     token = @user.authentication_tokens.create!(purpose: :newsletters, description: "test", newsletter_tag: "news")
     assert_equal "test", token.description

@@ -92,4 +92,21 @@ class UserTest < ActiveSupport::TestCase
   test "existing subscriptions is empty without feeds to search" do
     assert_equal({}, @user.existing_subscriptions([]))
   end
+
+  test "find_by_email matches regardless of case or surrounding space" do
+    assert_equal @user, User.find_by_email("  #{@user.email.upcase}  ")
+  end
+
+  test "find_by_email is nil for an address no one has" do
+    assert_nil User.find_by_email("nobody@example.com")
+  end
+
+  test "find_by_email is nil for bytes that are not valid UTF-8" do
+    assert_nil User.find_by_email("\xC3\x28#{@user.email}".b)
+  end
+
+  test "find_by_email is nil for anything that is not a string" do
+    assert_nil User.find_by_email(nil)
+    assert_nil User.find_by_email(email: @user.email)
+  end
 end

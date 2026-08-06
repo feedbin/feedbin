@@ -17,13 +17,13 @@ module Extension
           @record.update(address_params)
           @record
         else
-          if clean_token.present?
-            @token = AuthenticationToken.newsletters.generate_custom_token(clean_token)
-            @verified_token = Rails.application.message_verifier(:address_token).generate(@token)
-            @numbers = @token.split(".").last
-          else
+          @token = AuthenticationToken.newsletters.generate_custom_token(clean_token) if clean_token.present?
+          # nil when the prefix is blank, or when it has no free address left.
+          if @token.nil?
             render json: {error: true}, status: :bad_request and return
           end
+          @verified_token = Rails.application.message_verifier(:address_token).generate(@token)
+          @numbers = @token.split(".").last
         end
       end
 

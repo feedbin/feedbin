@@ -27,10 +27,12 @@ class DevicePushNotificationSend
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
-    feed_title = format_text(feed.title)
+    default_title = format_text(feed.title)
 
     notifications = tokens.each_with_object({}) { |(user_id, token, operating_system), hash|
-      feed_title = feed_titles[user_id] || feed_title
+      # Per iteration. Reassigning feed_title carried one subscriber's private
+      # rename into every later recipient's notification.
+      feed_title = feed_titles[user_id] || default_title
       notification = build_notification(token, feed_title, entry, operating_system)
       hash[notification.apns_id] = notification
     }

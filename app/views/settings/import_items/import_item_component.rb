@@ -20,7 +20,7 @@ module Settings
                       favicon_with_record(@import_item.favicon, host: @import_item.host, generated: true)
                     end
                     feed.title do
-                      link_to @import_item.details[:title] || "Untitled", @import_item.details[:html_url], target: "_blank", class: "!text-600"
+                      link_to @import_item.title || "Untitled", @import_item.details[:html_url], target: "_blank", class: "!text-600"
                     end
                     feed.subhead do
                       a(href: @import_item.details[:xml_url], class: "!text-500 truncate", target: :blank) do

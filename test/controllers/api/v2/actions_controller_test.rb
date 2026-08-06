@@ -58,6 +58,34 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
     assert_includes assigns(:entries).to_a, @entry
   end
 
+  # The endpoint returns 200 with a plausible list either way, so asserting on
+  # what reaches the search is the only thing that catches an unconstrained one.
+  test "results searches on the action's own criteria" do
+    login_as @user
+    action = @actions.first
+    captured = nil
+
+    Entry.stub(:scoped_search, ->(query, _user) { captured = query; Search::Response.new({}) }) do
+      get :results, params: {id: action.id}, format: :json
+    end
+
+    assert_equal action.query, captured[:query]
+    assert_equal action.computed_feed_ids, captured[:feed_ids]
+  end
+
+  test "results_watch restricts the search to unread entries" do
+    login_as @user
+    @actions.first.update!(action_type: Action.action_types[:notifier])
+    captured = nil
+
+    Entry.stub(:scoped_search, ->(query, _user) { captured = query; Search::Response.new({}) }) do
+      get :results_watch, format: :json
+    end
+
+    assert_equal false, captured[:read]
+    assert_equal @actions.first.query, captured[:query]
+  end
+
   private
 
   def action_keys

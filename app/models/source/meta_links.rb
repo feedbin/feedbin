@@ -1,6 +1,6 @@
 class Source::MetaLinks < Source
   def options
-    return unless document?
+    return [] unless document?
 
     document.css("link[rel~=alternate]").each_with_object([]) do |link, array|
       if link_valid?(link)

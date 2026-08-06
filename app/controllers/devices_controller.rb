@@ -6,14 +6,12 @@ class DevicesController < ApplicationController
       head :not_found and return
     end
 
-    update = {
+    Device.register(@user, token, {
       token: token,
+      device_type: :browser,
       model: request.env["HTTP_USER_AGENT"],
       data: device_params[:data]
-    }
-
-    device = @user.devices.browser.where_lower(token: token).take || @user.devices.browser.create(update)
-    device.update(update)
+    })
 
     head :ok
   end

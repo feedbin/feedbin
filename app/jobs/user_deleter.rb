@@ -4,9 +4,15 @@ class UserDeleter
 
   def perform(user_id, signed_id = nil)
     @user = User.find(user_id)
-    email_subscriptions
+    # Render the export while the associations still exist, but deliver it
+    # after the account is gone: the user has already been signed out and told
+    # the account is closed, so a mail failure must not leave the record — and
+    # the Stripe subscription cancelled in before_destroy — alive.
+    email = @user.email
+    opml = subscriptions_opml
     refund_payment(signed_id)
     @user.destroy
+    email_subscriptions(email, opml)
   end
 
   def refund_payment(signed_id)
@@ -25,14 +31,19 @@ class UserDeleter
   rescue Stripe::InvalidRequestError
   end
 
-  def email_subscriptions
+  def subscriptions_opml
     tags = @user.feed_tags
     feeds = @user.feeds.xml
     titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
       hash[feed_id] = title
     }
-    opml = SubscriptionsController.render(:index, assigns: {user: @user, tags: tags, feeds: feeds, titles: titles}, layout: nil)
-    UserMailer.account_closed(@user.id, opml).deliver_now
-  rescue Net::SMTPSyntaxError, Postmark::InactiveRecipientError
+    SubscriptionsController.render(:index, assigns: {user: @user, tags: tags, feeds: feeds, titles: titles}, layout: nil)
+  end
+
+  # InactiveRecipientError is one of several siblings under ApiInputError, all
+  # of which mean the address is permanently undeliverable.
+  def email_subscriptions(email, opml)
+    UserMailer.account_closed(email, opml).deliver_now
+  rescue Net::SMTPSyntaxError, Postmark::ApiInputError
   end
 end

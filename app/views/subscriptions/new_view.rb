@@ -54,8 +54,15 @@ class Subscriptions::NewView < ApplicationView
         end
       end
       div class: ["text-500", ("pl-[28px]" if @feeds.length > 1)] do
-        render App::FeedStatsComponent.new(feed: feed, stats: FeedStat.daily_counts(feed_ids: @feeds.map(&:id)))
+        render App::FeedStatsComponent.new(feed: feed, stats: feed_stats)
       end
     end
+  end
+
+  # daily_counts already answers for the whole set -- it is a 29-day
+  # generate_series cross joined against every feed id. Calling it inside the
+  # row loop ran that aggregate once per result and used one key of each.
+  def feed_stats
+    @feed_stats ||= FeedStat.daily_counts(feed_ids: @feeds.map(&:id))
   end
 end

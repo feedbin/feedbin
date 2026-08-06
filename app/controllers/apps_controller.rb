@@ -12,7 +12,7 @@ class AppsController < ApplicationController
   end
 
   def login
-    if user = authenticate_with_http_basic { |username, password| User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password) }
+    if user = authenticate_with_http_basic { |username, password| User.find_by_email(username).try(:authenticate, password) }
       sign_in user
       head :ok
     else

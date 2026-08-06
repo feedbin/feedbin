@@ -220,7 +220,10 @@ class ApplicationController < ActionController::Base
 
     excluded_feeds = @user.taggings.distinct.pluck(:feed_id)
     excluded_feeds += [@page_feed&.id]
-    @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon)
+    # include_user_title folds subscriptions.title onto the record. Without it
+    # the untagged "Feeds" section shows the publisher's title while the same
+    # component, fed by tag_group, shows the user's rename.
+    @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon).include_user_title
 
     @count_data = {
       unread_entries: @user.unread_entries.pluck("feed_id, entry_id").each_slice(10_000).to_a,

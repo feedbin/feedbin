@@ -4,6 +4,12 @@ module FeedCrawler
     sidekiq_options queue: :parse
 
     def perform(data)
+      # The Sidekiq path round-trips this through JSON, so everything below
+      # indexes with string keys. The import path calls perform in-process and
+      # the filter's keys are symbols, which silently turned every lookup into
+      # nil: no update was ever applied and the de-duplication guard was
+      # bypassed.
+      data = data.deep_stringify_keys
       feed = Feed.find(data["feed"]["id"])
       if data["entries"].present?
         receive_entries(data["entries"], feed)

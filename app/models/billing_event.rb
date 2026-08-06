@@ -23,6 +23,15 @@ class BillingEvent < ApplicationRecord
   end
 
   def process_event
+    # An event for a Stripe customer we do not have -- a deleted account whose
+    # customer outlived it, one created by hand in the dashboard, a webhook
+    # replayed after the user was removed -- is not an event we can act on.
+    # Every branch below needs it -- to call a method on it, to mail it, or to
+    # put its id in a statement descriptor -- so raising here just turns one
+    # orphaned customer into a retry loop: Stripe reads a non-2xx as a failed
+    # delivery and redelivers on its own schedule.
+    return if billable.nil?
+
     if charge_succeeded?
       UserMailer.payment_receipt(id).deliver_later
     end

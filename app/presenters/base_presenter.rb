@@ -7,7 +7,9 @@ class BasePresenter
 
   def favicon(feed, entry = nil)
     @favicon ||= begin
-      @template.render FaviconComponent.new(feed:, entry:)
+      # The entry list resolves the whole page's Pages favicons up front and
+      # hands the map down as a local; a caller rendering one entry has none.
+      @template.render FaviconComponent.new(feed:, entry:, favicons: @locals && @locals[:favicons])
     end
   end
 

@@ -136,10 +136,17 @@ module ImageCrawler
 
         return nil if faces.nil?
 
-        result = faces.filter_map { |face| face.safe_dig("face") }.map do |face|
+        # filter_map on both: inside a map, a bare `next` yields nil into the
+        # array rather than skipping the element, so the guard below was turning
+        # a malformed face row into a nil that [nil].sum could not add.
+        result = faces.filter_map { |face| face.safe_dig("face") }.filter_map do |face|
           next if face[axis].nil? || face["size"].nil?
           face[axis] + face["size"] / 2
         end
+
+        # A detector that ran and found nothing returns [], which is a different
+        # answer from the nil above but has the same meaning here: no position.
+        return nil if result.empty?
 
         (result.sum(0.0) / result.size).to_i
       end

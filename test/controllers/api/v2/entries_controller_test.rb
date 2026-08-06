@@ -76,6 +76,72 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     # assert_equal_ids expected, parse_json
   end
 
+  test "should accept a minute-precision since" do
+    login_as @user
+    since = 10.years.ago.utc.strftime("%Y-%m-%dT%H:%MZ")
+
+    get :index, params: {since: since}, format: :json
+
+    assert_response :success
+    assert_equal_ids @entries, parse_json
+  end
+
+  test "should accept a date-only since" do
+    login_as @user
+    since = 10.years.ago.utc.strftime("%Y-%m-%d")
+
+    get :index, params: {since: since}, format: :json
+
+    assert_response :success
+    assert_equal_ids @entries, parse_json
+  end
+
+  test "should filter on a since it cannot drop silently" do
+    login_as @user
+    since = 1.day.from_now.utc.strftime("%Y-%m-%dT%H:%MZ")
+
+    get :index, params: {since: since}, format: :json
+
+    assert_response :success
+    assert_equal [], parse_json, "a since the API accepts has to actually filter"
+  end
+
+  test "should say which parameter is wrong when per_page is zero" do
+    login_as @user
+
+    get :index, params: {per_page: "0"}, format: :json
+
+    assert_response :bad_request
+    assert parse_json["errors"].any? { |error| error.key?("per_page") }, parse_json.inspect
+  end
+
+  test "should say which parameter is wrong when per_page is not a number" do
+    login_as @user
+
+    get :index, params: {per_page: "lots"}, format: :json
+
+    assert_response :bad_request
+    assert parse_json["errors"].any? { |error| error.key?("per_page") }, parse_json.inspect
+  end
+
+  test "should cap an unreasonably large per_page rather than honouring it" do
+    login_as @user
+
+    get :index, params: {per_page: "1000000"}, format: :json
+
+    assert_response :success
+    assert_equal Api::V2::ApiController::MAX_PER_PAGE, assigns(:page_query).per_page
+  end
+
+  test "should say which parameter is wrong when since cannot be parsed" do
+    login_as @user
+
+    get :index, params: {since: "yesterday"}, format: :json
+
+    assert_response :bad_request
+    assert parse_json["errors"].any? { |error| error.key?("since") }, parse_json.inspect
+  end
+
   private
 
   def entry_keys(all = false)

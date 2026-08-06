@@ -3,7 +3,10 @@ class PagesController < ApplicationController
 
   after_action :cors_headers, only: [:create, :options]
 
+  # The GET fallback that used to live here was removed with its route: a
+  # request that saves a page is a state change and does not belong on GET.
   def create
+    return head :bad_request if params[:url].blank?
     SavePage.perform_async(current_user.id, params[:url], params[:title])
   end
 
@@ -28,7 +31,7 @@ class PagesController < ApplicationController
         User.find_by_page_token!(params[:page_token])
       else
         authenticate_or_request_with_http_basic("Feedbin") do |username, password|
-          User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password)
+          User.find_by_email(username).try(:authenticate, password)
         end
       end
     end

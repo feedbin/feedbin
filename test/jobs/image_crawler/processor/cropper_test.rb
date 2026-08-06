@@ -17,6 +17,23 @@ module ImageCrawler
         assert_equal(462, image.average_face_position("y", File.new(file)))
       end
 
+      # "I found nothing" and "I found something I cannot fully describe" are
+      # both ordinary answers from a face detector, and neither is a position.
+      def test_should_have_no_face_position_when_pigo_reports_nothing_usable
+        {
+          "no faces detected" => "[]",
+          "face row without a size" => '[{"face":{"x":10}}]',
+          "face row without an axis" => '[{"face":{"size":10}}]'
+        }.each do |description, output|
+          file = copy_support_file("image.jpeg")
+          cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+
+          Open3.stub(:capture3, [output, "", OpenStruct.new(success?: true)]) do
+            assert_nil(cropper.average_face_position("x", File.new(file)), description)
+          end
+        end
+      end
+
       def test_should_crop
         file = copy_support_file("image.jpeg")
         cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)

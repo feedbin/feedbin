@@ -14,6 +14,17 @@ class FeedFinderTest < ActiveSupport::TestCase
     assert_empty notified, "expected upstream Feedkit errors not to be reported"
   end
 
+  test "discovery falls through to the later strategies when the body is not markup" do
+    url = "https://guessable.example.com/"
+    stub_request(:get, url).to_return(body: "ok", headers: {"Content-Type" => "text/plain"})
+    stub_request(:get, "#{url}feed").to_return(status: 404)
+    stub_request_file("atom.xml", "#{url}rss")
+
+    assert_difference "Feed.count", +1 do
+      FeedFinder.feeds(url)
+    end
+  end
+
   test "unexpected (non-Feedkit) errors are still notified" do
     url = "http://boom.example.com/"
     stub_request(:get, url).to_return(status: 200, body: "ok")

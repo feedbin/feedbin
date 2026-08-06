@@ -54,9 +54,15 @@ module Search
           actions = user_actions[user.id].join(",")
           message = "#{message} #{actions}"
         end
-        Throttle.throttle!("starred_entries:create:#{user.id}", 100, 1.day) do
+        # The cap has to guard the write, not sit next to it. An action with a
+        # broad query matches most of a user's intake, and every match is a
+        # star they never asked for and have to delete by hand.
+        starred = Throttle.throttle!("starred_entries:create:#{user.id}", 100, 1.day) do
+          StarredEntry.create_from_owners(user, @entry, message)
         end
-        StarredEntry.create_from_owners(user, @entry, message)
+        if starred == false
+          Sidekiq.logger.info "Auto-star limit reached user_id=#{user.id} entry_id=#{@entry.id}"
+        end
       end
     end
 

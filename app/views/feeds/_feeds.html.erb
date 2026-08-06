@@ -24,7 +24,8 @@
 <% end %>
 
 <% if tags.present? %>
-  <% cache [tags, tags.map(&:user_feeds), "v9"] do %>
+  <%# titles come from subscriptions, so a rename does not touch the feed's cache key %>
+  <% cache [tags, tags.map(&:user_feeds), tags.flat_map { _1.user_feeds.map(&:title) }, "v9"] do %>
     <li class="source-section section-tags">
         Tags
     </li>
@@ -33,7 +34,7 @@
 <% end %>
 
 <% if feeds.present? %>
-  <% cache [feeds, "v3"] do %>
+  <% cache [feeds, feeds.map(&:title), "v3"] do %>
       <li class="source-section section-feeds">
           Feeds
       </li>

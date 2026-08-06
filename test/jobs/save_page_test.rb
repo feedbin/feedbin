@@ -49,6 +49,51 @@ class SavePageTest < ActiveSupport::TestCase
     end
   end
 
+  test "a retry of an unparseable page leaves the entry where it was in the Pages list" do
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+    url = "http://example.com/saved_page"
+
+    entry = assert_raises(SavePage::MissingPage) {
+      SavePage.new.perform(@user.id, url, "Title")
+    }.entry
+    published = entry.reload.published
+
+    travel_to 6.hours.from_now do
+      assert_raises(SavePage::MissingPage) do
+        SavePage.new.perform(@user.id, url, "Title")
+      end
+    end
+
+    assert_equal published.to_i, entry.reload.published.to_i,
+      "re-dating the entry floats an unreadable page back to the top of Pages on every retry"
+  end
+
+  test "a retry of an unparseable page does not re-enqueue its side-effect jobs" do
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+    url = "http://example.com/saved_page"
+
+    assert_raises(SavePage::MissingPage) do
+      SavePage.new.perform(@user.id, url, "Title")
+    end
+    images = ImageSaver.jobs.count
+    favicons = FaviconCrawler::Finder.jobs.count
+
+    assert_raises(SavePage::MissingPage) do
+      SavePage.new.perform(@user.id, url, "Title")
+    end
+
+    assert_equal images, ImageSaver.jobs.count
+    assert_equal favicons, FaviconCrawler::Finder.jobs.count
+  end
+
+  test "discards a save with no url instead of retrying it for three weeks" do
+    assert_nothing_raised do
+      assert_no_difference "Entry.count" do
+        SavePage.new.perform(@user.id, nil, nil)
+      end
+    end
+  end
+
   test "should save YouTube video" do
     stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
     youtube_video_id = "video_id"

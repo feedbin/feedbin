@@ -52,11 +52,10 @@ class Settings::ImportsController < ApplicationController
     @user = current_user
     @import = @user.imports.find(params[:id])
     @import.import_items.fixable.each do |import_item|
-      import_item.complete!
       FeedImportFixer.perform_async(@user.id, import_item.id)
     end
     respond_to do |format|
-      format.html { redirect_to settings_import_url(@import), notice: "Imports replaced." }
+      format.html { redirect_to settings_import_url(@import), notice: "Replacing feeds." }
       format.js { }
     end
   end

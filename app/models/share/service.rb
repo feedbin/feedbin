@@ -6,7 +6,12 @@ class Share::Service
     response = {}
     entry = Entry.find(params[:entry_id])
     params["entry_url"] = entry.fully_qualified_url
-    if klass.active?
+    if params["entry_url"].blank?
+      # fully_qualified_url is nil whenever the entry's url is blank or cannot
+      # be resolved. Sharing it posts a nil url, which the remote rejects, and
+      # the retry below would then re-post the same nil url 25 times.
+      response[:error] = "This article has no link to share."
+    elsif klass.active?
       # child classes using this need to implement add
       status = add(params)
       if status == 200

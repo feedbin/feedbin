@@ -1,8 +1,9 @@
 class FaviconComponent < ApplicationComponent
 
-  def initialize(feed:, entry: nil)
+  def initialize(feed:, entry: nil, favicons: nil)
     @feed = feed
     @entry = entry
+    @favicons = favicons
   end
 
   def view_template(&)
@@ -50,12 +51,24 @@ class FaviconComponent < ApplicationComponent
   end
 
   def icon_pages
-    icon = Favicon.find_by_host(@entry.hostname)
+    icon = pages_favicon
     if icon&.cdn_url
       icon_favicon(icon)
     else
       icon_pages_default
     end
+  end
+
+  # favicons is the collection-wide map the entry list resolves up front. Fall
+  # back to a lookup for the callers that render one entry on its own.
+  #
+  # host is nullable, so an entry whose url will not parse would otherwise
+  # query host IS NULL and bind to an unrelated row.
+  def pages_favicon
+    hostname = @entry.hostname
+    return nil if hostname.blank?
+    return @favicons[hostname] if @favicons
+    Favicon.find_by_host(hostname)
   end
 
   def icon_pages_default

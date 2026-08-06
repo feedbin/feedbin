@@ -17,6 +17,15 @@ class Source
     source.options
   end
 
+  # Collection-returning methods here return [], never nil: callers chain
+  # .uniq/.each straight onto the result, and FeedFinder runs the sources in
+  # order, so one of them returning nil takes every later strategy down with
+  # it — the site is reported as having no feed rather than falling through to
+  # the known patterns and the guesses.
+  def options
+    []
+  end
+
   def document
     @document ||= begin
       parsed = response.parse(validate: false)

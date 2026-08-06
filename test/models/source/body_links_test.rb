@@ -30,4 +30,20 @@ class BodyLinksTest < ActiveSupport::TestCase
       Source::BodyLinks.find(response)
     end
   end
+
+  test "options is empty when the body is not a parseable document" do
+    url = "https://plaintext.example.com/"
+    stub_request(:get, url).to_return(body: "ok", headers: {"Content-Type" => "text/plain"})
+    response = Feedkit::Request.download(url)
+
+    assert_equal [], Source::BodyLinks.options(response)
+  end
+
+  test "find is a no-op when the body is not a parseable document" do
+    url = "https://plaintext.example.com/"
+    stub_request(:get, url).to_return(body: "ok", headers: {"Content-Type" => "text/plain"})
+    response = Feedkit::Request.download(url)
+
+    assert_equal [], Source::BodyLinks.find(response)
+  end
 end

@@ -40,16 +40,19 @@ class AuthenticationToken < ApplicationRecord
     AuthenticationToken.newsletters.new.generate_token
   end
 
+  # Returns nil when every attempt collided, rather than the last taken token:
+  # a saturated prefix is reachable, and handing the caller an address that is
+  # already someone else's only defers the failure to a uniqueness violation on
+  # save.
   def self.generate_custom_token(prefix)
-    token = nil
-    count = AuthenticationToken.newsletters.where("token LIKE :query", query: "#{prefix}.%").count
-    length = count > 900 ? 4 : 3
-    1_000.times do |count|
+    taken = AuthenticationToken.newsletters.where("token LIKE :query", query: "#{prefix}.%").count
+    length = taken > 900 ? 4 : 3
+    1_000.times do
       numbers = Array.new(length) { (0..9).to_a.sample }.join
       token = "#{prefix}.#{numbers}"
-      break unless AuthenticationToken.exists?(token: token, purpose: :newsletters)
+      return token unless AuthenticationToken.exists?(token: token, purpose: :newsletters)
     end
-    token
+    nil
   end
 
   def title

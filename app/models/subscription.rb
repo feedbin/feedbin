@@ -20,8 +20,10 @@ class Subscription < ApplicationRecord
 
   validate :reject_title_changes, on: :update, if: :generated?
 
+  # errors[:title] returns a freshly built array, so pushing onto it mutated a
+  # temporary and the validation always passed.
   def reject_title_changes
-    errors[:title] << "can not be changed" if title_changed?
+    errors.add(:title, "can not be changed") if title_changed?
   end
 
   enum :kind, {default: 0, generated: 1}
@@ -29,19 +31,39 @@ class Subscription < ApplicationRecord
   enum :show_status, {not_show: 0, hidden: 1, subscribed: 2, bookmarked: 3}
   enum :fix_status, {none: 0, present: 1, ignored: 2}, prefix: :fix_suggestion
 
+  # The newsletter-sender switch is routed from two places that write these
+  # same rows, so the UI's idea of the current state and the server's drift
+  # apart. Depend only on the state being asked for, never on the difference
+  # between two states.
+  def self.set_subscribed(user, feed_id, subscribed)
+    if subscribed
+      user.subscriptions.find_or_create_by(feed_id: feed_id)
+    else
+      user.subscriptions.where(feed_id: feed_id).take&.destroy
+    end
+  end
+
   def self.create_multiple(feeds, user, valid_feed_ids)
     @subscriptions = feeds.each_with_object([]) { |(feed_id, subscription), array|
       feed = Feed.find(feed_id)
       if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
         record = user.subscriptions.find_or_create_by(feed: feed)
-        record.update(title: subscription["title"].strip, media_only: subscription["media_only"])
+        # Leaving the box empty means "use the feed's own name", so store nil
+        # rather than "" — the fallback in #title only fires on nil. And an
+        # empty box must not wipe a title the user set on an earlier visit,
+        # since find_or_create_by hands back the existing row.
+        attributes = {media_only: subscription["media_only"]}
+        title = subscription["title"].to_s.strip.presence
+        attributes[:title] = title if title || record.previously_new_record?
+        record.update(attributes)
         array.push(record)
       end
     }
   end
 
+  # presence, not ||, so the rows already carrying "" recover too.
   def title
-    self[:title] || feed&.title
+    self[:title].presence || feed&.title
   end
 
   def mark_as_unread
