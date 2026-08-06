@@ -66,6 +66,60 @@ class CrawlDataTest < ActiveSupport::TestCase
     assert_equal(max_time.to_i, feed.retry_after)
   end
 
+  def test_save_should_keep_validators_when_not_modified
+    url = "http://example.com/atom.xml"
+    stub_request(:get, url).to_return(status: 304)
+
+    data = CrawlData.new({
+      etag: "etag",
+      last_modified: "last_modified",
+      download_fingerprint: "694b08e"
+    })
+
+    data.save(Feedkit::Request.download(url))
+
+    assert_equal("etag", data.etag)
+    assert_equal("last_modified", data.last_modified)
+    assert_equal("694b08e", data.download_fingerprint)
+  end
+
+  def test_save_should_use_validators_supplied_by_not_modified
+    url = "http://example.com/atom.xml"
+    stub_request(:get, url).to_return(status: 304, headers: {
+      "Etag" => "new_etag",
+      "Last-Modified" => "new_last_modified"
+    })
+
+    data = CrawlData.new({
+      etag: "etag",
+      last_modified: "last_modified",
+      download_fingerprint: "694b08e"
+    })
+
+    data.save(Feedkit::Request.download(url))
+
+    assert_equal("new_etag", data.etag)
+    assert_equal("new_last_modified", data.last_modified)
+    assert_equal("694b08e", data.download_fingerprint)
+  end
+
+  def test_save_should_clear_validators_the_server_stopped_sending
+    url = "http://example.com/atom.xml"
+    stub_request(:get, url).to_return(status: 200, body: "body")
+
+    data = CrawlData.new({
+      etag: "etag",
+      last_modified: "last_modified",
+      download_fingerprint: "694b08e"
+    })
+
+    data.save(Feedkit::Request.download(url))
+
+    assert_nil(data.etag)
+    assert_nil(data.last_modified)
+    assert_equal(Digest::SHA1.hexdigest("body")[0, 7], data.download_fingerprint)
+  end
+
   def http_exception_mock(retry_after)
     OpenStruct.new({
       response: OpenStruct.new({

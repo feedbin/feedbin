@@ -72,9 +72,14 @@ class CrawlData
   end
 
   def save(response)
-    @data.etag                 = response.etag
-    @data.last_modified        = response.last_modified
-    @data.download_fingerprint = response.checksum
+    if response.status == 304
+      @data.etag          = response.etag          if response.etag
+      @data.last_modified = response.last_modified if response.last_modified
+    else
+      @data.etag                 = response.etag
+      @data.last_modified        = response.last_modified
+      @data.download_fingerprint = response.checksum
+    end
     if retry_after = FeedCrawler::Throttle.retry_after(response.url)
       @data.retry_after = retry_after
     end

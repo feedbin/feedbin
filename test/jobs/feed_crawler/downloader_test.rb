@@ -151,6 +151,37 @@ module FeedCrawler
       assert_equal 0, ParserCritical.jobs.size
     end
 
+    def test_should_keep_conditional_headers_after_not_modified
+      etag = "etag"
+      last_modified = "last_modified"
+      download_fingerprint = "694b08e"
+
+      data = CrawlData.new({
+        etag: etag,
+        last_modified: last_modified,
+        download_fingerprint: download_fingerprint,
+        downloaded_at: 1.hour.ago.to_i
+      })
+
+      conditional = stub_request(:get, @feed.feed_url)
+        .with(headers: {"If-None-Match" => etag, "If-Modified-Since" => last_modified})
+        .to_return(status: 304)
+
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10, data.to_h)
+      PersistCrawlData.new.perform
+
+      crawl_data = @feed.reload.crawl_data
+      assert_equal(etag, crawl_data.etag)
+      assert_equal(last_modified, crawl_data.last_modified)
+      assert_equal(download_fingerprint, crawl_data.download_fingerprint)
+
+      # the crawl after it can still ask conditionally
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10, crawl_data.to_h)
+
+      assert_requested conditional, times: 2
+      assert_equal 0, Parser.jobs.size
+    end
+
     def test_should_not_be_ok_after_error
       retry_after = 10_000
       time = Time.now.to_i + retry_after
