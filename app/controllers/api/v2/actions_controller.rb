@@ -42,7 +42,10 @@ module Api
         if @action.computed_feed_ids.present?
           query[:feed_ids] = @action.computed_feed_ids
           if params[:read].present?
-            query[:read] = params[:read] == "true"
+            # As a query token: scoped_search reads only :query and :feed_ids,
+            # and build_query already understands is:read / is:unread.
+            token = (params[:read] == "true") ? "is:read" : "is:unread"
+            query[:query] = [query[:query], token].compact.join(" ")
           end
           result = Entry.scoped_search(query, @user)
           @entries = result.records(Entry).includes(:feed)
@@ -61,7 +64,7 @@ module Api
           end
           if action.computed_feed_ids.present?
             query[:feed_ids] = action.computed_feed_ids
-            query[:read] = false
+            query[:query] = [query[:query], "is:unread"].compact.join(" ")
 
             result = Entry.scoped_search(query, @user)
             @entries = result.records(Entry).limit(10).includes(:feed)

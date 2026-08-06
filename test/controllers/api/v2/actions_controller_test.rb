@@ -82,8 +82,28 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
       get :results_watch, format: :json
     end
 
-    assert_equal false, captured[:read]
-    assert_equal @actions.first.query, captured[:query]
+    # As a query token: scoped_search reads only :query and :feed_ids, so a
+    # :read key would be dropped on the floor.
+    assert_includes captured[:query], "is:unread"
+    assert_includes captured[:query], @actions.first.query
+  end
+
+  test "results honors an explicit read filter" do
+    login_as @user
+    action = @actions.first
+    captured = nil
+
+    Entry.stub(:scoped_search, ->(query, _user) { captured = query; Search::Response.new({}) }) do
+      get :results, params: {id: action.id, read: "false"}, format: :json
+    end
+
+    assert_includes captured[:query], "is:unread"
+
+    Entry.stub(:scoped_search, ->(query, _user) { captured = query; Search::Response.new({}) }) do
+      get :results, params: {id: action.id, read: "true"}, format: :json
+    end
+
+    assert_includes captured[:query], "is:read"
   end
 
   private
