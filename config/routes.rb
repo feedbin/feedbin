@@ -2,6 +2,138 @@ require "sidekiq/web"
 Sidekiq::Web.app_url = ENV["FEEDBIN_URL"]
 
 Rails.application.routes.draw do
+  constraints subdomain: "api" do
+    namespace :api, path: nil do
+      namespace :v1 do
+        match "*path", to: "api#gone", via: :all
+      end
+    end
+  end
+
+  constraints subdomain: "api" do
+    namespace :api, path: nil do
+      namespace :public do
+        namespace :v1 do
+          resources :feeds, only: :show
+        end
+      end
+
+      namespace :podcasts do
+        namespace :v1 do
+          resources :feeds, only: :show
+          resources :subscriptions, only: [:index, :create, :update, :destroy]
+          namespace :queued_entries do
+            resource :bulk, controller: :bulk, only: [:update]
+          end
+          resources :queued_entries, only: [:index, :create, :update, :destroy]
+          resources :playlists, only: [:index, :create, :update, :destroy]
+          post :authentication, to: "authentication#index"
+        end
+      end
+
+      namespace :v2 do
+        resources :feeds, only: [:show] do
+          resources :entries, only: [:index, :show], controller: :feeds_entries
+        end
+
+        resources :entry_counts, only: [] do
+          collection do
+            get :post_frequency
+          end
+        end
+
+        resources :actions, only: [:index, :create, :update] do
+          member do
+            get :results
+          end
+          collection do
+            get :results_watch
+          end
+        end
+
+        resources :devices, only: [:create] do
+          collection do
+            get :ios_test
+            get :safari_test
+          end
+        end
+
+        resources :users, only: [:create] do
+          collection do
+            get :info
+            patch :update
+            delete :destroy
+          end
+        end
+
+        resources :tags, only: [:index] do
+          collection do
+            post :update
+            delete :destroy
+          end
+        end
+
+        resources :imports, only: [:index, :create, :show]
+        resources :subscriptions, only: [:index, :show, :create, :destroy, :update]
+
+        resources :favicons, only: [:index]
+        resources :icons, only: [:index]
+        resources :taggings, only: [:index, :show, :create, :destroy]
+        resources :recently_read_entries, only: [:index, :create]
+        resources :in_app_purchases, only: [:create]
+        resources :suggested_categories, only: [:index]
+        resources :authentication_tokens, only: [:create]
+
+        resources :entries, only: [:index, :show] do
+          member do
+            get :text
+            get :watch
+          end
+        end
+        resources :suggested_feeds, only: [:index] do
+          member do
+            post :subscribe
+            delete :unsubscribe
+          end
+        end
+
+        resources :pages, only: [:create, :destroy]
+
+        get :authentication, to: "authentication#index"
+
+        post "subscriptions/:id/update", to: "subscriptions#update"
+
+        resources :unread_entries, only: [:index, :show, :create]
+        delete "unread_entries", to: "unread_entries#destroy"
+        put "unread_entries", to: "unread_entries#create"
+        post "unread_entries/delete", to: "unread_entries#destroy"
+
+        resources :starred_entries, only: [:index, :show, :create]
+        delete "starred_entries", to: "starred_entries#destroy"
+        put "starred_entries", to: "starred_entries#create"
+        post "starred_entries/delete", to: "starred_entries#destroy"
+
+        resources :updated_entries, only: [:index]
+        delete "updated_entries", to: "updated_entries#destroy"
+        post "updated_entries/delete", to: "updated_entries#destroy"
+
+        resources :saved_searches, only: [:index, :show, :create, :destroy, :update]
+        post "saved_searches/:id/update", to: "saved_searches#update"
+      end
+    end
+  end
+
+  constraints subdomain: "api" do
+    get "/", to: redirect(status: 302) { |_params, request|
+      Rails.application.routes.url_helpers.root_url(
+        host: request.domain,
+        protocol: request.protocol,
+        port: request.port
+      )
+    }
+    match "*path", to: "errors#not_found", via: :all
+  end
+
   root to: "site#index"
 
   mount StripeEvent::Engine, at: "/stripe"
@@ -287,128 +419,6 @@ Rails.application.routes.draw do
   namespace :onboarding do
     resources :imports, only: [:show, :create]
     resource :subscriptions, only: [:update]
-  end
-
-
-  constraints subdomain: "api" do
-    namespace :api, path: nil do
-      namespace :v1 do
-        match "*path", to: "api#gone", via: :all
-      end
-    end
-  end
-
-  constraints subdomain: "api" do
-    namespace :api, path: nil do
-      namespace :public do
-        namespace :v1 do
-          resources :feeds, only: :show
-        end
-      end
-
-      namespace :podcasts do
-        namespace :v1 do
-          resources :feeds, only: :show
-          resources :subscriptions, only: [:index, :create, :update, :destroy]
-          namespace :queued_entries do
-            resource :bulk, controller: :bulk, only: [:update]
-          end
-          resources :queued_entries, only: [:index, :create, :update, :destroy]
-          resources :playlists, only: [:index, :create, :update, :destroy]
-          post :authentication, to: "authentication#index"
-        end
-      end
-
-      namespace :v2 do
-        resources :feeds, only: [:show] do
-          resources :entries, only: [:index, :show], controller: :feeds_entries
-        end
-
-        resources :entry_counts, only: [] do
-          collection do
-            get :post_frequency
-          end
-        end
-
-        resources :actions, only: [:index, :create, :update] do
-          member do
-            get :results
-          end
-          collection do
-            get :results_watch
-          end
-        end
-
-        resources :devices, only: [:create] do
-          collection do
-            get :ios_test
-            get :safari_test
-          end
-        end
-
-        resources :users, only: [:create] do
-          collection do
-            get :info
-            patch :update
-            delete :destroy
-          end
-        end
-
-        resources :tags, only: [:index] do
-          collection do
-            post :update
-            delete :destroy
-          end
-        end
-
-        resources :imports, only: [:index, :create, :show]
-        resources :subscriptions, only: [:index, :show, :create, :destroy, :update]
-
-        resources :favicons, only: [:index]
-        resources :icons, only: [:index]
-        resources :taggings, only: [:index, :show, :create, :destroy]
-        resources :recently_read_entries, only: [:index, :create]
-        resources :in_app_purchases, only: [:create]
-        resources :suggested_categories, only: [:index]
-        resources :authentication_tokens, only: [:create]
-
-        resources :entries, only: [:index, :show] do
-          member do
-            get :text
-            get :watch
-          end
-        end
-        resources :suggested_feeds, only: [:index] do
-          member do
-            post :subscribe
-            delete :unsubscribe
-          end
-        end
-
-        resources :pages, only: [:create, :destroy]
-
-        get :authentication, to: "authentication#index"
-
-        post "subscriptions/:id/update", to: "subscriptions#update"
-
-        resources :unread_entries, only: [:index, :show, :create]
-        delete "unread_entries", to: "unread_entries#destroy"
-        put "unread_entries", to: "unread_entries#create"
-        post "unread_entries/delete", to: "unread_entries#destroy"
-
-        resources :starred_entries, only: [:index, :show, :create]
-        delete "starred_entries", to: "starred_entries#destroy"
-        put "starred_entries", to: "starred_entries#create"
-        post "starred_entries/delete", to: "starred_entries#destroy"
-
-        resources :updated_entries, only: [:index]
-        delete "updated_entries", to: "updated_entries#destroy"
-        post "updated_entries/delete", to: "updated_entries#destroy"
-
-        resources :saved_searches, only: [:index, :show, :create, :destroy, :update]
-        post "saved_searches/:id/update", to: "saved_searches#update"
-      end
-    end
   end
 
   constraints lambda { |request| AuthConstraint.admin?(request) } do
