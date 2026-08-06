@@ -124,6 +124,7 @@ Rails.application.routes.draw do
   end
 
   constraints subdomain: "api" do
+    match "/", to: "errors#not_found", via: :head
     get "/", to: redirect(status: 302) { |_params, request|
       Rails.application.routes.url_helpers.root_url(
         host: request.domain,

@@ -30,6 +30,21 @@ class ApiSubdomainRoutesTest < ActionDispatch::IntegrationTest
     assert_response :found
   end
 
+  test "preserves the scheme and port in the API root redirect" do
+    https!
+    host! "api.example.com:8443"
+
+    get "/"
+
+    assert_redirected_to "https://example.com:8443/"
+  end
+
+  test "does not redirect a HEAD request to the API root" do
+    head "/"
+
+    assert_response :not_found
+  end
+
   test "returns not found for an unknown path" do
     get "/not-an-api-route"
 
@@ -51,5 +66,23 @@ class ApiSubdomainRoutesTest < ActionDispatch::IntegrationTest
     get "/health_check"
 
     assert_response :ok
+  end
+
+  test "returns not found for unsafe requests with forgery protection enabled" do
+    with_forgery_protection do
+      post "/stripe"
+    end
+
+    assert_response :not_found
+  end
+
+  private
+
+  def with_forgery_protection
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    yield
+  ensure
+    ActionController::Base.allow_forgery_protection = original
   end
 end
