@@ -80,14 +80,18 @@ class Tweet
 
   private
 
+  # dup on the branch that does not already build a new string: callers assign
+  # into the result through entity index ranges, and without this that edited
+  # the Twitter::Tweet's own full_text -- which is also its :text attribute.
   def trim_text(hash, exclude_end = false, trim_start = false)
     text = hash[:full_text]
     if range = hash[:display_text_range]
       start = trim_start ? range.first : 0
       range = Range.new(start, range.last, exclude_end)
-      text = text.codepoints[range].pack("U*")
+      text.codepoints[range].pack("U*")
+    else
+      text.dup
     end
-    text
   end
 
   # tweet.to_h is the Twitter::Tweet's own attrs hash, not a copy, so editing it

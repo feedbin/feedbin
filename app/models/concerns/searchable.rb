@@ -12,9 +12,14 @@ module Searchable
     RANGE_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]|media_duration:\(.*?\)|media_duration:\[.*?\]|word_count:\(.*?\)|word_count:\[.*?\]/
     RANGE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)|media_duration:[<>=+].*?(?=\s|$)|word_count:[<>=+].*?(?=\s|$)/
 
+    # A limit on how many are counted, not a switch that turns counting off.
+    # The old guard meant the fiftieth saved search silently blanked the badge
+    # on all fifty, with a 200 and nothing to explain it.
+    MAX_COUNTED_SAVED_SEARCHES = 50
+
     def self.saved_search_count(user)
-      saved_searches = user.saved_searches
-      if saved_searches.length < 50
+      saved_searches = user.saved_searches.first(MAX_COUNTED_SAVED_SEARCHES)
+      if saved_searches.present?
         searches = build_multi_search(user, saved_searches)
         records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
 

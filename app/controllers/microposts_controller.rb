@@ -12,16 +12,22 @@ class MicropostsController < ApplicationController
   def build_microposts
     replies = get_replies
     items = replies["items"] || []
-    items.reverse.map do |item|
-      data = {
-        micropost: Micropost.new(item),
+    # Item-level authors are optional in JSON Feed, and Micropost#valid? already
+    # decides whether a post can be rendered -- Entry#micropost asks. Building
+    # these without asking meant one authorless reply raised out of the template
+    # and took the whole conversation with it.
+    items.reverse.filter_map do |item|
+      micropost = Micropost.new(item)
+      next unless micropost.valid?
+
+      OpenStruct.new({
+        micropost: micropost,
         fully_qualified_url: item["url"],
         published: parse_published(item["date_published"]),
         content: item["content_html"],
         id: item["id"],
         media: []
-      }
-      OpenStruct.new(data)
+      })
     end
   end
 
@@ -37,7 +43,13 @@ class MicropostsController < ApplicationController
 
   def get_replies
     auth = "Token #{ENV["MICROBLOG_TOKEN"]}"
-    HTTP.auth(auth).get("https://micro.blog/posts/conversation", params: {id: thread_id}).parse
+    # The http gem's default is no deadline at all, so a micro.blog that
+    # accepts the connection and stops talking holds this Puma thread until the
+    # far end closes the socket. Every other outbound call here sets one.
+    HTTP.timeout(write: 5, connect: 5, read: 5)
+      .auth(auth)
+      .get("https://micro.blog/posts/conversation", params: {id: thread_id})
+      .parse
   end
 
   def thread_id

@@ -24,6 +24,16 @@ class SearchableCountTest < ActiveSupport::TestCase
     end
   end
 
+  # The cap was a switch, not a limit: at 49 saved searches every badge had a
+  # count and at 50 they all silently went blank, with a 200 and no message.
+  test "crossing the saved search cap still returns counts" do
+    50.times { |index| @user.saved_searches.create!(name: "S#{index}", query: "example") }
+
+    counts = Entry.saved_search_count(@user.reload)
+
+    assert counts.present?, "every saved search badge went blank at the cap"
+  end
+
   test "Action#results does not re-run its search for every reader" do
     feed = @user.feeds.first
     action = @user.actions.create!(feed_ids: [feed.id], query: "example", actions: ["mark_read"])

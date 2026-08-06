@@ -58,10 +58,16 @@ export default class extends Controller {
 
   showWithoutAnimation(event) {
     if (this.hasToolbarTarget) {
+      // Whether there is a transition to wait out: the toolbar is hidden now
+      // and show() is about to reveal it. This read this.openValue, which the
+      // controller does not declare, so it was always undefined -- the
+      // no-transition class was removed synchronously, before show() ran, and
+      // the method did nothing the plain show() does not.
+      const hidden = document.body.classList.contains(this.cssClass)
       this.toolbarTargets.forEach((element) =>
         element.classList.add(Config.noTransitionClass)
       )
-      afterTransition(this.toolbarTarget, this.openValue, () => {
+      afterTransition(this.toolbarTarget, hidden, () => {
         this.toolbarTargets.forEach((element) =>
           element.classList.remove(Config.noTransitionClass)
         )

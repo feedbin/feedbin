@@ -1,5 +1,18 @@
 module SessionsHelper
+  # Written before the visitor authenticates and read after, so these have to
+  # be carried across the reset rather than lost with it.
+  SESSION_KEYS_CARRIED_THROUGH_SIGN_IN = [:return_to, :feed_wrangler_token]
+
   def sign_in(user, remember_me = false)
+    # sign_out resets and sign_in did not, so anything planted in a visitor's
+    # session survived the privilege transition -- the precondition for session
+    # fixation, and the app runs subdomains that can write the cookie.
+    carried = SESSION_KEYS_CARRIED_THROUGH_SIGN_IN.filter_map { |key|
+      [key, session[key]] if session[key].present?
+    }
+    reset_session
+    carried.each { |key, value| session[key] = value }
+
     update_auth_cookie(user)
     @current_user = user
   end

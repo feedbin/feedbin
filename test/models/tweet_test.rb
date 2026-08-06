@@ -164,6 +164,29 @@ class TweetTest < ActiveSupport::TestCase
     assert_equal expected, rendered.main_tweet.urls.map { _1.url.to_s }
   end
 
+  # A tweet captured without extended mode has no display_text_range, and on
+  # that branch trim_text handed back the tweet's own full_text String -- so
+  # summarising a tweet rewrote the text it was summarising, leaving the entity
+  # indices pointing at offsets that no longer exist.
+  test "tweet_summary leaves the tweet's own text alone" do
+    data = load_tweet("one")
+    data.delete("display_text_range")
+    tweet = Tweet.new({"tweet" => data}, nil)
+    before = tweet.main_tweet.to_h[:full_text].dup
+
+    tweet.tweet_summary
+
+    assert_equal before, tweet.main_tweet.to_h[:full_text]
+  end
+
+  test "tweet_summary returns the same summary twice" do
+    data = load_tweet("one")
+    data.delete("display_text_range")
+    tweet = Tweet.new({"tweet" => data}, nil)
+
+    assert_equal tweet.tweet_summary, tweet.tweet_summary
+  end
+
   test "tweet_text renders a reply the same way twice" do
     reply = load_tweet("one")
     reply["full_text"] = "hello https://t.co/abcdefghij"

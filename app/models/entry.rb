@@ -181,11 +181,14 @@ class Entry < ApplicationRecord
     end
   end
 
+  # nil, not 0, when the feed gave no itunes:duration -- the element is
+  # optional and plenty of feeds omit it. Returning 0 made every caller's nil
+  # guard dead code, so a durationless episode rendered as "0 minutes".
   def audio_duration
     seconds = 0
     duration = data && data["itunes_duration"]
 
-    return seconds if duration.nil?
+    return nil if duration.nil?
 
     parts = duration.to_s.split(":").map(&:to_i).compact
     parts.first(3).reverse.each_with_index do |item, index|
@@ -413,7 +416,7 @@ class Entry < ApplicationRecord
 
     subscriptions.each do |subscription|
       if subscription.subscribed? && !subscription.filtered?(podcast_search_data)
-        queued_entries.push QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
+        queued_entries.push QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration.to_i)
         notification_ids.push subscription.user_id
       elsif subscription.bookmarked?
         notification_ids.push subscription.user_id
