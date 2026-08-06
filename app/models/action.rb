@@ -17,7 +17,7 @@ class Action < ApplicationRecord
   validate :query_valid, unless: :automatic_modification
   validates :query, presence: true, if: -> { mute? }
 
-  after_destroy :percolate_destroy
+  after_commit :percolate_destroy, on: :destroy
   after_commit :percolate_create, on: [:create, :update]
   after_commit :bulk_actions, on: [:create, :update]
 

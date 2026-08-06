@@ -39,11 +39,14 @@ class EntryDeleter
     if entry_ids.present?
       Search::SearchIndexRemove.perform_async(entry_ids)
 
-      UnreadEntry.where(entry_id: entry_ids).delete_all
-      UpdatedEntry.where(entry_id: entry_ids).delete_all
-      RecentlyReadEntry.where(entry_id: entry_ids).delete_all
-      StarredEntry.where(entry_id: entry_ids).delete_all
-      Entry.where(id: entry_ids).delete_all
+      ActiveRecord::Base.transaction do
+        UnreadEntry.where(entry_id: entry_ids).delete_all
+        UpdatedEntry.where(entry_id: entry_ids).delete_all
+        RecentlyReadEntry.where(entry_id: entry_ids).delete_all
+        RecentlyPlayedEntry.where(entry_id: entry_ids).delete_all
+        StarredEntry.where(entry_id: entry_ids).delete_all
+        Entry.where(id: entry_ids).delete_all
+      end
 
       Librato.increment("entry.destroy", by: entry_ids.count)
     end

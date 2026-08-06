@@ -61,6 +61,26 @@ class ActionTest < ActiveSupport::TestCase
     assert_not percolator_found?(action)
   end
 
+  test "enqueues PercolateDestroy when a destroy commits" do
+    Sidekiq::Worker.clear_all
+    ActiveRecord::Base.transaction do
+      @action.destroy
+    end
+    assert_equal 1, Search::PercolateDestroy.jobs.size
+  end
+
+  test "does not enqueue PercolateDestroy when a destroy is rolled back" do
+    Sidekiq::Worker.clear_all
+    ActiveRecord::Base.transaction do
+      @action.destroy
+      raise ActiveRecord::Rollback
+    end
+
+    assert Action.exists?(@action.id), "the destroy should have rolled back"
+    assert_empty Search::PercolateDestroy.jobs,
+      "the percolator should not be removed for an action that still exists"
+  end
+
   private
 
   def percolator_found?(action)

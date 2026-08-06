@@ -35,6 +35,28 @@ class TagTest < ActiveSupport::TestCase
     assert_equal existing.id, result.id
   end
 
+  test "rename does not duplicate a tagging the destination tag already has" do
+    old_tag = Tag.create!(name: "Alpha")
+    new_tag = Tag.create!(name: "Beta")
+    @user.taggings.create!(tag: old_tag, feed: @feed)
+    @user.taggings.create!(tag: new_tag, feed: @feed)
+
+    Tag.rename(@user, old_tag, "Beta")
+
+    feed_ids = @user.taggings.where(tag: new_tag).pluck(:feed_id)
+    assert_equal feed_ids.uniq, feed_ids,
+      "a feed in both tags should end up with one tagging, not two"
+  end
+
+  test "rename to the tag's own name keeps the taggings" do
+    tag = Tag.create!(name: "Same")
+    @user.taggings.create!(tag: tag, feed: @feed)
+
+    Tag.rename(@user, tag, "Same")
+
+    assert_equal 1, @user.taggings.where(tag: tag).count
+  end
+
   test "destroy removes the user's taggings for the given tag" do
     tag = Tag.create!(name: "ToDelete")
     @user.taggings.create!(tag: tag, feed: @feed)
