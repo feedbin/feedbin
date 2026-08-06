@@ -4,7 +4,9 @@ class EmbedsController < ApplicationController
     @dom_id = params[:dom_id]
     @media = IframeEmbed::Twitter.download(@url)
     render "embed", locals: {source: "twitter"}, formats: :js
-  rescue JSON::ParserError
+  # TypeError as well as ParserError: UrlCache declines to cache a failed
+  # response and hands back a nil body, which JSON.parse rejects as a type.
+  rescue JSON::ParserError, TypeError
     head :ok
   end
 
@@ -13,7 +15,7 @@ class EmbedsController < ApplicationController
     @dom_id = params[:dom_id]
     @media = IframeEmbed::Instagram.download(@url)
     render "embed", locals: {source: "instagram"}, formats: :js
-  rescue JSON::ParserError
+  rescue JSON::ParserError, TypeError
     head :ok
   end
 

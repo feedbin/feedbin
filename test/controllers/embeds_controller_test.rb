@@ -49,6 +49,22 @@ class EmbedsControllerTest < ActionController::TestCase
     assert_response :ok
   end
 
+  test "GET twitter quietly returns 200 when the oembed fetch fails" do
+    login_as @user
+    # UrlCache skips caching failed responses and returns a nil body, so the
+    # JSON.parse in IframeEmbed::Twitter#data raises TypeError, not ParserError.
+    stub_request(:get, /publish\.twitter\.com/).to_return(status: 500)
+    get :twitter, params: {url: "https://twitter.com/x/status/failed-fetch-#{SecureRandom.hex(4)}"}, xhr: true
+    assert_response :ok
+  end
+
+  test "GET instagram quietly returns 200 when the oembed fetch fails" do
+    login_as @user
+    stub_request(:get, /graph\.facebook\.com/).to_return(status: 500)
+    get :instagram, params: {url: "https://www.instagram.com/p/failed-fetch-#{SecureRandom.hex(4)}/"}, xhr: true
+    assert_response :ok
+  end
+
   test "GET iframe renders the embed when IframeEmbed.fetch resolves" do
     login_as @user
     fake_media = OpenStruct.new
