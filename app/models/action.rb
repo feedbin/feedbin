@@ -99,9 +99,15 @@ class Action < ApplicationRecord
     end
   end
 
+  # A network call, not an accessor. The preview dialog reads total and records
+  # separately, so an unmemoized version ran the same search three or four
+  # times per press of "View Results" -- and the mute dialog previews on a
+  # throttled keystroke. An Action does not outlive a request.
   def results
-    response = Search.client { _1.search(Search.index_name(Entry.table_name), query: search_options) }
-    OpenStruct.new({total: response.total, records: response.records(Entry).includes(:feed)})
+    @results ||= begin
+      response = Search.client { _1.search(Search.index_name(Entry.table_name), query: search_options) }
+      OpenStruct.new({total: response.total, records: response.records(Entry).includes(:feed)})
+    end
   end
 
   def error_hint

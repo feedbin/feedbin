@@ -15,7 +15,6 @@ module Searchable
     def self.saved_search_count(user)
       saved_searches = user.saved_searches
       if saved_searches.length < 50
-        unread_entries = user.unread_entries.pluck(:entry_id)
         searches = build_multi_search(user, saved_searches)
         records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
 
@@ -29,13 +28,25 @@ module Searchable
     end
 
     def self.build_multi_search(user, saved_searches)
+      # Read once for the whole batch rather than once per saved search.
+      starred_ids = user.starred_entries.pluck(:entry_id)
+      unread_ids = user.unread_entries.pluck(:entry_id)
+      allowed_feed_ids = user.subscriptions.pluck(:feed_id)
+
       saved_searches.filter_map { |saved_search|
         query_string = saved_search.query
 
         next if READ_REGEX.match?(query_string)
 
         query_string = query_string.gsub(UNREAD_REGEX, "")
-        query  = build_query(user: user, query: "#{query_string} is:unread", size: 50)
+        query = build_query(
+          user: user,
+          query: "#{query_string} is:unread",
+          size: 50,
+          starred_ids: starred_ids,
+          unread_ids: unread_ids,
+          allowed_feed_ids: allowed_feed_ids
+        )
         query = query.slice(:query, :from, :size)
         OpenStruct.new({id: saved_search.id, query: query})
       }
@@ -112,15 +123,19 @@ module Searchable
       query
     end
 
-    def self.build_query(user:, query:, feed_ids: nil, size: nil)
+    # starred_ids, unread_ids and allowed_feed_ids are the user's whole lists,
+    # unbounded and identical across a batch. saved_search_count builds one
+    # query per saved search, so without these they were re-plucked once per
+    # search on a request the sidebar polls.
+    def self.build_query(user:, query:, feed_ids: nil, size: nil, starred_ids: nil, unread_ids: nil, allowed_feed_ids: nil)
       query ||= ""
       query = replace_tag_ids(query, user)
       query = query.gsub(READ_REGEX,      "NOT is:unread")
       query = query.gsub(UNSTARRED_REGEX, "NOT is:starred")
       min_should =
 
-      starred_ids = user.starred_entries.pluck(:entry_id)
-      allowed_feed_ids = user.subscriptions.pluck(:feed_id)
+      starred_ids ||= user.starred_entries.pluck(:entry_id)
+      allowed_feed_ids ||= user.subscriptions.pluck(:feed_id)
       if feed_ids.present?
         allowed_feed_ids = (feed_ids & allowed_feed_ids)
       end
@@ -169,7 +184,7 @@ module Searchable
 
         states = [
           [STARRED_REGEX, -> { starred_ids }],
-          [UNREAD_REGEX, -> { user.unread_entries.pluck(:entry_id) }]
+          [UNREAD_REGEX, -> { unread_ids ||= user.unread_entries.pluck(:entry_id) }]
         ]
 
         # handles the case of `is:starred OR is:unread`

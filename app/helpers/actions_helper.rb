@@ -1,8 +1,10 @@
 module ActionsHelper
-  def action_feed_names(action)
+  # The request already has the owner loaded. Looking it up by id here ran once
+  # per action row and threw away the association cache each time.
+  def action_feed_names(action, user = nil)
     output = []
 
-    user = User.find(action.user_id)
+    user ||= User.find(action.user_id)
 
     feed_names = user.feeds.where(id: action.feed_ids).include_user_title.map { |feed|
       feed.title
