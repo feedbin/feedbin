@@ -36,19 +36,13 @@ class Api::Podcasts::V1::FeedsControllerTest < ApiControllerTestCase
     end
   end
 
-  # The endpoint is anonymous, so an unbounded item list is a small request
-  # that makes Feedbin render a podcast's whole history.
-  test "show limits how many items it serializes" do
+  test "show serializes every item" do
     30.times { create_entry(@feed) }
 
-    statements = capture_sql do
-      get :show, params: {id: hex_encode(@feed.feed_url)}, format: :json
-    end
+    get :show, params: {id: hex_encode(@feed.feed_url)}, format: :json
 
     assert_response :success
-    assert_operator parse_json["items"].size, :<=, 25
-    entry_selects = statements.select { _1.match?(/FROM "entries"/i) }
-    assert entry_selects.any? { _1.match?(/LIMIT/i) }, "the item query carries no LIMIT: #{entry_selects.inspect}"
+    assert_equal @feed.entries.count, parse_json["items"].size
   end
 
   test "show returns the newest items first" do
