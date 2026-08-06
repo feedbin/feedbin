@@ -39,6 +39,44 @@ class WebPushNotificationSendTest < ActiveSupport::TestCase
     end
   end
 
+  test "skip_read leaves out users who have already read the entry" do
+    @users.each { |user| user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:safari]) }
+    entry = @entries.first
+    read_user, unread_user = @users
+    UnreadEntry.where(entry_id: entry.id).delete_all
+    UnreadEntry.create!(
+      user: unread_user, entry: entry, feed_id: entry.feed_id,
+      published: entry.published, entry_created_at: entry.created_at
+    )
+
+    pool = PushServerMock.new("200")
+    WebPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      WebPushNotificationSend.new.perform(@users.map(&:id), entry.id, true)
+    end
+
+    assert_equal 1, pool.count
+    assert_nil pool.delivered["token#{read_user.id}"]
+  end
+
+  # A subscription title is the name one user gave the feed in their own
+  # account. Reassigning the same local inside the loop hands it to every
+  # later recipient who has no custom title of their own.
+  test "one recipient's private title does not reach another's notification" do
+    @users.each { |user| user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:safari]) }
+    entry = @entries.first
+    renamer, other = @users
+    Subscription.where(user_id: renamer.id, feed_id: entry.feed_id).update_all(title: "PRIVATE-RENAME")
+    Subscription.where(user_id: other.id, feed_id: entry.feed_id).update_all(title: nil)
+
+    pool = PushServerMock.new("200")
+    WebPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      WebPushNotificationSend.new.perform([renamer.id, other.id], entry.id, false)
+    end
+
+    assert_equal "PRIVATE-RENAME", pool.delivered["token#{renamer.id}"]
+    assert_equal entry.feed.title, pool.delivered["token#{other.id}"]
+  end
+
   test "should remove web device" do
     stub_request(:post, %r{example.com}).to_return(status: 410)
 

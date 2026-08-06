@@ -1,9 +1,11 @@
 class PushServerMock
-  attr_reader :status, :count
+  attr_reader :status, :count, :delivered
 
   def initialize(status)
     @status = status
     @count = 0
+    # token => alert title, so a test can check what each recipient was sent
+    @delivered = {}
   end
 
   def with
@@ -11,6 +13,7 @@ class PushServerMock
   end
 
   def prepare_push(notification)
+    @delivered[notification.token] = notification.alert[:title]
     ResponseMock.new(@status, notification)
   end
 

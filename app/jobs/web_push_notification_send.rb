@@ -22,7 +22,6 @@ class WebPushNotificationSend
   }
 
   def perform(user_ids, entry_id, skip_read)
-    devices = Device.where(user_id: user_ids, device_type: [:safari, :browser])
     entry = Entry.find(entry_id)
     feed = entry.feed
 
@@ -30,22 +29,28 @@ class WebPushNotificationSend
       user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
     end
 
+    # The relation captures user_ids when it is built, so this has to come
+    # after the filter rebinds the local -- otherwise skip_read does nothing
+    # and devices disagrees with the titles built from the filtered list.
+    devices = Device.where(user_id: user_ids, device_type: [:safari, :browser])
+
     if entry.tweet?
       body = entry.tweet.main_tweet.full_text
-      title = format_text(entry.tweet.main_tweet.user.name, 36)
+      default_title = format_text(entry.tweet.main_tweet.user.name, 36)
       titles = {}
     else
       body = entry.title || entry.summary
-      title = format_text(feed.title, 36)
+      default_title = format_text(feed.title, 36)
       titles = subscription_titles(user_ids, feed)
     end
     body = format_text(body, 90)
 
     safari_notifications = {}
     devices.each do |device|
-      if user_title = titles[device.user_id]
-        title = format_text(user_title, 36)
-      end
+      # Per iteration. Reassigning one local meant the first recipient's
+      # private subscription title was handed to every later recipient who
+      # had none of their own.
+      title = titles[device.user_id].presence || default_title
 
       if device.safari?
         notification = build_notification(device.token, title, body, entry_id, device.user_id)
