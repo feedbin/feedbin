@@ -26,4 +26,38 @@ class StarredEntriesExportTest < ActiveSupport::TestCase
       StarredEntriesExport.new.perform(0)
     end
   end
+
+  test "exports an empty array when the account has nothing starred" do
+    user = users(:ben)
+    StarredEntry.where(user: user).delete_all
+    exported = nil
+
+    StarredEntriesExport.new.tap do |job|
+      job.define_singleton_method(:upload_file) do |file|
+        exported = File.read(file)
+        Faker::Internet.url
+      end
+      job.perform(user.id)
+    end
+
+    assert_equal [], JSON.parse(exported)
+  end
+
+  test "exports an empty array when every starred entry has aged out" do
+    user = users(:ben)
+    entry = create_entry(user.feeds.first)
+    StarredEntry.create_from_owners(user, entry)
+    entry.destroy
+    exported = nil
+
+    StarredEntriesExport.new.tap do |job|
+      job.define_singleton_method(:upload_file) do |file|
+        exported = File.read(file)
+        Faker::Internet.url
+      end
+      job.perform(user.id)
+    end
+
+    assert_equal [], JSON.parse(exported)
+  end
 end
