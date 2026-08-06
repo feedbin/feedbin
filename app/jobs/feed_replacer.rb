@@ -39,6 +39,10 @@ class FeedReplacer
 
     return unless new_feed && discovered_feed
 
+    # Migrate before destroying: Subscription's before_destroy :untag deletes
+    # every tagging for (user, old_feed), which would leave nothing to move.
+    migrate_taggings(user, old_feed, new_feed)
+
     if existing = user.subscriptions.where(feed: new_feed).take
       subscription.destroy
       subscription = existing
@@ -46,7 +50,6 @@ class FeedReplacer
       subscription.update(feed: new_feed, fix_status: Subscription.fix_statuses[:none])
     end
 
-    user.taggings.where(feed: old_feed).update(feed: new_feed)
     user.actions.where(all_feeds: true).each { _1.save }
     user.actions.where(":feed_id = ANY(feed_ids)", feed_id: old_feed.id.to_s).each do |action|
       new_feeds = action.feed_ids - [old_feed.id.to_s]
@@ -55,5 +58,11 @@ class FeedReplacer
     end
 
     subscription
+  end
+
+  def migrate_taggings(user, old_feed, new_feed)
+    duplicate_tag_ids = user.taggings.where(feed: new_feed).pluck(:tag_id)
+    user.taggings.where(feed: old_feed, tag_id: duplicate_tag_ids).delete_all
+    user.taggings.where(feed: old_feed).update(feed: new_feed)
   end
 end

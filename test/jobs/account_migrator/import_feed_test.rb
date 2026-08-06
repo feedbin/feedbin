@@ -44,6 +44,17 @@ module AccountMigrator
       assert_equal ["Favorites", "Videos"], @user.feed_tags.map(&:name)
     end
 
+    test "should maintain the starred entries counter cache" do
+      stub_feed_items
+
+      AccountMigrator::ImportFeed.new.perform(@item.id)
+
+      entries = @user.starred_entries.map { _1.entry }
+      assert_equal 2, entries.count
+      assert_equal [1, 1], entries.map { _1.reload.starred_entries_count },
+        "EntryDeleter uses starred_entries_count as its delete guard, so imported stars must maintain it"
+    end
+
     test "API error should mark as failed" do
       stub_request_file("atom.xml", @item.fw_feed&.safe_dig("feed_url"))
       stub_request_file("migration_error_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list/,
@@ -55,5 +66,25 @@ module AccountMigrator
       assert @item.reload.failed?, "Import should have failed"
     end
 
+    private
+
+    def stub_feed_items
+      stub_request_file("atom.xml", @item.fw_feed&.safe_dig("feed_url"))
+      stub_request_file("migration_ids_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list.*?offset=0.*?read=false/,
+        headers: {
+          "Content-Type" => "application/json; charset=utf-8"
+        }
+      )
+      stub_request_file("migration_starred_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list.*?offset=0.*?starred=true/,
+        headers: {
+          "Content-Type" => "application/json; charset=utf-8"
+        }
+      )
+      stub_request_file("migration_empty_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list.*?offset=100/,
+        headers: {
+          "Content-Type" => "application/json; charset=utf-8"
+        }
+      )
+    end
   end
 end
