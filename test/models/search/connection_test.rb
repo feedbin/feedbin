@@ -52,5 +52,23 @@ module Search
 
       assert_equal [], Search.client { _1.all_matches(@index, query: query) }
     end
+
+    # A proxy error page or empty reply arrives with no Content-Type header,
+    # which .parse reported as only "Unknown MIME type:" -- no status, no body,
+    # nothing to say what actually answered. Keep the evidence in the message.
+    test "request surfaces status and body when the response cannot be parsed" do
+      stub_request(:get, "http://search.example.com/entries/_count")
+        .to_return(status: 503, body: "<html>upstream timeout</html>", headers: {})
+
+      connection = Search::Connection.new("http://search.example.com")
+
+      exception = assert_raises(Search::Connection::ResponseError) do
+        connection.request(:get, "/entries/_count")
+      end
+
+      assert_includes exception.message, "503"
+      assert_includes exception.message, "upstream timeout"
+      assert_kind_of HTTP::Error, exception.cause
+    end
   end
 end

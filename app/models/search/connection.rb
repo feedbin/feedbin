@@ -1,5 +1,11 @@
 module Search
   class Connection
+    # Raised when a response cannot be parsed. Carries the status, content
+    # type, and leading bytes of the body, because the underlying ParseError
+    # reports none of them -- a header-less proxy error page surfaced only as
+    # "Unknown MIME type:" with no clue as to what actually answered.
+    class ResponseError < StandardError; end
+
     PATHS = {
       document: "/%{index}/_doc/%{id}",
       search:   "/%{index}/_search",
@@ -205,7 +211,15 @@ module Search
       unless path.start_with?("/")
         path = "/#{path}"
       end
-      connection.request(method.to_sym, path, **options).parse
+      response = connection.request(method.to_sym, path, **options)
+      begin
+        response.parse
+      rescue HTTP::Error => exception
+        # Reading the body here also keeps the persistent connection usable;
+        # parse dies before consuming it when the content type is missing.
+        body = response.to_s.byteslice(0, 500).scrub rescue nil
+        raise ResponseError, "#{exception.message} (status: #{response.status.code}, content_type: #{response.content_type.mime_type.inspect}, body: #{body.inspect})"
+      end
     end
 
     def close
