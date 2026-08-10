@@ -3460,7 +3460,6 @@ $feed-title-width: 115px;
   audio {
     display: block;
     width: 100%;
-    background-color: black;
     max-height: 100%;
   }
 
@@ -6452,6 +6451,9 @@ Bigfoot
   background-color: map-get($color-contrast-100, day);
   color: map-get($color-contrast-700, day);
   line-height: 1.6;
+}
+.bigfoot-footnote__button {
+  font-family: $font-stack;
 }
 .bigfoot-footnote.is-active {
   opacity: 1 !important;
