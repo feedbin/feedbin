@@ -8,13 +8,7 @@ class UnreadLimiterTest < ActiveSupport::TestCase
     @user = users(:ben)
     @feed = @user.feeds.first
     Feed.reset_counters(@feed.id, :subscriptions)
-    @entries = @count.times.map {
-      @feed.entries.create!(
-        content: Faker::Lorem.paragraph,
-        public_id: SecureRandom.hex,
-        published: Time.now
-      )
-    }
+    @entries = bulk_create_entries(@feed, @count, users: @user)
   end
 
   test "should remove UnreadEntries" do

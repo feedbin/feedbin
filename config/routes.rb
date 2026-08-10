@@ -147,7 +147,7 @@ Rails.application.routes.draw do
     mount Sidekiq::Web, at: "/sidekiq"
   end
 
-  constraints lambda { |request| Rails.env.development? } do
+  constraints lambda { |request| Rails.env.development? || Rails.env.test? } do
     get :auto_sign_in, to: "site#auto_sign_in"
     get :onboarding, to: "onboarding#show"
   end

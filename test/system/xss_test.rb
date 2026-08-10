@@ -24,7 +24,9 @@ class XssTest < ApplicationSystemTestCase
     find("[data-event-identifier-param=toggle-search]").click
     wait_for_ajax
     find("[data-search-token-target~=query]").fill_in with: "XSS137"
-    wait_for_ajax
+
+    # Wait for the debounced autocomplete to render before inspecting it.
+    all("[data-search-token-index-param]", minimum: 1)
 
     assert_equal "not executed", page.evaluate_script("window.__xss137"),
       "the tag name executed as markup"
@@ -54,10 +56,10 @@ class XssTest < ApplicationSystemTestCase
     find("[data-event-identifier-param=toggle-search]").click
     wait_for_ajax
     find("[data-search-token-target~=query]").fill_in with: "XSS140"
-    wait_for_ajax
 
-    all("[data-search-token-index-param]")[1].click
-    wait_for_ajax
+    # The autocomplete fires behind a debounce; all(minimum:) waits for the
+    # suggestions to actually render.
+    all("[data-search-token-index-param]", minimum: 2)[1].click
 
     token = find("[data-action='search-token#deleteToken:prevent']")
     assert_equal title, token.text(:all), "the token should show the title, not its entities"

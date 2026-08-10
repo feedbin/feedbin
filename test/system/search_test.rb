@@ -16,11 +16,9 @@ class SearchTest < ApplicationSystemTestCase
 
     find("[data-search-token-target~=query]").fill_in with: @feed.title
 
-    wait_for_ajax
-
-    all("[data-search-token-index-param]")[1].click
-
-    wait_for_ajax
+    # The autocomplete fires behind a debounce; all(minimum:) waits for the
+    # suggestions to actually render.
+    all("[data-search-token-index-param]", minimum: 2)[1].click
 
     token = find("[data-action='search-token#deleteToken:prevent']")
     assert token.visible?
