@@ -188,7 +188,7 @@ module Search
     end
 
     def reindex(index, mappings:, &block)
-      new_index = "#{index}-#{Time.now.to_i}"
+      new_index = "#{index}-#{Time.now.strftime("%s%L")}"
       request(:put, new_index, json: mappings)
       begin
         yield(new_index)
@@ -196,7 +196,10 @@ module Search
         delete_index(new_index)
         raise
       end
-      old_indexes = get_indexes_from_alias(index)
+      # If a reindex reuses a still-aliased name (two runs in the same clock
+      # second), treating it as an old index would delete it right after the
+      # alias swap points at it.
+      old_indexes = get_indexes_from_alias(index) - [new_index]
       update_alias(alias_name: index, old_indexes: old_indexes, new_index: new_index)
       old_indexes.each { delete_index(_1) }
     end

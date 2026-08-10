@@ -51,7 +51,6 @@ class ArticleTest < ApplicationSystemTestCase
 
     click_link(@entries.first.title)
 
-    sleep 1
     wait_for_ajax
 
     assert_text "Samsung Galaxy Note 9 Impressions: Underrated!"
@@ -72,7 +71,6 @@ class ArticleTest < ApplicationSystemTestCase
 
     click_link(@entries.first.title)
 
-    sleep 1
     wait_for_ajax
 
     url = RemoteFile.signed_url("https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs.png")

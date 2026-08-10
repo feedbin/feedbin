@@ -10,7 +10,7 @@ Rails.application.reloader.to_prepare do
 
       shared_settings = {
         index: {
-          number_of_shards: "6",
+          number_of_shards: Rails.env.test? ? "1" : "6",
         },
         analysis: {
           analyzer: {
@@ -236,7 +236,7 @@ Rails.application.reloader.to_prepare do
 
 end
 
-unless Rails.env.production?
+if Rails.env.development?
   ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
     Rails.logger.info(search: "request", method: payload.safe_dig(:response).request.verb, path: payload.safe_dig(:response).request.uri.to_s)
     json = JSON.pretty_generate(JSON.parse(payload.safe_dig(:response)&.request&.body&.source)) rescue nil

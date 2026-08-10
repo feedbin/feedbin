@@ -12,11 +12,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   parallelize(workers: 1)
 
+  # Sign in via the dev/test auto_sign_in route rather than the login form —
+  # same session, none of the form driving. LoginTest covers the real form.
   def login_as(user)
-    visit login_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: default_password
-    click_button "Sign In"
+    visit auto_sign_in_path(email: user.email)
   end
 
   def show_article_setup
@@ -33,8 +32,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     click_link(@entries.first.title)
   end
 
-  def wait_for_ajax(duration: 0.1)
-    sleep duration
+  # Polls rather than sleeping a fixed interval; most requests settle in a
+  # few milliseconds.
+  def wait_for_ajax(duration: Capybara.default_max_wait_time)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + duration
+    until finished_all_ajax_requests?
+      raise "timed out waiting for ajax" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+      sleep 0.01
+    end
   end
 
   def finished_all_ajax_requests?

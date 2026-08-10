@@ -14,9 +14,9 @@ class NewsletterTest < ApplicationSystemTestCase
 
     assert find("button[type=submit]").disabled?
 
-    wait_for_ajax(duration: 1)
-
-    assert_not find("button[type=submit]").disabled?
+    # The availability check debounces before it fires, so wait on the button
+    # itself rather than on the request being in flight.
+    assert_selector "button[type=submit]:not([disabled])"
 
     numbers = find("[data-behavior~=token_suffix]").text()
 
@@ -32,9 +32,14 @@ class NewsletterTest < ApplicationSystemTestCase
 
     fill_in "authentication_token[description]", with: description
 
-    wait_for_ajax(duration: 0.5)
-
+    # The description autosaves per keystroke behind a debounce, so poll the
+    # record rather than the request counter.
     token = AuthenticationToken.last
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + Capybara.default_max_wait_time
+    until token.reload.description == description
+      break if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+      sleep 0.05
+    end
 
     assert_equal(description, token.description)
   end

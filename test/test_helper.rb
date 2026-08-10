@@ -161,6 +161,17 @@ class ActiveSupport::TestCase
     yield OutsideTransaction
   end
 
+  # Temporarily replaces a constant for the block — for thresholds a test
+  # would otherwise have to loop hundreds of real iterations to cross.
+  def swap_const(mod, name, value)
+    original = mod.send(:remove_const, name)
+    mod.const_set(name, value)
+    yield
+  ensure
+    mod.send(:remove_const, name)
+    mod.const_set(name, original)
+  end
+
   def support_file(file)
     File.join(Rails.root, "test/support/www", file)
   end
@@ -224,12 +235,31 @@ class ActiveSupport::TestCase
     Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price.to_i, currency: "USD", interval: "day")
   end
 
+  # Empties the search indexes without deleting them — index creation is far
+  # more expensive than a match_all delete_by_query, and this runs in the
+  # setup of every search-adjacent test. Falls back to recreating via
+  # Search.setup when an alias is missing (a test deleted or swapped the
+  # physical index behind it).
   def clear_search
-    Search.client { _1.request(:delete, $search[:config][:aliases][:entries]) }
-    Search.client { _1.request(:delete, $search[:config][:aliases][:actions]) }
-    Search.client { _1.request(:delete, $search[:config][:aliases][:feeds]) }
+    Search.client do |client|
+      # delete_by_query only sees documents a refresh has made visible, so
+      # without this a doc indexed by an earlier test and never refreshed
+      # would survive the wipe and haunt a later search.
+      client.refresh
+      [Entry, Action, Feed].map { Search.index_name(_1.table_name) }.each do |alias_name|
+        response = clear_index(client, alias_name)
+        if response.key?("error")
+          Search.setup
+          clear_index(client, alias_name)
+        end
+      end
+    end
+  end
 
-    Search.setup
+  def clear_index(client, alias_name)
+    client.request(:post, "/#{alias_name}/_delete_by_query",
+      params: {refresh: "true", conflicts: "proceed"},
+      json: {query: {match_all: {}}})
   end
 
   def newsletter_params(recipient, signature, title = nil, from = nil)

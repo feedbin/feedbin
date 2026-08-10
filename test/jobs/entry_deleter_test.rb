@@ -8,12 +8,7 @@ class EntryDeleterTest < ActiveSupport::TestCase
     @user = users(:ben)
     @feed = @user.feeds.first
     Feed.reset_counters(@feed.id, :subscriptions)
-    @entries = (ENV["ENTRY_LIMIT"].to_i + count.sample).times.map {
-      @feed.entries.create!(
-        content: Faker::Lorem.paragraph,
-        public_id: SecureRandom.hex
-      )
-    }
+    @entries = bulk_create_entries(@feed, ENV["ENTRY_LIMIT"].to_i + count.sample)
   end
 
   test "should limit total entries" do

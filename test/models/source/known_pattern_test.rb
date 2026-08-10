@@ -16,7 +16,7 @@ class KnownPatternTest < ActiveSupport::TestCase
     }
     urls.each do |known_pattern, destination|
       stub_request_file("index.html", known_pattern)
-      stub_request_file("atom.xml", destination)
+      stub_request_file("atom_single.xml", destination)
       response = Feedkit::Request.download(known_pattern)
       assert_difference "Feed.count", +1 do
         Source::KnownPattern.find(response)

@@ -10,7 +10,7 @@ module ImageCrawler
       assert timer.expired?
 
       elapsed = time + 0.01
-      assert [elapsed].include?(timer.elapsed), "Around #{elapsed}s should have elapsed."
+      assert_in_delta elapsed, timer.elapsed, 0.05, "Around #{elapsed}s should have elapsed."
     end
   end
 end

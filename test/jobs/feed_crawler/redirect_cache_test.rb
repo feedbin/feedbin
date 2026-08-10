@@ -8,6 +8,10 @@ module FeedCrawler
     end
 
     def test_should_collapse_stable_redirects
+      swap_const(RedirectCache, :PERSIST_AFTER, 5) { collapse_stable_redirects }
+    end
+
+    def collapse_stable_redirects
       feed_id = 2
 
       redirect1 = Feedkit::Redirect.new(status: 301, from: "http://example.com", to: "http://example.com/second")

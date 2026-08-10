@@ -234,6 +234,10 @@ module FeedCrawler
     end
 
     def test_should_save_redirected_to
+      swap_const(RedirectCache, :PERSIST_AFTER, 5) { save_redirected_to }
+    end
+
+    def save_redirected_to
       last_url = URI.join(@feed.feed_url, "/final")
 
       response = {

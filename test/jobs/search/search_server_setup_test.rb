@@ -7,12 +7,7 @@ module Search
       clear_search
       @user = users(:ben)
       feed = @user.feeds.first
-      @entries = (1..10).to_a.sample.times.map {
-        feed.entries.create!(
-          content: Faker::Lorem.paragraph,
-          public_id: SecureRandom.hex
-        )
-      }
+      @entries = bulk_create_entries(feed, (1..10).to_a.sample)
     end
 
     test "should bulk index entries in elasticsearch" do
