@@ -52,7 +52,7 @@ module Api
         else
           status_forbidden
         end
-      rescue Elasticsearch::Transport::Transport::Errors::InternalServerError
+      rescue Search::Connection::ResponseError, HTTP::Error
         render(json: [], status: 404)
       end
 

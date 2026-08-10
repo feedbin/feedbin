@@ -96,6 +96,20 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
     assert_equal "x", other_search.query
   end
 
+  # The rescue named Elasticsearch::Transport::Transport::Errors::InternalServerError,
+  # a constant from the retired elasticsearch gem, so a search failure raised
+  # NameError and the API returned 500 instead of the intended 404 (metric
+  # error 173).
+  test "show returns 404 when the search backend fails" do
+    login_as @user
+    stub_request(:get, %r{/_validate/query}).to_return(status: 503, body: "")
+
+    get :show, params: {id: @saved_search}, format: :json
+
+    assert_response :not_found
+    assert_equal [], parse_json
+  end
+
   test "show returns empty json when no entries match" do
     empty_search = @user.saved_searches.create!(query: "verynonexistentquerystring12345", name: "empty")
     login_as @user

@@ -10,7 +10,6 @@ module Search
       document: "/%{index}/_doc/%{id}",
       search:   "/%{index}/_search",
       validate: "/%{index}/_validate/query",
-      msearch:  "/%{index}/_msearch",
       count:    "/%{index}/_count",
       refresh:  "/_refresh",
       bulk:     "/_bulk",
@@ -75,16 +74,6 @@ module Search
         params: {"filter_path" => "took"}
       }
       request(:post, PATHS[:bulk], options)
-    end
-
-    def msearch(index, records:)
-      options = {
-        body: prepare_bulk_request(records)
-      }
-      path = PATHS[:msearch] % {index:}
-      request(:post, path, options).safe_dig("responses")&.map do |data|
-        Response.new(data)
-      end
     end
 
     def aggregations(index, query:)
