@@ -10,6 +10,9 @@ class EntriesSearchControllerTest < ActionController::TestCase
 
   test "should get search" do
     login_as @user
+    # A unique token: search index contents survive across tests in a run, so
+    # a Faker sentence can collide with a stale document from another test.
+    @entry.update!(title: "searchtoken #{SecureRandom.hex}")
     reindex_search
     get :search, params: {query: "\"#{@entry.title}\""}, xhr: true
     assert_response :success

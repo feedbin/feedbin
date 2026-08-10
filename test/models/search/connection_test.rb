@@ -15,9 +15,8 @@ module Search
     # search matching more than the cap silently returned only the first N ids
     # -- which is why "mark all search results as read" left the rest unread.
     test "all_matches returns every id when the reported total is capped" do
-      entries = 25.times.map { create_entry(@feed).tap { _1.update!(title: "#{@token} #{SecureRandom.hex}") } }
-      entries.each { SearchIndexStore.new.perform("Entry", _1.id) }
-      Search.client { _1.refresh }
+      entries = bulk_create_entries(@feed, 25, attributes: {title: "#{@token} #{SecureRandom.hex}"})
+      index_entries(entries)
 
       query = {
         track_total_hits: 10,

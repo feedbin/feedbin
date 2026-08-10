@@ -37,7 +37,7 @@ class Api::Podcasts::V1::FeedsControllerTest < ApiControllerTestCase
   end
 
   test "show serializes every item" do
-    30.times { create_entry(@feed) }
+    bulk_create_entries(@feed, 30)
 
     get :show, params: {id: hex_encode(@feed.feed_url)}, format: :json
 

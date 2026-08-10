@@ -242,6 +242,10 @@ class ActiveSupport::TestCase
   # physical index behind it).
   def clear_search
     Search.client do |client|
+      # delete_by_query only sees documents a refresh has made visible, so
+      # without this a doc indexed by an earlier test and never refreshed
+      # would survive the wipe and haunt a later search.
+      client.refresh
       [Entry, Action, Feed].map { Search.index_name(_1.table_name) }.each do |alias_name|
         response = clear_index(client, alias_name)
         if response.key?("error")

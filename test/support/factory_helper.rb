@@ -2,7 +2,6 @@ module FactoryHelper
   def create_feeds(users, count = 3)
     flush_redis
     users = [*users]
-    entries = []
     feeds = count.times.map {
       url = Faker::Internet.url
       host = URI(url).host
@@ -10,9 +9,9 @@ module FactoryHelper
         users.map do |user|
           user.subscriptions.where(feed: feed).first_or_create
         end
-        entries.push(create_entry(feed))
       end
     }
+    entries = feeds.flat_map { bulk_create_entries(_1, 1, users: users) }
     index_entries(entries)
     feeds
   end
@@ -41,17 +40,22 @@ module FactoryHelper
   # only need rows to exist. Pass users: to also mark the entries unread for
   # them, the way the mark_as_unread callback would have. Tests that depend
   # on other callback side effects should use create_entry.
-  def bulk_create_entries(feed, count, users: [])
+  def bulk_create_entries(feed, count, users: [], attributes: {})
     now = Time.now
     rows = count.times.map do |index|
       {
         feed_id: feed.id,
+        title: Faker::Lorem.sentence,
+        url: Faker::Internet.url,
+        author: SecureRandom.hex,
         content: Faker::Lorem.paragraph,
         public_id: SecureRandom.hex,
+        entry_id: SecureRandom.hex,
+        data: {enclosure_url: Faker::Internet.url},
         published: now + index,
         created_at: now,
         updated_at: now
-      }
+      }.merge(attributes)
     end
     ids = Entry.insert_all(rows, returning: [:id]).rows.flatten
     entries = Entry.where(id: ids).order(:id).to_a

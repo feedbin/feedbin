@@ -46,7 +46,7 @@ class MetaLinksTest < ActiveSupport::TestCase
     feed_url = "/feeds/json/"
     stub_request(:get, url)
       .to_return(body: %(<link rel="alternate" type="application/json" href="#{feed_url}"/>))
-    stub_request_file("feed.json", url + feed_url)
+    stub_request_file("feed_single.json", url + feed_url)
     response = Feedkit::Request.download(url)
     assert_difference "Feed.count", +1 do
       Source::MetaLinks.find(response)

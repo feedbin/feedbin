@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Feedbin</title>
+    <subtitle>A fast, simple RSS feed reader that delivers a great reading experience.</subtitle>
+    <link rel="hub" href="http://pubsubhubbub.superfeedr.com/" />
+    <link href="https://feedbin.com/blog/atom.xml" rel="self" />
+    <link href="https://feedbin.com" />
+    <updated>2016-06-03T13:25:02-05:00</updated>
+    <id>https://feedbin.com</id>
+    <author>
+        <name>Feedbin</name>
+        <email>support@feedbin.com</email>
+    </author>
+
+
+    <entry>
+        <title>Subscribe to Email Newsletters in Feedbin</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2016/02/03/subscribe-to-email-newsletters-in-feedbin/" />
+
+            <published>2016-02-03T15:37:25-06:00</published>
+
+
+            <updated>2016-02-03T00:00:00-06:00</updated>
+
+        <id>/2016/02/03/subscribe-to-email-newsletters-in-feedbin</id>
+        <summary>You can now receive email newsletters in Feedbin. Newsletter Subscriptions To use this feature, go to the settings page and find your secret Feedbin email address. Use this email address whenever you sign up for an email newsletter. Anything sent to it will show up as a feed in Feedbin,...</summary>
+        <content type="html">&lt;p&gt;You can now receive email newsletters in Feedbin.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;a href=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2016-02-03/email-large-ce9a0b27d895b4cb89429bb1d5773e0d1a394ef225dab5c0ced8c4419ed05bae.png&quot;&gt;&lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2016-02-03/email-large-ce9a0b27d895b4cb89429bb1d5773e0d1a394ef225dab5c0ced8c4419ed05bae.png&quot; /&gt;&lt;/a&gt;
+  &lt;figcaption&gt;Newsletter Subscriptions&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;To use this feature, go to the &lt;a href=&quot;https://feedbin.com/settings&quot;&gt;settings&lt;/a&gt; page and find your secret Feedbin email address. Use this email address whenever you sign up for an email newsletter. Anything sent to it will show up as a feed in Feedbin, grouped by sender.&lt;/p&gt;
+
+&lt;p&gt;Reading email in an email app feels like work to me. However, there’s a certain class of email that I &lt;em&gt;want&lt;/em&gt; to enjoy reading, and Feedbin is where I go when I want to read for pleasure.&lt;/p&gt;
+
+&lt;p&gt;For example, many great websites offer subscription content, usually with an email newsletter component. Not only do I enjoy the premium content from these sites, but I believe this a great way forward for people to support writers. Personally I have paid subscriptions to four of these including:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.macstories.net&quot;&gt;MacStories&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.aboveavalon.com&quot;&gt;Above Avalon&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stratechery.com&quot;&gt;Stratechery&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://sixcolors.com&quot;&gt;Six Colors&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This feature is also great for mailing lists and product announcement emails and since it’s just a regular feed, it will sync with your favorite native app as well.&lt;/p&gt;
+</content>
+    </entry>
+</feed>
