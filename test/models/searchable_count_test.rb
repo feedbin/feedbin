@@ -34,6 +34,36 @@ class SearchableCountTest < ActiveSupport::TestCase
     assert counts.present?, "every saved search badge went blank at the cap"
   end
 
+  test "counting embeds the unread id list once, not once per saved search" do
+    feed = @user.feeds.first
+    entry = create_entry(feed).tap { _1.update!(title: "countpayload #{SecureRandom.hex}") }
+    Search::SearchIndexStore.new.perform("Entry", entry.id)
+    mark_unread(@user)
+    Search.client { _1.refresh }
+
+    searches = 3.times.map { |index| @user.saved_searches.create!(name: "S#{index}", query: "countpayload") }
+
+    requests = []
+    original = Search::Connection.instance_method(:request)
+    Search::Connection.define_method(:request) do |method, path, options = {}|
+      requests << [method, path, options]
+      original.bind(self).call(method, path, options)
+    end
+
+    counts = Entry.saved_search_count(@user.reload)
+
+    searches.each do |search|
+      assert_equal [entry.id], counts[search.id]
+    end
+
+    payload = JSON.dump(requests.map(&:last))
+    occurrences = payload.scan(/.{0,60}(?<!\d)#{entry.id}(?!\d).{0,20}/)
+    assert_equal 1, occurrences.length,
+      "the unread entry id should appear exactly once in the request payload, contexts: #{occurrences.inspect}"
+  ensure
+    Search::Connection.define_method(:request, original) if original
+  end
+
   test "Action#results does not re-run its search for every reader" do
     feed = @user.feeds.first
     action = @user.actions.create!(feed_ids: [feed.id], query: "example", actions: ["mark_read"])

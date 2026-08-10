@@ -87,6 +87,11 @@ module Search
       end
     end
 
+    def aggregations(index, query:)
+      path = PATHS[:search] % {index:}
+      request(:get, path, json: query)
+    end
+
     def validate(index, query:)
       path = PATHS[:validate] % {index:}
       result = request(:get, path, json: query)

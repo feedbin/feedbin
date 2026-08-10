@@ -19,23 +19,40 @@ module Searchable
 
     def self.saved_search_count(user)
       saved_searches = user.saved_searches.first(MAX_COUNTED_SAVED_SEARCHES)
-      if saved_searches.present?
-        searches = build_multi_search(user, saved_searches)
-        records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
+      return if saved_searches.blank?
 
-        if records.present?
-          responses = Search.client { _1.msearch(Search.index_name(Entry.table_name), records: records) }
-          entry_ids = responses.map(&:ids)
-          search_ids = searches.map(&:id)
-          Hash[search_ids.zip(entry_ids)]
-        end
+      searches = build_count_searches(user, saved_searches)
+      return if searches.blank?
+
+      unread_ids = user.unread_entries.pluck(:entry_id)
+
+      aggregations = searches.each_with_index.each_with_object({}) do |(search, index), aggs|
+        aggs[index.to_s] = {
+          filter: search.query[:query],
+          aggs: {
+            matches: {top_hits: {size: 50, _source: false, sort: [{published: "desc"}]}}
+          }
+        }
+      end
+
+      body = {
+        size: 0,
+        track_total_hits: false,
+        query: {bool: {filter: [{ids: {values: unread_ids}}]}},
+        aggs: aggregations
+      }
+
+      data = Search.client { _1.aggregations(Search.index_name(Entry.table_name), query: body) }
+
+      searches.each_with_index.each_with_object({}) do |(search, index), counts|
+        hits = data.safe_dig("aggregations", index.to_s, "matches", "hits", "hits") || []
+        counts[search.id] = hits.map { _1["_id"].to_i }
       end
     end
 
-    def self.build_multi_search(user, saved_searches)
+    def self.build_count_searches(user, saved_searches)
       # Read once for the whole batch rather than once per saved search.
       starred_ids = user.starred_entries.pluck(:entry_id)
-      unread_ids = user.unread_entries.pluck(:entry_id)
       allowed_feed_ids = user.subscriptions.pluck(:feed_id)
 
       saved_searches.filter_map { |saved_search|
@@ -46,14 +63,11 @@ module Searchable
         query_string = query_string.gsub(UNREAD_REGEX, "")
         query = build_query(
           user: user,
-          query: "#{query_string} is:unread",
-          size: 50,
+          query: query_string,
           starred_ids: starred_ids,
-          unread_ids: unread_ids,
           allowed_feed_ids: allowed_feed_ids
         )
-        query = query.slice(:query, :from, :size)
-        OpenStruct.new({id: saved_search.id, query: query})
+        OpenStruct.new({id: saved_search.id, query: query.slice(:query)})
       }
     end
 
