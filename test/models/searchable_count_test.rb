@@ -56,10 +56,12 @@ class SearchableCountTest < ActiveSupport::TestCase
       assert_equal [entry.id], counts[search.id]
     end
 
+    # Match the serialized ids clause, not the bare id: aggregation buckets are
+    # keyed "0", "1", "2"..., which collides when the entry gets a small id.
     payload = JSON.dump(requests.map(&:last))
-    occurrences = payload.scan(/.{0,60}(?<!\d)#{entry.id}(?!\d).{0,20}/)
-    assert_equal 1, occurrences.length,
-      "the unread entry id should appear exactly once in the request payload, contexts: #{occurrences.inspect}"
+    unread_ids_clause = JSON.dump({ids: {values: [entry.id]}})
+    assert_equal 1, payload.scan(unread_ids_clause).length,
+      "the unread id list should appear exactly once in the request payload: #{payload}"
   ensure
     Search::Connection.define_method(:request, original) if original
   end
