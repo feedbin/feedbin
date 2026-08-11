@@ -5,5 +5,7 @@ connection:
   system_ssl_cert_chain: true
 exceptions:
   local_variables: true
+breadcrumbs:
+  enabled: false
 insights:
   enabled: false

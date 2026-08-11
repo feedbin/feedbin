@@ -11,7 +11,7 @@ gem "llhttp", github: "benubois/llhttp",
 gem "rails", "8.1.3.1"
 gem "will_paginate"
 
-gem "http",            github: "benubois/http",           branch: "eof"
+gem "http",            github: "benubois/http",           branch: "feedbin"
 gem "carrierwave",     github: "feedbin/carrierwave",     branch: "feedbin"
 gem "sax-machine",     github: "feedbin/sax-machine",     branch: "feedbin"
 gem "feedjira",        github: "feedbin/feedjira",        branch: "f2"
@@ -79,6 +79,7 @@ gem "autotuner"
 
 group :development do
   gem "benchmark-ips"
+  gem "ruby-prof"
   gem "better_errors"
   gem "binding_of_caller"
   gem "htmlbeautifier"

@@ -3,6 +3,8 @@ module FeedCrawler
 
     TIMEOUT = 60 * 30
 
+    HOST = %r{\A[a-z][a-z0-9+\-.]*://(?:[^/?#]*@)?([^/?#:]+)}i
+
     def initialize(feed_url)
       @feed_url = feed_url
     end
@@ -11,7 +13,17 @@ module FeedCrawler
       new(...).retry_after
     end
 
+    def self.throttled_hosts
+      value = ENV["THROTTLED_HOSTS"]
+      return @throttled_hosts if @throttled_hosts && @throttled_hosts_source == value
+      @throttled_hosts_source = value
+      @throttled_hosts = FeedbinUtils.key_value_parser(value) do |weight|
+        weight&.to_i || 1
+      end
+    end
+
     def retry_after
+      return nil if throttled_hosts.empty?
       return nil unless throttled_hosts.include?(host)
       Time.now.to_i + random_timeout
     end
@@ -22,9 +34,7 @@ module FeedCrawler
     end
 
     def throttled_hosts
-      FeedbinUtils.key_value_parser(ENV["THROTTLED_HOSTS"]) do |weight|
-        weight&.to_i || 1
-      end
+      self.class.throttled_hosts
     end
 
     def weight
@@ -32,9 +42,8 @@ module FeedCrawler
     end
 
     def host
-      Addressable::URI.heuristic_parse(@feed_url).host.split(".").last(2).join(".")
-    rescue
-      nil
+      return @host if defined?(@host)
+      @host = @feed_url.to_s[HOST, 1]&.split(".")&.last(2)&.join(".")
     end
   end
 end
