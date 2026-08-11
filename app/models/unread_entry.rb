@@ -23,11 +23,4 @@ class UnreadEntry < ApplicationRecord
     end
   end
 
-  def self.sort_preference(sort)
-    if sort == "ASC"
-      order("published ASC")
-    else
-      order("published DESC")
-    end
-  end
 end

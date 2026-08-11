@@ -243,6 +243,58 @@ class EntriesControllerTest < ActionController::TestCase
     refute_includes assigns(:entries).map(&:id), new_entry.id
   end
 
+  test "unread pagination does not skip or dead-end when entries are read between pages" do
+    original_per_page = UnreadEntry.per_page
+    UnreadEntry.per_page = 5
+
+    feed = @feeds.first
+    10.times { create_entry(feed) }
+    mark_unread(@user)
+    @user.entries.order(:id).each_with_index do |entry, index|
+      entry.update_column(:published, Time.now - (100 - index).hours)
+      UnreadEntry.where(user: @user, entry_id: entry.id).update_all(published: entry.published)
+    end
+    expected_ids = @user.unread_entries.order("published DESC, entry_id DESC").pluck(:entry_id)
+
+    login_as @user
+
+    seen_ids = []
+    params = {}
+    10.times do
+      get :unread, params: params, xhr: true
+      assert_response :success
+      page_ids = assigns(:entries).map(&:id)
+      break if page_ids.empty?
+      seen_ids += page_ids
+
+      # simulate the user reading everything on this page before the next load
+      UnreadEntry.where(user: @user, entry_id: page_ids).delete_all
+
+      cursor = assigns(:page_cursor)
+      break if cursor.nil?
+      params = cursor.merge(page: 2, page_anchor: assigns(:anchor))
+    end
+
+    assert_equal expected_ids, seen_ids
+
+    UnreadEntry.per_page = original_per_page
+  end
+
+  test "unread pagination cursor is included in pager links" do
+    original_per_page = UnreadEntry.per_page
+    UnreadEntry.per_page = 2
+
+    mark_unread(@user)
+    login_as @user
+
+    get :unread, xhr: true
+    assert_response :success
+    assert_includes @response.body, "cursor_published"
+    assert_includes @response.body, "cursor_entry_id"
+
+    UnreadEntry.per_page = original_per_page
+  end
+
   test "pagination anchor excludes new entries with view_all" do
     login_as @user
     original_count = @user.entries.count

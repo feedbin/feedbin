@@ -1,5 +1,7 @@
 var callback = function() {
-    <% if @entries.length == 0 %>
+    <% if @entries.length == 0 && @append %>
+        var entries = "";
+    <% elsif @entries.length == 0 %>
         var entries = "<%= j render partial: "entries/no_entry" %>";
     <% else %>
         <% favicons = Favicon.for_entries(@entries) %>
@@ -17,7 +19,7 @@ var callback = function() {
     <% end %>
 
     <% if @page_query %>
-        feedbin.updatePager("<%= j will_paginate(@page_query, params: @anchor ? { page_anchor: @anchor } : {}) %>");
+        feedbin.updatePager("<%= j will_paginate(@page_query, params: pagination_link_params) %>");
     <% else %>
         feedbin.updatePager("");
     <% end %>

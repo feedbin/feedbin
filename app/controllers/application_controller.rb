@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
   include SessionsHelper
+  include StablePagination
 
   before_action :authorize
   before_action :set_user
@@ -283,25 +284,12 @@ class ApplicationController < ActionController::Base
       @page_query = scope.order(published: :desc).page(params[:page])
       @entries = Entry.entries_with_feed(@page_query.pluck(:id), "DESC").entries_list
     elsif view_mode == "view_starred"
-      scope = pagination_anchor(@user.starred_entries.select(:entry_id).where(feed_id: @feed_ids))
-      @page_query = scope.page(params[:page]).order("published DESC")
-      @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), "DESC").entries_list
+      @entries = entries_page(@user.starred_entries.select(:entry_id).where(feed_id: @feed_ids))
     else
       @all_unread = "true"
-      scope = pagination_anchor(@user.unread_entries.select(:entry_id).where(feed_id: @feed_ids))
-      @page_query = scope.page(params[:page]).sort_preference(@user.entry_sort)
-      @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), @user.entry_sort).entries_list
+      @entries = entries_page(@user.unread_entries.select(:entry_id).where(feed_id: @feed_ids), sort: @user.entry_sort)
     end
     @append = params[:page].present?
-  end
-
-  def pagination_anchor(scope, column: scope.arel_table[:entry_id])
-    @anchor ||= if params[:page_anchor].present?
-      params[:page_anchor].to_i
-    else
-      Entry.maximum(:id)
-    end
-    @anchor ? scope.where(column.lteq(@anchor)) : scope
   end
 
   def honeybadger_context
