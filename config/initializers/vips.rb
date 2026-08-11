@@ -7,3 +7,5 @@
 # false) does not help, because libvips checks the untrusted flag separately from
 # per-operation blocking. It's all or nothing.
 Vips.block_untrusted(false) if defined?(Vips)
+
+Vips.cache_set_max(0)
