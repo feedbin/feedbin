@@ -18,22 +18,46 @@ module ImageCrawler
         )
 
         if processor.valid?(@image.validate?)
-          cropped = processor.crop!
+          if @image.unified?
+            pair = processor.crop_pair!
+            cropped = pair[:jpg]
+            webp = pair[:webp]
+
+            @image.webp_path   = webp.file
+            @image.bytesize    = webp.size
+            @image.fingerprint = webp.fingerprint
+          else
+            cropped = processor.crop!
+            @image.fingerprint = cropped.fingerprint
+          end
 
           @image.processed_path      = cropped.file
           @image.width               = cropped.width
           @image.height              = cropped.height
           @image.placeholder_color   = cropped.placeholder_color
           @image.processed_extension = cropped.extension
-          @image.fingerprint         = cropped.fingerprint
 
           Upload.perform_async(@image.to_h)
         else
-          image = Image.new_with_attributes(id: @image.id, preset_name: @image.preset_name, image_urls: @image.image_urls, provider: @image.provider, provider_id: @image.provider_id)
-          FindCritical.perform_async(image.to_h) unless @image.image_urls.empty?
+          requeue_remaining
         end
       ensure
         File.unlink(@image.download_path) rescue Errno::ENOENT
+      end
+
+      def requeue_remaining
+        return if @image.image_urls.empty?
+        image = Image.new_with_attributes(
+          id: @image.id,
+          preset_name: @image.preset_name,
+          image_urls: @image.image_urls,
+          provider: @image.provider,
+          provider_id: @image.provider_id,
+          feed_id: @image.feed_id,
+          page_url: @image.page_url,
+          meta_image_urls: @image.meta_image_urls
+        )
+        FindCritical.perform_async(image.to_h)
       end
     end
   end
