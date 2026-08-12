@@ -23,6 +23,10 @@ end
 
 REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path = "" }.to_s
 
+ENV["R2_ENDPOINT"] ||= "https://test-account.r2.cloudflarestorage.com"
+ENV["R2_ACCESS_KEY_ID"] ||= "r2-test-key"
+ENV["R2_SECRET_ACCESS_KEY"] ||= "r2-test-secret"
+
 require File.expand_path("../../config/environment", __FILE__)
 
 # MakeEpub's cover generation renders text with libvips, which on macOS
@@ -143,6 +147,14 @@ class ActiveSupport::TestCase
         redis.flushdb
       end
     end
+  end
+
+  def with_env(vars)
+    previous = vars.keys.index_with { |key| ENV[key] }
+    vars.each { |key, value| ENV[key] = value }
+    yield
+  ensure
+    previous.each { |key, value| value.nil? ? ENV.delete(key) : ENV[key] = value }
   end
 
   def parse_json

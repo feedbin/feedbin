@@ -1,16 +1,20 @@
 module ImageCrawler
   class Image
     ATTRIBUTES = %i[
+      bytesize
       camo
       download_path
       entry_url
+      feed_id
       final_url
       height
       width
       id
       image_urls
+      meta_image_urls
       original_extension
       original_url
+      page_url
       placeholder_color
       preset_name
       processed_extension
@@ -19,6 +23,7 @@ module ImageCrawler
       provider
       provider_id
       fingerprint
+      webp_path
     ]
 
 
@@ -32,6 +37,7 @@ module ImageCrawler
         minimum_size: 20_000,
         crop: :smart_crop,
         validate: true,
+        unified: true,
         job_class: EntryImage
       },
       twitter: {
@@ -40,6 +46,7 @@ module ImageCrawler
         minimum_size: 10_000,
         crop: :smart_crop,
         validate: true,
+        unified: true,
         job_class: TwitterLinkImage
       },
       youtube: {
@@ -48,6 +55,7 @@ module ImageCrawler
         minimum_size: nil,
         crop: :fill_crop,
         validate: true,
+        unified: true,
         job_class: EntryImage
       },
       podcast: {
@@ -113,30 +121,68 @@ module ImageCrawler
     end
 
     def send_to_feedbin
-      preset.job_class.perform_async(id, {
+      payload = {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
         "width"             => width,
         "height"            => height,
         "placeholder_color" => placeholder_color
-      })
-
-      # create_image
+      }
+      if unified?
+        payload["storage_path"] = storage_path
+        payload["bytesize"]     = bytesize
+        payload["provider"]     = provider_label
+      end
+      preset.job_class.perform_async(id, payload)
     end
 
     def create_image
-      data = {
-        provider: provider,
-        provider_id: provider_id,
-        url: original_url,
-        storage_url: storage_url,
-        image_fingerprint: fingerprint,
-        width: width,
-        height: height,
-        placeholder_color: placeholder_color
+      ::Image.with_url_lock(url_fingerprint) do
+        ::Image.attach!(
+          provider: provider,
+          provider_id: provider_id,
+          feed_id: feed_id,
+          url: original_url,
+          image_fingerprint: fingerprint,
+          storage_path: storage_path,
+          width: width,
+          height: height,
+          bytesize: bytesize,
+          placeholder_color: placeholder_color,
+          data: {
+            "legacy_storage_url" => storage_url,
+            "preset"             => preset_name,
+            "final_url"          => final_url
+          }
+        )
+      end
+    end
+
+    def unified?
+      preset.unified == true && ENV["R2_BUCKET_IMAGES"].present?
+    end
+
+    def url_fingerprint
+      ::Image.url_fingerprint_for(original_url)
+    end
+
+    def storage_path
+      ::Image.storage_path_for(original_url)
+    end
+
+    def provider_label
+      ::Image.providers.key(provider)
+    end
+
+    def r2_bucket
+      ENV["R2_BUCKET_IMAGES"]
+    end
+
+    def r2_storage_options
+      {
+        "Content-Type"  => "image/webp",
+        "Cache-Control" => "max-age=315360000, public, immutable"
       }
-      record = ::Image.create_with(data).find_or_create_by(provider:, provider_id:)
-      record.update(data)
     end
 
     def image_name
