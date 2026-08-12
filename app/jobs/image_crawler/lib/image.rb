@@ -120,7 +120,7 @@ module ImageCrawler
       preset.validate || false
     end
 
-    def send_to_feedbin
+    def send_to_feedbin(include_unified: true)
       payload = {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
@@ -128,7 +128,7 @@ module ImageCrawler
         "height"            => height,
         "placeholder_color" => placeholder_color
       }
-      if unified?
+      if unified? && include_unified
         payload["storage_path"] = storage_path
         payload["bytesize"]     = bytesize
         payload["provider"]     = provider_label

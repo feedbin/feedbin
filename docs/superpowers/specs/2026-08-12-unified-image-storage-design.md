@@ -181,6 +181,16 @@ the other — this is why the table stores `storage_path`, not a URL.
 Starred entries are never pruned, so their refcounts never reach zero — correct, their
 images must live on.
 
+**Known residual race, accepted:** `Upload`'s R2 `PUT` happens *before* `create_image`
+takes the advisory lock (Task 6). If GC deletes that same fingerprint's last old row and
+object in the window between the fresh `PUT` and `create_image` acquiring the lock, the
+fresh object is deleted and the new row (inserted once GC releases the lock) ends up
+pointing at nothing. The window is milliseconds and requires the same URL to be
+simultaneously re-crawled and last-pruned — negligible frequency. This does not self-heal:
+`find_images` only runs on entry create, and `FixImage` checks the per-entry legacy S3 jpg,
+which still exists and is unaffected. The affected entry keeps serving its legacy S3 image
+during the transition; recovery is manual.
+
 ## Cleanup of the half attempt
 
 - Keep `app/models/image.rb`; update the schema comment; add `feed_id`/`bytesize`/
@@ -200,7 +210,8 @@ images must live on.
 - **Phase 1 — shadow writes.** Dual save/PUT; Image rows created; reuse rules enabled
   behind a flag (they change *which* image an entry gets, for both storage paths — bake
   them deliberately). Serving unchanged. Verify row/object counts, dedup hit rate,
-  R2 error rate (Librato counters: `image.dedup_hit`, `image.r2_error`, `image.gc_delete`).
+  R2 error rate (Librato counters: `image.dedupe_hit`, `image.r2_upload`, `image.r2_error`,
+  `image.reuse_skipped`, `image.reuse_rejected`, `image.gc_rows`, `image.gc_objects`).
 - **Phase 2 — read cutover.** Flip the read flag; new-system entries serve WebP from R2.
   Watch client behavior/API consumers.
 - **Phase 3 — retire legacy writes.** Stop jpg save + S3 PUT; retire the Redis positive

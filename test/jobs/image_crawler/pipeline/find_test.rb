@@ -151,6 +151,41 @@ module ImageCrawler
         end
       end
 
+      def test_should_skip_page_fetched_meta_candidate_already_used_in_feed
+        with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
+          page_url = "http://example.com/article"
+          og_url = "http://example.com/og.jpg"
+          fresh_url = "http://example.com/inline.jpg"
+
+          stub_request(:get, page_url).to_return(
+            status: 200,
+            body: %(<html><head><meta property="og:image" content="/og.jpg"></head></html>),
+            headers: {content_type: "text/html"}
+          )
+          stub_request_file("image.jpeg", fresh_url, headers: {content_type: "image/jpeg"})
+
+          ::Image.create!(
+            provider: :entry_preview, provider_id: "1", feed_id: 9,
+            url: og_url, image_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.storage_path_for(og_url),
+            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
+            data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
+          )
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "primary",
+            image_urls: [fresh_url],
+            provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
+            entry_url: page_url, page_url: page_url
+          )
+          Find.new.perform(image.to_h)
+
+          refute_requested :get, og_url
+          assert_requested :get, fresh_url
+          assert_equal 1, Process.jobs.size
+        end
+      end
+
       def test_should_skip_reused_meta_candidate_and_try_the_next_url
         with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
           reused_url = "http://example.com/og.jpg"

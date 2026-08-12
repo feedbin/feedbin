@@ -37,6 +37,39 @@ class ImageTest < ActiveSupport::TestCase
     assert record.url_fingerprint.present?
   end
 
+  test "attach! recovers when it loses the insert race inside a transaction" do
+    attributes = {
+      provider: Image.providers[:entry_preview],
+      provider_id: 321,
+      feed_id: 1,
+      url: "http://example.com/race.jpg",
+      image_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for("http://example.com/race.jpg"),
+      width: 542,
+      height: 304,
+      bytesize: 10_000,
+      placeholder_color: "aabbcc"
+    }
+    Image.attach!(attributes)
+
+    original = Image.method(:find_by)
+    calls = 0
+    misser = ->(*args, **kwargs) do
+      calls += 1
+      calls == 1 ? nil : original.call(*args, **kwargs)
+    end
+
+    record = nil
+    Image.stub(:find_by, misser) do
+      Image.transaction do
+        record = Image.attach!(attributes.merge(bytesize: 20_000))
+      end
+    end
+
+    assert_equal 20_000, record.bytesize
+    assert_equal 1, Image.where(provider: attributes[:provider], provider_id: "321").count
+  end
+
   test "with_url_lock yields inside a transaction and accepts dashed fingerprints" do
     yielded = false
     Image.with_url_lock("9e107d9d-372b-b682-6bd8-1d3542a419d6") do

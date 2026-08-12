@@ -39,17 +39,21 @@ class Image < ApplicationRecord
     File.join(fingerprint[0..2], "#{fingerprint}.webp")
   end
 
-  # Upsert keyed by (provider, provider_id). Not create_or_find_by: a unique
-  # violation inside the transactional test wrapper poisons the transaction,
-  # and concurrent duplicates are already rare — retry after RecordNotUnique
-  # covers the cross-process race.
+  # Upsert keyed by (provider, provider_id). Not create_or_find_by: every
+  # call site runs inside Image.with_url_lock's transaction, so a unique
+  # violation would otherwise poison that outer transaction. The
+  # requires_new: true save wraps it in a savepoint, scoping the violation
+  # so the rescue/retry below can actually recover instead of raising
+  # PG::InFailedSqlTransaction.
   def self.attach!(attributes)
     attributes = attributes.symbolize_keys
     attributes[:provider_id] = attributes[:provider_id].to_s
     record = find_by(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)) ||
       new(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id))
     record.assign_attributes(attributes)
-    record.save!
+    transaction(requires_new: true) do
+      record.save!
+    end
     record
   rescue ActiveRecord::RecordNotUnique
     retry

@@ -15,4 +15,5 @@ STORAGE_R2 = {}.tap do |hash|
   hash[:endpoint]              = ENV["R2_ENDPOINT"] if ENV["R2_ENDPOINT"]
   hash[:region]                = ENV["R2_REGION"] || "auto"
   hash[:path_style]            = true
+  hash[:connection_options] = {connect_timeout: 5, read_timeout: 10, write_timeout: 10}
 end

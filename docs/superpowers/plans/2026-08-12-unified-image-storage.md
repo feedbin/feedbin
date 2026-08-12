@@ -2410,7 +2410,7 @@ class ImageGarbageCollector
 end
 ```
 
-Known residual race, accepted: if `Upload` PUTs a fresh object and GC deletes that same fingerprint's last old row in the window before `create_image` takes the lock, the fresh object is deleted and one entry holds a dead reference. The window is milliseconds, requires the same URL to be simultaneously re-crawled and last-pruned, and the entry self-heals on its next re-crawl (`FixImage`-style recovery also remains available).
+Known residual race, accepted: if `Upload` PUTs a fresh object and GC deletes that same fingerprint's last old row in the window before `create_image` takes the lock, the fresh object is deleted and one entry holds a dead reference. The window is milliseconds and requires the same URL to be simultaneously re-crawled and last-pruned — negligible frequency. This does *not* self-heal: `find_images` only runs on entry create, and `FixImage` checks the per-entry legacy S3 jpg, which still exists and is unaffected by the R2 delete. The affected entry keeps serving its legacy S3 image during the transition (only the R2 row/object is inconsistent); recovery is manual.
 
 Run: `source ~/.bash_profile && bin/rails test test/jobs/image_garbage_collector_test.rb`
 Expected: PASS (4 tests)
