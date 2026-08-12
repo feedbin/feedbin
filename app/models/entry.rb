@@ -130,11 +130,16 @@ class Entry < ApplicationRecord
   end
 
   def processed_image
-    return unless image
+    r2_processed_image || legacy_processed_image
+  end
 
-    if r2_url = r2_image_url(image["storage_path"])
-      return r2_url
-    end
+  def r2_processed_image
+    return unless image
+    r2_image_url(image["storage_path"])
+  end
+
+  def legacy_processed_image
+    return unless image
 
     if image["original_url"] && image["width"] && image["height"] && image["processed_url"]
       image_url = image["processed_url"]
