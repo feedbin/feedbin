@@ -357,10 +357,15 @@ class Entry < ApplicationRecord
 
   private
 
+  # Accepts a full origin ("https://media.feedbin.org") or a bare host
+  # ("media.feedbin.org", matching the ENTRY_IMAGE_HOST convention) —
+  # without a scheme the browser would resolve the URL relative to the app.
   def r2_image_url(storage_path)
     return nil if storage_path.blank?
-    return nil if ENV["R2_IMAGE_HOST"].blank?
-    [ENV["R2_IMAGE_HOST"].chomp("/"), storage_path].join("/")
+    host = ENV["R2_IMAGE_HOST"]
+    return nil if host.blank?
+    host = "https://#{host}" unless host.match?(%r{\Ahttps?://})
+    [host.chomp("/"), storage_path].join("/")
   end
 
   def provider_metadata

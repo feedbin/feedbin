@@ -183,6 +183,26 @@ class EntryTest < ActiveSupport::TestCase
     end
   end
 
+  test "processed_image tolerates a schemeless R2 host" do
+    entry = create_entry(Feed.first)
+    entry.update(image: {
+      "original_url" => "http://example.com/image.jpg",
+      "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg",
+      "storage_path" => "abc/abcdef123.webp",
+      "width" => 542,
+      "height" => 304,
+      "placeholder_color" => "aabbcc"
+    })
+
+    with_env("R2_IMAGE_HOST" => "media.feedbin.org") do
+      assert_equal "https://media.feedbin.org/abc/abcdef123.webp", entry.processed_image
+    end
+
+    with_env("R2_IMAGE_HOST" => "http://minio.local:9000/images") do
+      assert_equal "http://minio.local:9000/images/abc/abcdef123.webp", entry.processed_image
+    end
+  end
+
   test "processed_image ignores R2 host for legacy images without a storage_path" do
     entry = create_entry(Feed.first)
     entry.update(image: {
