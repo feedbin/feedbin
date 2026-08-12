@@ -82,6 +82,29 @@ class EntryDeleterTest < ActiveSupport::TestCase
     end
   end
 
+  test "should enqueue image cleanup for deleted entries" do
+    flush_redis
+    entry = @entries.first
+    entry.update(
+      published: 20.years.ago,   # oldest by published, guaranteed to be pruned
+      image: {"processed_url" => "https://bucket.s3.amazonaws.com/abc/preview.jpg"},
+      data: {
+        "twitter_link_image_processed" => "https://bucket.s3.amazonaws.com/abc/link-legacy.jpg",
+        "link_image" => {"processed_url" => "https://bucket.s3.amazonaws.com/abc/link-new.jpg"}
+      }
+    )
+
+    EntryDeleter.new.perform(@feed.id)
+
+    assert_equal 1, ImageGarbageCollector.jobs.size
+    assert_includes ImageGarbageCollector.jobs.first["args"].first, entry.id
+
+    deleted_urls = ImageDeleter.jobs.flat_map { _1["args"].first }
+    assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/preview.jpg"
+    assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/link-legacy.jpg"
+    assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/link-new.jpg"
+  end
+
   private
 
   def removed_count

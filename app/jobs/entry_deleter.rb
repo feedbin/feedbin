@@ -22,9 +22,13 @@ class EntryDeleter
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit
       entries_to_keep = Entry.where(feed_id: feed_id).order("published DESC").limit(entry_limit).pluck("entries.id")
-      entries_to_delete = Entry.where(feed_id: feed_id, starred_entries_count: 0, recently_played_entries_count: 0).where.not(id: entries_to_keep).pluck(:id, :image)
+      entries_to_delete = Entry.where(feed_id: feed_id, starred_entries_count: 0, recently_played_entries_count: 0)
+        .where.not(id: entries_to_keep)
+        .pluck(:id, :image, Arel.sql("data->>'twitter_link_image_processed'"), Arel.sql("data#>>'{link_image,processed_url}'"))
       entries_to_delete_ids = entries_to_delete.map(&:first)
-      entries_to_delete_images = entries_to_delete.map { |array| array.last && array.last["processed_url"] }.compact
+      entries_to_delete_images = entries_to_delete.flat_map { |_, image, link_legacy, link_new|
+        [image && image["processed_url"], link_legacy, link_new]
+      }.compact
       delete_entries(feed_id, entries_to_delete_ids, entries_to_delete_images)
     end
   end
@@ -47,6 +51,10 @@ class EntryDeleter
         StarredEntry.where(entry_id: entry_ids).delete_all
         Entry.where(id: entry_ids).delete_all
       end
+
+      # After the transaction: if the deletes roll back, the usage rows must
+      # survive too.
+      ImageGarbageCollector.perform_async(entry_ids)
 
       Librato.increment("entry.destroy", by: entry_ids.count)
     end
