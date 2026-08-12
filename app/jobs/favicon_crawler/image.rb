@@ -13,8 +13,6 @@ module FaviconCrawler
     end
 
     def resize
-      return unless ImageFormat.allowed?(@path)
-
       image = best_layer
 
       return unless image.present?
