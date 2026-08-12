@@ -102,7 +102,7 @@ module ImageCrawler
       end
 
       def test_should_reject_repeated_fingerprint_in_feed
-        with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
           # Compute the fingerprint this exact source produces.
           reference = Processor::Cropper.new(copy_support_file("image.jpeg"), crop: :smart_crop, extension: "jpeg", width: 542, height: 304).crop_pair!
           fingerprint = reference[:webp].fingerprint

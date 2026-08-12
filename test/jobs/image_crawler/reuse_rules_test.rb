@@ -36,54 +36,41 @@ module ImageCrawler
       )
     end
 
-    test "disabled without the env flag" do
-      seed_row(provider_id: 1)
-      refute ReuseRules.new(@image).skip?(@url)
-    end
-
     test "skips a url already used by another entry in the feed" do
-      with_env("IMAGE_REUSE_RULES" => "1") do
-        rules = ReuseRules.new(@image)
-        refute rules.skip?(@url)
+      rules = ReuseRules.new(@image)
+      refute rules.skip?(@url)
 
-        seed_row(provider_id: 1)
-        assert rules.skip?(@url)
-      end
+      seed_row(provider_id: 1)
+      assert rules.skip?(@url)
     end
 
     test "does not skip for the same entry, another feed, or non-meta candidates" do
-      with_env("IMAGE_REUSE_RULES" => "1") do
-        seed_row(provider_id: 2)
-        refute ReuseRules.new(@image).skip?(@url), "an entry must not block itself on re-crawl"
+      seed_row(provider_id: 2)
+      refute ReuseRules.new(@image).skip?(@url), "an entry must not block itself on re-crawl"
 
-        ::Image.delete_all
-        seed_row(provider_id: 1, feed_id: 10)
-        refute ReuseRules.new(@image).skip?(@url), "reuse is scoped per feed"
+      ::Image.delete_all
+      seed_row(provider_id: 1, feed_id: 10)
+      refute ReuseRules.new(@image).skip?(@url), "reuse is scoped per feed"
 
-        ::Image.delete_all
-        seed_row(provider_id: 1)
-        @image.meta_image_urls = []
-        refute ReuseRules.new(@image).skip?(@url), "inline img/media candidates are exempt"
-      end
+      ::Image.delete_all
+      seed_row(provider_id: 1)
+      @image.meta_image_urls = []
+      refute ReuseRules.new(@image).skip?(@url), "inline img/media candidates are exempt"
     end
 
     test "skips a site-wide og:image" do
-      with_env("IMAGE_REUSE_RULES" => "1") do
-        stub_request(:get, "http://example.com/")
-          .to_return(status: 200, body: %(<meta property="og:image" content="/og.jpg">), headers: {content_type: "text/html"})
+      stub_request(:get, "http://example.com/")
+        .to_return(status: 200, body: %(<meta property="og:image" content="/og.jpg">), headers: {content_type: "text/html"})
 
-        assert ReuseRules.new(@image).skip?(@url)
-      end
+      assert ReuseRules.new(@image).skip?(@url)
     end
 
     test "detects a repeated content fingerprint in the feed" do
-      with_env("IMAGE_REUSE_RULES" => "1") do
-        fingerprint = SecureRandom.hex(16)
-        seed_row(provider_id: 1, url: "http://example.com/different-url.jpg", image_fingerprint: fingerprint)
+      fingerprint = SecureRandom.hex(16)
+      seed_row(provider_id: 1, url: "http://example.com/different-url.jpg", image_fingerprint: fingerprint)
 
-        assert ReuseRules.new(@image).fingerprint_used_in_feed?(fingerprint)
-        refute ReuseRules.new(@image).fingerprint_used_in_feed?(SecureRandom.hex(16))
-      end
+      assert ReuseRules.new(@image).fingerprint_used_in_feed?(fingerprint)
+      refute ReuseRules.new(@image).fingerprint_used_in_feed?(SecureRandom.hex(16))
     end
   end
 end

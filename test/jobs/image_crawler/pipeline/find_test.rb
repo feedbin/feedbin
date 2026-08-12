@@ -152,7 +152,7 @@ module ImageCrawler
       end
 
       def test_should_skip_page_fetched_meta_candidate_already_used_in_feed
-        with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
           page_url = "http://example.com/article"
           og_url = "http://example.com/og.jpg"
           fresh_url = "http://example.com/inline.jpg"
@@ -187,7 +187,7 @@ module ImageCrawler
       end
 
       def test_should_skip_reused_meta_candidate_and_try_the_next_url
-        with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
           reused_url = "http://example.com/og.jpg"
           fresh_url = "http://example.com/inline.jpg"
 

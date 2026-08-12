@@ -3,10 +3,6 @@ module ImageCrawler
   # (og:image / twitter:image) are policed — inline images and attached media
   # legitimately repeat within a feed (retweet chains, reposts).
   class ReuseRules
-    def self.enabled?
-      ENV["IMAGE_REUSE_RULES"].present?
-    end
-
     def initialize(image)
       @image = image
     end
@@ -16,7 +12,6 @@ module ImageCrawler
     # runs first — it is one indexed query, while the site-wide check may
     # fetch the host's root page.
     def skip?(original_url)
-      return false unless self.class.enabled?
       return false unless meta_candidate?(original_url)
 
       used_in_feed?(original_url) || site_wide?(original_url)
@@ -25,7 +20,6 @@ module ImageCrawler
     # Post-process check: same image bytes (different url) already used by
     # another entry in this feed. Catches cache-busted site-wide images.
     def fingerprint_used_in_feed?(fingerprint)
-      return false unless self.class.enabled?
       return false unless meta_candidate?(@image.original_url)
       return false if @image.feed_id.nil?
 

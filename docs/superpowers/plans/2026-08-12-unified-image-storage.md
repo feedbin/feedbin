@@ -18,13 +18,13 @@
 - Do not change behavior for the non-unified presets (`podcast`, `podcast_feed`, `icon`) or the favicon crawler. Existing tests for them must stay green untouched.
 - WebP output is exactly quality 65, `strip: true`. Legacy jpg output stays exactly quality 80, `strip: true, background: 255`. Crop dimensions stay 542×304 (`primary`/`twitter`/`youtube`).
 - All pipeline jobs remain `retry: false`.
-- New env vars (all optional; features are inert without them): `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_REGION` (defaults to `auto`), `R2_BUCKET_IMAGES` (enables dual-write), `R2_IMAGE_HOST` (enables R2 read path), `IMAGE_REUSE_RULES` (enables reuse rules).
+- New env vars (all optional; features are inert without them): `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_REGION` (defaults to `auto`), `R2_BUCKET_IMAGES` (enables dual-write), `R2_IMAGE_HOST` (enables R2 read path). (`IMAGE_REUSE_RULES` existed during implementation and was removed afterward — the reuse rules are always on for unified presets.)
 - Commit after each task. Match the repo's terse commit style. End every commit message with:
   `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`
 
 ## Deployment notes (not part of this branch's tasks, but why Task 1 is isolated)
 
-`Pipeline::Process`/`Pipeline::Upload` run on host-local queues (`local_queue` appends the hostname) on dedicated crawler machines; deploys are not atomic across hosts and every job is `retry: false`, so an unknown payload attribute raising in `ImageCrawler::Image#initialize` silently drops images mid-deploy. **Task 1 must be deployable on its own, before everything else.** Rollout after merge: deploy Task 1 fleet-wide → deploy the rest → set `R2_*` creds + `R2_BUCKET_IMAGES` (shadow writes begin) → set `IMAGE_REUSE_RULES` → after bake, set `R2_IMAGE_HOST` (read cutover). Stopping the S3 write is a later phase, deliberately not in this plan.
+`Pipeline::Process`/`Pipeline::Upload` run on host-local queues (`local_queue` appends the hostname) on dedicated crawler machines; deploys are not atomic across hosts and every job is `retry: false`, so an unknown payload attribute raising in `ImageCrawler::Image#initialize` silently drops images mid-deploy. **Task 1 must be deployable on its own, before everything else.** Rollout after merge: deploy Task 1 fleet-wide → deploy the rest → set `R2_*` creds + `R2_BUCKET_IMAGES` (shadow writes begin) → after bake, set `R2_IMAGE_HOST` (read cutover). Stopping the S3 write is a later phase, deliberately not in this plan.
 
 ---
 
@@ -2536,7 +2536,7 @@ Append to `.env.development` (commented out — the features stay off in dev unt
 # export R2_REGION=auto
 # export R2_BUCKET_IMAGES=            # presence enables webp dual-writes + image rows
 # export R2_IMAGE_HOST=               # presence flips entry image reads to R2 (public bucket domain)
-# export IMAGE_REUSE_RULES=           # presence enables site-wide/same-feed reuse rules
+
 ```
 
 - [ ] **Step 2: Run the full test suite**

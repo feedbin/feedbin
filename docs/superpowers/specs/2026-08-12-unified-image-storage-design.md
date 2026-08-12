@@ -207,9 +207,9 @@ during the transition; recovery is manual.
 
 - **Phase 0 — infra + schema.** R2 bucket, custom domain, API token; `STORAGE_R2`
   initializer + env vars; images migration; tolerant `Image#initialize` deployed fleet-wide.
-- **Phase 1 — shadow writes.** Dual save/PUT; Image rows created; reuse rules enabled
-  behind a flag (they change *which* image an entry gets, for both storage paths — bake
-  them deliberately). Serving unchanged. Verify row/object counts, dedup hit rate,
+- **Phase 1 — shadow writes.** Dual save/PUT; Image rows created; reuse rules active
+  (always on — no flag; they only apply to unified presets, so `R2_BUCKET_IMAGES` is
+  the effective gate). Serving unchanged. Verify row/object counts, dedup hit rate,
   R2 error rate (Librato counters: `image.dedupe_hit`, `image.r2_upload`, `image.r2_error`,
   `image.reuse_skipped`, `image.reuse_rejected`, `image.gc_rows`, `image.gc_objects`).
 - **Phase 2 — read cutover.** Flip the read flag; new-system entries serve WebP from R2.
