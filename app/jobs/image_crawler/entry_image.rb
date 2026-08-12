@@ -33,6 +33,7 @@ module ImageCrawler
 
     def build_job
       image_urls = []
+      meta_image_urls = []
       entry_url = nil
       preset_name = "primary"
       if @entry.tweet?
@@ -47,23 +48,30 @@ module ImageCrawler
         image_urls = [@entry.fully_qualified_url]
         preset_name = "youtube"
       elsif @entry.micropost?
-        image_urls = find_image_urls
+        found = find_image_urls
+        image_urls = found.map(&:first)
+        meta_image_urls = found.select(&:last).map(&:first)
         @entry.media.each do |media|
           image_urls.push(media.url) if media.type =~ /image/i
         end
       else
         entry_url = @entry.fully_qualified_url if same_domain?
-        image_urls = find_image_urls
+        found = find_image_urls
+        image_urls = found.map(&:first)
+        meta_image_urls = found.select(&:last).map(&:first)
       end
 
       if image_urls.present? || entry_url.present?
         Image.new_with_attributes(
-          id:          @entry.public_id,
-          preset_name: preset_name,
-          image_urls:  image_urls,
-          provider:    ::Image.providers[:entry_preview],
-          provider_id: @entry.id,
-          entry_url:   entry_url
+          id:              @entry.public_id,
+          preset_name:     preset_name,
+          image_urls:      image_urls,
+          provider:        ::Image.providers[:entry_preview],
+          provider_id:     @entry.id,
+          entry_url:       entry_url,
+          feed_id:         @entry.feed_id,
+          page_url:        @entry.fully_qualified_url,
+          meta_image_urls: meta_image_urls
         ).to_h
       end
     end
@@ -92,7 +100,7 @@ module ImageCrawler
           when "meta"   then element["content"]
           end
 
-          array.push(@entry.rebase_url(source)) if source.present?
+          array.push([@entry.rebase_url(source), element.name == "meta"]) if source.present?
         end
     end
 

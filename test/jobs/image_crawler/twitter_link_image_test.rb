@@ -46,5 +46,46 @@ module ImageCrawler
       assert_equal image["processed_url"], @entry.data["twitter_link_image_processed"]
       assert_equal image["placeholder_color"], @entry.data["twitter_link_image_placeholder_color"]
     end
+
+    test "should enqueue Find with feed context" do
+      entry = Feed.first.entries.create(
+        content: "content",
+        public_id: SecureRandom.hex,
+        url: "http://example.com/article"
+      )
+
+      TwitterLinkImage.new.perform(entry.public_id, nil, "http://example.com/linked-page")
+
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      assert_equal entry.feed_id, image.feed_id
+      assert_equal "http://example.com/linked-page", image.page_url
+      assert_equal "http://example.com/linked-page", image.entry_url
+    end
+
+    test "should store the full link_image metadata" do
+      entry = Feed.first.entries.create(
+        content: "content",
+        public_id: SecureRandom.hex,
+        url: "http://example.com/article",
+        data: {}
+      )
+
+      payload = {
+        "original_url" => "http://example.com/image.jpg",
+        "processed_url" => "https://bucket.s3.amazonaws.com/abc/abc.jpg",
+        "width" => 542,
+        "height" => 304,
+        "bytesize" => 12_345,
+        "placeholder_color" => "aabbcc",
+        "storage_path" => "abc/abcdef.webp",
+        "provider" => "entry_link_preview"
+      }
+      TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload)
+
+      entry.reload
+      assert_equal payload, entry.data["link_image"]
+      assert_equal payload["processed_url"], entry.data["twitter_link_image_processed"]
+      assert_equal "aabbcc", entry.data["twitter_link_image_placeholder_color"]
+    end
   end
 end

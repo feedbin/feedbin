@@ -116,8 +116,10 @@ module ImageCrawler
           Sidekiq.logger.info "Recognized URL: entry_url=#{entry_url}"
           [entry_url]
         else
-          Sidekiq.logger.info "MetaImages: count=#{page_urls&.length || 0} entry_url=#{entry_url}"
-          MetaImages.find_urls(entry_url)
+          found = MetaImages.find_urls(entry_url).map(&:to_s)
+          Sidekiq.logger.info "MetaImages: count=#{found.length} entry_url=#{entry_url}"
+          @image.meta_image_urls = (@image.meta_image_urls || []) | found
+          found
         end
 
         page_urls ||= []

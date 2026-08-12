@@ -103,5 +103,26 @@ module ImageCrawler
         EntryImage.new.perform(@entry.public_id)
       end
     end
+
+    test "should enqueue Find with feed context and meta urls" do
+      content = <<-EOT
+      <meta property="og:image" content="/og">
+      <img src="/img">
+      EOT
+
+      entry = @feed.entries.create(
+        content: content,
+        public_id: SecureRandom.hex,
+        url: "http://example.com/article"
+      )
+
+      EntryImage.new.perform(entry.public_id)
+
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      assert_equal @feed.id, image.feed_id
+      assert_equal entry.fully_qualified_url, image.page_url
+      assert_equal ["http://example.com/og"], image.meta_image_urls
+      assert_equal ["http://example.com/og", "http://example.com/img"], image.image_urls
+    end
   end
 end
