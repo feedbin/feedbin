@@ -54,6 +54,18 @@ StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
 WebMock.disable_net_connect!(allow_localhost: true, allow: ENV['WEBMOCK_ALLOWED_HOSTS']&.split(","))
 Sidekiq.logger.level = Logger::WARN
 
+# fog-aws 3.33 builds DeleteObjects XML by mutating a string literal
+# (delete_multiple_objects.rb), which Ruby 4 deprecation-warns about on every
+# call. Silence that one gem warning until upstream is frozen-string-literal
+# clean; everything else still warns.
+module FogFrozenStringLiteralWarningFilter
+  def warn(message, **)
+    return if message.include?("fog-aws") && message.include?("literal string will be frozen")
+    super
+  end
+end
+Warning.extend(FogFrozenStringLiteralWarningFilter)
+
 
 # Writer for ActiveSupport::TestCase#outside_transaction. Its own connection
 # pool, named so that skip_transactional_tests_for_database can keep the

@@ -64,10 +64,13 @@ class Image < ApplicationRecord
 
   # Takes every lock in one sorted acquisition so concurrent multi-lock
   # holders (garbage collection batches) cannot deadlock each other.
+  # `execute`, not `select_all`: pg_advisory_xact_lock returns void, a type
+  # ActiveRecord's result decoder warns about (unknown OID 2278); the raw
+  # result is discarded either way.
   def self.with_url_locks(fingerprints)
     keys = fingerprints.map { _1.to_s.delete("-") }.uniq.sort
     transaction do
-      connection.select_all(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(key, 0)) FROM unnest(ARRAY[?]) AS key", keys]))
+      connection.execute(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(key, 0)) FROM unnest(ARRAY[?]) AS key", keys]))
       yield
     end
   end
