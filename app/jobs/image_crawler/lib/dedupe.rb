@@ -1,8 +1,10 @@
 module ImageCrawler
   # Attaches an entry to an already-stored unified image so the same
-  # original_url is never downloaded or processed twice. The legacy S3 object
-  # is still copied per entry (EntryDeleter deletes per-entry legacy objects);
-  # the R2 object is shared and refcounted by images rows.
+  # original_url is never downloaded or processed twice. Attaching is purely
+  # a database operation: the new row shares both stored objects — the R2
+  # webp and the legacy S3 jpg — with the rows that already reference them.
+  # The garbage collector refcounts both by url_fingerprint, so shared
+  # objects live exactly as long as their last row.
   class Dedupe
     attr_reader :record
 
@@ -21,13 +23,10 @@ module ImageCrawler
     def attach
       return false if record.nil?
 
-      legacy_url = copy_legacy_object
-      return false if legacy_url.nil?
-
       attached = nil
       ::Image.with_url_lock(record.url_fingerprint) do
-        # If GC removed the last reference (and the R2 object) between our
-        # lookup and here, we must not reference a deleted object.
+        # If GC removed the last reference (and the stored objects) between
+        # our lookup and here, we must not reference deleted objects.
         if ::Image.entry_images.where(url_fingerprint: record.url_fingerprint).exists?
           attached = ::Image.attach!(
             provider: @image.provider,
@@ -41,7 +40,7 @@ module ImageCrawler
             bytesize: record.bytesize,
             placeholder_color: record.placeholder_color,
             data: {
-              "legacy_storage_url" => legacy_url,
+              "legacy_storage_url" => record.data["legacy_storage_url"],
               "preset"             => @image.preset_name,
               "final_url"          => final_url
             }
@@ -52,7 +51,7 @@ module ImageCrawler
 
       @image.original_url      = @original_url
       @image.final_url         = final_url
-      @image.storage_url       = legacy_url
+      @image.storage_url       = record.data["legacy_storage_url"]
       @image.width             = record.width
       @image.height            = record.height
       @image.bytesize          = record.bytesize
@@ -66,24 +65,6 @@ module ImageCrawler
 
     def final_url
       record.data["final_url"].presence || @original_url
-    end
-
-    # Same mechanics as the legacy DownloadCache#copy_image: give this entry
-    # its own copy of the processed S3 object so per-entry legacy deletion
-    # stays valid during the transition.
-    def copy_legacy_object
-      source_url = record.data["legacy_storage_url"]
-      return nil if source_url.blank?
-
-      url = URI.parse(source_url)
-      source_object_name = url.path[1..-1]
-      @image.processed_extension = File.extname(source_object_name).delete(".")
-      destination = @image.image_name
-      Fog::Storage.new(STORAGE).copy_object(@image.bucket, source_object_name, @image.bucket, destination, @image.storage_options)
-      url.path = "/#{destination}"
-      url.to_s
-    rescue Excon::Error::NotFound
-      nil
     end
   end
 end

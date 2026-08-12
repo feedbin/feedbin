@@ -126,8 +126,8 @@ module ImageCrawler
             placeholder_color: "aabbcc",
             data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
           )
-          stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
+          # No storage stubs: a dedupe hit issues no storage API requests.
           image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
           Find.new.perform(image.to_h)
 

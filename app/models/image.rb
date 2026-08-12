@@ -58,10 +58,16 @@ class Image < ApplicationRecord
   # Serializes attach vs. garbage collection for one stored object. The
   # fingerprint arrives dashed when read back from the uuid column and
   # undashed when freshly computed; normalize so both take the same lock.
-  def self.with_url_lock(fingerprint)
-    key = fingerprint.to_s.delete("-")
+  def self.with_url_lock(fingerprint, &block)
+    with_url_locks([fingerprint], &block)
+  end
+
+  # Takes every lock in one sorted acquisition so concurrent multi-lock
+  # holders (garbage collection batches) cannot deadlock each other.
+  def self.with_url_locks(fingerprints)
+    keys = fingerprints.map { _1.to_s.delete("-") }.uniq.sort
     transaction do
-      connection.select_value(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", key]))
+      connection.select_all(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(key, 0)) FROM unnest(ARRAY[?]) AS key", keys]))
       yield
     end
   end

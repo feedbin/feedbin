@@ -163,8 +163,10 @@ entries crawled before the transition. Reads prefer the row and fall back to the
   as the pipeline's already-crawled guard, so it must keep answering for both stores.
 - Read cutover remains `R2_IMAGE_HOST`: unset, row-backed images serve their
   legacy S3 object; set, they serve WebP from R2. Rollback = unset.
-- Legacy per-entry S3 objects for row-backed images are deleted by the garbage
-  collector from `data["legacy_storage_url"]` (they are never shared); the entry-JSON
+- Rows sharing a `url_fingerprint` share BOTH stored objects: the R2 webp and the
+  legacy S3 jpg. A dedup hit copies the source row's `data["legacy_storage_url"]`
+  instead of issuing an S3 `COPY` — attaching is purely a database write, zero storage
+  API calls. Both objects are refcounted by the garbage collector; the entry-JSON
   pluck in `EntryDeleter` covers pre-transition entries only.
 
 ## Garbage collection
@@ -172,13 +174,22 @@ entries crawled before the transition. Reads prefer the row and fall back to the
 `EntryDeleter#prune_entries` currently plucks `image["processed_url"]` and enqueues
 `ImageDeleter` (S3 object delete). New flow:
 
-1. Keep the legacy pluck → `ImageDeleter` path for legacy per-entry S3 objects
-   (including the dual-written jpg objects; they are per-entry, never shared).
-2. Additionally enqueue `ImageGarbageCollector` with the deleted entry ids:
+1. Keep the legacy pluck → `ImageDeleter` path for pre-transition entries (their
+   objects are per-entry, never shared).
+2. Additionally enqueue `ImageGarbageCollector` with the deleted entry ids. It is
+   batch-shaped — for a feed-sized prune it issues one lock acquisition, one row
+   delete, one survivor query, and one storage request per store:
    - Load `Image.where(provider: [entry_preview, entry_link_preview], provider_id: ids)`.
-   - Group by `url_fingerprint`. For each fingerprint, inside a transaction holding
-     a `pg_advisory_xact_lock` on the fingerprint: delete the usage rows, re-check
-     `Image.where(url_fingerprint:).exists?`, and if none remain delete the R2 object.
+   - Inside ONE transaction holding `pg_advisory_xact_lock`s for every affected
+     fingerprint (taken sorted, so concurrent GC batches cannot deadlock): delete all
+     rows in one statement, find surviving fingerprints in one query, and delete the
+     orphaned fingerprints' R2 objects with batched `DeleteObjects` calls (999 keys per
+     request, the `ImageDeleter` pattern). The R2 delete stays inside the locks because
+     its keys are shared and deterministic — a resurrecting upload would recreate the
+     same key.
+   - After the locks: enqueue `ImageDeleter` (already batched) with the orphaned
+     fingerprints' `legacy_storage_url`s. Safe outside the locks because fresh uploads
+     write new per-entry legacy keys — nothing collides.
    - No Redis invalidation is needed for unified images: the positive `DownloadCache`
      is never written for them (the `images` table replaces it from day one), so there
      are no cache keys to go stale. Only the negative "attempted, failed" keys stay in

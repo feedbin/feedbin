@@ -35,11 +35,12 @@ module ImageCrawler
       end
     end
 
-    test "attaches to an existing image without downloading" do
+    test "attaches to an existing image with no storage API calls" do
       with_env("R2_BUCKET_IMAGES" => "images-test") do
         row = seed_row
-        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
+        # No webmock stubs: any HTTP request here would raise. Attaching is
+        # purely a database operation — the rows share both stored objects.
         assert_difference -> { ::Image.count }, +1 do
           assert Dedupe.attach(@original_url, @image)
         end
@@ -48,31 +49,19 @@ module ImageCrawler
         assert_equal row.storage_path, attached.storage_path
         assert_equal row.image_fingerprint, attached.image_fingerprint
         assert_equal 12_345, attached.bytesize
-        assert attached.data["legacy_storage_url"].include?(@image.image_name)
+        assert_equal row.data["legacy_storage_url"], attached.data["legacy_storage_url"]
 
         _, payload = EntryImage.jobs.last["args"]
         assert_equal row.storage_path, payload["storage_path"]
         assert_equal 12_345, payload["bytesize"]
         assert_equal "http://example.com/image-final.jpg", payload["original_url"]
-      end
-    end
-
-    test "falls back to download when the legacy copy source is gone" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
-        seed_row
-        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 404)
-
-        assert_no_difference -> { ::Image.count } do
-          refute Dedupe.attach(@original_url, @image)
-        end
-        assert_equal 0, EntryImage.jobs.size
+        assert_equal row.data["legacy_storage_url"], payload["processed_url"]
       end
     end
 
     test "falls back to download when GC removed the rows mid-flight" do
       with_env("R2_BUCKET_IMAGES" => "images-test") do
         seed_row
-        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
         dedupe = Dedupe.new(@original_url, @image)
         ::Image.delete_all

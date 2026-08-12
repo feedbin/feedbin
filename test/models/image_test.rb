@@ -78,4 +78,14 @@ class ImageTest < ActiveSupport::TestCase
     end
     assert yielded
   end
+
+  test "with_url_locks takes many locks in one acquisition" do
+    yielded = false
+    fingerprints = ["9e107d9d-372b-b682-6bd8-1d3542a419d6", Digest::MD5.hexdigest("other"), Digest::MD5.hexdigest("other")]
+    Image.with_url_locks(fingerprints) do
+      yielded = true
+      assert Image.connection.transaction_open?
+    end
+    assert yielded
+  end
 end

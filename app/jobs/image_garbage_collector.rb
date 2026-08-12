@@ -1,7 +1,14 @@
-# Removes images-table usage rows for deleted entries and deletes the shared
-# R2 object once nothing references it. The advisory lock serializes the
-# zero-reference check against Dedupe/create_image attaching a new reference
-# to the same object.
+# Removes images-table usage rows for deleted entries and deletes stored
+# objects once nothing references them. Designed for feed-sized batches:
+# one lock acquisition, one row delete, one survivor query, and one batched
+# DeleteObjects call per run — not one request per image.
+#
+# The advisory locks serialize the zero-reference check against
+# Dedupe/create_image attaching a new reference to the same object. The R2
+# delete happens inside the locks because its keys are shared and
+# deterministic (a resurrecting upload would recreate the same key); the
+# legacy S3 delete happens outside because fresh uploads write new per-entry
+# keys, so there is nothing to collide with.
 class ImageGarbageCollector
   include Sidekiq::Worker
   sidekiq_options queue: :utility
@@ -13,27 +20,32 @@ class ImageGarbageCollector
     rows = Image.entry_images.where(provider_id: entry_ids).to_a
     return if rows.empty?
 
-    # Each row's legacy S3 object is a per-entry copy (never shared), so it
-    # goes with the row unconditionally. Only the R2 object is refcounted.
-    legacy_urls = rows.filter_map { _1.data["legacy_storage_url"] }
-    ImageDeleter.perform_async(legacy_urls) if legacy_urls.present?
+    grouped = rows.group_by(&:url_fingerprint)
+    orphaned = []
 
-    rows.group_by(&:url_fingerprint).each do |fingerprint, group|
-      Image.with_url_lock(fingerprint) do
-        Image.where(id: group.map(&:id)).delete_all
-        unless Image.entry_images.where(url_fingerprint: fingerprint).exists?
-          delete_object(group.first.storage_path)
-        end
-      end
+    Image.with_url_locks(grouped.keys) do
+      Image.where(id: rows.map(&:id)).delete_all
+      survivors = Image.entry_images.where(url_fingerprint: grouped.keys).distinct.pluck(:url_fingerprint)
+      orphaned = grouped.keys - survivors
+      delete_r2_objects(orphaned.map { |fingerprint| grouped[fingerprint].first.storage_path })
     end
+
+    legacy_urls = orphaned.flat_map { |fingerprint|
+      grouped[fingerprint].filter_map { _1.data["legacy_storage_url"] }
+    }.uniq
+    ImageDeleter.perform_async(legacy_urls) if legacy_urls.present?
 
     Librato.increment("image.gc_rows", by: rows.size)
   end
 
-  def delete_object(path)
+  def delete_r2_objects(paths)
+    return if paths.empty?
     return if ENV["R2_BUCKET_IMAGES"].blank?
-    Fog::Storage.new(STORAGE_R2).delete_object(ENV["R2_BUCKET_IMAGES"], path)
-    Librato.increment("image.gc_objects")
-  rescue Excon::Error::NotFound
+
+    client = Fog::Storage.new(STORAGE_R2)
+    paths.each_slice(999) do |slice|
+      client.delete_multiple_objects(ENV["R2_BUCKET_IMAGES"], slice, {quiet: true})
+    end
+    Librato.increment("image.gc_objects", by: paths.size)
   end
 end
