@@ -43,6 +43,12 @@ module ImageCrawler
       end
 
       def attempt_unified(original_url)
+        if reuse_rules.skip?(original_url)
+          Librato.increment("image.reuse_skipped")
+          Sidekiq.logger.info @image.trace(message: "skipping reused image", metadata: {original_url: original_url})
+          return false
+        end
+
         download_cache = DownloadCache.new(original_url, @image)
 
         if Dedupe.attach(original_url, @image)
@@ -124,6 +130,10 @@ module ImageCrawler
 
         page_urls ||= []
         page_urls.concat(image_urls || [])
+      end
+
+      def reuse_rules
+        @reuse_rules ||= ReuseRules.new(@image)
       end
     end
   end

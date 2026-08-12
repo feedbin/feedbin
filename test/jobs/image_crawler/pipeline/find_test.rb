@@ -150,6 +150,34 @@ module ImageCrawler
           assert_requested :get, original_url
         end
       end
+
+      def test_should_skip_reused_meta_candidate_and_try_the_next_url
+        with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
+          reused_url = "http://example.com/og.jpg"
+          fresh_url = "http://example.com/inline.jpg"
+
+          ::Image.create!(
+            provider: :entry_preview, provider_id: "1", feed_id: 9,
+            url: reused_url, image_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.storage_path_for(reused_url),
+            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
+            data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
+          )
+          stub_request_file("image.jpeg", fresh_url, headers: {content_type: "image/jpeg"})
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "primary",
+            image_urls: [reused_url, fresh_url],
+            provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
+            page_url: "http://example.com/article", meta_image_urls: [reused_url]
+          )
+          Find.new.perform(image.to_h)
+
+          refute_requested :get, reused_url
+          assert_requested :get, fresh_url
+          assert_equal 1, Process.jobs.size
+        end
+      end
     end
   end
 end

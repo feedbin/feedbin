@@ -100,6 +100,44 @@ module ImageCrawler
         assert_nil queued.webp_path
         File.unlink(queued.processed_path)
       end
+
+      def test_should_reject_repeated_fingerprint_in_feed
+        with_env("R2_BUCKET_IMAGES" => "images-test", "IMAGE_REUSE_RULES" => "1") do
+          # Compute the fingerprint this exact source produces.
+          reference = Processor::Cropper.new(copy_support_file("image.jpeg"), crop: :smart_crop, extension: "jpeg", width: 542, height: 304).crop_pair!
+          fingerprint = reference[:webp].fingerprint
+          File.unlink(reference[:jpg].file)
+          File.unlink(reference[:webp].file)
+
+          original_url = "http://example.com/cache-busted.jpg?v=2"
+          ::Image.create!(
+            provider: :entry_preview, provider_id: "1", feed_id: 9,
+            url: "http://example.com/cache-busted.jpg?v=1",
+            image_fingerprint: fingerprint,
+            storage_path: ::Image.storage_path_for("http://example.com/cache-busted.jpg?v=1"),
+            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
+          )
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "primary",
+            image_urls: ["http://example.com/next-candidate.jpg"],
+            provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
+            page_url: "http://example.com/article", meta_image_urls: [original_url],
+            original_url: original_url, final_url: original_url,
+            download_path: copy_support_file("image.jpeg"), original_extension: "jpeg"
+          )
+
+          assert_no_difference -> { Upload.jobs.size } do
+            assert_difference -> { FindCritical.jobs.size }, +1 do
+              Process.new.perform(image.to_h)
+            end
+          end
+
+          requeued = Image.new(FindCritical.jobs.last["args"].first)
+          assert_equal ["http://example.com/next-candidate.jpg"], requeued.image_urls
+          assert_equal 9, requeued.feed_id
+        end
+      end
     end
   end
 end

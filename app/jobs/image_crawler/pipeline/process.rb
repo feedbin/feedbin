@@ -37,7 +37,14 @@ module ImageCrawler
           @image.placeholder_color   = cropped.placeholder_color
           @image.processed_extension = cropped.extension
 
-          Upload.perform_async(@image.to_h)
+          if reuse_rejected?
+            Librato.increment("image.reuse_rejected")
+            Sidekiq.logger.info "Process: rejecting reused fingerprint public_id=#{@image.id} original_url=#{@image.original_url}"
+            discard_processed_files
+            requeue_remaining
+          else
+            Upload.perform_async(@image.to_h)
+          end
         else
           requeue_remaining
         end
@@ -58,6 +65,17 @@ module ImageCrawler
           meta_image_urls: @image.meta_image_urls
         )
         FindCritical.perform_async(image.to_h)
+      end
+
+      def reuse_rejected?
+        return false unless @image.unified?
+        ReuseRules.new(@image).fingerprint_used_in_feed?(@image.fingerprint)
+      end
+
+      def discard_processed_files
+        [@image.processed_path, @image.webp_path].compact.each do |path|
+          File.unlink(path) rescue Errno::ENOENT
+        end
       end
     end
   end

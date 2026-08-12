@@ -35,13 +35,16 @@ module ImageCrawler
       cache.has_meta!(!urls.empty?)
     end
 
-    def parse(file)
-      Nokogiri.HTML5(file.read).search("meta[property='twitter:image'], meta[property='og:image']").map do |element|
+    def self.parse_meta_urls(html, base_url)
+      Nokogiri.HTML5(html).search("meta[property='twitter:image'], meta[property='og:image']").map do |element|
         url = element["content"]&.strip
-        next if url.nil?
-        next if url == ""
-        Addressable::URI.join(parsed_url, url)
+        next if url.blank?
+        Addressable::URI.join(base_url, url)
       end.compact
+    end
+
+    def parse(file)
+      self.class.parse_meta_urls(file.read, parsed_url)
     end
 
     def needs_download?
