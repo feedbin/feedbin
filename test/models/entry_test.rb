@@ -161,4 +161,61 @@ class EntryTest < ActiveSupport::TestCase
     @entry.data = {"tweet" => load_tweet("one")}
     assert_same @entry.tweet, @entry.tweet
   end
+
+  test "processed_image prefers R2 when configured" do
+    entry = create_entry(Feed.first)
+    entry.update(image: {
+      "original_url" => "http://example.com/image.jpg",
+      "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg",
+      "storage_path" => "abc/abcdef123.webp",
+      "width" => 542,
+      "height" => 304,
+      "placeholder_color" => "aabbcc"
+    })
+
+    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+      assert_equal "https://images.example.com/abc/abcdef123.webp", entry.processed_image
+      assert entry.processed_image?
+    end
+
+    with_env("R2_IMAGE_HOST" => nil) do
+      assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", entry.processed_image
+    end
+  end
+
+  test "processed_image ignores R2 host for legacy images without a storage_path" do
+    entry = create_entry(Feed.first)
+    entry.update(image: {
+      "original_url" => "http://example.com/image.jpg",
+      "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg",
+      "width" => 542,
+      "height" => 304
+    })
+
+    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+      assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", entry.processed_image
+    end
+  end
+
+  test "link_image prefers R2 and falls back to legacy keys" do
+    entry = create_entry(Feed.first)
+    entry.data ||= {}
+    entry.data["link_image"] = {
+      "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg",
+      "storage_path" => "abc/abcdef123.webp",
+      "placeholder_color" => "bbccdd"
+    }
+    entry.data["twitter_link_image_processed"] = "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg"
+    entry.data["twitter_link_image_placeholder_color"] = "ccddee"
+    entry.save!
+
+    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+      assert_equal "https://images.example.com/abc/abcdef123.webp", entry.link_image
+      assert_equal "bbccdd", entry.link_image_placeholder_color
+    end
+
+    with_env("R2_IMAGE_HOST" => nil) do
+      assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg", entry.link_image
+    end
+  end
 end

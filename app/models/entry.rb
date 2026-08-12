@@ -130,7 +130,13 @@ class Entry < ApplicationRecord
   end
 
   def processed_image
-    if image && image["original_url"] && image["width"] && image["height"] && image["processed_url"]
+    return unless image
+
+    if r2_url = r2_image_url(image["storage_path"])
+      return r2_url
+    end
+
+    if image["original_url"] && image["width"] && image["height"] && image["processed_url"]
       image_url = image["processed_url"]
       host = ENV["ENTRY_IMAGE_HOST"]
       url = URI(image_url)
@@ -302,6 +308,12 @@ class Entry < ApplicationRecord
   end
 
   def link_image
+    link_image_data = data && data["link_image"]
+
+    if link_image_data && (r2_url = r2_image_url(link_image_data["storage_path"]))
+      return r2_url
+    end
+
     if data && data["twitter_link_image_processed"]
       image_url = data["twitter_link_image_processed"]
 
@@ -315,8 +327,9 @@ class Entry < ApplicationRecord
   end
 
   def link_image_placeholder_color
-    if data && data["twitter_link_image_placeholder_color"].respond_to?(:length) && data["twitter_link_image_placeholder_color"].length == 6
-      data["twitter_link_image_placeholder_color"]
+    color = data && (data.dig("link_image", "placeholder_color") || data["twitter_link_image_placeholder_color"])
+    if color.respond_to?(:length) && color.length == 6
+      color
     end
   end
 
@@ -338,6 +351,12 @@ class Entry < ApplicationRecord
   end
 
   private
+
+  def r2_image_url(storage_path)
+    return nil if storage_path.blank?
+    return nil if ENV["R2_IMAGE_HOST"].blank?
+    [ENV["R2_IMAGE_HOST"].chomp("/"), storage_path].join("/")
+  end
 
   def provider_metadata
     if tweet? && tweet.main_tweet
