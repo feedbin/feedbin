@@ -32,27 +32,51 @@ module ImageCrawler
 
           Sidekiq.logger.info @image.trace(message: "attempting image candidate", metadata: {original_url: original_url})
 
-          download_cache = DownloadCache.copy(original_url, @image)
-
-          if download_cache.copied?
-            image             = download_cache.cached_image
-            image.storage_url = download_cache.storage_url
-            image.id          = @image.id
-            image.provider    = @image.provider
-            image.provider_id = @image.provider_id
-
-            image.send_to_feedbin
-
-            Sidekiq.logger.info @image.trace(message: "copied existing image", metadata: {image_url: @image.final_url, storage_url: @image.storage_url})
-            break
-          elsif download_cache.download?
-            break if download_image(original_url, download_cache)
+          if @image.unified?
+            break if attempt_unified(original_url)
           else
-            Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {image_url: @image.final_url})
+            break if attempt_legacy(original_url)
           end
         end
       rescue => exception
         Sidekiq.logger.info @image.trace(message: "find image exception", metadata: {exception: exception, backtrace: exception.backtrace})
+      end
+
+      def attempt_unified(original_url)
+        download_cache = DownloadCache.new(original_url, @image)
+
+        if Dedupe.attach(original_url, @image)
+          Librato.increment("image.dedupe_hit")
+          Sidekiq.logger.info @image.trace(message: "attached existing image", metadata: {original_url: original_url})
+          true
+        elsif download_cache.download?
+          download_image(original_url, download_cache)
+        else
+          Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {original_url: original_url})
+          false
+        end
+      end
+
+      def attempt_legacy(original_url)
+        download_cache = DownloadCache.copy(original_url, @image)
+
+        if download_cache.copied?
+          image             = download_cache.cached_image
+          image.storage_url = download_cache.storage_url
+          image.id          = @image.id
+          image.provider    = @image.provider
+          image.provider_id = @image.provider_id
+
+          image.send_to_feedbin
+
+          Sidekiq.logger.info @image.trace(message: "copied existing image", metadata: {image_url: @image.final_url, storage_url: @image.storage_url})
+          true
+        elsif download_cache.download?
+          download_image(original_url, download_cache)
+        else
+          Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {image_url: @image.final_url})
+          false
+        end
       end
 
       def download_image(original_url, download_cache)

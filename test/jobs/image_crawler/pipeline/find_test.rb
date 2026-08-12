@@ -111,6 +111,45 @@ module ImageCrawler
 
         assert_requested :get, camo_url
       end
+
+      def test_should_attach_existing_unified_image_without_downloading
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          original_url = "http://example.com/image.jpg"
+          ::Image.create!(
+            provider: :entry_preview,
+            provider_id: "1",
+            feed_id: 9,
+            url: original_url,
+            image_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.storage_path_for(original_url),
+            width: 542, height: 304, bytesize: 12_345,
+            placeholder_color: "aabbcc",
+            data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
+          )
+          stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
+
+          image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
+          Find.new.perform(image.to_h)
+
+          assert_equal 1, EntryImage.jobs.size
+          refute_requested :get, original_url
+          assert_equal 2, ::Image.entry_images.where(url_fingerprint: ::Image.url_fingerprint_for(original_url)).count
+        end
+      end
+
+      def test_should_download_unified_image_on_dedupe_miss
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          original_url = "http://example.com/image.jpg"
+          stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
+
+          image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
+
+          assert_difference -> { Process.jobs.size }, +1 do
+            Find.new.perform(image.to_h)
+          end
+          assert_requested :get, original_url
+        end
+      end
     end
   end
 end

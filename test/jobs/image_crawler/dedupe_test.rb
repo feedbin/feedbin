@@ -1,0 +1,85 @@
+require "test_helper"
+
+module ImageCrawler
+  class DedupeTest < ActiveSupport::TestCase
+    setup do
+      flush_redis
+      @original_url = "http://example.com/image.jpg"
+      @image = Image.new_with_attributes(
+        id: SecureRandom.hex,
+        preset_name: "primary",
+        image_urls: [],
+        provider: ::Image.providers[:entry_preview],
+        provider_id: 2,
+        feed_id: 9
+      )
+    end
+
+    def seed_row(provider_id: 1, data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", "final_url" => "http://example.com/image-final.jpg"})
+      ::Image.create!(
+        provider: :entry_preview,
+        provider_id: provider_id.to_s,
+        feed_id: 9,
+        url: @original_url,
+        image_fingerprint: SecureRandom.hex(16),
+        storage_path: ::Image.storage_path_for(@original_url),
+        width: 542, height: 304, bytesize: 12_345,
+        placeholder_color: "aabbcc",
+        data: data
+      )
+    end
+
+    test "returns false when nothing is stored for the url" do
+      with_env("R2_BUCKET_IMAGES" => "images-test") do
+        refute Dedupe.attach(@original_url, @image)
+      end
+    end
+
+    test "attaches to an existing image without downloading" do
+      with_env("R2_BUCKET_IMAGES" => "images-test") do
+        row = seed_row
+        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
+
+        assert_difference -> { ::Image.count }, +1 do
+          assert Dedupe.attach(@original_url, @image)
+        end
+
+        attached = ::Image.entry_images.find_by(provider_id: "2")
+        assert_equal row.storage_path, attached.storage_path
+        assert_equal row.image_fingerprint, attached.image_fingerprint
+        assert_equal 12_345, attached.bytesize
+        assert attached.data["legacy_storage_url"].include?(@image.image_name)
+
+        _, payload = EntryImage.jobs.last["args"]
+        assert_equal row.storage_path, payload["storage_path"]
+        assert_equal 12_345, payload["bytesize"]
+        assert_equal "http://example.com/image-final.jpg", payload["original_url"]
+      end
+    end
+
+    test "falls back to download when the legacy copy source is gone" do
+      with_env("R2_BUCKET_IMAGES" => "images-test") do
+        seed_row
+        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 404)
+
+        assert_no_difference -> { ::Image.count } do
+          refute Dedupe.attach(@original_url, @image)
+        end
+        assert_equal 0, EntryImage.jobs.size
+      end
+    end
+
+    test "falls back to download when GC removed the rows mid-flight" do
+      with_env("R2_BUCKET_IMAGES" => "images-test") do
+        seed_row
+        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
+
+        dedupe = Dedupe.new(@original_url, @image)
+        ::Image.delete_all
+
+        refute dedupe.attach
+        assert_equal 0, EntryImage.jobs.size
+      end
+    end
+  end
+end
