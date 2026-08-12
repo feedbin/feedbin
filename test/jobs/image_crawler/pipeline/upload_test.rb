@@ -40,6 +40,48 @@ module ImageCrawler
         assert_equal(width,        options["width"])
         assert_equal(height,       options["height"])
       end
+
+      def test_should_dual_write_unified_images
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          id = SecureRandom.hex
+          download_path = copy_support_file("image.jpeg")
+          webp_path = copy_support_file("image.jpeg")
+          original_url = "http://example.com/image.jpg"
+
+          image = Image.new_with_attributes(
+            id: id, preset_name: "primary", image_urls: [],
+            provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1,
+            fingerprint: SecureRandom.hex(16),
+            original_url: original_url, final_url: original_url,
+            download_path: download_path, processed_path: download_path,
+            webp_path: webp_path, bytesize: File.size(webp_path),
+            width: 542, height: 304, placeholder_color: "0867e2"
+          )
+
+          stub_request(:put, /s3\.amazonaws\.com/)
+          r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .with(headers: {"Content-Type" => "image/webp"})
+
+          assert_difference -> { ::Image.count }, +1 do
+            assert_difference -> { EntryImage.jobs.size }, +1 do
+              Upload.new.perform(image.to_h)
+            end
+          end
+
+          assert_requested r2_put
+
+          record = ::Image.entry_images.find_by(url_fingerprint: ::Image.url_fingerprint_for(original_url))
+          assert_equal "1", record.provider_id
+          assert_equal image.storage_path, record.storage_path
+          assert record.data["legacy_storage_url"].present?
+
+          _, payload = EntryImage.jobs.last["args"]
+          assert_equal image.storage_path, payload["storage_path"]
+
+          # the positive redis cache is retired for unified images
+          assert_nil DownloadCache.new(original_url, image).cached_image
+        end
+      end
     end
   end
 end
