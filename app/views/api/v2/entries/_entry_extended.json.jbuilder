@@ -11,11 +11,11 @@ present entry do |entry_presenter|
   json.extracted_content_url entry.extracted_content_url
   json.images do
     if entry.processed_image?
-      json.original_url entry.image["original_url"]
+      json.original_url entry.preview_image_data["original_url"]
       json.size_1 do
         json.cdn_url entry.processed_image
-        json.width entry.image["width"]
-        json.height entry.image["height"]
+        json.width entry.preview_image_data["width"]
+        json.height entry.preview_image_data["height"]
       end
     else
       json.null!

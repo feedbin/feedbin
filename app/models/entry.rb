@@ -12,8 +12,8 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
-  has_many :images, -> { entry_images }, foreign_key: :provider_id, primary_key: :id
-  has_many :icons,  -> { entry_icons },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
+  has_one :preview_image_record, -> { provider_entry_preview }, class_name: "Image", foreign_key: :provider_id
+  has_one :link_image_record, -> { provider_entry_link_preview }, class_name: "Image", foreign_key: :provider_id
 
   before_create :ensure_published
   before_create :create_summary
@@ -58,6 +58,7 @@ class Entry < ApplicationRecord
 
   def self.entries_list
     select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
+      .preload(:preview_image_record, :link_image_record)
   end
 
   def self.sort_preference(sort)
@@ -133,29 +134,40 @@ class Entry < ApplicationRecord
     r2_processed_image || legacy_processed_image
   end
 
+  # New images live on the images row; entries crawled before the R2
+  # transition keep their JSON. Reads prefer the row, then fall back.
   def r2_processed_image
-    return unless image
-    r2_image_url(image["storage_path"])
+    if preview_image_record
+      r2_image_url(preview_image_record.storage_path)
+    elsif image
+      r2_image_url(image["storage_path"])
+    end
   end
 
   def legacy_processed_image
-    return unless image
+    if preview_image_record
+      legacy_image_url(preview_image_record.data["legacy_storage_url"])
+    elsif image && image["original_url"] && image["width"] && image["height"] && image["processed_url"]
+      legacy_image_url(image["processed_url"])
+    end
+  end
 
-    if image["original_url"] && image["width"] && image["height"] && image["processed_url"]
-      image_url = image["processed_url"]
-      host = ENV["ENTRY_IMAGE_HOST"]
-      url = URI(image_url)
-      unless Rails.env.development?
-        url.scheme = "https"
-      end
-      url.host = host if host
-      url.to_s
+  def preview_image_data
+    if record = preview_image_record
+      {
+        "original_url" => record.data["final_url"] || record.url,
+        "width" => record.width,
+        "height" => record.height
+      }
+    else
+      image
     end
   end
 
   def placeholder_color
-    if image && image["placeholder_color"].respond_to?(:length) && image["placeholder_color"].length == 6
-      image["placeholder_color"]
+    color = preview_image_record&.placeholder_color || (image && image["placeholder_color"])
+    if color.respond_to?(:length) && color.length == 6
+      color
     end
   end
 
@@ -297,7 +309,7 @@ class Entry < ApplicationRecord
   def tweet
     @tweet ||=
       if data.is_a?(Hash) && data["tweet"].is_a?(Hash)
-        Tweet.new(data, image) rescue nil
+        Tweet.new(data, image || preview_image_record) rescue nil
       end
   end
 
@@ -313,13 +325,9 @@ class Entry < ApplicationRecord
   end
 
   def link_image
-    link_image_data = data && data["link_image"]
-
-    if link_image_data && (r2_url = r2_image_url(link_image_data["storage_path"]))
-      return r2_url
-    end
-
-    if data && data["twitter_link_image_processed"]
+    if record = link_image_record
+      r2_image_url(record.storage_path) || legacy_image_url(record.data["legacy_storage_url"])
+    elsif data && data["twitter_link_image_processed"]
       image_url = data["twitter_link_image_processed"]
 
       host = ENV["ENTRY_IMAGE_HOST"]
@@ -332,7 +340,7 @@ class Entry < ApplicationRecord
   end
 
   def link_image_placeholder_color
-    color = data && (data.dig("link_image", "placeholder_color") || data["twitter_link_image_placeholder_color"])
+    color = link_image_record&.placeholder_color || (data && data["twitter_link_image_placeholder_color"])
     if color.respond_to?(:length) && color.length == 6
       color
     end
@@ -366,6 +374,17 @@ class Entry < ApplicationRecord
     return nil if host.blank?
     host = "https://#{host}" unless host.match?(%r{\Ahttps?://})
     [host.chomp("/"), storage_path].join("/")
+  end
+
+  def legacy_image_url(image_url)
+    return nil if image_url.blank?
+    host = ENV["ENTRY_IMAGE_HOST"]
+    url = URI(image_url)
+    unless Rails.env.development?
+      url.scheme = "https"
+    end
+    url.host = host if host
+    url.to_s
   end
 
   def provider_metadata

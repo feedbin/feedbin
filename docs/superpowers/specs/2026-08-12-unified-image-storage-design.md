@@ -138,24 +138,34 @@ does exactly this.
 
 ### Callbacks
 
-`send_to_feedbin` continues to update the legacy JSON for compatibility, and the Image
-row becomes the canonical record. `TwitterLinkImage`'s `"#{public_id}-twitter"` id hack
-stays at the job-routing layer only; the row is keyed properly by provider enum.
+The Image row is the single store for new images. When the callback payload carries a
+`storage_path` (row-backed), `EntryImage#receive` / `TwitterLinkImage#receive` only
+`touch` the entry to bust cached views — no metadata is written to the entry. Payloads
+without a `storage_path` (pipeline running without `R2_BUCKET_IMAGES`, i.e. rollback)
+write the legacy JSON exactly as before. `TwitterLinkImage`'s `"#{public_id}-twitter"`
+id hack stays at the job-routing layer only; the row is keyed properly by provider enum.
 
 ## Serving and read path
 
-`Entry#processed_image` today rewrites the host of whatever URL sits in `entries.image`
-to `ENTRY_IMAGE_HOST`. Mixing S3 and R2 absolute URLs through one rewrite breaks one or
-the other — this is why the table stores `storage_path`, not a URL.
+Image metadata lives in exactly one place per image generation: the `images` row for
+new images, the entry JSON (`entries.image` / `data["twitter_link_image_*"]`) for
+entries crawled before the transition. Reads prefer the row and fall back to the JSON.
 
-- New unified accessors: `Entry#preview_image` / `Entry#link_preview_image` (plus
-  width/height/bytesize/placeholder_color) prefer the `Image` row — URL built as
-  `R2_IMAGE_HOST + storage_path` — and fall back to the legacy JSON fields.
-  `ENTRY_IMAGE_HOST` rewriting applies to the legacy fallback only.
-- Cutover behind an env flag: until flipped, readers use legacy JSON (S3) even though
-  rows exist; after flipping, Image rows win. Rollback = unset flag.
-- Consumers to update: `EntryPresenter`, `entry_image_component.rb`,
-  `_entry.html.erb` (link image), API v2 `_entry_extended.json.jbuilder` (`images.size_1`).
+- Associations: `Entry has_one :preview_image_record / :link_image_record`
+  (`Image` scoped by provider, keyed on `provider_id`). `Entry.entries_list` —
+  the shared scope behind every entry-list render — preloads both, so list
+  rendering issues no per-entry queries.
+- Accessors: `Entry#processed_image` / `#link_image` build the URL from the row's
+  `storage_path` + `R2_IMAGE_HOST` when configured, else from the row's
+  `data["legacy_storage_url"]` (S3, with the `ENTRY_IMAGE_HOST` rewrite), else from
+  the legacy JSON. `Entry#preview_image_data` serves the API's
+  original_url/width/height the same row-first way. `Entry#processed_image?` doubles
+  as the pipeline's already-crawled guard, so it must keep answering for both stores.
+- Read cutover remains `R2_IMAGE_HOST`: unset, row-backed images serve their
+  legacy S3 object; set, they serve WebP from R2. Rollback = unset.
+- Legacy per-entry S3 objects for row-backed images are deleted by the garbage
+  collector from `data["legacy_storage_url"]` (they are never shared); the entry-JSON
+  pluck in `EntryDeleter` covers pre-transition entries only.
 
 ## Garbage collection
 

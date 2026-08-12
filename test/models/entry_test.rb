@@ -217,25 +217,76 @@ class EntryTest < ActiveSupport::TestCase
     end
   end
 
-  test "link_image prefers R2 and falls back to legacy keys" do
+  test "link_image falls back to legacy data keys" do
     entry = create_entry(Feed.first)
     entry.data ||= {}
-    entry.data["link_image"] = {
-      "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg",
-      "storage_path" => "abc/abcdef123.webp",
-      "placeholder_color" => "bbccdd"
-    }
     entry.data["twitter_link_image_processed"] = "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg"
     entry.data["twitter_link_image_placeholder_color"] = "ccddee"
     entry.save!
 
+    assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg", entry.link_image
+    assert_equal "ccddee", entry.link_image_placeholder_color
+  end
+
+  test "processed_image reads from the images row" do
+    entry = create_entry(Feed.first)
+    row = create_image_row(entry)
+
     with_env("R2_IMAGE_HOST" => "https://images.example.com") do
-      assert_equal "https://images.example.com/abc/abcdef123.webp", entry.link_image
-      assert_equal "bbccdd", entry.link_image_placeholder_color
+      assert_equal "https://images.example.com/#{row.storage_path}", entry.reload.processed_image
     end
 
     with_env("R2_IMAGE_HOST" => nil) do
-      assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef-twitter.jpg", entry.link_image
+      assert_equal "https://bucket.s3.amazonaws.com/abc/legacy.jpg", entry.reload.processed_image
     end
+
+    assert entry.processed_image?
+    assert_equal "aabbcc", entry.placeholder_color
+  end
+
+  test "preview_image_data prefers the row and falls back to legacy JSON" do
+    entry = create_entry(Feed.first)
+    entry.update(image: {"original_url" => "http://old.example.com/i.jpg", "width" => 100, "height" => 50})
+    assert_equal 100, entry.preview_image_data["width"]
+
+    create_image_row(entry)
+    entry.reload
+    assert_equal "http://example.com/image-final.jpg", entry.preview_image_data["original_url"]
+    assert_equal 542, entry.preview_image_data["width"]
+    assert_equal 304, entry.preview_image_data["height"]
+  end
+
+  test "link_image reads from the images row" do
+    entry = create_entry(Feed.first)
+    row = create_image_row(entry, provider: :entry_link_preview, url: "http://example.com/link.jpg")
+
+    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+      assert_equal "https://images.example.com/#{row.storage_path}", entry.reload.link_image
+    end
+
+    with_env("R2_IMAGE_HOST" => nil) do
+      assert_equal "https://bucket.s3.amazonaws.com/abc/legacy.jpg", entry.reload.link_image
+    end
+
+    assert_equal "aabbcc", entry.link_image_placeholder_color
+  end
+
+  private
+
+  def create_image_row(entry, provider: :entry_preview, url: "http://example.com/image.jpg")
+    Image.create!(
+      provider: provider,
+      provider_id: entry.id.to_s,
+      feed_id: entry.feed_id,
+      url: url,
+      image_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for(url),
+      width: 542, height: 304, bytesize: 12_345,
+      placeholder_color: "aabbcc",
+      data: {
+        "legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg",
+        "final_url" => "http://example.com/image-final.jpg"
+      }
+    )
   end
 end

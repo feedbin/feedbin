@@ -104,6 +104,44 @@ module ImageCrawler
       end
     end
 
+    test "should not duplicate row-backed images onto the entry" do
+      image = {
+        "original_url" => "http://example.com/image.jpg",
+        "processed_url" => "http://cdn.example.com/image.jpg",
+        "width" => 542,
+        "height" => 304,
+        "bytesize" => 12_345,
+        "placeholder_color" => "aabbcc",
+        "storage_path" => "abc/abcdef.webp",
+        "provider" => "entry_preview"
+      }
+
+      original_updated_at = @entry.updated_at
+      EntryImage.new.perform(@entry.public_id, image)
+
+      @entry.reload
+      assert_nil @entry.image
+      assert @entry.updated_at > original_updated_at, "the callback should touch the entry to bust cached views"
+    end
+
+    test "should skip enqueue when an images row exists" do
+      ::Image.create!(
+        provider: :entry_preview,
+        provider_id: @entry.id.to_s,
+        feed_id: @entry.feed_id,
+        url: "http://example.com/image.jpg",
+        image_fingerprint: SecureRandom.hex(16),
+        storage_path: ::Image.storage_path_for("http://example.com/image.jpg"),
+        width: 542, height: 304, bytesize: 12_345,
+        placeholder_color: "aabbcc",
+        data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg"}
+      )
+
+      assert_no_difference -> { Pipeline::Find.jobs.size } do
+        EntryImage.new.perform(@entry.public_id)
+      end
+    end
+
     test "should enqueue Find with feed context and meta urls" do
       content = <<-EOT
       <meta property="og:image" content="/og">

@@ -13,6 +13,11 @@ class ImageGarbageCollector
     rows = Image.entry_images.where(provider_id: entry_ids).to_a
     return if rows.empty?
 
+    # Each row's legacy S3 object is a per-entry copy (never shared), so it
+    # goes with the row unconditionally. Only the R2 object is refcounted.
+    legacy_urls = rows.filter_map { _1.data["legacy_storage_url"] }
+    ImageDeleter.perform_async(legacy_urls) if legacy_urls.present?
+
     rows.group_by(&:url_fingerprint).each do |fingerprint, group|
       Image.with_url_lock(fingerprint) do
         Image.where(id: group.map(&:id)).delete_all

@@ -62,7 +62,29 @@ module ImageCrawler
       assert_equal "http://example.com/linked-page", image.entry_url
     end
 
-    test "should store the full link_image metadata" do
+    test "should write legacy data keys for non-row payloads" do
+      entry = Feed.first.entries.create(
+        content: "content",
+        public_id: SecureRandom.hex,
+        url: "http://example.com/article",
+        data: {}
+      )
+
+      payload = {
+        "original_url" => "http://example.com/image.jpg",
+        "processed_url" => "https://bucket.s3.amazonaws.com/abc/abc.jpg",
+        "width" => 542,
+        "height" => 304,
+        "placeholder_color" => "aabbcc"
+      }
+      TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload)
+
+      entry.reload
+      assert_equal payload["processed_url"], entry.data["twitter_link_image_processed"]
+      assert_equal "aabbcc", entry.data["twitter_link_image_placeholder_color"]
+    end
+
+    test "should not duplicate row-backed images onto the entry" do
       entry = Feed.first.entries.create(
         content: "content",
         public_id: SecureRandom.hex,
@@ -83,9 +105,8 @@ module ImageCrawler
       TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload)
 
       entry.reload
-      assert_equal payload, entry.data["link_image"]
-      assert_equal payload["processed_url"], entry.data["twitter_link_image_processed"]
-      assert_equal "aabbcc", entry.data["twitter_link_image_placeholder_color"]
+      assert_nil entry.data["link_image"]
+      assert_nil entry.data["twitter_link_image_processed"]
     end
   end
 end

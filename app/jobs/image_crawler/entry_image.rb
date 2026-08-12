@@ -83,7 +83,14 @@ module ImageCrawler
     end
 
     def receive
-      @entry.update(image: @image)
+      if @image["storage_path"]
+        # Row-backed image: Upload/Dedupe already created the images row
+        # before enqueueing this callback. The touch busts cached entry
+        # views; metadata is not duplicated onto the entry.
+        @entry.touch
+      else
+        @entry.update(image: @image)
+      end
     end
 
     def find_image_urls

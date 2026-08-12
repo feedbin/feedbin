@@ -32,10 +32,15 @@ module ImageCrawler
     end
 
     def receive
-      @entry.data["twitter_link_image_processed"] = @image["processed_url"]
-      @entry.data["twitter_link_image_placeholder_color"] = @image["placeholder_color"]
-      @entry.data["link_image"] = @image
-      @entry.save!
+      if @image["storage_path"]
+        # Row-backed image: metadata lives on the images row; the touch
+        # busts cached entry views.
+        @entry.touch
+      else
+        @entry.data["twitter_link_image_processed"] = @image["processed_url"]
+        @entry.data["twitter_link_image_placeholder_color"] = @image["placeholder_color"]
+        @entry.save!
+      end
     end
   end
 end

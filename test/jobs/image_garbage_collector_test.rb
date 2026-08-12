@@ -15,8 +15,23 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
       image_fingerprint: SecureRandom.hex(16),
       storage_path: Image.storage_path_for(url),
       width: 542, height: 304, bytesize: 12_345,
-      placeholder_color: "aabbcc"
+      placeholder_color: "aabbcc",
+      data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy-#{provider_id}.jpg"}
     )
+  end
+
+  test "deletes each row's per-entry legacy object regardless of refcount" do
+    with_env("R2_BUCKET_IMAGES" => "images-test") do
+      seed_row(provider_id: 1)
+      seed_row(provider_id: 2)
+      stub_request(:delete, /r2\.cloudflarestorage\.com/).to_return(status: 204)
+
+      assert_difference -> { ImageDeleter.jobs.size }, +1 do
+        ImageGarbageCollector.new.perform([1])
+      end
+
+      assert_equal ["https://bucket.s3.amazonaws.com/abc/legacy-1.jpg"], ImageDeleter.jobs.last["args"].first
+    end
   end
 
   test "keeps the object while other entries reference it" do
