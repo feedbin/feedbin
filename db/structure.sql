@@ -528,9 +528,7 @@ CREATE TABLE public.entries (
     provider_id text,
     provider_parent_id text,
     chapters jsonb,
-    categories jsonb,
-    image_provider bigint,
-    image_provider_id text
+    categories jsonb
 );
 
 
@@ -645,8 +643,6 @@ CREATE TABLE public.feeds (
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
     crawl_data jsonb,
-    image_provider bigint,
-    image_provider_id text,
     redirected_to text
 );
 

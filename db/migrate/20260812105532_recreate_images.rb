@@ -1,8 +1,5 @@
 class RecreateImages < ActiveRecord::Migration[8.1]
   def change
-    drop_table :image_tags, if_exists: true
-    drop_table :images, if_exists: true
-
     create_table :images do |t|
       t.bigint :provider,          null: false
       t.text   :provider_id,       null: false
