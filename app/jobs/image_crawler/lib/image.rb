@@ -85,12 +85,13 @@ module ImageCrawler
       new(other.merge(arguments))
     end
 
+    # Ignores attributes it does not recognize: pipeline jobs are retry: false
+    # and run on host-local queues, so payloads written by a newer deploy must
+    # not crash a not-yet-deployed consumer (and vice versa).
     def initialize(data = {})
       data.each do |name, value|
         if ATTRIBUTES.include?(name.to_sym)
           instance_variable_set("@#{name}", value)
-        else
-          raise ArgumentError.new("Unknown #{self.class.name} attribute: #{name}")
         end
       end
     end
