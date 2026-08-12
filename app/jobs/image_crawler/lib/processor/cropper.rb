@@ -6,6 +6,9 @@ module ImageCrawler
       PIGO_INSTALLED = File.executable?(PIGO)
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
+      JPG_SAVER  = {strip: true, quality: 80, background: 255}.freeze
+      WEBP_SAVER = {strip: true, quality: 65}.freeze
+
       attr_reader :path
 
       def initialize(file, crop:, extension:, width:, height:)
@@ -17,7 +20,19 @@ module ImageCrawler
       end
 
       def crop!
-        send(@crop)
+        return limit_crop if @crop == :limit_crop
+        Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
+      end
+
+      # One geometry pass, two encodings. Only the fill/smart crops support
+      # this; limit_crop (icons) picks its own format and may keep the
+      # original file, and never dual-writes.
+      def crop_pair!
+        cropped = geometry
+        {
+          jpg:  Processed.from_pipeline(save_as(cropped, "jpg", JPG_SAVER)),
+          webp: Processed.from_pipeline(save_as(cropped, "webp", WEBP_SAVER))
+        }
       end
 
       def source
@@ -35,12 +50,18 @@ module ImageCrawler
         false
       end
 
+      def geometry
+        @geometry ||= send(@crop)
+      end
+
+      def save_as(pipeline, format, saver)
+        pipeline.convert(format).saver(**saver)
+      end
+
       def pipeline(width, height)
         ImageProcessing::Vips
           .source(source)
           .resize_to_fill(width, height)
-          .convert("jpg")
-          .saver(strip: true, quality: 80, background: 255)
       end
 
       def limit_crop
@@ -62,8 +83,7 @@ module ImageCrawler
       end
 
       def fill_crop
-        image = pipeline(@width, @height)
-        Processed.from_pipeline(image)
+        pipeline(@width, @height)
       end
 
       def smart_crop
@@ -81,7 +101,7 @@ module ImageCrawler
           max = proposed_size.height - @height
         end
 
-        if PIGO_INSTALLED && center = average_face_position(axis, image.call)
+        if PIGO_INSTALLED && center = average_face_position(axis, save_as(image, "jpg", JPG_SAVER).call)
           point = {"x" => 0, "y" => 0}
           point[axis] = (center.to_f - contraint.to_f / 2.0).floor
 
@@ -96,7 +116,7 @@ module ImageCrawler
           image = image.resize_to_fill(@width, @height, crop: :attention)
         end
 
-        Processed.from_pipeline(image)
+        image
       end
 
       def proposed_size

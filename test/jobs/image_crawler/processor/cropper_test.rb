@@ -113,6 +113,40 @@ module ImageCrawler
 
         FileUtils.rm file
       end
+
+      def test_should_crop_pair_in_both_formats
+        file = copy_support_file("image.jpeg")
+        cropper = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 542, height: 304)
+        pair = cropper.crop_pair!
+
+        assert_equal(542, pair[:jpg].width)
+        assert_equal(304, pair[:jpg].height)
+        assert pair[:jpg].file.end_with?(".jpg")
+        assert_equal(:jpeg, ImageFormat.detect(pair[:jpg].file))
+
+        assert_equal(542, pair[:webp].width)
+        assert_equal(304, pair[:webp].height)
+        assert pair[:webp].file.end_with?(".webp")
+        assert_equal(:webp, ImageFormat.detect(pair[:webp].file))
+        assert pair[:webp].size.positive?
+
+        FileUtils.rm pair[:jpg].file
+        FileUtils.rm pair[:webp].file
+      end
+
+      def test_should_crop_pair_with_smart_crop
+        file = copy_support_file("image.jpeg")
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+        pair = cropper.crop_pair!
+
+        assert_equal(:jpeg, ImageFormat.detect(pair[:jpg].file))
+        assert_equal(:webp, ImageFormat.detect(pair[:webp].file))
+        assert_equal(pair[:jpg].width, pair[:webp].width)
+        assert_equal(pair[:jpg].height, pair[:webp].height)
+
+        FileUtils.rm pair[:jpg].file
+        FileUtils.rm pair[:webp].file
+      end
     end
   end
 end
