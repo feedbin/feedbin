@@ -1,14 +1,15 @@
 # t.bigint :provider,          null: false
 # t.text   :provider_id,       null: false
+# t.bigint :feed_id
 # t.text   :url,               null: false
 # t.uuid   :url_fingerprint,   null: false
-# t.text   :storage_url,       null: false
 # t.uuid   :image_fingerprint, null: false
+# t.text   :storage_path,      null: false
 # t.bigint :width,             null: false
 # t.bigint :height,            null: false
+# t.bigint :bytesize,          null: false
 # t.text   :placeholder_color, null: false
 # t.jsonb  :data,              null: false, default: {}
-# t.jsonb  :settings,          null: false, default: {}
 
 class Image < ApplicationRecord
   enum :provider, {
@@ -29,10 +30,45 @@ class Image < ApplicationRecord
 
   before_save :fingerprint_url
 
+  def self.url_fingerprint_for(url)
+    Digest::MD5.hexdigest(url.to_s.strip)
+  end
+
+  def self.storage_path_for(url)
+    fingerprint = url_fingerprint_for(url)
+    File.join(fingerprint[0..2], "#{fingerprint}.webp")
+  end
+
+  # Upsert keyed by (provider, provider_id). Not create_or_find_by: a unique
+  # violation inside the transactional test wrapper poisons the transaction,
+  # and concurrent duplicates are already rare — retry after RecordNotUnique
+  # covers the cross-process race.
+  def self.attach!(attributes)
+    attributes = attributes.symbolize_keys
+    attributes[:provider_id] = attributes[:provider_id].to_s
+    record = find_by(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)) ||
+      new(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id))
+    record.assign_attributes(attributes)
+    record.save!
+    record
+  rescue ActiveRecord::RecordNotUnique
+    retry
+  end
+
+  # Serializes attach vs. garbage collection for one stored object. The
+  # fingerprint arrives dashed when read back from the uuid column and
+  # undashed when freshly computed; normalize so both take the same lock.
+  def self.with_url_lock(fingerprint)
+    key = fingerprint.to_s.delete("-")
+    transaction do
+      connection.select_value(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", key]))
+      yield
+    end
+  end
+
   private
 
   def fingerprint_url
-    self[:url_fingerprint] = Digest::MD5.hexdigest(url)
+    self[:url_fingerprint] = self.class.url_fingerprint_for(url)
   end
-
 end

@@ -2,12 +2,11 @@ SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = off;
+SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
-SET escape_string_warning = off;
 SET row_security = off;
 
 --
@@ -53,8 +52,6 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 
 
 SET default_tablespace = '';
-
-SET default_with_oids = false;
 
 --
 -- Name: account_migration_items; Type: TABLE; Schema: public; Owner: -
@@ -531,7 +528,9 @@ CREATE TABLE public.entries (
     provider_id text,
     provider_parent_id text,
     chapters jsonb,
-    categories jsonb
+    categories jsonb,
+    image_provider bigint,
+    image_provider_id text
 );
 
 
@@ -646,6 +645,8 @@ CREATE TABLE public.feeds (
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
     crawl_data jsonb,
+    image_provider bigint,
+    image_provider_id text,
     redirected_to text
 );
 
@@ -667,6 +668,48 @@ CREATE SEQUENCE public.feeds_id_seq
 --
 
 ALTER SEQUENCE public.feeds_id_seq OWNED BY public.feeds.id;
+
+
+--
+-- Name: images; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.images (
+    id bigint NOT NULL,
+    provider bigint NOT NULL,
+    provider_id text NOT NULL,
+    feed_id bigint,
+    url text NOT NULL,
+    url_fingerprint uuid NOT NULL,
+    image_fingerprint uuid NOT NULL,
+    storage_path text NOT NULL,
+    width bigint NOT NULL,
+    height bigint NOT NULL,
+    bytesize bigint NOT NULL,
+    placeholder_color text NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.images_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.images_id_seq OWNED BY public.images.id;
 
 
 --
@@ -1669,6 +1712,13 @@ ALTER TABLE ONLY public.feeds ALTER COLUMN id SET DEFAULT nextval('public.feeds_
 
 
 --
+-- Name: images id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.images ALTER COLUMN id SET DEFAULT nextval('public.images_id_seq'::regclass);
+
+
+--
 -- Name: import_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1977,6 +2027,14 @@ ALTER TABLE ONLY public.feed_stats
 
 ALTER TABLE ONLY public.feeds
     ADD CONSTRAINT feeds_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: images images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.images
+    ADD CONSTRAINT images_pkey PRIMARY KEY (id);
 
 
 --
@@ -2436,6 +2494,27 @@ CREATE INDEX index_feeds_on_redirected_to ON public.feeds USING btree (redirecte
 --
 
 CREATE INDEX index_feeds_on_standalone_request_at ON public.feeds USING btree (standalone_request_at DESC) WHERE (standalone_request_at IS NOT NULL);
+
+
+--
+-- Name: index_images_on_feed_id_and_image_fingerprint; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_images_on_feed_id_and_image_fingerprint ON public.images USING btree (feed_id, image_fingerprint);
+
+
+--
+-- Name: index_images_on_provider_and_provider_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_images_on_provider_and_provider_id ON public.images USING btree (provider, provider_id);
+
+
+--
+-- Name: index_images_on_url_fingerprint; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_images_on_url_fingerprint ON public.images USING btree (url_fingerprint);
 
 
 --
@@ -3041,6 +3120,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260812105532'),
 ('20260604120000'),
 ('20251027170411'),
 ('20250117094633'),
