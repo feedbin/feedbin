@@ -118,5 +118,38 @@ module ImageCrawler
         assert_equal :icon_crop, image.preset.crop
       end
     end
+
+    # Icons mutate under a stable URL, so the URL cannot name the object. Two
+    # different sources that happen to serve identical bytes get one object;
+    # one URL serving new bytes gets a new one.
+    test "icon presets derive storage_path from the original bytes" do
+      fingerprint = Digest::MD5.hexdigest("bytes")
+      build = ->(url) {
+        Image.new_with_attributes(
+          id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+          provider: ::Image.providers[:feed_icon], provider_id: 1,
+          original_url: url, original_fingerprint: fingerprint
+        )
+      }
+
+      assert build.call("http://a.example.com/favicon.ico").content_addressed?
+      assert_equal ::Image.content_storage_path_for(fingerprint, "32x32", "png"),
+        build.call("http://a.example.com/favicon.ico").storage_path
+      assert_equal build.call("http://a.example.com/favicon.ico").storage_path,
+        build.call("http://b.example.com/favicon.ico").storage_path
+      assert_not build.call("http://a.example.com/favicon.ico").legacy_store?
+    end
+
+    test "entry presets stay keyed by url" do
+      image = Image.new_with_attributes(
+        id: SecureRandom.hex, preset_name: "primary", image_urls: [],
+        provider: ::Image.providers[:entry_preview], provider_id: 1,
+        original_url: "http://example.com/a.jpg", original_fingerprint: Digest::MD5.hexdigest("bytes")
+      )
+
+      assert_not image.content_addressed?
+      assert image.legacy_store?
+      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "webp"), image.storage_path
+    end
   end
 end

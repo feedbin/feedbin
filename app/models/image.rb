@@ -42,6 +42,14 @@ class Image < ApplicationRecord
     path_for(url_fingerprint_for(url, variant), extension)
   end
 
+  # The icon family's stored-object identity, in contrast to storage_path_for's:
+  # these sources mutate under a stable URL (/favicon.ico serves new bytes; a
+  # channel changes its avatar), so the URL answers "have we seen this source?"
+  # and only the bytes answer "which object is this?".
+  def self.content_storage_path_for(original_fingerprint, variant, extension)
+    path_for(Digest::MD5.hexdigest("#{variant}|#{original_fingerprint}"), extension)
+  end
+
   def self.path_for(fingerprint, extension)
     File.join(fingerprint[0..2], "#{fingerprint}.#{extension}")
   end

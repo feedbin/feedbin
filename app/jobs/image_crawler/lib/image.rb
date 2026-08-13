@@ -204,6 +204,32 @@ module ImageCrawler
       preset.unified == true && ENV["R2_BUCKET_IMAGES"].present?
     end
 
+    def storage_path
+      if content_addressed?
+        ::Image.content_storage_path_for(original_fingerprint, variant, preset.format)
+      else
+        ::Image.storage_path_for(original_url, variant, preset.format)
+      end
+    end
+
+    # The icon family: storage identity comes from the original bytes rather
+    # than the URL, and the pipeline always downloads before deciding anything.
+    def content_addressed?
+      preset.content_addressed == true
+    end
+
+    # Entry presets dual-store: the legacy S3 jpg is what pre-R2 clients read.
+    # Icons store one object. Presets that say nothing keep dual-storing.
+    def legacy_store?
+      preset.legacy_store != false
+    end
+
+    # The R2 object is the webp for the dual-format entry presets and the
+    # single PNG for icons.
+    def r2_source_path
+      webp_path || processed_path
+    end
+
     # The stored-object identity is (url, variant): presets sharing an output
     # geometry share objects, presets that differ (podcast 200x200 vs entry
     # 542x304) never collide even for the same source URL.
@@ -213,10 +239,6 @@ module ImageCrawler
 
     def url_fingerprint
       ::Image.url_fingerprint_for(original_url, variant)
-    end
-
-    def storage_path
-      ::Image.storage_path_for(original_url, variant, preset.format)
     end
 
     def provider_label

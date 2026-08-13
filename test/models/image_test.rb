@@ -105,4 +105,15 @@ class ImageTest < ActiveSupport::TestCase
     assert_equal File.join(fingerprint[0..2], "#{fingerprint}.png"),
       Image.storage_path_for("http://example.com/a.jpg", "32x32", "png")
   end
+
+  test "content_storage_path_for keys on the bytes, not the url" do
+    fingerprint = Digest::MD5.hexdigest("some original bytes")
+    expected = Digest::MD5.hexdigest("32x32|#{fingerprint}")
+
+    assert_equal File.join(expected[0..2], "#{expected}.png"),
+      Image.content_storage_path_for(fingerprint, "32x32", "png")
+
+    refute_equal Image.content_storage_path_for(fingerprint, "32x32", "png"),
+      Image.content_storage_path_for(fingerprint, "200x200", "png")
+  end
 end
