@@ -35,9 +35,15 @@ class Image < ApplicationRecord
     Digest::MD5.hexdigest("#{variant}|#{url.to_s.strip}")
   end
 
-  def self.storage_path_for(url, variant)
-    fingerprint = url_fingerprint_for(url, variant)
-    File.join(fingerprint[0..2], "#{fingerprint}.webp")
+  # The extension is the stored object's format, which is a property of the
+  # preset: webp for entry previews, png for the icon family (alpha, and the
+  # ICO best-layer logic depends on it).
+  def self.storage_path_for(url, variant, extension = "webp")
+    path_for(url_fingerprint_for(url, variant), extension)
+  end
+
+  def self.path_for(fingerprint, extension)
+    File.join(fingerprint[0..2], "#{fingerprint}.#{extension}")
   end
 
   # Upsert keyed by (provider, provider_id). Not create_or_find_by: every

@@ -88,5 +88,16 @@ module ImageCrawler
         assert_equal "http://example.com/a-final.jpg", record.data["final_url"]
       end
     end
+
+    test "storage_path and content type follow the preset format" do
+      image = Image.new_with_attributes(
+        id: SecureRandom.hex, preset_name: "primary", image_urls: [],
+        provider: ::Image.providers[:entry_preview], provider_id: 1,
+        original_url: "http://example.com/a.jpg"
+      )
+      assert_equal "webp", image.preset.format
+      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "webp"), image.storage_path
+      assert_equal "image/webp", image.r2_storage_options["Content-Type"]
+    end
   end
 end

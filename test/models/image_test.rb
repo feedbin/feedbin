@@ -97,4 +97,12 @@ class ImageTest < ActiveSupport::TestCase
     end
     assert yielded
   end
+
+  test "storage_path_for defaults to webp and accepts an extension" do
+    fingerprint = Image.url_fingerprint_for("http://example.com/a.jpg", "32x32")
+    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.webp"),
+      Image.storage_path_for("http://example.com/a.jpg", "32x32")
+    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.png"),
+      Image.storage_path_for("http://example.com/a.jpg", "32x32", "png")
+  end
 end

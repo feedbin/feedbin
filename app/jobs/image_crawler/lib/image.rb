@@ -30,12 +30,18 @@ module ImageCrawler
     attr_accessor *ATTRIBUTES
 
     BUCKET = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+    CONTENT_TYPES = {
+      "webp" => "image/webp",
+      "png"  => "image/png",
+      "jpg"  => "image/jpeg"
+    }.freeze
     PRESETS = {
       primary: {
         width: 542,
         height: 304,
         minimum_size: 20_000,
         crop: :smart_crop,
+        format: "webp",
         validate: true,
         unified: true,
         job_class: EntryImage
@@ -45,6 +51,7 @@ module ImageCrawler
         height: 304,
         minimum_size: 10_000,
         crop: :smart_crop,
+        format: "webp",
         validate: true,
         unified: true,
         job_class: TwitterLinkImage
@@ -54,6 +61,7 @@ module ImageCrawler
         height: 304,
         minimum_size: nil,
         crop: :fill_crop,
+        format: "webp",
         validate: true,
         unified: true,
         job_class: EntryImage
@@ -63,6 +71,7 @@ module ImageCrawler
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
+        format: "jpg",
         validate: true,
         job_class: ItunesImage
       },
@@ -71,6 +80,7 @@ module ImageCrawler
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
+        format: "jpg",
         validate: true,
         job_class: ItunesFeedImage
       },
@@ -175,7 +185,7 @@ module ImageCrawler
     end
 
     def storage_path
-      ::Image.storage_path_for(original_url, variant)
+      ::Image.storage_path_for(original_url, variant, preset.format)
     end
 
     def provider_label
@@ -188,7 +198,7 @@ module ImageCrawler
 
     def r2_storage_options
       {
-        "Content-Type"  => "image/webp",
+        "Content-Type"  => CONTENT_TYPES.fetch(preset.format),
         "Cache-Control" => "max-age=315360000, public, immutable"
       }
     end
