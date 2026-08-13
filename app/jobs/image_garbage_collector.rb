@@ -29,6 +29,11 @@ class ImageGarbageCollector
       delete_r2_objects(orphaned)
     end
 
+    # Exact because every row sharing a storage_path carries the same
+    # legacy_storage_url -- Dedupe.attach (dedupe.rb) copies it verbatim from
+    # the row it dedupes onto rather than fetching its own -- so it does not
+    # matter which row in an orphaned group we read it from, including
+    # whichever one happens to be deleted last.
     legacy_urls = orphaned.flat_map { |path|
       grouped[path].filter_map { _1.data["legacy_storage_url"] }
     }.uniq

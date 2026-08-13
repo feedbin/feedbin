@@ -228,8 +228,12 @@ module ImageCrawler
       preset.content_addressed == true
     end
 
-    # Entry presets dual-store: the legacy S3 jpg is what pre-R2 clients read.
-    # Icons store one object. Presets that say nothing keep dual-storing.
+    # legacy_store? only decides whether the legacy S3 object gets written --
+    # dual-storing also requires unified?. Entry presets (primary/twitter/
+    # youtube) are both, so they dual-store. podcast, podcast_feed, and the
+    # plain icon preset say nothing here either, but aren't unified?, so they
+    # write only the legacy object. favicon/touch_icon are the only presets
+    # that turn this off, writing only the R2 object.
     def legacy_store?
       preset.legacy_store != false
     end
@@ -247,10 +251,6 @@ module ImageCrawler
     # never collide even for the same source.
     def variant
       "#{preset.width}x#{preset.height}"
-    end
-
-    def url_fingerprint
-      ::Image.url_fingerprint_for(original_url, variant)
     end
 
     def provider_label

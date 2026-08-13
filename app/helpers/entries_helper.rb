@@ -14,9 +14,12 @@ module EntriesHelper
   # N+1 per render: favicons is the collection-wide map (Favicon.for_entries),
   # feed.favicon comes from the includes(feed: [:favicon]) every entry-list
   # path does, and preview_image_record from the preload every entry-list
-  # controller does -- most via Entry.entries_list, and directly wherever the
+  # controller does -- most via Entry.entries_list, directly in
+  # entries_controller#search and saved_searches_controller#show because the
   # relation is Elasticsearch-backed and can't take entries_list's column
-  # select.
+  # select, and directly in updated_entries_controller, whose .sort_by turns
+  # the relation into an Array so the preload must already be attached by
+  # then.
   def self.entries_cache_key(entry, favicons = {})
     [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, "v8"]
   end

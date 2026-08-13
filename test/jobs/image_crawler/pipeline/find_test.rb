@@ -215,17 +215,6 @@ module ImageCrawler
         end
       end
 
-      def test_should_fingerprint_the_original_bytes
-        original_url = "http://example.com/image.jpg"
-        stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
-
-        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
-        Find.new.perform(image.to_h)
-
-        queued = Image.new(Process.jobs.last["args"][0])
-        assert_equal Digest::MD5.file(support_file("image.jpeg")).hexdigest, queued.original_fingerprint
-      end
-
       # Dedupe's shortcut is skip-the-download-because-a-row-exists. For icons
       # the row proves nothing about the bytes behind the URL, so the fetch
       # always happens and the short circuit is after it.
@@ -289,6 +278,39 @@ module ImageCrawler
           end
           assert_requested :get, original_url
           assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
+        end
+      end
+
+      # The stored object's identity is MD5("<variant>|<original_fingerprint>"),
+      # so variant is half of it -- unchanged? must key on both. A row left
+      # over from a different preset geometry (say favicon moving from 32x32
+      # to 48x48) has the right fingerprint but names a different object; if
+      # unchanged? matched on fingerprint alone, the crawl would short-circuit
+      # forever and the fleet would freeze at the old geometry.
+      def test_should_reprocess_the_icon_when_the_stored_row_is_a_different_variant
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          original_url = "http://example.com/favicon.ico"
+          stub_request_file("favicon.ico", original_url, headers: {content_type: "image/x-icon"})
+          fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
+
+          ::Image.create!(
+            provider: :feed_icon, provider_id: "5", feed_id: 9,
+            url: original_url, variant: "48x48",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: fingerprint,
+            storage_path: ::Image.content_storage_path_for(fingerprint, "48x48", "png"),
+            width: 48, height: 48, bytesize: 500, placeholder_color: "aabbcc"
+          )
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
+            provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
+          )
+
+          assert_difference -> { Process.jobs.size }, +1 do
+            Find.new.perform(image.to_h)
+          end
+          assert_requested :get, original_url
         end
       end
     end

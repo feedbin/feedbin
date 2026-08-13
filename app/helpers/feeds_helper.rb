@@ -1,8 +1,8 @@
 module FeedsHelper
   # The sidebar renders a FaviconComponent per feed, and a favicon is its own
   # row with its own timestamp -- nothing writes to the feed when one changes.
-  # Digesting the records is what makes it safe to remove the TouchFeeds
-  # fan-out: invalidation stops depending on writing to every feed on the
+  # Digesting the records is what made it safe to remove the TouchFeeds
+  # fan-out: invalidation no longer depends on writing to every feed on the
   # host. Both collections reach here already includes(:favicon), so it
   # costs no query.
   def self.sidebar_feeds_cache_key(feeds)

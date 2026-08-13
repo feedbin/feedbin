@@ -31,7 +31,6 @@ module ImageCrawler
     test "storage_path is derived from original_url" do
       image = Image.new_with_attributes(id: "a", preset_name: "primary", image_urls: [], provider: 2, provider_id: 1, original_url: "http://example.com/a.jpg")
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304"), image.storage_path
-      assert_equal ::Image.url_fingerprint_for("http://example.com/a.jpg", "542x304"), image.url_fingerprint
     end
 
     test "send_to_feedbin includes unified metadata when unified" do

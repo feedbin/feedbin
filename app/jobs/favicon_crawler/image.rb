@@ -1,5 +1,6 @@
 module FaviconCrawler
   class Image
+
     def self.resize(*args)
       new(*args).resize
     end
