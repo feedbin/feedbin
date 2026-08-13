@@ -106,4 +106,29 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
       ImageGarbageCollector.new.perform([12345])
     end
   end
+
+  # Two URLs serving identical bytes are one stored object. Refcounting by url
+  # would delete it while the other row still points at it.
+  test "keeps an object shared by two different urls until the last row goes" do
+    with_env("R2_BUCKET_IMAGES" => "images-test") do
+      shared_path = Image.storage_path_for(@url, "542x304")
+      one = seed_row(provider_id: 1)
+      Image.create!(
+        provider: :entry_preview, provider_id: "2", feed_id: 9,
+        url: "http://example.com/a-different-url.jpg",
+        variant: "542x304", image_fingerprint: one.image_fingerprint,
+        storage_path: shared_path,
+        width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
+      )
+      batch = stub_batch_delete
+
+      ImageGarbageCollector.new.perform([1])
+      assert_not_requested batch
+
+      ImageGarbageCollector.new.perform([2])
+      assert_requested :post, "https://test-account.r2.cloudflarestorage.com/images-test/?delete", times: 1 do |request|
+        request.body.include?(shared_path)
+      end
+    end
+  end
 end

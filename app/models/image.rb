@@ -55,7 +55,7 @@ class Image < ApplicationRecord
   end
 
   # Upsert keyed by (provider, provider_id). Not create_or_find_by: every
-  # call site runs inside Image.with_url_lock's transaction, so a unique
+  # call site runs inside Image.with_storage_lock's transaction, so a unique
   # violation would otherwise poison that outer transaction. The
   # requires_new: true save wraps it in a savepoint, scoping the violation
   # so the rescue/retry below can actually recover instead of raising
@@ -74,11 +74,11 @@ class Image < ApplicationRecord
     retry
   end
 
-  # Serializes attach vs. garbage collection for one stored object. The
-  # fingerprint arrives dashed when read back from the uuid column and
-  # undashed when freshly computed; normalize so both take the same lock.
-  def self.with_url_lock(fingerprint, &block)
-    with_url_locks([fingerprint], &block)
+  # Serializes attach vs. garbage collection for one stored object. The object
+  # is the shared resource -- one path can be referenced by rows from several
+  # providers and several URLs -- so the path is the lock key.
+  def self.with_storage_lock(storage_path, &block)
+    with_storage_locks([storage_path], &block)
   end
 
   # Takes every lock in one sorted acquisition so concurrent multi-lock
@@ -86,8 +86,8 @@ class Image < ApplicationRecord
   # `execute`, not `select_all`: pg_advisory_xact_lock returns void, a type
   # ActiveRecord's result decoder warns about (unknown OID 2278); the raw
   # result is discarded either way.
-  def self.with_url_locks(fingerprints)
-    keys = fingerprints.map { _1.to_s.delete("-") }.uniq.sort
+  def self.with_storage_locks(storage_paths)
+    keys = storage_paths.map(&:to_s).uniq.sort
     transaction do
       connection.execute(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(key, 0)) FROM unnest(ARRAY[?]) AS key", keys]))
       yield

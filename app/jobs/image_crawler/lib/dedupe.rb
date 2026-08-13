@@ -3,7 +3,7 @@ module ImageCrawler
   # original_url is never downloaded or processed twice. Attaching is purely
   # a database operation: the new row shares both stored objects — the R2
   # webp and the legacy S3 jpg — with the rows that already reference them.
-  # The garbage collector refcounts both by url_fingerprint, so shared
+  # The garbage collector refcounts both by storage_path, so shared
   # objects live exactly as long as their last row.
   class Dedupe
     attr_reader :record
@@ -24,10 +24,11 @@ module ImageCrawler
       return false if record.nil?
 
       attached = nil
-      ::Image.with_url_lock(record.url_fingerprint) do
+      ::Image.with_storage_lock(record.storage_path) do
         # If GC removed the last reference (and the stored objects) between
-        # our lookup and here, we must not reference deleted objects.
-        if ::Image.entry_images.where(url_fingerprint: record.url_fingerprint).exists?
+        # our lookup and here, we must not reference deleted objects. Any
+        # provider's row counts: the object, not the URL, is what survives.
+        if ::Image.where(storage_path: record.storage_path).exists?
           attached = ::Image.attach!(
             provider: @image.provider,
             provider_id: @image.provider_id,

@@ -177,7 +177,7 @@ module ImageCrawler
     end
 
     def create_image
-      ::Image.with_url_lock(url_fingerprint) do
+      ::Image.with_storage_lock(storage_path) do
         ::Image.attach!(
           provider: provider,
           provider_id: provider_id,

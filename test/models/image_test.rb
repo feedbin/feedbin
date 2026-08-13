@@ -79,19 +79,23 @@ class ImageTest < ActiveSupport::TestCase
     assert_equal 1, Image.where(provider: attributes[:provider], provider_id: "321").count
   end
 
-  test "with_url_lock yields inside a transaction and accepts dashed fingerprints" do
+  test "with_storage_lock yields inside a transaction" do
     yielded = false
-    Image.with_url_lock("9e107d9d-372b-b682-6bd8-1d3542a419d6") do
+    Image.with_storage_lock("9e1/9e107d9d372bb6826bd81d3542a419d6.webp") do
       yielded = true
       assert Image.connection.transaction_open?
     end
     assert yielded
   end
 
-  test "with_url_locks takes many locks in one acquisition" do
+  test "with_storage_locks takes many locks in one acquisition" do
     yielded = false
-    fingerprints = ["9e107d9d-372b-b682-6bd8-1d3542a419d6", Digest::MD5.hexdigest("other"), Digest::MD5.hexdigest("other")]
-    Image.with_url_locks(fingerprints) do
+    paths = [
+      "9e1/9e107d9d372bb6826bd81d3542a419d6.webp",
+      "abc/abcdef00000000000000000000000000.png",
+      "abc/abcdef00000000000000000000000000.png"
+    ]
+    Image.with_storage_locks(paths) do
       yielded = true
       assert Image.connection.transaction_open?
     end

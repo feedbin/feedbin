@@ -2509,6 +2509,13 @@ CREATE UNIQUE INDEX index_images_on_provider_and_provider_id ON public.images US
 
 
 --
+-- Name: index_images_on_storage_path; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_images_on_storage_path ON public.images USING btree (storage_path);
+
+
+--
 -- Name: index_images_on_url_fingerprint; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3118,6 +3125,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260813120500'),
 ('20260813120000'),
 ('20260813041030'),
 ('20260812105532'),
