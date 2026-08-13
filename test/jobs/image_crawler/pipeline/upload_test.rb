@@ -315,6 +315,59 @@ module ImageCrawler
           assert DownloadCache.new(original_url, image).cached_image.present?
         end
       end
+
+      # podcast is the first preset that is both content_addressed and
+      # legacy_store: true -- everywhere else in this file those two are
+      # mutually exclusive (favicon/touch_icon are content-addressed and
+      # R2-only; primary/twitter/youtube are legacy_store and url-keyed, not
+      # content-addressed). Nothing else pins that the combination actually
+      # dual-writes: the legacy jpg at the id-derived S3 key, and the same
+      # jpg bytes again at the fingerprint-derived R2 key with a matching
+      # image/jpeg Content-Type.
+      def test_should_dual_write_podcast_artwork_to_s3_and_r2
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          processed_path = copy_support_file("image.jpeg")
+          original_url = "http://example.com/cover.jpg"
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "podcast", image_urls: [],
+            provider: ::Image.providers[:entry_icon], provider_id: 11, feed_id: 9,
+            fingerprint: SecureRandom.hex(16),
+            original_fingerprint: Digest::MD5.hexdigest("cover bytes"),
+            original_url: original_url, final_url: original_url,
+            download_path: processed_path, processed_path: processed_path,
+            processed_extension: "jpg",
+            bytesize: File.size(processed_path),
+            width: 200, height: 200, placeholder_color: "0867e2"
+          )
+
+          legacy = stub_request(:put, /s3\.amazonaws\.com/)
+          r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .with(headers: {"Content-Type" => "image/jpeg"})
+          # ensure_stored HEADs the object it just wrote; not the behavior
+          # under test here, so it stays a plain 200.
+          stub_request(:head, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .to_return(status: 200)
+
+          assert_difference -> { ::Image.count }, +1 do
+            assert_difference -> { ItunesImage.jobs.size }, +1 do
+              Upload.new.perform(image.to_h)
+            end
+          end
+
+          assert_requested legacy
+          assert_requested r2_put
+          assert image.image_name.end_with?(".jpg")
+          assert image.storage_path.end_with?(".jpg")
+
+          record = ::Image.find_by(provider: ::Image.providers[:entry_icon], provider_id: "11")
+          assert_equal image.storage_path, record.storage_path
+          assert record.data["legacy_storage_url"].present?
+
+          _, payload = ItunesImage.jobs.last["args"]
+          assert_equal image.storage_path, payload["storage_path"]
+        end
+      end
     end
   end
 end

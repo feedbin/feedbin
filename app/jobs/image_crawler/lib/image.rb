@@ -253,10 +253,12 @@ module ImageCrawler
 
     # legacy_store? only decides whether the legacy S3 object gets written --
     # dual-storing also requires unified?. Entry presets (primary/twitter/
-    # youtube) are both, so they dual-store. podcast, podcast_feed, and the
-    # plain icon preset say nothing here either, but aren't unified?, so they
-    # write only the legacy object. favicon/touch_icon are the only presets
-    # that turn this off, writing only the R2 object.
+    # youtube) say nothing here and are unified?, so they dual-store; podcast
+    # and podcast_feed say legacy_store: true explicitly and are also
+    # unified?, so they dual-store too. The plain icon preset says nothing
+    # here either, but isn't unified?, so it writes only the legacy object.
+    # favicon/touch_icon are the only presets that turn this off, writing
+    # only the R2 object.
     def legacy_store?
       preset.legacy_store != false
     end
@@ -269,9 +271,13 @@ module ImageCrawler
 
     # The stored-object identity pairs variant with either the url (entry
     # presets) or original_fingerprint (the content-addressed icon family --
-    # see content_addressed? above): presets sharing an output geometry
-    # share objects, presets that differ (podcast 200x200 vs entry 542x304)
-    # never collide even for the same source.
+    # see content_addressed? above), then folds in the format as the file
+    # extension -- all three have to match to share an object. podcast and
+    # touch_icon both render 200x200 but never collide: podcast is jpg,
+    # touch_icon is png, and the format is the only thing keeping them
+    # apart. podcast and the entry presets never collide either, but for a
+    # different reason -- one is fingerprint-keyed, the other url-keyed, so
+    # they're not even hashing the same input regardless of geometry.
     def variant
       "#{preset.width}x#{preset.height}"
     end
