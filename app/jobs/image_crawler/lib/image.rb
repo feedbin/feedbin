@@ -13,6 +13,7 @@ module ImageCrawler
       image_urls
       meta_image_urls
       original_extension
+      original_fingerprint
       original_url
       page_url
       placeholder_color
@@ -184,6 +185,7 @@ module ImageCrawler
           url: original_url,
           variant: variant,
           image_fingerprint: fingerprint,
+          original_fingerprint: original_fingerprint,
           storage_path: storage_path,
           width: width,
           height: height,

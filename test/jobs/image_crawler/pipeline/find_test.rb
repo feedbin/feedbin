@@ -214,6 +214,17 @@ module ImageCrawler
           assert_equal 1, Process.jobs.size
         end
       end
+
+      def test_should_fingerprint_the_original_bytes
+        original_url = "http://example.com/image.jpg"
+        stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
+
+        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
+        Find.new.perform(image.to_h)
+
+        queued = Image.new(Process.jobs.last["args"][0])
+        assert_equal Digest::MD5.file(support_file("image.jpeg")).hexdigest, queued.original_fingerprint
+      end
     end
   end
 end

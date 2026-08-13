@@ -104,6 +104,9 @@ module ImageCrawler
           @image.final_url          = download.image_url
           @image.original_url       = original_url
           @image.original_extension = download.file_extension
+          # Digest::MD5.file streams the file through the digest in C; the
+          # File.read form would allocate the whole image as a Ruby string.
+          @image.original_fingerprint = Digest::MD5.file(@image.download_path).hexdigest
 
           Process.perform_async(@image.to_h)
           Sidekiq.logger.info @image.trace(message: "download valid", metadata: {image_url: @image.final_url})
