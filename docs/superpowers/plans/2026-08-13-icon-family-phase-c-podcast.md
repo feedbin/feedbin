@@ -657,7 +657,7 @@ In `app/jobs/image_crawler/itunes_image.rb`, replace `receive`:
 source ~/.bash_profile && bin/rails test test/models/entry_test.rb test/jobs/image_crawler/itunes_image_test.rb test/presenters
 ```
 
-Expected: PASS. Note `test/presenters` does **not** in fact cover `EntryPresenter#media_image` — that directory holds only an XSS test, and no test anywhere exercises the `entry.itunes_image || entry.feed.custom_icon` fallback. Task 5 changes the other half of that expression, so this task adds a real presenter test for all three branches of it.
+Expected: PASS. Note `test/presenters` does **not** in fact cover `EntryPresenter#media_image` — that directory holds only an XSS test, and no test anywhere exercises the `entry.itunes_image || entry.feed.custom_icon` fallback. This task adds a real presenter test for all three branches of it. (An earlier draft justified that by claiming Task 5 changes the other half of the expression — it does not: Task 5 adds a new `Feed#icon_url` and leaves `custom_icon` and the presenter untouched. The test earns its place on the zero-coverage gap alone.)
 
 - [ ] **Step 7: Commit**
 
