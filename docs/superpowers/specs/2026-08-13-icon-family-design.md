@@ -511,6 +511,36 @@ starts trusting a stored object's identity as evidence of *provenance* rather
 than merely of sameness. That is the assumption that makes second-preimage
 resistance the only thing standing here.
 
+**Phase E's `Etag`/`Last-Modified` plan collides with the touch rule, and this
+is unresolved.** This document puts them in `images.data`, per row. But writing
+`data` bumps `updated_at`, and Phase B made `updated_at` a view cache key. A
+source that returns a new `ETag` with **identical bytes** would therefore
+invalidate every view referencing that icon — the exact cost the cache-digest
+design exists to avoid, arriving through a different door.
+
+Decide before writing Phase E's plan, not during it. The options are to write
+those fields with `update_column`/`update_all` so timestamps are skipped, to
+store them somewhere that is not part of the row's cache identity, or to accept
+the churn on the grounds that ETag-changes-without-bytes-changing is rare. The
+first is probably right, but it means the row's `updated_at` no longer tells
+the whole truth about when the row last changed, which is worth stating
+explicitly wherever that is relied on.
+
+**Neither Phase D nor Phase E can start without an enum addition.**
+`Image.provider` is currently `entry_icon: 0, entry_link_preview: 1,
+entry_preview: 2, feed_icon: 3, remote_file: 4`. The providers this document
+assumes — `embed_icon`, `website_favicon`, `website_touch_icon` — do not exist.
+Each phase needs an append-only addition to that enum (never a renumbering:
+the column stores the integer).
+
+**Host-scoped favicon rows have no owner-deletion event.** Entry-owned rows are
+collected when the entry is deleted, and feed-owned rows when the feed goes.
+A row keyed by host belongs to nothing that gets deleted, so
+`ImageGarbageCollector` will never collect it. `ImageReplacementCollector`
+still handles object churn as artwork changes, which is the common case — but
+"favicon rows are never collected" should be a stated decision in Phase E's
+plan rather than something discovered later.
+
 **One test-suite blind spot worth knowing about.** `config/environments/test.rb`
 sets `perform_caching = false`, and Rails skips a collection-cache `cached:`
 lambda entirely when that is false. So **no controller test can observe a query

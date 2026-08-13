@@ -907,9 +907,11 @@ Expect 1 for a show that uses one image throughout — that is "one object per s
 
 ## Deployment notes
 
-`R2_IMAGE_HOST` is the read cutover switch, and it is shared with entry previews — it is already set if Phase 1 has been cut over. `Image.r2_url` returns nil without it, so rows accumulate and reads stay on the legacy path until it is set.
+`R2_IMAGE_HOST` is the read cutover switch, and it is **shared with entry previews** — so if Phase 1 has been cut over it is already set, and there is no accumulate-then-flip step for this tenant. Reads flip **per row, the instant that row is written**.
 
-Deploy order is code first, then let rows accumulate, then verify. There is no migration in this plan and no cache-key version bump, so no cold-cache wave.
+That is lower-risk than a global switch, because the fallback is per-feed rather than all-or-nothing: a feed with no row keeps rendering `custom_icon`. But it means the manual verification below should be run against the first real rows immediately after deploy, not after a bake — by the time you look, some feeds are already reading from R2.
+
+There is no migration in this plan and no cache-key version bump, so no cold-cache wave.
 
 One new cost to watch: Task 1 adds a HEAD request to **every** unified upload, entry previews included, not just podcast artwork. That is deliberate — the window it closes is equally permanent for entry previews, which never re-crawl. If the added request rate proves to matter, scoping it to `@image.content_addressed?` is a one-line change, at the cost of leaving the entry-preview window open.
 

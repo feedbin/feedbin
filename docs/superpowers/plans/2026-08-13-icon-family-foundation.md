@@ -30,12 +30,21 @@
 
 Phase B changes cache keys (`v7` → `v8` for entries, `v3` → `v4` and `v9` → `v10` for the sidebar). Expect one cold-cache render wave after deploy; that is the intended cost of the version bump and is why the bumps are deliberate rather than incidental.
 
-**Run the migrations before the code that needs them.** Task 7's
-`orphaned_paths` and `Dedupe`'s survivor check both query
-`Image.where(storage_path: ...)`. Until `index_images_on_storage_path` exists
-those are sequential scans of `images` on every garbage-collection run and
-every dedup hit. The index is built `CONCURRENTLY`, so it can go out ahead of
-the deploy without locking the table.
+**Run the migrations before the code that needs them.** Two separate reasons,
+and the second is not a performance note.
+
+The index is performance: Task 7's `orphaned_paths` and `Dedupe`'s survivor
+check both query `Image.where(storage_path: ...)`, and until
+`index_images_on_storage_path` exists those are sequential scans of `images` on
+every garbage-collection run and every dedup hit. It is built `CONCURRENTLY`,
+so it can go out ahead of the deploy without locking the table.
+
+`original_fingerprint` is a **hard prerequisite**. `create_image` passes it to
+`attach!` unconditionally, so without the column every unified upload raises
+`UnknownAttributeError`, degrades to the legacy path, and orphans the R2 object
+it has already PUT. Run that migration first, and note that any process started
+before it needs a restart to pick up the new schema cache — a long-lived
+Sidekiq worker will keep raising until it does.
 
 **The advisory-lock re-key has a rollout window, and it is the one hazard here
 that can lose data.** Task 7 moved the lock from `hashtextextended(url_fingerprint)`
