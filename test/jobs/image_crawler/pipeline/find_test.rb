@@ -313,6 +313,39 @@ module ImageCrawler
           assert_requested :get, original_url
         end
       end
+
+      # Podcast artwork can change under a stable URL, so Dedupe's
+      # skip-the-download shortcut is wrong for it: always fetch, then
+      # short-circuit on the original bytes.
+      def test_should_short_circuit_unchanged_podcast_artwork
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          original_url = "http://example.com/cover.jpg"
+          stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
+          fingerprint = Digest::MD5.file(support_file("image.jpeg")).hexdigest
+
+          row = ::Image.create!(
+            provider: :entry_icon, provider_id: "5", feed_id: 9,
+            url: original_url, variant: "200x200",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: fingerprint,
+            storage_path: ::Image.content_storage_path_for(fingerprint, "200x200", "jpg"),
+            width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc",
+            updated_at: 1.year.ago
+          )
+          expected_updated_at = row.updated_at
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "podcast", image_urls: [original_url],
+            provider: ::Image.providers[:entry_icon], provider_id: 5, feed_id: 9
+          )
+
+          assert_no_difference -> { Process.jobs.size } do
+            Find.new.perform(image.to_h)
+          end
+          assert_requested :get, original_url
+          assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
+        end
+      end
     end
   end
 end

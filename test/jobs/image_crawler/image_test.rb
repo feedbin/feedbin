@@ -180,5 +180,49 @@ module ImageCrawler
         assert_equal [[first.storage_path]], ImageReplacementCollector.jobs.last["args"]
       end
     end
+
+    # One object per show instead of one per episode: a show and every episode
+    # reusing the same artwork fingerprint to the same storage_path, across
+    # both presets, because they share a variant and a format.
+    test "podcast presets are content-addressed and share objects across show and episode" do
+      fingerprint = Digest::MD5.hexdigest("cover bytes")
+      build = ->(preset, provider, url) {
+        Image.new_with_attributes(
+          id: SecureRandom.hex, preset_name: preset, image_urls: [],
+          provider: ::Image.providers[provider], provider_id: 1,
+          original_url: url, original_fingerprint: fingerprint
+        )
+      }
+
+      episode = build.call("podcast", :entry_icon, "http://example.com/ep1.jpg")
+      show = build.call("podcast_feed", :feed_icon, "http://example.com/show.jpg")
+
+      assert episode.content_addressed?
+      assert episode.legacy_store?, "the legacy S3 object is still the fallback read path"
+      assert_equal "200x200", episode.variant
+      assert_equal "jpg", episode.preset.format
+      assert_equal :fill_crop, episode.preset.crop
+      assert_equal ::Image.content_storage_path_for(fingerprint, "200x200", "jpg"), episode.storage_path
+      assert_equal episode.storage_path, show.storage_path
+    end
+
+    # touch_icon is also 200x200 but renders png through a different recipe.
+    # The extension is what keeps the two object keys apart.
+    test "podcast artwork does not collide with touch_icon at the same variant" do
+      fingerprint = Digest::MD5.hexdigest("cover bytes")
+      podcast = Image.new_with_attributes(
+        id: SecureRandom.hex, preset_name: "podcast", image_urls: [],
+        provider: ::Image.providers[:entry_icon], provider_id: 1,
+        original_url: "http://example.com/a.jpg", original_fingerprint: fingerprint
+      )
+      touch = Image.new_with_attributes(
+        id: SecureRandom.hex, preset_name: "touch_icon", image_urls: [],
+        provider: ::Image.providers[:feed_icon], provider_id: 1,
+        original_url: "http://example.com/a.jpg", original_fingerprint: fingerprint
+      )
+
+      assert_equal "200x200", touch.variant
+      refute_equal podcast.storage_path, touch.storage_path
+    end
   end
 end

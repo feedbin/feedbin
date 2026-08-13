@@ -74,6 +74,9 @@ module ImageCrawler
         crop: :fill_crop,
         format: "jpg",
         validate: true,
+        unified: true,
+        content_addressed: true,
+        legacy_store: true,
         job_class: ItunesImage
       },
       podcast_feed: {
@@ -83,6 +86,9 @@ module ImageCrawler
         crop: :fill_crop,
         format: "jpg",
         validate: true,
+        unified: true,
+        content_addressed: true,
+        legacy_store: true,
         job_class: ItunesFeedImage
       },
       icon: {
