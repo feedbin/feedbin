@@ -116,6 +116,39 @@ module ImageCrawler
           assert DownloadCache.new(original_url, image).cached_image.present?
         end
       end
+
+      def test_should_store_icons_only_in_r2
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          processed_path = copy_support_file("image.png")
+          original_url = "http://example.com/favicon.ico"
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+            provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9,
+            fingerprint: SecureRandom.hex(16),
+            original_fingerprint: Digest::MD5.hexdigest("bytes"),
+            original_url: original_url, final_url: original_url,
+            download_path: processed_path, processed_path: processed_path,
+            bytesize: File.size(processed_path),
+            width: 32, height: 32, placeholder_color: "0867e2"
+          )
+
+          legacy = stub_request(:put, /s3\.amazonaws\.com/)
+          r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .with(headers: {"Content-Type" => "image/png"})
+
+          assert_difference -> { ::Image.count }, +1 do
+            Upload.new.perform(image.to_h)
+          end
+
+          assert_requested r2_put
+          assert_not_requested legacy
+
+          record = ::Image.find_by(provider: ::Image.providers[:feed_icon], provider_id: "5")
+          assert_equal image.storage_path, record.storage_path
+          assert_equal Digest::MD5.hexdigest("bytes"), record.original_fingerprint.delete("-")
+        end
+      end
     end
   end
 end

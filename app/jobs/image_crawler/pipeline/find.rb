@@ -32,7 +32,9 @@ module ImageCrawler
 
           Sidekiq.logger.info @image.trace(message: "attempting image candidate", metadata: {original_url: original_url})
 
-          if @image.unified?
+          if @image.content_addressed?
+            break if attempt_icon(original_url)
+          elsif @image.unified?
             break if attempt_unified(original_url)
           else
             break if attempt_legacy(original_url)
@@ -83,6 +85,55 @@ module ImageCrawler
           Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {image_url: @image.final_url})
           false
         end
+      end
+
+      # Icons mutate under a stable URL, so a row for this URL says nothing
+      # about the bytes behind it and Dedupe's skip-the-download shortcut is
+      # exactly wrong. Always fetch, then short-circuit on the original bytes:
+      # hashing the original rather than the processed output is what lets this
+      # skip *processing*, which for a 32x32 render is the expensive part.
+      def attempt_icon(original_url)
+        download = begin
+          Download.download!(original_url, camo: @image.camo, minimum_size: @image.preset.minimum_size)
+        rescue => exception
+          Sidekiq.logger.info @image.trace(message: "download exception", metadata: {exception: exception, original_url: original_url})
+          return false
+        end
+
+        return false unless download
+
+        unless download.valid?
+          download.delete!
+          Sidekiq.logger.info @image.trace(message: "download invalid", metadata: {original_url: original_url})
+          return false
+        end
+
+        @image.download_path        = download.persist!
+        @image.final_url            = download.image_url
+        @image.original_url         = original_url
+        @image.original_extension   = download.file_extension
+        @image.original_fingerprint = Digest::MD5.file(@image.download_path).hexdigest
+
+        if unchanged?
+          Librato.increment("image.icon_unchanged")
+          Sidekiq.logger.info @image.trace(message: "icon unchanged", metadata: {original_url: original_url})
+          begin
+            File.unlink(@image.download_path)
+          rescue Errno::ENOENT
+          end
+          return true
+        end
+
+        Process.perform_async(@image.to_h)
+        Sidekiq.logger.info @image.trace(message: "download valid", metadata: {image_url: @image.final_url})
+        true
+      end
+
+      def unchanged?
+        ::Image
+          .where(provider: @image.provider, provider_id: @image.provider_id.to_s)
+          .where(original_fingerprint: @image.original_fingerprint)
+          .exists?
       end
 
       def download_image(original_url, download_cache)

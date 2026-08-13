@@ -8,7 +8,7 @@ module ImageCrawler
 
       def perform(image_hash)
         @image = Image.new(image_hash)
-        @image.storage_url = upload
+        @image.storage_url = upload if @image.legacy_store?
         r2_stored = false
 
         if @image.unified?
@@ -59,7 +59,7 @@ module ImageCrawler
       end
 
       def upload_r2
-        File.open(@image.webp_path) do |file|
+        File.open(@image.r2_source_path) do |file|
           Fog::Storage.new(STORAGE_R2).put_object(@image.r2_bucket, @image.storage_path, file, @image.r2_storage_options)
         end
       end

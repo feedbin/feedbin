@@ -18,7 +18,9 @@ module ImageCrawler
         )
 
         if processor.valid?(@image.validate?)
-          if @image.unified?
+          # Dual-format is the entry presets' arrangement: one geometry pass,
+          # a legacy jpg and an R2 webp. Icons store a single PNG.
+          if @image.unified? && !@image.content_addressed?
             pair = processor.crop_pair!
             cropped = pair[:jpg]
             webp = pair[:webp]
@@ -28,6 +30,7 @@ module ImageCrawler
             @image.fingerprint = webp.fingerprint
           else
             cropped = processor.crop!
+            @image.bytesize    = cropped.size
             @image.fingerprint = cropped.fingerprint
           end
 
@@ -69,6 +72,7 @@ module ImageCrawler
 
       def reuse_rejected?
         return false unless @image.unified?
+        return false if @image.content_addressed?
         ReuseRules.new(@image).fingerprint_used_in_feed?(@image.fingerprint)
       end
 

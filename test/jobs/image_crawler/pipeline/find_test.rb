@@ -225,6 +225,68 @@ module ImageCrawler
         queued = Image.new(Process.jobs.last["args"][0])
         assert_equal Digest::MD5.file(support_file("image.jpeg")).hexdigest, queued.original_fingerprint
       end
+
+      # Dedupe's shortcut is skip-the-download-because-a-row-exists. For icons
+      # the row proves nothing about the bytes behind the URL, so the fetch
+      # always happens and the short circuit is after it.
+      def test_should_always_download_an_icon_even_with_a_row_for_the_url
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          original_url = "http://example.com/favicon.ico"
+          stub_request_file("favicon.ico", original_url, headers: {content_type: "image/x-icon"})
+
+          ::Image.create!(
+            provider: :feed_icon, provider_id: "5", feed_id: 9,
+            url: original_url, variant: "32x32",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: Digest::MD5.hexdigest("different bytes"),
+            storage_path: ::Image.content_storage_path_for(Digest::MD5.hexdigest("different bytes"), "32x32", "png"),
+            width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc"
+          )
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
+            provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
+          )
+
+          assert_difference -> { Process.jobs.size }, +1 do
+            Find.new.perform(image.to_h)
+          end
+          assert_requested :get, original_url
+        end
+      end
+
+      # An unchanged icon must cost one download and nothing else: no vips
+      # work, no upload, and no row write -- the row's updated_at is a view
+      # cache key, so a write here would invalidate every view referencing it
+      # on every crawl.
+      def test_should_stop_after_the_download_when_the_icon_is_unchanged
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          original_url = "http://example.com/favicon.ico"
+          stub_request_file("favicon.ico", original_url, headers: {content_type: "image/x-icon"})
+          fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
+
+          row = ::Image.create!(
+            provider: :feed_icon, provider_id: "5", feed_id: 9,
+            url: original_url, variant: "32x32",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: fingerprint,
+            storage_path: ::Image.content_storage_path_for(fingerprint, "32x32", "png"),
+            width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc",
+            updated_at: 1.year.ago
+          )
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
+            provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
+          )
+
+          assert_no_difference -> { Process.jobs.size } do
+            Find.new.perform(image.to_h)
+          end
+          assert_requested :get, original_url
+          assert_equal 1.year.ago.to_i, row.reload.updated_at.to_i
+        end
+      end
     end
   end
 end
