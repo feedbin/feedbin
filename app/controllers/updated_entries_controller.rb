@@ -3,7 +3,7 @@ class UpdatedEntriesController < ApplicationController
     @user = current_user
 
     updated_entry_ids = @user.updated_entries.order(updated_at: :desc).limit(100).pluck(:entry_id)
-    @entries = Entry.where(id: updated_entry_ids).includes(feed: [:favicon])
+    @entries = Entry.where(id: updated_entry_ids).includes(feed: [:favicon]).preload(:preview_image_record)
     @entries = @entries.sort_by { |entry| updated_entry_ids.index(entry.id) }
 
     @type = "updated"

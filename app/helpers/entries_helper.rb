@@ -13,7 +13,10 @@ module EntriesHelper
   # Every part must come from something already loaded, or the key becomes an
   # N+1 per render: favicons is the collection-wide map (Favicon.for_entries),
   # feed.favicon comes from the includes(feed: [:favicon]) every entry-list
-  # path does, and preview_image_record from Entry.entries_list's preload.
+  # path does, and preview_image_record from the preload every entry-list
+  # controller does -- most via Entry.entries_list, and directly wherever the
+  # relation is Elasticsearch-backed and can't take entries_list's column
+  # select.
   def self.entries_cache_key(entry, favicons = {})
     [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, "v8"]
   end

@@ -14,6 +14,31 @@ class SavedSearchesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  # The entry cache key also reads preview_image_record (Task 11), and
+  # entry.processed_image? -- rendered for every row regardless of caching --
+  # reads it too. This action builds @entries straight off the search result
+  # rather than through Entry.entries_list, so without its own preload this
+  # is a query per row. (A ".loaded?" assertion cannot tell a preload from an
+  # N+1 that happens to run before it is checked -- processed_image? would
+  # load the association either way -- so this counts queries instead.)
+  test "should preload the preview image the entry cache key reads" do
+    login_as @user
+    token = "savedsearchpreviewtoken"
+    entries = 5.times.map { create_entry(@feeds.first).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
+    Search.client { _1.refresh }
+    saved_search = @user.saved_searches.create!(query: token, name: "preview image")
+
+    statements = capture_sql do
+      get :show, params: {id: saved_search}, xhr: true
+    end
+
+    assert_response :success
+    assert_operator assigns(:entries).to_a.size, :>=, 5
+    images = statements.select { _1.match?(/FROM "images"/i) }
+    assert_operator images.count, :<=, 1, "one images query for the whole page: #{images.count}"
+  end
+
   test "should accept a per_page off the query string" do
     login_as @user
     get :show, params: {id: @saved_search, per_page: "10"}, xhr: true

@@ -205,7 +205,7 @@ class EntriesController < ApplicationController
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
-    @entries = result.records(Entry).includes(feed: [:favicon])
+    @entries = result.records(Entry).includes(feed: [:favicon]).preload(:preview_image_record)
     @page_query = result.pagination
     @total_results = result.total
 
