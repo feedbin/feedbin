@@ -230,9 +230,11 @@ module ImageCrawler
       webp_path || processed_path
     end
 
-    # The stored-object identity is (url, variant): presets sharing an output
-    # geometry share objects, presets that differ (podcast 200x200 vs entry
-    # 542x304) never collide even for the same source URL.
+    # The stored-object identity pairs variant with either the url (entry
+    # presets) or original_fingerprint (the content-addressed icon family --
+    # see content_addressed? above): presets sharing an output geometry
+    # share objects, presets that differ (podcast 200x200 vs entry 542x304)
+    # never collide even for the same source.
     def variant
       "#{preset.width}x#{preset.height}"
     end

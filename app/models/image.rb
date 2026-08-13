@@ -29,8 +29,11 @@ class Image < ApplicationRecord
 
   # Identity is (url, variant), where variant is the output geometry
   # ("542x304"). One URL rendered at two sizes is two stored objects — the
-  # fingerprint drives dedup lookups, GC grouping, and advisory locks, so
-  # folding the variant in here keeps all of them variant-safe.
+  # fingerprint drives dedup lookups, and folding the variant in here keeps
+  # storage_path variant-safe by extension: GC grouping and the advisory
+  # locks key on storage_path, and both storage_path_for (via this
+  # fingerprint) and content_storage_path_for (directly) fold the variant
+  # into it.
   def self.url_fingerprint_for(url, variant)
     Digest::MD5.hexdigest("#{variant}|#{url.to_s.strip}")
   end
