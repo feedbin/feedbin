@@ -659,7 +659,7 @@ class AddOriginalFingerprintToImages < ActiveRecord::Migration[8.1]
 end
 ```
 
-Nullable on purpose: the entry presets are keyed by URL and never set it. `uuid` because MD5 is 128 bits — the same choice already load-bearing for `image_fingerprint`.
+Nullable on purpose: the entry presets are keyed by URL and never *read* it, and a row attached by `Dedupe` never gets one at all. `uuid` because MD5 is 128 bits — the same choice already load-bearing for `image_fingerprint`.
 
 ```bash
 source ~/.bash_profile && bin/rails db:migrate
@@ -673,7 +673,7 @@ In `app/jobs/image_crawler/lib/image.rb`, add `original_fingerprint` to `ATTRIBU
             original_fingerprint: original_fingerprint,
 ```
 
-In `app/jobs/image_crawler/pipeline/find.rb`, in `download_image`, add the fingerprint immediately after `download_path` is set:
+In `app/jobs/image_crawler/pipeline/find.rb`, in `download_image`, add the fingerprint after the four existing assignments:
 
 ```ruby
           @image.download_path      = download.persist!
