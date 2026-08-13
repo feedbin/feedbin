@@ -48,7 +48,16 @@ module ImageCrawler
     # keeps its legacy value for readers still on the fallback path.
     test "keeps writing the legacy url and touches the entry when row-backed" do
       processed_url = "https://cdn.example.com/cover.jpg"
-      @entry.update!(updated_at: 1.year.ago)
+      # Pre-set every attribute receive writes -- media_image, provider, and
+      # provider_id -- to what it will write again, the way a re-crawl of
+      # unchanged artwork finds the entry in production. That makes the
+      # update a true no-op, so only the touch can move updated_at.
+      @entry.update!(
+        media_image: processed_url,
+        provider: :entry_icon,
+        provider_id: @entry.id,
+        updated_at: 1.year.ago
+      )
       before = @entry.reload.updated_at
 
       ItunesImage.new.perform(@entry.public_id, {
