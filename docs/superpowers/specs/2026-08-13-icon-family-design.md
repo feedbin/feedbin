@@ -491,6 +491,26 @@ legacy object. Over-deletion is impossible in either case — same legacy url
 implies same storage path. Bounded, pre-existing, and worth knowing before
 anything starts depending on the invariant being absolute.
 
+**MD5 as the content-addressing key: assessed during Phase C, kept
+deliberately.** Content-addressing makes collision resistance load-bearing in
+a way URL-keying never did — two sources whose bytes collide map to one stored
+object, and the last crawl to upload wins. Phase C made that live for the first
+time, with artwork URLs coming from arbitrary third-party feeds.
+
+Assessed and accepted. The reachable attack is weaker than it first looks:
+chosen-prefix MD5 collisions require the attacker to craft **both** files.
+Colliding with artwork someone else already published is a *second-preimage*
+attack, which MD5 still resists (~2^123). So the achievable outcome is an
+attacker making two feeds they already control share one stored object —
+self-inflicted, with no cross-user impact. Widening the digest would also cost
+a migration: MD5 fits `original_fingerprint`'s `uuid` column exactly, and
+SHA-256 does not.
+
+Re-examine this if the threat model changes — specifically if anything ever
+starts trusting a stored object's identity as evidence of *provenance* rather
+than merely of sameness. That is the assumption that makes second-preimage
+resistance the only thing standing here.
+
 **One test-suite blind spot worth knowing about.** `config/environments/test.rb`
 sets `perform_caching = false`, and Rails skips a collection-cache `cached:`
 lambda entirely when that is false. So **no controller test can observe a query
