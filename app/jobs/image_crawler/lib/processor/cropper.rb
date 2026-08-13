@@ -17,6 +17,10 @@ module ImageCrawler
       # size savings at fixed Q. See tmp/images/README.md.
       WEBP_SAVER = {strip: true, quality: 58, effort: 6, smart_subsample: true, smart_deblock: true}.freeze
 
+      # Icons are flat graphics with alpha; there is nothing to trade quality
+      # against, so the only knob is dropping metadata.
+      PNG_SAVER  = {strip: true}.freeze
+
       attr_reader :path
 
       def initialize(file, crop:, extension:, width:, height:)
@@ -29,6 +33,7 @@ module ImageCrawler
 
       def crop!
         return limit_crop if @crop == :limit_crop
+        return icon_crop  if @crop == :icon_crop
         Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
       end
 
@@ -53,6 +58,7 @@ module ImageCrawler
 
       def valid?(validate)
         source.avg
+        return false if @crop == :icon_crop && best_layer.nil?
         validate ? (source.width >= @width && source.height >= @height) : true
       rescue ::Vips::Error, ImageFormat::Unsupported
         false
@@ -88,6 +94,23 @@ module ImageCrawler
           return Processed.from_file(@file, @extension)
         end
         result
+      end
+
+      # Multi-layer sources have no single "the image"; the layer choice is the
+      # first real decision, so it happens before any resizing. Memoized
+      # including the nil case -- ||= would re-run the whole layer scan every
+      # time the answer was "nothing usable".
+      def best_layer
+        return @best_layer if defined?(@best_layer)
+        @best_layer = IconLayer.best(ImageFormat.checked!(@file))
+      end
+
+      def icon_crop
+        image = ImageProcessing::Vips
+          .source(best_layer)
+          .resize_to_limit(@width, @height)
+
+        Processed.from_pipeline(save_as(image, "png", PNG_SAVER))
       end
 
       def fill_crop

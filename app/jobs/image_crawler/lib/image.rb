@@ -93,6 +93,30 @@ module ImageCrawler
         region: RemoteFile::REGION,
         validate: false,
         job_class: CacheRemoteFile
+      },
+      favicon: {
+        width: 32,
+        height: 32,
+        minimum_size: nil,
+        crop: :icon_crop,
+        format: "png",
+        validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
+        job_class: nil
+      },
+      touch_icon: {
+        width: 200,
+        height: 200,
+        minimum_size: nil,
+        crop: :icon_crop,
+        format: "png",
+        validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
+        job_class: nil
       }
     }
 
@@ -131,6 +155,11 @@ module ImageCrawler
     end
 
     def send_to_feedbin(include_unified: true)
+      # A preset with no callback job stores the row and stops. The icon
+      # presets ship before their tenants do; each tenant adds its job_class
+      # when it lands.
+      return if preset.job_class.nil?
+
       payload = {
         "original_url"      => final_url,
         "processed_url"     => storage_url,

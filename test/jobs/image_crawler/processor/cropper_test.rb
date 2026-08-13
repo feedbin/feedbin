@@ -147,6 +147,59 @@ module ImageCrawler
         FileUtils.rm pair[:jpg].file
         FileUtils.rm pair[:webp].file
       end
+
+      def test_should_render_an_icon_as_png_from_the_best_layer
+        file = copy_support_file("favicon.ico")
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 32, height: 32)
+
+        assert cropper.valid?(false)
+        image = cropper.crop!
+
+        assert_equal(:png, ImageFormat.detect(image.file))
+        assert_operator image.width, :<=, 32
+        assert_operator image.height, :<=, 32
+        FileUtils.rm image.file
+      end
+
+      # limit, not fit: upscaling fabricates no detail, it only makes a bigger
+      # file that is equally soft. A 200x200 recipe applied to a small source
+      # must leave the source's dimensions alone.
+      def test_should_never_upscale_an_icon
+        file = copy_support_file("favicon.ico")
+        layer_width = IconLayer.best(file).width
+
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 200, height: 200)
+        image = cropper.crop!
+
+        assert_operator layer_width, :<, 200, "fixture must be smaller than the target for this to prove anything"
+        assert_equal layer_width, image.width
+        FileUtils.rm image.file
+      end
+
+      # Plenty of sites now ship an SVG favicon. It rasterizes at the preset's
+      # size like any other input -- one rendition per variant, no format
+      # branch -- which also proves librsvg is reachable through vips.
+      def test_should_rasterize_an_svg_icon
+        file = File.join(Dir.tmpdir, "#{SecureRandom.hex}.svg")
+        File.write(file, %(<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#0867e2"/></svg>))
+
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "svg", width: 32, height: 32)
+        assert cropper.valid?(false)
+        image = cropper.crop!
+
+        assert_equal(:png, ImageFormat.detect(image.file))
+        assert_equal(32, image.width)
+        FileUtils.rm image.file
+      ensure
+        FileUtils.rm_f file
+      end
+
+      def test_should_be_invalid_when_no_icon_layer_is_usable
+        file = copy_support_file("favicon-blank.ico")
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 32, height: 32)
+
+        assert_not cropper.valid?(false)
+      end
     end
   end
 end

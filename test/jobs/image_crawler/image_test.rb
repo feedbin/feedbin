@@ -99,5 +99,24 @@ module ImageCrawler
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "webp"), image.storage_path
       assert_equal "image/webp", image.r2_storage_options["Content-Type"]
     end
+
+    # variant names the rendering recipe, not the result. A 180x180 touch icon
+    # rendered by the 200x200 limit recipe stays 180x180 and is still variant
+    # "200x200" -- keying on the actual output would fragment the namespace and
+    # break dedup between two renditions of the same recipe.
+    test "icon presets keep their recipe as the variant and store png" do
+      %w[favicon touch_icon].zip(["32x32", "200x200"]).each do |preset_name, variant|
+        image = Image.new_with_attributes(
+          id: SecureRandom.hex, preset_name: preset_name, image_urls: [],
+          provider: ::Image.providers[:feed_icon], provider_id: 1,
+          original_url: "http://example.com/favicon.ico",
+          width: 17, height: 17
+        )
+        assert_equal variant, image.variant
+        assert_equal "png", image.preset.format
+        assert_equal "image/png", image.r2_storage_options["Content-Type"]
+        assert_equal :icon_crop, image.preset.crop
+      end
+    end
   end
 end
