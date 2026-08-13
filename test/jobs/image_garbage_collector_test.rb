@@ -131,4 +131,48 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
       end
     end
   end
+
+  # Episode artwork is provider entry_icon and is owned by the entry, so
+  # deleting the entry must take the row and its object. entry_images
+  # deliberately excludes entry_icon -- Dedupe and ReuseRules rely on that --
+  # so the collector needs its own, wider scope.
+  test "collects an entry's icon row along with its preview rows" do
+    with_env("R2_BUCKET_IMAGES" => "images-test") do
+      icon_url = "http://example.com/cover.jpg"
+      icon = Image.create!(
+        provider: :entry_icon, provider_id: "1", feed_id: 9,
+        url: icon_url, variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
+        storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg"),
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+      )
+      stub_batch_delete
+
+      assert_difference -> { Image.count }, -1 do
+        ImageGarbageCollector.new.perform([1])
+      end
+
+      assert_requested :post, "https://test-account.r2.cloudflarestorage.com/images-test/?delete", times: 1 do |request|
+        request.body.include?(icon.storage_path)
+      end
+    end
+  end
+
+  # The narrow scope is load-bearing elsewhere: widening it would let an icon
+  # crawl dedupe onto an entry-preview row. Asserted behaviourally rather than
+  # by inspecting where_values_hash, which holds cast enum integers.
+  test "entry_images excludes icon rows while entry_owned includes them" do
+    icon = Image.create!(
+      provider: :entry_icon, provider_id: "77", feed_id: 9,
+      url: "http://example.com/cover.jpg", variant: "200x200",
+      image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg"),
+      width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+    )
+
+    refute_includes Image.entry_images, icon
+    assert_includes Image.entry_owned, icon
+  end
 end

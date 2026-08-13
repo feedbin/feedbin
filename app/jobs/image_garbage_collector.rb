@@ -17,7 +17,7 @@ class ImageGarbageCollector
     entry_ids = [*entry_ids].map(&:to_s)
     return if entry_ids.empty?
 
-    rows = Image.entry_images.where(provider_id: entry_ids).to_a
+    rows = Image.entry_owned.where(provider_id: entry_ids).to_a
     return if rows.empty?
 
     grouped = rows.group_by(&:storage_path)

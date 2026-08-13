@@ -25,6 +25,13 @@ class Image < ApplicationRecord
 
   scope :entry_images, -> { where(provider: %i[entry_link_preview entry_preview]) }
 
+  # What an entry's deletion takes with it. Wider than entry_images because
+  # episode artwork (entry_icon) is entry-owned too. These are deliberately
+  # two scopes, not one: entry_images is also Dedupe's and ReuseRules' lookup
+  # scope, and its narrowness is what stops an icon crawl from deduping onto
+  # an entry-preview row.
+  scope :entry_owned, -> { where(provider: %i[entry_link_preview entry_preview entry_icon]) }
+
   before_save :fingerprint_url
 
   # Identity is (url, variant), where variant is the output geometry
