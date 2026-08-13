@@ -30,6 +30,26 @@
 
 Phase B changes cache keys (`v7` → `v8` for entries, `v3` → `v4` and `v9` → `v10` for the sidebar). Expect one cold-cache render wave after deploy; that is the intended cost of the version bump and is why the bumps are deliberate rather than incidental.
 
+**Run the migrations before the code that needs them.** Task 7's
+`orphaned_paths` and `Dedupe`'s survivor check both query
+`Image.where(storage_path: ...)`. Until `index_images_on_storage_path` exists
+those are sequential scans of `images` on every garbage-collection run and
+every dedup hit. The index is built `CONCURRENTLY`, so it can go out ahead of
+the deploy without locking the table.
+
+**The advisory-lock re-key has a rollout window, and it is the one hazard here
+that can lose data.** Task 7 moved the lock from `hashtextextended(url_fingerprint)`
+to `hashtextextended(storage_path)`. Mid-deploy, an old worker and a new worker
+take *different* keys for the same stored object, so an in-flight
+`Dedupe#attach` and a newly-deployed `ImageGarbageCollector` are no longer
+mutually excluded. The failure mode is a row referencing a deleted R2 object —
+and for entry previews that is permanent, because entries never re-crawl.
+
+This is unavoidable when re-keying a lock, but it is avoidable *during the
+window*: drain the `:utility` queue (or pause `EntryDeleter`) across the
+deploy, so no collector runs while both code versions are live. Nothing in the
+code enforces this; it only works if the deployer knows.
+
 ---
 
 # Phase A — Pipeline foundation

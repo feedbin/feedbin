@@ -419,9 +419,79 @@ touch-only callback, retire the legacy store).
 
 `remote_file` is out of scope for now and keeps its existing model and bucket.
 
+## What Phases A and B learned — read before starting Phase C
+
+Added after the foundation shipped. These are not design choices being
+relitigated; they are things implementation and review turned up that the
+tenant phases inherit. Each has a decision attached, and three of them are
+open.
+
+**The upload-before-lock race is now permanent for icons, and this document's
+earlier reasoning about it was wrong.** `Pipeline::Upload` PUTs the R2 object
+*before* `create_image` takes the storage lock. A sweep landing between the two
+leaves a row referencing a deleted object. That window predates this work, and
+it was rated acceptable because a 404 icon would self-heal on the next crawl.
+**With the `unchanged?` short circuit in place it does not self-heal**: the row
+keeps its `original_fingerprint`, so every later crawl short-circuits before
+processing and never re-uploads. The 404 is permanent.
+
+Unreachable while no tenant schedules a content-addressed preset, so it did not
+block the foundation. **It must be answered before Phase C ships**, and
+reachability is not exotic once icons are live: two hosts serving byte-identical
+icons share one `storage_path`, so host A's icon changing fires
+`ImageReplacementCollector` on exactly the path host B's concurrent crawl is
+uploading to. Cheapest correct fix: take the storage lock around `upload_r2`
+*and* `create_image` together — writers racing for one path are writing
+identical bytes, so serializing them costs nothing real. HEAD-then-re-upload
+after `create_image` also works and holds no lock across a network call.
+
+**`ImageGarbageCollector` harvests only `entry_images`, so Phase C's claim to
+"fix the episode-art deletion leak" does not hold yet.** The survivor check
+correctly counts every provider, but the *harvest* — the set of rows deletion
+starts from — is still `Image.entry_images.where(provider_id: entry_ids)`.
+Podcast episode art is `entry_icon`, which that scope excludes, so its rows and
+R2 objects are never collected when the entry is deleted. `EntryDeleter` already
+passes the right ids; Phase C only needs to widen the scope, plus a test.
+
+**Provider separation between favicon and touch icon is load-bearing for
+correctness, not just row layout.** `Pipeline::Find#unchanged?` keys on
+`(provider, provider_id, original_fingerprint, variant)`. The `(provider,
+provider_id)` unique index is what stops the two presets sharing a row — if
+Phase E ever gave them the same provider for one host, whichever ran last would
+own `original_fingerprint` and the other would short-circuit forever on a
+fingerprint belonging to a different variant's object. The separate
+`website_favicon` / `website_touch_icon` providers this document already
+specifies are the mechanism; do not collapse them.
+
+**Why `Dedupe` cannot orphan a replaced object — the correct reason.** It is
+*not* that `Dedupe` only ever writes new rows: `attach!` is an upsert keyed on
+`(provider, provider_id)`, so it can move an existing row. The actual guarantee
+is that `Dedupe`'s lookup is scoped to `entry_images` and keyed on a
+variant-folded fingerprint, so a 32×32 icon crawl can never match a 542×304
+entry row. A tenant that widens either the scope or the key inherits the
+problem — check this before reusing `Dedupe` for anything.
+
+**`create_image`'s replacement sweep is enqueued inside `Pipeline::Upload`'s
+bare `rescue => exception`.** A Redis failure at that moment leaks the replaced
+object permanently — the row has already committed to the new path, so a Sidekiq
+retry sees no `storage_path` change and never re-derives the sweep — *and*
+misreports as `image.r2_error` with `DownloadCache.save` running on a row that
+was in fact written. A dedicated rescue around just the `perform_async` fixes
+the metric skew. Unreachable until a tenant ships.
+
+**One test-suite blind spot worth knowing about.** `config/environments/test.rb`
+sets `perform_caching = false`, and Rails skips a collection-cache `cached:`
+lambda entirely when that is false. So **no controller test can observe a query
+issued from `entries_cache_key`** — two N+1s in Phase B reached review rather
+than CI because of it. The controller-level guards that exist work only
+indirectly, because `_entry.html.erb` reads `processed_image?` in the partial
+body; if that read ever moves, those guards go vacuous while the key still
+N+1s. Any future work that adds a read to a cache key has the same exposure.
+
 ## Open questions
 
-None outstanding. Decisions settled during design, recorded here so they are not
+None outstanding *as of the original design*; see the section above for three
+opened by implementation. Decisions settled during design, recorded here so they are not
 relitigated: `remote_file` deferred; `favicons.favicon` (base64) is dead and ignored;
 every surface keeps rendering the favicon variant, with touch icons collected but not
 yet consumed; both icon presets use `resize_to_limit`; SVG sources rasterize; the
