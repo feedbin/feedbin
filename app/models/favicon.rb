@@ -12,12 +12,6 @@ class Favicon < ApplicationRecord
     where(host: hosts).index_by(&:host)
   end
 
-  after_commit :touch_owners
-
-  def touch_owners
-    TouchFeeds.perform_in(rand(1..10).seconds, host) if saved_change_to_attribute?(:url)
-  end
-
   def data
     self[:data] || {}
   end
