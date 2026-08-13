@@ -29,8 +29,9 @@ module ImageCrawler
         provider_id: provider_id.to_s,
         feed_id: feed_id,
         url: url,
+        variant: "542x304",
         image_fingerprint: image_fingerprint,
-        storage_path: ::Image.storage_path_for(url),
+        storage_path: ::Image.storage_path_for(url, "542x304"),
         width: 542, height: 304, bytesize: 12_345,
         placeholder_color: "aabbcc"
       )

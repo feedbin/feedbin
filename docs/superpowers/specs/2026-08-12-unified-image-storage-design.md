@@ -54,7 +54,8 @@ create_table :images do |t|
   t.text   :provider_id,       null: false   # entry id
   t.bigint :feed_id                          # for the same-feed reuse rule
   t.text   :url,               null: false   # original image URL
-  t.uuid   :url_fingerprint,   null: false   # MD5(url) — dedup + refcount key
+  t.text   :variant,           null: false   # output geometry ("542x304"); part of the identity
+  t.uuid   :url_fingerprint,   null: false   # MD5("variant|url") — dedup + refcount key
   t.uuid   :image_fingerprint, null: false   # MD5 of processed bytes — content-level reuse checks
   t.text   :storage_path,      null: false   # R2 key, NOT a full URL (see "Serving")
   t.bigint :width,             null: false
@@ -79,10 +80,13 @@ width/height/bytesize, which they lack today).
 ## Storage layout
 
 - Bucket: new R2 bucket, public via custom domain (e.g. `images.feedbin.com`).
-- Key: `url_fingerprint[0..2]/<url_fingerprint>.webp` — content-addressed by original
-  URL, so existence is decidable from the DB alone and identical URLs share one object.
-  All three entry presets (primary/twitter/youtube) output 542×304, so one object serves
-  any provider; preset is recorded in `data` for debugging.
+- Key: `url_fingerprint[0..2]/<url_fingerprint>.webp` where
+  `url_fingerprint = MD5("<variant>|<url>")` and `variant` is the output geometry
+  ("542x304"). Identity is (url, variant): identical URLs at the same output size share
+  one object; the same URL rendered at a different size (a future podcast tenant's
+  200x200) is a different object, so multi-variant tenants can join without key
+  collisions. All three entry presets share the 542×304 variant; preset is recorded in
+  `data` for debugging.
 - Format: WebP, `saver(strip: true, quality: 65)`.
 - Headers: explicit `Content-Type: image/webp` (today's upload sets none — R2 would
   serve `application/octet-stream`), `Cache-Control: max-age=315360000, public, immutable`.

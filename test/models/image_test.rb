@@ -1,15 +1,22 @@
 require "test_helper"
 
 class ImageTest < ActiveSupport::TestCase
-  test "url_fingerprint_for strips and hashes" do
-    assert_equal Digest::MD5.hexdigest("http://example.com/a.jpg"),
-      Image.url_fingerprint_for(" http://example.com/a.jpg ")
+  test "url_fingerprint_for strips and hashes url and variant" do
+    assert_equal Digest::MD5.hexdigest("542x304|http://example.com/a.jpg"),
+      Image.url_fingerprint_for(" http://example.com/a.jpg ", "542x304")
+  end
+
+  test "the same url at different variants has different identities" do
+    refute_equal Image.url_fingerprint_for("http://example.com/a.jpg", "542x304"),
+      Image.url_fingerprint_for("http://example.com/a.jpg", "200x200")
+    refute_equal Image.storage_path_for("http://example.com/a.jpg", "542x304"),
+      Image.storage_path_for("http://example.com/a.jpg", "200x200")
   end
 
   test "storage_path_for is sharded by fingerprint prefix" do
-    fingerprint = Image.url_fingerprint_for("http://example.com/a.jpg")
+    fingerprint = Image.url_fingerprint_for("http://example.com/a.jpg", "542x304")
     assert_equal File.join(fingerprint[0..2], "#{fingerprint}.webp"),
-      Image.storage_path_for("http://example.com/a.jpg")
+      Image.storage_path_for("http://example.com/a.jpg", "542x304")
   end
 
   test "attach! creates then updates rather than duplicating" do
@@ -18,8 +25,9 @@ class ImageTest < ActiveSupport::TestCase
       provider_id: 123,
       feed_id: 1,
       url: "http://example.com/a.jpg",
+      variant: "542x304",
       image_fingerprint: SecureRandom.hex(16),
-      storage_path: Image.storage_path_for("http://example.com/a.jpg"),
+      storage_path: Image.storage_path_for("http://example.com/a.jpg", "542x304"),
       width: 542,
       height: 304,
       bytesize: 10_000,
@@ -43,8 +51,9 @@ class ImageTest < ActiveSupport::TestCase
       provider_id: 321,
       feed_id: 1,
       url: "http://example.com/race.jpg",
+      variant: "542x304",
       image_fingerprint: SecureRandom.hex(16),
-      storage_path: Image.storage_path_for("http://example.com/race.jpg"),
+      storage_path: Image.storage_path_for("http://example.com/race.jpg", "542x304"),
       width: 542,
       height: 304,
       bytesize: 10_000,

@@ -43,7 +43,7 @@ module ImageCrawler
       return false if @image.feed_id.nil?
 
       ::Image.entry_images
-        .where(feed_id: @image.feed_id, url_fingerprint: ::Image.url_fingerprint_for(url))
+        .where(feed_id: @image.feed_id, url_fingerprint: ::Image.url_fingerprint_for(url, @image.variant))
         .where.not(provider_id: @image.provider_id.to_s)
         .exists?
     end

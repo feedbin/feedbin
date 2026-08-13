@@ -70,7 +70,7 @@ module ImageCrawler
 
           assert_requested r2_put
 
-          record = ::Image.entry_images.find_by(url_fingerprint: ::Image.url_fingerprint_for(original_url))
+          record = ::Image.entry_images.find_by(url_fingerprint: ::Image.url_fingerprint_for(original_url, "542x304"))
           assert_equal "1", record.provider_id
           assert_equal image.storage_path, record.storage_path
           assert record.data["legacy_storage_url"].present?

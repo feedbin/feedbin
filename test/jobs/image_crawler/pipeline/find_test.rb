@@ -120,8 +120,9 @@ module ImageCrawler
             provider_id: "1",
             feed_id: 9,
             url: original_url,
+            variant: "542x304",
             image_fingerprint: SecureRandom.hex(16),
-            storage_path: ::Image.storage_path_for(original_url),
+            storage_path: ::Image.storage_path_for(original_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345,
             placeholder_color: "aabbcc",
             data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
@@ -133,7 +134,7 @@ module ImageCrawler
 
           assert_equal 1, EntryImage.jobs.size
           refute_requested :get, original_url
-          assert_equal 2, ::Image.entry_images.where(url_fingerprint: ::Image.url_fingerprint_for(original_url)).count
+          assert_equal 2, ::Image.entry_images.where(url_fingerprint: ::Image.url_fingerprint_for(original_url, "542x304")).count
         end
       end
 
@@ -166,8 +167,8 @@ module ImageCrawler
 
           ::Image.create!(
             provider: :entry_preview, provider_id: "1", feed_id: 9,
-            url: og_url, image_fingerprint: SecureRandom.hex(16),
-            storage_path: ::Image.storage_path_for(og_url),
+            url: og_url, variant: "542x304", image_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.storage_path_for(og_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
             data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
           )
@@ -193,8 +194,8 @@ module ImageCrawler
 
           ::Image.create!(
             provider: :entry_preview, provider_id: "1", feed_id: 9,
-            url: reused_url, image_fingerprint: SecureRandom.hex(16),
-            storage_path: ::Image.storage_path_for(reused_url),
+            url: reused_url, variant: "542x304", image_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.storage_path_for(reused_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
             data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
           )

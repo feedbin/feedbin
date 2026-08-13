@@ -7,7 +7,15 @@ module ImageCrawler
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
       JPG_SAVER  = {strip: true, quality: 80, background: 255}.freeze
-      WEBP_SAVER = {strip: true, quality: 65}.freeze
+
+      # smart_subsample computes the chroma planes in linear light, which is
+      # what stops saturated edges — white text on red, mostly — from bleeding.
+      # It costs ~4% more bytes and buys enough quality to pay for the Q cut:
+      # measured over 89 real entry images, this pair is 7.4% smaller than the
+      # old quality: 65 and still better on median, p10 and worst case, with the
+      # images scoring under ssimulacra2 60 down from 8 to 2. effort: 6 is pure
+      # size savings at fixed Q. See tmp/images/README.md.
+      WEBP_SAVER = {strip: true, quality: 58, effort: 6, smart_subsample: true, smart_deblock: true}.freeze
 
       attr_reader :path
 

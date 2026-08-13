@@ -130,8 +130,9 @@ module ImageCrawler
         provider_id: @entry.id.to_s,
         feed_id: @entry.feed_id,
         url: "http://example.com/image.jpg",
+        variant: "542x304",
         image_fingerprint: SecureRandom.hex(16),
-        storage_path: ::Image.storage_path_for("http://example.com/image.jpg"),
+        storage_path: ::Image.storage_path_for("http://example.com/image.jpg", "542x304"),
         width: 542, height: 304, bytesize: 12_345,
         placeholder_color: "aabbcc",
         data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg"}

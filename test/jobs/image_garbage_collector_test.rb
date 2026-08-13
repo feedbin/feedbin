@@ -14,8 +14,9 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
       provider_id: provider_id.to_s,
       feed_id: 9,
       url: url,
+      variant: "542x304",
       image_fingerprint: SecureRandom.hex(16),
-      storage_path: Image.storage_path_for(url),
+      storage_path: Image.storage_path_for(url, "542x304"),
       width: 542, height: 304, bytesize: 12_345,
       placeholder_color: "aabbcc",
       data: {"legacy_storage_url" => legacy_storage_url || "https://bucket.s3.amazonaws.com/abc/#{Digest::MD5.hexdigest(url)}.jpg"}
@@ -86,8 +87,9 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
       Image.create!(
         provider: :entry_link_preview, provider_id: "1", feed_id: 9,
         url: "http://example.com/linked.jpg",
+        variant: "542x304",
         image_fingerprint: SecureRandom.hex(16),
-        storage_path: Image.storage_path_for("http://example.com/linked.jpg"),
+        storage_path: Image.storage_path_for("http://example.com/linked.jpg", "542x304"),
         width: 542, height: 304, bytesize: 1, placeholder_color: "aabbcc"
       )
 

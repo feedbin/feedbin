@@ -15,7 +15,7 @@ module ImageCrawler
     def initialize(original_url, image)
       @original_url = original_url.to_s
       @image = image
-      @record = ::Image.entry_images.find_by(url_fingerprint: ::Image.url_fingerprint_for(@original_url))
+      @record = ::Image.entry_images.find_by(url_fingerprint: ::Image.url_fingerprint_for(@original_url, image.variant))
     end
 
     # Returns true when the entry was attached to an existing image and the
@@ -33,6 +33,7 @@ module ImageCrawler
             provider_id: @image.provider_id,
             feed_id: @image.feed_id,
             url: @original_url,
+            variant: record.variant,
             image_fingerprint: record.image_fingerprint,
             storage_path: record.storage_path,
             width: record.width,

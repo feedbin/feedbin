@@ -143,6 +143,7 @@ module ImageCrawler
           provider_id: provider_id,
           feed_id: feed_id,
           url: original_url,
+          variant: variant,
           image_fingerprint: fingerprint,
           storage_path: storage_path,
           width: width,
@@ -162,12 +163,19 @@ module ImageCrawler
       preset.unified == true && ENV["R2_BUCKET_IMAGES"].present?
     end
 
+    # The stored-object identity is (url, variant): presets sharing an output
+    # geometry share objects, presets that differ (podcast 200x200 vs entry
+    # 542x304) never collide even for the same source URL.
+    def variant
+      "#{preset.width}x#{preset.height}"
+    end
+
     def url_fingerprint
-      ::Image.url_fingerprint_for(original_url)
+      ::Image.url_fingerprint_for(original_url, variant)
     end
 
     def storage_path
-      ::Image.storage_path_for(original_url)
+      ::Image.storage_path_for(original_url, variant)
     end
 
     def provider_label

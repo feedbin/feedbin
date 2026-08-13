@@ -2,6 +2,7 @@
 # t.text   :provider_id,       null: false
 # t.bigint :feed_id
 # t.text   :url,               null: false
+# t.text   :variant,           null: false
 # t.uuid   :url_fingerprint,   null: false
 # t.uuid   :image_fingerprint, null: false
 # t.text   :storage_path,      null: false
@@ -26,12 +27,16 @@ class Image < ApplicationRecord
 
   before_save :fingerprint_url
 
-  def self.url_fingerprint_for(url)
-    Digest::MD5.hexdigest(url.to_s.strip)
+  # Identity is (url, variant), where variant is the output geometry
+  # ("542x304"). One URL rendered at two sizes is two stored objects — the
+  # fingerprint drives dedup lookups, GC grouping, and advisory locks, so
+  # folding the variant in here keeps all of them variant-safe.
+  def self.url_fingerprint_for(url, variant)
+    Digest::MD5.hexdigest("#{variant}|#{url.to_s.strip}")
   end
 
-  def self.storage_path_for(url)
-    fingerprint = url_fingerprint_for(url)
+  def self.storage_path_for(url, variant)
+    fingerprint = url_fingerprint_for(url, variant)
     File.join(fingerprint[0..2], "#{fingerprint}.webp")
   end
 
@@ -78,6 +83,6 @@ class Image < ApplicationRecord
   private
 
   def fingerprint_url
-    self[:url_fingerprint] = self.class.url_fingerprint_for(url)
+    self[:url_fingerprint] = self.class.url_fingerprint_for(url, variant)
   end
 end
