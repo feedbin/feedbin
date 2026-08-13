@@ -1,9 +1,10 @@
 module FeedsHelper
   # The sidebar renders a FaviconComponent per feed, and a favicon is its own
   # row with its own timestamp -- nothing writes to the feed when one changes.
-  # Digesting the records is what invalidates these fragments now that the
-  # TouchFeeds fan-out is gone. Both collections reach here already
-  # includes(:favicon), so it costs no query.
+  # Digesting the records is what makes it safe to remove the TouchFeeds
+  # fan-out: invalidation stops depending on writing to every feed on the
+  # host. Both collections reach here already includes(:favicon), so it
+  # costs no query.
   def self.sidebar_feeds_cache_key(feeds)
     [feeds, feeds.map(&:title), feeds.map(&:favicon), "v4"]
   end

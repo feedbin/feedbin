@@ -54,4 +54,22 @@ class FeedsHelperTest < ActiveSupport::TestCase
 
     assert_empty statements.select { _1.match?(/FROM "favicons"/i) }
   end
+
+  # Tag#user_feeds is an attr_accessor populated by User#tag_group, not an
+  # association -- a structurally different path to favicon than the feeds
+  # key above, fed by the same feeds.includes(:favicon). Assert the key
+  # actually carries a favicon too, so this can't pass vacuously on an empty
+  # tag list.
+  test "the tags key does not query favicons when they are preloaded" do
+    @feed.tag("News", @user)
+    favicon = Favicon.create!(host: @feed.host, url: "http://example.com/a.png")
+    tags = @user.tag_group
+
+    key = nil
+    statements = capture_sql { key = FeedsHelper.sidebar_tags_cache_key(tags) }
+
+    assert_empty statements.select { _1.match?(/FROM "favicons"/i) }
+    _, _, _, favicons, _ = key
+    assert_includes favicons, favicon
+  end
 end
