@@ -61,6 +61,10 @@ module ImageCrawler
           stub_request(:put, /s3\.amazonaws\.com/)
           r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
             .with(headers: {"Content-Type" => "image/webp"})
+          # ensure_stored HEADs the object it just wrote; not the behavior under
+          # test here, so it stays a plain 200.
+          stub_request(:head, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .to_return(status: 200)
 
           assert_difference -> { ::Image.count }, +1 do
             assert_difference -> { EntryImage.jobs.size }, +1 do
@@ -136,6 +140,10 @@ module ImageCrawler
           legacy = stub_request(:put, /s3\.amazonaws\.com/)
           r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
             .with(headers: {"Content-Type" => "image/png"})
+          # ensure_stored HEADs the object it just wrote; not the behavior under
+          # test here, so it stays a plain 200.
+          stub_request(:head, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .to_return(status: 200)
 
           assert_difference -> { ::Image.count }, +1 do
             Upload.new.perform(image.to_h)
@@ -147,6 +155,74 @@ module ImageCrawler
           record = ::Image.find_by(provider: ::Image.providers[:feed_icon], provider_id: "5")
           assert_equal image.storage_path, record.storage_path
           assert_equal Digest::MD5.hexdigest("bytes"), record.original_fingerprint.delete("-")
+        end
+      end
+
+      # The R2 PUT lands before create_image takes the storage lock, so a sweep
+      # in between deletes an object nothing references yet. Once the row
+      # exists no sweep can touch it, so one HEAD after attaching closes the
+      # window -- and re-uploading is the only recovery, because unchanged?
+      # would short-circuit every later crawl before it reprocessed.
+      #
+      # Preset is touch_icon, not podcast: Task 3 of this plan is what flips
+      # podcast/podcast_feed to unified+content_addressed, and this task runs
+      # before it, so podcast doesn't take this code path yet. touch_icon
+      # already carries both flags today and matches the 200x200 geometry
+      # already used below, so it exercises the same mechanism this task adds.
+      def test_should_re_upload_when_the_object_vanished_before_the_row_existed
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          processed_path = copy_support_file("image.jpeg")
+          original_url = "http://example.com/cover.jpg"
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "touch_icon", image_urls: [],
+            provider: ::Image.providers[:entry_icon], provider_id: 5, feed_id: 9,
+            fingerprint: SecureRandom.hex(16),
+            original_fingerprint: Digest::MD5.hexdigest("bytes"),
+            original_url: original_url, final_url: original_url,
+            download_path: processed_path, processed_path: processed_path,
+            bytesize: File.size(processed_path),
+            width: 200, height: 200, placeholder_color: "0867e2"
+          )
+
+          stub_request(:put, /s3\.amazonaws\.com/)
+          put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+          head = stub_request(:head, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .to_return(status: 404)
+
+          Upload.new.perform(image.to_h)
+
+          assert_requested head
+          assert_requested put, times: 2
+        end
+      end
+
+      # Same substitution as above, and for the same reason: podcast isn't
+      # unified/content_addressed until Task 3.
+      def test_should_not_re_upload_when_the_object_is_still_there
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          processed_path = copy_support_file("image.jpeg")
+          original_url = "http://example.com/cover.jpg"
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "touch_icon", image_urls: [],
+            provider: ::Image.providers[:entry_icon], provider_id: 6, feed_id: 9,
+            fingerprint: SecureRandom.hex(16),
+            original_fingerprint: Digest::MD5.hexdigest("other bytes"),
+            original_url: original_url, final_url: original_url,
+            download_path: processed_path, processed_path: processed_path,
+            bytesize: File.size(processed_path),
+            width: 200, height: 200, placeholder_color: "0867e2"
+          )
+
+          stub_request(:put, /s3\.amazonaws\.com/)
+          put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+          stub_request(:head, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+            .to_return(status: 200)
+
+          Upload.new.perform(image.to_h)
+
+          assert_requested put, times: 1
         end
       end
     end

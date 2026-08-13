@@ -15,6 +15,7 @@ module ImageCrawler
           begin
             upload_r2
             @image.create_image
+            ensure_stored
             Librato.increment("image.r2_upload")
             r2_stored = true
           rescue => exception
@@ -62,6 +63,22 @@ module ImageCrawler
         File.open(@image.r2_source_path) do |file|
           Fog::Storage.new(STORAGE_R2).put_object(@image.r2_bucket, @image.storage_path, file, @image.r2_storage_options)
         end
+      end
+
+      # create_image is the first moment a row references this object. Until
+      # then a garbage-collection sweep sees the path as unreferenced and is
+      # entitled to delete it -- and for a content-addressed preset that loss
+      # is permanent, because unchanged? matches on the original bytes and
+      # stops every later crawl before it reprocesses. The lock serializes the
+      # sweep against create_image, so by the time we get here the answer is
+      # settled: either the object survived, or it was deleted and no sweep can
+      # delete it again.
+      def ensure_stored
+        Fog::Storage.new(STORAGE_R2).head_object(@image.r2_bucket, @image.storage_path)
+      rescue Excon::Errors::NotFound
+        Librato.increment("image.r2_resurrected")
+        Sidekiq.logger.info "Upload: object vanished before the row existed, re-uploading id=#{@image.id} storage_path=#{@image.storage_path}"
+        upload_r2
       end
     end
   end
