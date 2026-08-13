@@ -633,6 +633,13 @@ In `app/jobs/image_crawler/itunes_image.rb`, replace `receive`:
       # media_image stays written either way: it is still the fallback read
       # path until the legacy store retires, and one write per episode is not
       # a fan-out worth avoiding.
+      #
+      # The touch is not redundant with that update. The legacy S3 key comes
+      # from image_name, which is built from the job id ("<public_id>-itunes")
+      # and is therefore stable no matter what the bytes are -- new artwork
+      # overwrites the same key and yields the same processed_url, so the
+      # update no-ops and bumps nothing. Without the touch, artwork that
+      # changed would leave every cached view keyed on this entry stale.
       @entry.update(
         media_image: @image["processed_url"],
         provider: Entry.providers[:entry_icon],
@@ -832,6 +839,13 @@ In `app/jobs/image_crawler/itunes_feed_image.rb`, replace `receive`:
       # custom_icon stays written either way: it is still the fallback read
       # path until the legacy store retires, and it is what icon_options reads
       # to decide the icon's shape.
+      #
+      # The touch is not redundant with that update. The legacy S3 key comes
+      # from image_name, built from the job id, whose only variable part is a
+      # digest of the *source url* -- so a show that replaces its artwork at
+      # the same url overwrites the same key, yields the same processed_url,
+      # and the update no-ops. Without the touch, the sidebar and every entry
+      # summary for this feed would keep serving the old artwork.
       @feed.update(custom_icon: @image["processed_url"], custom_icon_format: "square")
       @feed.touch if @image["storage_path"]
     end
