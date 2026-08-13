@@ -55,21 +55,46 @@ class EntriesSearchControllerTest < ActionController::TestCase
   # assertion cannot tell a preload from an N+1 that happens to run before it
   # is checked -- processed_image? would load the association either way --
   # so this counts queries instead, like the favicon guard above does.)
+  #
+  # Compares two distinct-feed counts rather than a fixed threshold, and
+  # spreads entries across feeds rather than reusing @user.feeds.first: a
+  # fixed number goes stale the moment a second images-backed association
+  # needs its own preload (icon_image_record did -- see the show-artwork
+  # work), and entries sharing one feed hide an unpreloaded icon_image_record
+  # behind Rails' per-instance association cache, the same trap the favicon
+  # test above already sidesteps for the same reason.
   test "search results preload the preview image entries render" do
     login_as @user
     token = "previewimagepreloadtoken"
-    entries = 5.times.map { create_entry(@user.feeds.first).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
+
+    few_feeds = 2.times.map { |index|
+      feed = Feed.create!(feed_url: "http://previewfew#{index}.example.com/feed.xml", host: "previewfew#{index}.example.com", title: "Preview Few #{index}")
+      @user.subscriptions.create!(feed: feed)
+      feed
+    }
+    few_entries = few_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    few_entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
     Search.client { _1.refresh }
 
-    statements = capture_sql do
-      get :search, params: {query: token}, xhr: true
-    end
+    with_few_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
+
+    many_feeds = 6.times.map { |index|
+      feed = Feed.create!(feed_url: "http://previewmany#{index}.example.com/feed.xml", host: "previewmany#{index}.example.com", title: "Preview Many #{index}")
+      @user.subscriptions.create!(feed: feed)
+      feed
+    }
+    many_entries = many_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    many_entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
+    Search.client { _1.refresh }
+
+    with_many_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
 
     assert_response :success
-    assert_operator assigns(:entries).to_a.size, :>=, 5
-    images = statements.select { _1.match?(/FROM "images"/i) }
-    assert_operator images.count, :<=, 2, "two flat images queries for the whole page (preview_image_record, icon_image_record): #{images.count}"
+    assert_operator assigns(:entries).to_a.size, :>=, 8
+    pattern = /FROM "images"/i
+    few = with_few_feeds.count { _1.match?(pattern) }
+    many = with_many_feeds.count { _1.match?(pattern) }
+    assert_equal few, many, "the images lookup scales with the number of distinct feeds: #{few} then #{many}"
   end
 
   test "should handle complex query with multiple conditions" do
