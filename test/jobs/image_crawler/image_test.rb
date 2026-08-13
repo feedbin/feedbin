@@ -151,5 +151,35 @@ module ImageCrawler
       assert image.legacy_store?
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "webp"), image.storage_path
     end
+
+    test "create_image sweeps the object it replaced, and only when it changed" do
+      with_env("R2_BUCKET_IMAGES" => "images-test") do
+        build = ->(fingerprint) {
+          Image.new_with_attributes(
+            id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+            provider: ::Image.providers[:feed_icon], provider_id: 7,
+            original_url: "http://example.com/favicon.ico",
+            original_fingerprint: fingerprint,
+            fingerprint: SecureRandom.hex(16),
+            width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc"
+          )
+        }
+
+        first = build.call(Digest::MD5.hexdigest("old bytes"))
+        assert_no_difference -> { ImageReplacementCollector.jobs.size } do
+          first.create_image
+        end
+
+        assert_no_difference -> { ImageReplacementCollector.jobs.size } do
+          build.call(Digest::MD5.hexdigest("old bytes")).create_image
+        end
+
+        assert_difference -> { ImageReplacementCollector.jobs.size }, +1 do
+          build.call(Digest::MD5.hexdigest("new bytes")).create_image
+        end
+
+        assert_equal [[first.storage_path]], ImageReplacementCollector.jobs.last["args"]
+      end
+    end
   end
 end

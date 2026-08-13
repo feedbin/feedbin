@@ -37,6 +37,20 @@ class ImageGarbageCollector
     Librato.increment("image.gc_rows", by: rows.size)
   end
 
+  # The locked half of collection, on its own so the replacement path can use
+  # it without having rows to delete first.
+  def sweep(paths)
+    paths = Array(paths).compact.uniq
+    return [] if paths.empty?
+
+    orphaned = []
+    Image.with_storage_locks(paths) do
+      orphaned = orphaned_paths(paths)
+      delete_r2_objects(orphaned)
+    end
+    orphaned
+  end
+
   # Every provider counts, not just the entry ones: a stored object can be
   # referenced by an icon row and an entry row at once, and deleting it out
   # from under either is the same bug.

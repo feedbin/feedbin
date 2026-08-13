@@ -177,7 +177,7 @@ module ImageCrawler
     end
 
     def create_image
-      ::Image.with_storage_lock(storage_path) do
+      record = ::Image.with_storage_lock(storage_path) do
         ::Image.attach!(
           provider: provider,
           provider_id: provider_id,
@@ -198,6 +198,16 @@ module ImageCrawler
           }
         )
       end
+
+      # The row moved to a different object, so the old one may now be
+      # unreferenced. Swept in its own job because it is a different lock key
+      # than the one held above, and taking both here would invert the sorted
+      # acquisition order that keeps GC batches from deadlocking.
+      if record.saved_change_to_storage_path? && (replaced = record.storage_path_before_last_save)
+        ImageReplacementCollector.perform_async([replaced])
+      end
+
+      record
     end
 
     def unified?
