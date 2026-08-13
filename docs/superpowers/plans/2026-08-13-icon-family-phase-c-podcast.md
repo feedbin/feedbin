@@ -126,7 +126,7 @@ Append to `test/jobs/image_crawler/pipeline/upload_test.rb` (inside `class Uploa
 source ~/.bash_profile && bin/rails test test/jobs/image_crawler/pipeline/upload_test.rb
 ```
 
-Expected: FAIL on the first test — no HEAD is issued, so WebMock reports the `head` stub was never requested. (The second test passes already; it is the guard for the change you are about to make.)
+Expected: FAIL on the first test — no HEAD is issued, so WebMock reports the `head` stub was never requested. (The second test does not pass yet either — it references a method that does not exist until Step 3. It is the guard for the change you are about to make, not a currently-green test.)
 
 Note the preset is `touch_icon`, not `podcast`. `podcast` does not become `unified`/`content_addressed` until Task 3, so until then it never reaches the R2 branch at all and neither test could pass. `touch_icon` is already both, and is also 200×200, so it exercises exactly the path under test.
 
@@ -263,7 +263,7 @@ Append to `test/jobs/image_garbage_collector_test.rb`:
 source ~/.bash_profile && bin/rails test test/jobs/image_garbage_collector_test.rb
 ```
 
-Expected: FAIL on the first test — the `entry_icon` row is not harvested, so `Image.count` does not change and no delete is requested. The second test passes already and is the guard for the change you are about to make.
+Expected: FAIL on the first test — the `entry_icon` row is not harvested, so `Image.count` does not change and no delete is requested. The second test does not pass yet either — it references `Image.entry_owned`, which does not exist until Step 3, so it raises NoMethodError. It is the guard for the change you are about to make, not a currently-green test.
 
 - [ ] **Step 3: Add the scope**
 
