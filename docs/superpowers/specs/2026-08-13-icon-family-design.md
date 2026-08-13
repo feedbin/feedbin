@@ -473,11 +473,23 @@ problem — check this before reusing `Dedupe` for anything.
 
 **`create_image`'s replacement sweep is enqueued inside `Pipeline::Upload`'s
 bare `rescue => exception`.** A Redis failure at that moment leaks the replaced
-object permanently — the row has already committed to the new path, so a Sidekiq
-retry sees no `storage_path` change and never re-derives the sweep — *and*
-misreports as `image.r2_error` with `DownloadCache.save` running on a row that
-was in fact written. A dedicated rescue around just the `perform_async` fixes
-the metric skew. Unreachable until a tenant ships.
+object permanently: the row has already committed to the new path, and
+`Pipeline::Upload` is `retry: false`, so nothing ever re-derives the sweep. It
+*also* misreports as `image.r2_error`, with `DownloadCache.save` running on a
+row that was in fact written. A dedicated rescue around just the
+`perform_async` fixes the metric skew. Unreachable until a tenant ships.
+
+**The legacy-S3 refcount invariant holds per collection run, not absolutely.**
+`ImageGarbageCollector` harvests `legacy_storage_url` only from orphaned path
+groups, which is exact because `Dedupe` copies that value verbatim alongside
+`storage_path`. But nothing serializes two concurrent crawls of the same
+`(url, variant)`: both can miss `Dedupe`, each upload its own per-id legacy
+object, and write rows sharing one `storage_path` with two different
+`legacy_storage_url`s. A single run still reads every row in the group and
+`.uniq`s, so it stays exact; only rows collected in *separate* runs can leak a
+legacy object. Over-deletion is impossible in either case — same legacy url
+implies same storage path. Bounded, pre-existing, and worth knowing before
+anything starts depending on the invariant being absolute.
 
 **One test-suite blind spot worth knowing about.** `config/environments/test.rb`
 sets `perform_caching = false`, and Rails skips a collection-cache `cached:`
