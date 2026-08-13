@@ -1558,122 +1558,35 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 # Phase B — View cache digest
 
-### Task 10: `Favicon.for_entries` resolves every entry's icon host
+### Task 10: WITHDRAWN — superseded during execution
 
-`for_entries` currently collects hosts only for Pages entries, because that is the one case with no association to preload. The digest needs the record for *every* entry, and it needs it from a map rather than a per-row lookup: a cache key that triggers a query per row would trade 100k writes for an N+1 on every render.
+`Favicon.for_entries` was going to widen from Pages-only to every entry, so the
+cache key could read one uniform map. Implementing it exactly broke a
+pre-existing guard,
+`EntriesSearchControllerTest#test_search_results_preload_the_favicon_the_shared_template_renders`,
+which asserts **at most one** `favicons` query per entry-list render.
 
-**Files:**
-- Modify: `app/models/favicon.rb`
-- Test: `test/models/favicon_test.rb`
+The widening makes it two. The original `for_entries` short-circuits —
+`return {} if hosts.empty?` — so a non-Pages collection costs zero queries, and
+the single query on that path is the existing `includes(feed: [:favicon])`
+preload. Widening removes the short circuit and adds a second query on every
+entry-list controller in the app. That violates this plan's own Global
+Constraint that pre-existing tests stay green.
 
-**Interfaces:**
-- Consumes: nothing new.
-- Produces:
-  - `Favicon.host_for(entry) -> String | nil` — the host an entry's favicon is keyed by: the entry's own hostname for Pages feeds, the feed's host otherwise.
-  - `Favicon.for_entries(entries) -> Hash{String => Favicon}` — now covers every entry, keyed by host.
+**Resolution: the cache key branches the same way the renderer does, and pays
+for nothing extra.** `FaviconComponent` already resolves Pages entries through
+the map (`@favicons[hostname]`) and every other feed through `feed.favicon`.
+Both sources are already loaded on every path that renders the entry list — the
+map by `Favicon.for_entries`, the association by `includes(feed: [:favicon])`,
+which the guard test above exists to protect. So the digest reads the same two
+sources, costs zero additional queries, and cannot drift from what the
+component renders.
 
-- [ ] **Step 1: Write the failing test**
+`Favicon` is unchanged: `for_entries` keeps its Pages-only scope and its short
+circuit, and no `host_for` is needed. The branch lives in `EntriesHelper`
+alongside the cache key that uses it (Task 11).
 
-Replace the contents of `test/models/favicon_test.rb` with:
-
-```ruby
-require "test_helper"
-
-class FaviconTest < ActiveSupport::TestCase
-  test "should require a url" do
-    assert_raises(ActiveRecord::RecordInvalid) do
-      Favicon.create!(url: nil)
-    end
-  end
-
-  # Pages entries resolve by their own hostname (one Pages feed holds entries
-  # from everywhere); everything else resolves by its feed's host.
-  test "host_for uses the entry's host for pages and the feed's otherwise" do
-    pages_feed, xml_feed = create_feeds(users(:ben), 2)
-    pages_feed.update!(feed_type: :pages)
-    xml_feed.update!(host: "blog.example.com")
-
-    pages_entry = create_entry(pages_feed)
-    pages_entry.update!(url: "http://saved.example.com/article")
-    xml_entry = create_entry(xml_feed)
-
-    assert_equal "saved.example.com", Favicon.host_for(pages_entry)
-    assert_equal "blog.example.com", Favicon.host_for(xml_entry)
-  end
-
-  test "for_entries resolves pages and feed hosts together in one query" do
-    pages_feed, xml_feed = create_feeds(users(:ben), 2)
-    pages_feed.update!(feed_type: :pages)
-    xml_feed.update!(host: "blog.example.com")
-
-    saved = Favicon.create!(host: "saved.example.com", url: "http://cdn.example.com/saved.png")
-    blog = Favicon.create!(host: "blog.example.com", url: "http://cdn.example.com/blog.png")
-
-    pages_entry = create_entry(pages_feed)
-    pages_entry.update!(url: "http://saved.example.com/article")
-    entries = [pages_entry, create_entry(xml_feed)]
-
-    favicons = nil
-    statements = capture_sql { favicons = Favicon.for_entries(entries) }
-
-    assert_equal saved, favicons["saved.example.com"]
-    assert_equal blog, favicons["blog.example.com"]
-    assert_equal 1, statements.count { _1.match?(/FROM "favicons"/i) }
-  end
-
-  test "for_entries is empty with nothing to resolve" do
-    assert_equal({}, Favicon.for_entries([]))
-  end
-end
-```
-
-- [ ] **Step 2: Run the test to verify it fails**
-
-```bash
-source ~/.bash_profile && bin/rails test test/models/favicon_test.rb
-```
-
-Expected: FAIL with `undefined method 'host_for'`, and `for_entries` returning `{}` for the xml entry.
-
-- [ ] **Step 3: Widen the lookup**
-
-In `app/models/favicon.rb`, replace `for_entries` and add `host_for`:
-
-```ruby
-  # Which host an entry's favicon is keyed by. Pages entries are looked up by
-  # the entry's own host rather than the feed's -- one Pages feed holds entries
-  # from everywhere -- so there is no association to reach through.
-  def self.host_for(entry)
-    entry.feed&.pages? ? entry.hostname : entry.feed&.host
-  end
-
-  # Resolve the whole collection in one query. This map is both what the entry
-  # list renders Pages icons from and what the view cache digest reads, so a
-  # miss here is an N+1 on every render rather than a single extra query.
-  def self.for_entries(entries)
-    hosts = Array(entries).filter_map { host_for(_1) }.uniq
-    return {} if hosts.empty?
-    where(host: hosts).index_by(&:host)
-  end
-```
-
-- [ ] **Step 4: Run the test to verify it passes**
-
-```bash
-source ~/.bash_profile && bin/rails test test/models/favicon_test.rb test/views test/presenters
-```
-
-Expected: PASS.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add app/models/favicon.rb test/models/favicon_test.rb && git commit -m "Resolve every entry's favicon host in one query
-
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
-```
-
----
+Nothing to implement here.
 
 ### Task 11: `entries_cache_key` digests the favicon and the preview image
 
@@ -1685,8 +1598,10 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - Test: `test/views/entries_list_test.rb` — the existing home for this key's tests; it already has a private `entry_cache_key` helper and a `favicon_queries` matcher.
 
 **Interfaces:**
-- Consumes: `Favicon.host_for` (Task 10).
-- Produces: `EntriesHelper.entries_cache_key(entry, favicons = {}) -> Array` — `[entry, entry.feed, favicons[Favicon.host_for(entry)], entry.preview_image_record, "v8"]`. The instance method forwards with the same signature. The default `{}` keeps the existing one-argument call sites working.
+- Consumes: `Favicon.for_entries` (unchanged, Pages-only) and the `includes(feed: [:favicon])` preload every entry-list path already does.
+- Produces:
+  - `EntriesHelper.entries_cache_key(entry, favicons = {}) -> Array` — `[entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, "v8"]`. The instance method forwards with the same signature. The default `{}` keeps the existing one-argument call sites working.
+  - `EntriesHelper.entry_favicon(entry, favicons) -> Favicon | nil` — the map for Pages entries, `entry.feed&.favicon` for everything else. Mirrors `FaviconComponent`'s own branch so the digest cannot drift from the render, and reads only sources that are already loaded.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1715,9 +1630,31 @@ Replace the existing "building the cache key does not walk an association per en
   end
 ```
 
-and add two tests above the `private` marker:
+and add three tests above the `private` marker. The first covers the branch the
+one above cannot reach: this file's `@feed` is a Pages feed, so its entries
+resolve through the map and never touch `feed.favicon`. The non-Pages branch
+reads the association, which N+1s without `includes(feed: [:favicon])` — the
+exact property `EntriesSearchControllerTest#test_search_results_preload_the_favicon_the_shared_template_renders`
+guards end to end, worth pinning at the unit level too:
 
 ```ruby
+  # Non-Pages entries key on the feed's own favicon, read from the association
+  # every entry-list path preloads. Without that preload this is a query per
+  # row -- the N+1 the whole collection-wide approach exists to avoid.
+  test "the feed-favicon branch reads the preload rather than querying" do
+    plain_feed = create_feeds(@user).first
+    Favicon.create!(host: plain_feed.host, url: "http://example.com/a.png")
+    ids = 3.times.map { create_entry(plain_feed).id }
+    entries = Entry.where(id: ids).includes(feed: [:favicon]).preload(:preview_image_record).to_a
+    favicons = Favicon.for_entries(entries)
+
+    statements = capture_sql { entries.each { entry_cache_key(_1, favicons) } }
+
+    assert_empty favicon_queries(statements)
+    assert_not_nil EntriesHelper.entry_favicon(entries.first, favicons),
+      "the branch must actually resolve a favicon, or this proves nothing"
+  end
+
   # The favicon is its own row with its own timestamp. Digesting the record is
   # what lets one row update invalidate every view referencing it; the
   # alternative was TouchFeeds writing to every feed on the host -- 100,000
@@ -1780,11 +1717,22 @@ In `app/helpers/entries_helper.rb`, replace both `entries_cache_key` definitions
   # a favicon change -- 100,000 writes to invalidate views on a host like
   # medium.com.
   #
-  # Both must come from something already loaded. favicons is the
-  # collection-wide map (Favicon.for_entries); preview_image_record comes from
-  # Entry.entries_list's preload. A lookup here would be an N+1 per render.
+  # Every part must come from something already loaded, or the key becomes an
+  # N+1 per render: favicons is the collection-wide map (Favicon.for_entries),
+  # feed.favicon comes from the includes(feed: [:favicon]) every entry-list
+  # path does, and preview_image_record from Entry.entries_list's preload.
   def self.entries_cache_key(entry, favicons = {})
-    [entry, entry.feed, favicons[Favicon.host_for(entry)], entry.preview_image_record, "v8"]
+    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, "v8"]
+  end
+
+  # The same two sources FaviconComponent renders from, resolved the same way:
+  # a Pages feed is one row holding articles from everywhere, so its entries
+  # key on their own host via the map; everything else keys on the feed's own
+  # favicon. Mirroring the component is what keeps the digest from drifting
+  # away from what actually got rendered.
+  def self.entry_favicon(entry, favicons)
+    return favicons[entry.hostname] if entry.feed&.pages?
+    entry.feed&.favicon
   end
 
   def entries_cache_key(entry, favicons = {})
