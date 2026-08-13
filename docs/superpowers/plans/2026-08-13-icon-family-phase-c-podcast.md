@@ -70,7 +70,7 @@ Append to `test/jobs/image_crawler/pipeline/upload_test.rb` (inside `class Uploa
           original_url = "http://example.com/cover.jpg"
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "podcast", image_urls: [],
+            id: SecureRandom.hex, preset_name: "touch_icon", image_urls: [],
             provider: ::Image.providers[:entry_icon], provider_id: 5, feed_id: 9,
             fingerprint: SecureRandom.hex(16),
             original_fingerprint: Digest::MD5.hexdigest("bytes"),
@@ -98,7 +98,7 @@ Append to `test/jobs/image_crawler/pipeline/upload_test.rb` (inside `class Uploa
           original_url = "http://example.com/cover.jpg"
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "podcast", image_urls: [],
+            id: SecureRandom.hex, preset_name: "touch_icon", image_urls: [],
             provider: ::Image.providers[:entry_icon], provider_id: 6, feed_id: 9,
             fingerprint: SecureRandom.hex(16),
             original_fingerprint: Digest::MD5.hexdigest("other bytes"),
@@ -127,6 +127,8 @@ source ~/.bash_profile && bin/rails test test/jobs/image_crawler/pipeline/upload
 ```
 
 Expected: FAIL on the first test — no HEAD is issued, so WebMock reports the `head` stub was never requested. (The second test passes already; it is the guard for the change you are about to make.)
+
+Note the preset is `touch_icon`, not `podcast`. `podcast` does not become `unified`/`content_addressed` until Task 3, so until then it never reaches the R2 branch at all and neither test could pass. `touch_icon` is already both, and is also 200×200, so it exercises exactly the path under test.
 
 - [ ] **Step 3: Add the check**
 
