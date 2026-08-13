@@ -167,119 +167,31 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ---
 
-### Task 2: `Cropper#crop!` stops hardcoding jpg
+### Task 2: WITHDRAWN — superseded during execution
 
-`Cropper#crop!` saves every non-`limit_crop` strategy as jpg. Icons need PNG. Move the format from the method to the constructor, fed by `preset.format`.
+`Cropper#crop!` was going to take a `format:` keyword fed by `preset.format`.
+That was wrong: `preset.format` is the **stored R2 object's** extension
+(`"webp"` for the entry presets), while `crop!` writes the **legacy S3**
+output, which is jpg. They only coincide for the icon presets, which have a
+single output.
 
-**Files:**
-- Modify: `app/jobs/image_crawler/lib/processor/cropper.rb`
-- Modify: `app/jobs/image_crawler/pipeline/process.rb` (the `Processor::Cropper.new` call, lines 13–18)
-- Test: `test/jobs/image_crawler/processor/cropper_test.rb`
+`crop_pair!` runs only when `unified?` is true, which requires
+`R2_BUCKET_IMAGES` to be set. With R2 unconfigured, `primary`/`twitter`/
+`youtube` fall through to `crop!` — so threading `preset.format` there made
+them write webp to legacy S3, changing behavior for existing presets and
+breaking `FindTest#test_should_copy_image` and
+`ProcessTest#test_should_enqueue_upload`.
 
-**Interfaces:**
-- Consumes: `ImageCrawler::Image::PRESETS[*][:format]` from Task 1.
-- Produces: `Processor::Cropper.new(file, crop:, extension:, width:, height:, format: "jpg")` — new keyword, defaulted to `"jpg"` so existing tests construct it unchanged. `Cropper::SAVERS` maps format string → saver options hash. `Cropper::PNG_SAVER = {strip: true}`.
+**Resolution (owner's call): the output format stays a property of the
+strategy, not the preset.** `crop!` already special-cases `limit_crop` with
+an early return; Task 4's `icon_crop` gets the same treatment and saves its
+own PNG. `preset.format` keeps its Task 1 meaning — the stored object's
+extension, read only by `storage_path` and `r2_storage_options`, both of
+which are R2-only paths. No `format:` keyword, no `SAVERS` table, and
+`Task 1` needs no amendment.
 
-- [ ] **Step 1: Write the failing test**
-
-Append to `test/jobs/image_crawler/processor/cropper_test.rb` (inside the `CropperTest` class):
-
-```ruby
-      def test_should_save_in_the_requested_format
-        file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", format: "png", width: 100, height: 100)
-        image = cropper.crop!
-
-        assert image.file.end_with?(".png")
-        assert_equal(:png, ImageFormat.detect(image.file))
-        assert_equal("png", image.extension)
-        FileUtils.rm image.file
-      end
-
-      def test_should_still_default_to_jpg
-        file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 100, height: 100)
-        image = cropper.crop!
-
-        assert image.file.end_with?(".jpg")
-        assert_equal(:jpeg, ImageFormat.detect(image.file))
-        FileUtils.rm image.file
-      end
-```
-
-- [ ] **Step 2: Run the test to verify it fails**
-
-```bash
-source ~/.bash_profile && bin/rails test test/jobs/image_crawler/processor/cropper_test.rb -n test_should_save_in_the_requested_format
-```
-
-Expected: FAIL with `unknown keyword: :format`.
-
-- [ ] **Step 3: Thread the format through the Cropper**
-
-In `app/jobs/image_crawler/lib/processor/cropper.rb`, add the PNG saver and the format table next to the existing savers:
-
-```ruby
-      # Icons are flat graphics with alpha; there is nothing to trade quality
-      # against, so the only knob is dropping metadata.
-      PNG_SAVER  = {strip: true}.freeze
-
-      SAVERS = {"jpg" => JPG_SAVER, "webp" => WEBP_SAVER, "png" => PNG_SAVER}.freeze
-```
-
-Replace the constructor and `crop!`:
-
-```ruby
-      def initialize(file, crop:, extension:, width:, height:, format: "jpg")
-        @file      = file
-        @crop      = crop
-        @extension = extension
-        @width     = width
-        @height    = height
-        @format    = format
-      end
-
-      def crop!
-        return limit_crop if @crop == :limit_crop
-        Processed.from_pipeline(save_as(geometry, @format, SAVERS.fetch(@format)))
-      end
-```
-
-`crop_pair!` stays exactly as it is: it names jpg and webp explicitly because it produces both, not one.
-
-- [ ] **Step 4: Pass the preset's format from the pipeline**
-
-In `app/jobs/image_crawler/pipeline/process.rb`, add one line to the `Cropper.new` call:
-
-```ruby
-        processor = Processor::Cropper.new(@image.download_path,
-          crop:      @image.preset.crop,
-          extension: @image.original_extension,
-          format:    @image.preset.format || "jpg",
-          width:     @image.preset.width,
-          height:    @image.preset.height
-        )
-```
-
-(`|| "jpg"` covers the `icon` preset, which has no `format` because `limit_crop` chooses its own.)
-
-- [ ] **Step 5: Run the tests to verify they pass**
-
-```bash
-source ~/.bash_profile && bin/rails test test/jobs/image_crawler/processor/cropper_test.rb test/jobs/image_crawler/pipeline/process_test.rb
-```
-
-Expected: PASS.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add app/jobs/image_crawler/lib/processor/cropper.rb app/jobs/image_crawler/pipeline/process.rb test/jobs/image_crawler/processor/cropper_test.rb && git commit -m "Move the cropper's output format onto the preset
-
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
-```
-
----
+Nothing to implement here. `PNG_SAVER` and the `crop!` early return moved
+into Task 4.
 
 ### Task 3: Extract `Processor::IconLayer`
 
@@ -477,9 +389,10 @@ Add the rendering recipe the icon family uses — best layer, `resize_to_limit`,
 - Test: `test/jobs/image_crawler/processor/cropper_test.rb`, `test/jobs/image_crawler/image_test.rb`
 
 **Interfaces:**
-- Consumes: `IconLayer.best` (Task 3), `Cropper`'s `format:` keyword (Task 2).
+- Consumes: `IconLayer.best` (Task 3).
 - Produces:
-  - `Cropper#icon_crop` — a geometry method (returns an unsaved `ImageProcessing::Vips` pipeline), dispatched through the existing `geometry`/`send(@crop)` mechanism.
+  - `Cropper::PNG_SAVER = {strip: true}`.
+  - `Cropper#icon_crop -> Processed` — a strategy method with its own early return in `crop!`, mirroring the `limit_crop` branch that is already there. It returns a saved `Processed`, not a pipeline, and never reads any caller-supplied format: PNG is a property of this recipe.
   - `Cropper#best_layer -> Vips::Image | nil`, memoized including the nil case.
   - `PRESETS[:favicon]` = `{width: 32, height: 32, minimum_size: nil, crop: :icon_crop, format: "png", validate: false, unified: true, content_addressed: true, legacy_store: false, job_class: nil}`.
   - `PRESETS[:touch_icon]` = the same with `width: 200, height: 200`.
@@ -492,7 +405,7 @@ Append to `test/jobs/image_crawler/processor/cropper_test.rb`:
 ```ruby
       def test_should_render_an_icon_as_png_from_the_best_layer
         file = copy_support_file("favicon.ico")
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", format: "png", width: 32, height: 32)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 32, height: 32)
 
         assert cropper.valid?(false)
         image = cropper.crop!
@@ -510,7 +423,7 @@ Append to `test/jobs/image_crawler/processor/cropper_test.rb`:
         file = copy_support_file("favicon.ico")
         layer_width = IconLayer.best(file).width
 
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", format: "png", width: 200, height: 200)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 200, height: 200)
         image = cropper.crop!
 
         assert_operator layer_width, :<, 200, "fixture must be smaller than the target for this to prove anything"
@@ -525,7 +438,7 @@ Append to `test/jobs/image_crawler/processor/cropper_test.rb`:
         file = File.join(Dir.tmpdir, "#{SecureRandom.hex}.svg")
         File.write(file, %(<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#0867e2"/></svg>))
 
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "svg", format: "png", width: 32, height: 32)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "svg", width: 32, height: 32)
         assert cropper.valid?(false)
         image = cropper.crop!
 
@@ -538,7 +451,7 @@ Append to `test/jobs/image_crawler/processor/cropper_test.rb`:
 
       def test_should_be_invalid_when_no_icon_layer_is_usable
         file = copy_support_file("favicon-blank.ico")
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", format: "png", width: 32, height: 32)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 32, height: 32)
 
         assert_not cropper.valid?(false)
       end
@@ -573,11 +486,29 @@ Append to `test/jobs/image_crawler/image_test.rb`:
 source ~/.bash_profile && bin/rails test test/jobs/image_crawler/processor/cropper_test.rb test/jobs/image_crawler/image_test.rb
 ```
 
-Expected: FAIL — `undefined method 'icon_crop'` from `geometry`, and `nil` for `image.preset.format`.
+Expected: FAIL — `NoMethodError: undefined method 'icon_crop'` from `crop!`'s `geometry` fallthrough (`send(:icon_crop)`), and `nil` for `image.preset.format`.
 
 - [ ] **Step 3: Add the strategy to the Cropper**
 
-In `app/jobs/image_crawler/lib/processor/cropper.rb`, add `best_layer` and `icon_crop` next to `fill_crop`:
+In `app/jobs/image_crawler/lib/processor/cropper.rb`, add the PNG saver next to the existing `JPG_SAVER`/`WEBP_SAVER` constants:
+
+```ruby
+      # Icons are flat graphics with alpha; there is nothing to trade quality
+      # against, so the only knob is dropping metadata.
+      PNG_SAVER  = {strip: true}.freeze
+```
+
+Give `icon_crop` its own early return in `crop!`, alongside the `limit_crop` branch already there. PNG is a property of this recipe, not of the caller — `crop!` keeps writing jpg for every other strategy, which is what the legacy S3 object has always been:
+
+```ruby
+      def crop!
+        return limit_crop if @crop == :limit_crop
+        return icon_crop  if @crop == :icon_crop
+        Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
+      end
+```
+
+Then add `best_layer` and `icon_crop` next to `limit_crop`:
 
 ```ruby
       # Multi-layer sources have no single "the image"; the layer choice is the
@@ -590,9 +521,11 @@ In `app/jobs/image_crawler/lib/processor/cropper.rb`, add `best_layer` and `icon
       end
 
       def icon_crop
-        ImageProcessing::Vips
+        image = ImageProcessing::Vips
           .source(best_layer)
           .resize_to_limit(@width, @height)
+
+        Processed.from_pipeline(save_as(image, "png", PNG_SAVER))
       end
 ```
 
@@ -2250,7 +2183,7 @@ The suite covers the mechanics; these two need eyes.
 ```ruby
 path = ImageCrawler::Processor::Cropper.new(
   Rails.root.join("test/support/www/favicon.ico").to_s,
-  crop: :icon_crop, extension: "ico", format: "png", width: 200, height: 200
+  crop: :icon_crop, extension: "ico", width: 200, height: 200
 ).crop!.file
 `open #{path}`
 ```
