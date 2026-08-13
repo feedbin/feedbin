@@ -64,6 +64,16 @@ class Image < ApplicationRecord
     File.join(fingerprint[0..2], "#{fingerprint}.#{extension}")
   end
 
+  # The public URL for a stored object. Nil until R2_IMAGE_HOST is set, which
+  # is what keeps the read path on the legacy fallback during a transition.
+  def self.r2_url(storage_path)
+    return nil if storage_path.blank?
+    host = ENV["R2_IMAGE_HOST"]
+    return nil if host.blank?
+    host = "https://#{host}" unless host.match?(%r{\Ahttps?://})
+    [host.chomp("/"), storage_path].join("/")
+  end
+
   # Upsert keyed by (provider, provider_id). Not create_or_find_by: every
   # call site runs inside Image.with_storage_lock's transaction, so a unique
   # violation would otherwise poison that outer transaction. The

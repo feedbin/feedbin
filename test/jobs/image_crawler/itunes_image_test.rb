@@ -32,7 +32,7 @@ module ImageCrawler
       end
     end
 
-    test "updates the entry when an image hash is given" do
+    test "updates the entry when a legacy-only image hash is given" do
       processed_url = "https://cdn.example.com/cover.jpg"
 
       ItunesImage.new.perform(@entry.public_id, {"processed_url" => processed_url})
@@ -41,6 +41,24 @@ module ImageCrawler
       assert_equal processed_url, @entry.media_image
       assert_equal "entry_icon", @entry.provider
       assert_equal @entry.id.to_s, @entry.provider_id
+    end
+
+    # Row-backed: Upload already wrote the images row before enqueueing this
+    # callback, so the metadata is not duplicated onto the entry. media_image
+    # keeps its legacy value for readers still on the fallback path.
+    test "keeps writing the legacy url and touches the entry when row-backed" do
+      processed_url = "https://cdn.example.com/cover.jpg"
+      @entry.update!(updated_at: 1.year.ago)
+      before = @entry.reload.updated_at
+
+      ItunesImage.new.perform(@entry.public_id, {
+        "processed_url" => processed_url,
+        "storage_path" => "abc/abc123.jpg"
+      })
+
+      @entry.reload
+      assert_equal processed_url, @entry.media_image
+      assert_operator @entry.updated_at, :>, before
     end
 
     test "skips processing when SKIP_IMAGES env var is set" do

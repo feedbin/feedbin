@@ -14,6 +14,7 @@ class Entry < ApplicationRecord
 
   has_one :preview_image_record, -> { provider_entry_preview }, class_name: "Image", foreign_key: :provider_id
   has_one :link_image_record, -> { provider_entry_link_preview }, class_name: "Image", foreign_key: :provider_id
+  has_one :icon_image_record, -> { provider_entry_icon }, class_name: "Image", foreign_key: :provider_id
 
   before_create :ensure_published
   before_create :create_summary
@@ -176,6 +177,16 @@ class Entry < ApplicationRecord
   end
 
   def itunes_image
+    r2_itunes_image || legacy_itunes_image
+  end
+
+  # New artwork lives on the images row; episodes crawled before the R2
+  # transition keep their settings value. Reads prefer the row, then fall back.
+  def r2_itunes_image
+    r2_image_url(icon_image_record&.storage_path)
+  end
+
+  def legacy_itunes_image
     if media_image || (data && data["itunes_image_processed"])
       image_url = media_image || data["itunes_image_processed"]
 
@@ -365,15 +376,8 @@ class Entry < ApplicationRecord
 
   private
 
-  # Accepts a full origin ("https://media.feedbin.org") or a bare host
-  # ("media.feedbin.org", matching the ENTRY_IMAGE_HOST convention) —
-  # without a scheme the browser would resolve the URL relative to the app.
   def r2_image_url(storage_path)
-    return nil if storage_path.blank?
-    host = ENV["R2_IMAGE_HOST"]
-    return nil if host.blank?
-    host = "https://#{host}" unless host.match?(%r{\Ahttps?://})
-    [host.chomp("/"), storage_path].join("/")
+    Image.r2_url(storage_path)
   end
 
   def legacy_image_url(image_url)

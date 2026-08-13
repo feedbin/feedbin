@@ -33,11 +33,22 @@ module ImageCrawler
     end
 
     def receive
+      # media_image stays written either way: it is still the fallback read
+      # path until the legacy store retires, and one write per episode is not
+      # a fan-out worth avoiding.
+      #
+      # The touch is not redundant with that update. The legacy S3 key comes
+      # from image_name, which is built from the job id ("<public_id>-itunes")
+      # and is therefore stable no matter what the bytes are -- new artwork
+      # overwrites the same key and yields the same processed_url, so the
+      # update no-ops and bumps nothing. Without the touch, artwork that
+      # changed would leave every cached view keyed on this entry stale.
       @entry.update(
         media_image: @image["processed_url"],
         provider: Entry.providers[:entry_icon],
         provider_id: @entry.id
       )
+      @entry.touch if @image["storage_path"]
     end
   end
 end

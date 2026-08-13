@@ -271,6 +271,33 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal "aabbcc", entry.link_image_placeholder_color
   end
 
+  test "itunes_image prefers the stored row over the legacy url" do
+    with_env("R2_IMAGE_HOST" => "images.example.com", "ENTRY_IMAGE_HOST" => "legacy.example.com") do
+      feed = create_feeds(users(:ben)).first
+      entry = create_entry(feed)
+      entry.update!(media_image: "https://old.example.com/abc/cover.jpg")
+
+      assert_match "legacy.example.com", entry.itunes_image
+
+      path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
+      Image.create!(
+        provider: :entry_icon, provider_id: entry.id.to_s, feed_id: feed.id,
+        url: "http://example.com/cover.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
+        storage_path: path,
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+      )
+
+      assert_equal "https://images.example.com/#{path}", Entry.find(entry.id).itunes_image
+    end
+  end
+
+  test "itunes_image is nil when there is neither a row nor a legacy url" do
+    feed = create_feeds(users(:ben)).first
+    assert_nil create_entry(feed).itunes_image
+  end
+
   private
 
   def create_image_row(entry, provider: :entry_preview, url: "http://example.com/image.jpg")
