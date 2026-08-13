@@ -210,6 +210,23 @@ module ImageCrawler
       record
     end
 
+    # create_image's counterpart, for when a re-upload after a confirmed-
+    # vanished object also fails: the row create_image just wrote now
+    # references a storage_path with nothing behind it, which is worse than
+    # no row at all -- unchanged? would pin every later crawl of a
+    # content-addressed preset on the dead path forever, and Dedupe#attach
+    # only checks that a row exists, not that its object does, so it would
+    # keep attaching more rows to nothing. Re-takes the lock create_image
+    # used (already released by the time we get here) and re-checks
+    # storage_path first, so a concurrent crawl that already replaced this
+    # row with a real object is left alone.
+    def drop_image
+      ::Image.with_storage_lock(storage_path) do
+        record = ::Image.find_by(provider: provider, provider_id: provider_id.to_s)
+        record.destroy if record && record.storage_path == storage_path
+      end
+    end
+
     def unified?
       preset.unified == true && ENV["R2_BUCKET_IMAGES"].present?
     end

@@ -15,7 +15,6 @@ module ImageCrawler
           begin
             upload_r2
             @image.create_image
-            ensure_stored
             Librato.increment("image.r2_upload")
             r2_stored = true
           rescue => exception
@@ -25,6 +24,14 @@ module ImageCrawler
             Librato.increment("image.r2_error")
             Sidekiq.logger.info "Upload: R2 write failed, serving legacy only id=#{@image.id} exception=#{exception.inspect}"
           end
+
+          # Confirmatory, and deliberately outside the block above: both
+          # writes already succeeded by here, so a HEAD that could not be
+          # performed is not evidence that anything went wrong, and must not
+          # retract a store that may well be fine. Only a confirmed,
+          # unrecoverable loss does -- ensure_stored returns false for that
+          # one case, and only that one.
+          r2_stored = ensure_stored if r2_stored
         end
 
         DownloadCache.save(@image) unless r2_stored
@@ -65,20 +72,55 @@ module ImageCrawler
         end
       end
 
-      # create_image is the first moment a row references this object. Until
-      # then a garbage-collection sweep sees the path as unreferenced and is
-      # entitled to delete it -- and for a content-addressed preset that loss
-      # is permanent, because unchanged? matches on the original bytes and
-      # stops every later crawl before it reprocesses. The lock serializes the
-      # sweep against create_image, so by the time we get here the answer is
-      # settled: either the object survived, or it was deleted and no sweep can
-      # delete it again.
+      # create_image is the first moment any row references this object --
+      # true for every unified? preset, not just the content-addressed ones.
+      # Until then a garbage-collection sweep sees the path as unreferenced
+      # and is entitled to delete it. For a content-addressed preset that
+      # loss is permanent: unchanged? matches a later crawl's row on
+      # original_fingerprint and stops it before reprocessing, and
+      # Dedupe#attach only checks that a row exists, not that its object
+      # does, so it would keep attaching more rows to nothing.
+      #
+      # The lock serializes the sweep against create_image, so the object's
+      # fate is settled by the time we get here -- but "the row exists"
+      # only protects the path for as long as the row exists, and the
+      # re-upload below runs outside the lock. So this does not guarantee
+      # the object survives forever after; it guarantees perform never
+      # returns having left a row pointing at nothing. A confirmed,
+      # unrecoverable loss drops the row (see resurrect's rescue) rather
+      # than leaving it dangling; a merely-unconfirmable check leaves it in
+      # place, because it is not evidence of anything.
       def ensure_stored
         Fog::Storage.new(STORAGE_R2).head_object(@image.r2_bucket, @image.storage_path)
+        true
       rescue Excon::Errors::NotFound
+        resurrect
+      rescue => exception
+        # Not a 404: we don't know whether the object is there, only that we
+        # couldn't check. The write already happened, so this is unconfirmed,
+        # not failed -- returning false here would retract a store that may
+        # well be fine.
+        Librato.increment("image.r2_confirm_error")
+        Sidekiq.logger.info "Upload: could not confirm storage, leaving row as-is id=#{@image.id} storage_path=#{@image.storage_path} exception=#{exception.inspect}"
+        true
+      end
+
+      # Split from ensure_stored so a failure re-uploading is handled here,
+      # not by ensure_stored's own catch-all for an unconfirmable HEAD --
+      # those are different situations needing different outcomes.
+      def resurrect
         Librato.increment("image.r2_resurrected")
         Sidekiq.logger.info "Upload: object vanished before the row existed, re-uploading id=#{@image.id} storage_path=#{@image.storage_path}"
         upload_r2
+        true
+      rescue => exception
+        # The object is confirmed gone and we could not put it back. A row
+        # pointing at nothing is worse than no row (see drop_image), so
+        # retract: drop the row and report the store as failed.
+        Librato.increment("image.r2_error")
+        Sidekiq.logger.info "Upload: re-upload after vanish also failed, dropping the row id=#{@image.id} storage_path=#{@image.storage_path} exception=#{exception.inspect}"
+        @image.drop_image
+        false
       end
     end
   end
