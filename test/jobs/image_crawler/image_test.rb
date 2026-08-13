@@ -23,8 +23,8 @@ module ImageCrawler
 
       with_env("R2_BUCKET_IMAGES" => "images-test") do
         assert image.unified?
-        podcast = Image.new_with_attributes(id: "a", preset_name: "podcast", image_urls: [], provider: 0, provider_id: 1)
-        refute podcast.unified?
+        icon = Image.new_with_attributes(id: "a", preset_name: "icon", image_urls: [], provider: ::Image.providers[:remote_file], provider_id: 1)
+        refute icon.unified?
       end
     end
 
