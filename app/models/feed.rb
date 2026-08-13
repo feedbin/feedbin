@@ -13,6 +13,7 @@ class Feed < ApplicationRecord
 
   has_one :favicon, foreign_key: :host, primary_key: :host
   has_one :newsletter_sender
+  has_one :icon_image_record, -> { provider_feed_icon }, class_name: "Image", foreign_key: :provider_id
 
   before_create :set_host
   before_save :set_hubs
@@ -94,6 +95,16 @@ class Feed < ApplicationRecord
     base = icon_options.keys.find { !_1.nil? }
     return nil if base.nil?
     icon_options[base]
+  end
+
+  # The renderable URL for the feed's own icon. New artwork lives on the
+  # images row and is served straight from our CDN; anything crawled before
+  # the R2 transition is a third-party url that still has to go through the
+  # signing proxy. icon/icon_options/default_icon_format are untouched -- they
+  # still answer "which source won and what shape is it", which is a different
+  # question from "what do I put in the src attribute".
+  def icon_url
+    Image.r2_url(icon_image_record&.storage_path) || (icon && RemoteFile.signed_url(icon))
   end
 
   def self.create_from_parsed_feed(parsed_feed)

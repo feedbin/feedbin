@@ -52,6 +52,48 @@ class FaviconComponentTest < ComponentTestCase
     output = render FaviconComponent.new(feed: @feed)
     assert_equal %(<span class="favicon-wrap twitter-profile-image icon-format-round"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/91a28cf86b9cdea1dcc6c7570f922135db424123/687474703a2f2f6578616d706c652e636f6d2f637573746f6d2e706e67" /></span>), output.to_s
   end
+
+  test "feed icon from the stored row is served directly, not through the proxy" do
+    with_env("R2_IMAGE_HOST" => "images.example.com") do
+      path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
+      Image.create!(
+        provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id,
+        url: "http://example.com/show.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
+        storage_path: path,
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+      )
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_includes output.to_s, "https://images.example.com/#{path}"
+      refute_includes output.to_s, "/files/icons/",
+        "an R2 url is already on our own CDN and must not be wrapped in the signing proxy"
+    end
+  end
+
+  # The branch cannot key on custom_icon: once the legacy store retires, a
+  # row-backed feed has artwork and no custom_icon at all.
+  test "feed icon renders from the row even with no custom_icon" do
+    with_env("R2_IMAGE_HOST" => "images.example.com") do
+      assert_nil @feed.custom_icon
+
+      path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
+      Image.create!(
+        provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id,
+        url: "http://example.com/show.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
+        storage_path: path,
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+      )
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_includes output.to_s, path
+    end
+  end
 end
 
 

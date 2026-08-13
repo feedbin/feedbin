@@ -11,7 +11,7 @@ class FaviconComponent < ApplicationComponent
       icon_newsletter
     elsif @feed.twitter_user?
       icon_twitter_user
-    elsif @feed.icon
+    elsif @feed.icon_url
       icon_feed
     elsif @feed.pages? && @entry
       icon_pages
@@ -44,7 +44,7 @@ class FaviconComponent < ApplicationComponent
     span class: "favicon-wrap twitter-profile-image icon-format-#{@feed.custom_icon_format || @feed.default_icon_format}" do
       image_tag_with_fallback(
         image_url("favicon-profile-default.png"),
-        RemoteFile.signed_url(@feed.icon),
+        @feed.icon_url,
         alt: ""
       )
     end

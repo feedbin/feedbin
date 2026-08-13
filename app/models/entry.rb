@@ -54,7 +54,7 @@ class Entry < ApplicationRecord
    }
 
   def self.entries_with_feed(entry_ids, sort)
-    in_order_of(:id, entry_ids).includes(feed: [:favicon])
+    in_order_of(:id, entry_ids).includes(feed: [:favicon, :icon_image_record])
   end
 
   def self.entries_list

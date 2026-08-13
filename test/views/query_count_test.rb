@@ -79,3 +79,38 @@ class QueryCountTest < ActionController::TestCase
     ApplicationController.render(Settings::Imports::StatusComponent.new(import: import.reload), layout: nil)
   end
 end
+
+# Separate class, not a third test on QueryCountTest above: ActionController::TestCase
+# binds one controller per class via `tests`, and the sidebar is FeedsController's
+# auto_update, not ActionsController's.
+class SidebarQueryCountTest < ActionController::TestCase
+  tests FeedsController
+
+  setup do
+    @user = users(:ben)
+  end
+
+  def matching(statements, pattern)
+    statements.select { _1.match?(pattern) }
+  end
+
+  # FaviconComponent now reads @feed.icon_url, which queries icon_image_record --
+  # a has_one nothing preloaded before Task 5. get_feeds_list (the untagged
+  # "Feeds" section) and User#tag_group (the tagged sections) both build the
+  # feed lists Common::FeedsList renders one FaviconComponent per row from, so
+  # both need the preload. subscriptions_hash: "stale" forces the full list
+  # partial to render instead of the lighter counts-only response, the same
+  # trick test/controllers/feeds_controller_test.rb already uses.
+  test "the sidebar does not query images once per feed" do
+    login_as @user
+
+    with_few = capture_sql { get :auto_update, params: {subscriptions_hash: "stale"}, xhr: true }
+    create_feeds(@user, 10)
+    with_many = capture_sql { get :auto_update, params: {subscriptions_hash: "stale"}, xhr: true }
+
+    assert_response :success
+    pattern = /FROM "images"/i
+    assert_equal matching(with_few, pattern).count, matching(with_many, pattern).count,
+      "the sidebar's images lookup scales with the feed count"
+  end
+end
