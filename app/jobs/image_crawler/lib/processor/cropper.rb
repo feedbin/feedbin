@@ -38,8 +38,9 @@ module ImageCrawler
       end
 
       # One geometry pass, two encodings. Only the fill/smart crops support
-      # this; limit_crop (icons) picks its own format and may keep the
-      # original file, and never dual-writes.
+      # this; limit_crop (the legacy remote-file icon preset) and icon_crop
+      # (the favicon/touch_icon family) both pick their own format, may keep
+      # the original file, and never dual-write.
       def crop_pair!
         cropped = geometry
         {

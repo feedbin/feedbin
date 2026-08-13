@@ -19,7 +19,9 @@ module ImageCrawler
 
         if processor.valid?(@image.validate?)
           # Dual-format is the entry presets' arrangement: one geometry pass,
-          # a legacy jpg and an R2 webp. Icons store a single PNG.
+          # a legacy jpg and an R2 webp. Everything else -- legacy/non-unified
+          # presets and the content-addressed favicon/touch_icon family alike
+          # -- crops to a single output instead.
           if @image.unified? && !@image.content_addressed?
             pair = processor.crop_pair!
             cropped = pair[:jpg]

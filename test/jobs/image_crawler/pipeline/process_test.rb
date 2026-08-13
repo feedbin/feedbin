@@ -139,6 +139,42 @@ module ImageCrawler
           assert_equal 9, requeued.feed_id
         end
       end
+
+      # Regression test for the crop! vs. crop_pair! branch: content-addressed
+      # presets are unified but must not take the dual-format path -- geometry
+      # returns a saved Processed (icon_crop), not an unsaved pipeline, and
+      # crop_pair! calling .convert on it raises NoMethodError.
+      def test_should_produce_a_single_png_for_content_addressed_presets
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          download_path = copy_support_file("favicon.ico")
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex,
+            preset_name: "favicon",
+            image_urls: [],
+            provider: ::Image.providers[:feed_icon],
+            provider_id: 5,
+            feed_id: 9,
+            original_url: "http://example.com/favicon.ico",
+            final_url: "http://example.com/favicon.ico",
+            download_path: download_path,
+            original_extension: "unknown"
+          )
+
+          assert_difference -> { Upload.jobs.size }, +1 do
+            Process.new.perform(image.to_h)
+          end
+
+          queued = Image.new(Upload.jobs.last["args"].first)
+          assert_nil queued.webp_path
+          assert_equal "png", queued.processed_extension
+          assert_equal File.size(queued.processed_path), queued.bytesize
+          assert_equal Digest::MD5.file(queued.processed_path).hexdigest, queued.fingerprint
+          assert_equal 32, queued.width
+          assert_equal 32, queued.height
+
+          File.unlink(queued.processed_path)
+        end
+      end
     end
   end
 end

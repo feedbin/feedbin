@@ -274,6 +274,10 @@ module ImageCrawler
             width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc",
             updated_at: 1.year.ago
           )
+          # Captured once, not recomputed after the call: two independent
+          # `1.year.ago` evaluations can straddle a second boundary and make
+          # this assertion flaky even when the row was never touched.
+          expected_updated_at = row.updated_at
 
           image = Image.new_with_attributes(
             id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
@@ -284,7 +288,7 @@ module ImageCrawler
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
-          assert_equal 1.year.ago.to_i, row.reload.updated_at.to_i
+          assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
         end
       end
     end
