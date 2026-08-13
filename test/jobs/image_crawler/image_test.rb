@@ -139,6 +139,22 @@ module ImageCrawler
       assert_not build.call("http://a.example.com/favicon.ico").legacy_store?
     end
 
+    # A pre-migration Process (whose payload lacks original_fingerprint) can
+    # hand off to a post-migration Upload on the same host, since Process and
+    # Upload are host-local and retry: false. Silently hashing a blank
+    # fingerprint would collapse every such image onto one shared path instead
+    # of surfacing the mismatch.
+    test "storage_path raises for a content-addressed preset with no original_fingerprint" do
+      image = Image.new_with_attributes(
+        id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+        provider: ::Image.providers[:feed_icon], provider_id: 1,
+        original_url: "http://example.com/favicon.ico"
+      )
+
+      assert image.content_addressed?
+      assert_raises(ArgumentError) { image.storage_path }
+    end
+
     test "entry presets stay keyed by url" do
       image = Image.new_with_attributes(
         id: SecureRandom.hex, preset_name: "primary", image_urls: [],

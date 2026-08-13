@@ -46,12 +46,15 @@ module ImageCrawler
     # Row-backed: Upload already wrote the images row before enqueueing this
     # callback, so the metadata is not duplicated onto the entry. media_image
     # keeps its legacy value for readers still on the fallback path.
-    test "keeps writing the legacy url and touches the entry when row-backed" do
+    test "keeps writing the legacy url and does not touch the entry when row-backed" do
       processed_url = "https://cdn.example.com/cover.jpg"
       # Pre-set every attribute receive writes -- media_image, provider, and
       # provider_id -- to what it will write again, the way a re-crawl of
       # unchanged artwork finds the entry in production. That makes the
-      # update a true no-op, so only the touch can move updated_at.
+      # update a true no-op, so this proves updated_at truly does not move --
+      # there is no touch to catch a regression that silently reintroduces
+      # one. No cached view renders episode artwork keyed on this entry (see
+      # receive's comment), so there is nothing for a touch to keep fresh.
       @entry.update!(
         media_image: processed_url,
         provider: :entry_icon,
@@ -67,7 +70,7 @@ module ImageCrawler
 
       @entry.reload
       assert_equal processed_url, @entry.media_image
-      assert_operator @entry.updated_at, :>, before
+      assert_equal before, @entry.updated_at
     end
 
     test "skips processing when SKIP_IMAGES env var is set" do

@@ -159,6 +159,48 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
     end
   end
 
+  # Content-addressed rows never go through Dedupe, so each carries its own
+  # per-row legacy_storage_url even though the show and the episode share one
+  # storage_path -- unlike entry previews, where every row sharing a path
+  # carries the identical legacy_storage_url. Deleting the episode must queue
+  # its own legacy object even though the path survives via the show's row.
+  test "deletes an episode's own legacy object when a surviving show row shares its storage_path" do
+    with_env("R2_BUCKET_IMAGES" => "images-test") do
+      fingerprint = SecureRandom.hex(16)
+      shared_path = Image.content_storage_path_for(fingerprint, "200x200", "jpg")
+      episode_legacy = "https://bucket.s3.amazonaws.com/abc/episode-itunes.jpg"
+      show_legacy = "https://bucket.s3.amazonaws.com/abc/show-itunes.jpg"
+
+      Image.create!(
+        provider: :entry_icon, provider_id: "1", feed_id: 9,
+        url: "http://example.com/episode-cover.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16), original_fingerprint: fingerprint,
+        storage_path: shared_path,
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc",
+        data: {"legacy_storage_url" => episode_legacy}
+      )
+      Image.create!(
+        provider: :feed_icon, provider_id: "9", feed_id: 9,
+        url: "http://example.com/show-cover.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16), original_fingerprint: fingerprint,
+        storage_path: shared_path,
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc",
+        data: {"legacy_storage_url" => show_legacy}
+      )
+      batch = stub_batch_delete
+
+      assert_difference -> { Image.count }, -1 do
+        assert_difference -> { ImageDeleter.jobs.size }, +1 do
+          ImageGarbageCollector.new.perform([1])
+        end
+      end
+
+      assert_equal [episode_legacy], ImageDeleter.jobs.last["args"].first
+      assert_not_requested batch
+      assert Image.exists?(storage_path: shared_path)
+    end
+  end
+
   # The narrow scope is load-bearing elsewhere: widening it would let an icon
   # crawl dedupe onto an entry-preview row. Asserted behaviourally rather than
   # by inspecting where_values_hash, which holds cast enum integers.

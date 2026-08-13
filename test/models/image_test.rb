@@ -120,4 +120,16 @@ class ImageTest < ActiveSupport::TestCase
     refute_equal Image.content_storage_path_for(fingerprint, "32x32", "png"),
       Image.content_storage_path_for(fingerprint, "200x200", "png")
   end
+
+  # A fingerprint read back from the uuid column comes out dashed. Nothing
+  # round-trips it today, but the two forms must still hash to the same
+  # path or the next caller that does round-trip it silently fragments
+  # storage.
+  test "content_storage_path_for treats dashed and undashed fingerprints as the same identity" do
+    dashed = SecureRandom.uuid
+    undashed = dashed.delete("-")
+
+    assert_equal Image.content_storage_path_for(undashed, "200x200", "jpg"),
+      Image.content_storage_path_for(dashed, "200x200", "jpg")
+  end
 end

@@ -72,21 +72,27 @@ module ImageCrawler
         end
       end
 
-      # create_image is the first moment any row references this object --
-      # true for every unified? preset, not just the content-addressed ones.
-      # Until then a garbage-collection sweep sees the path as unreferenced
-      # and is entitled to delete it. For a content-addressed preset that
-      # loss is permanent: unchanged? matches a later crawl's row on
-      # original_fingerprint and stops it before reprocessing, and
-      # Dedupe#attach only checks that a row exists, not that its object
-      # does, so it would keep attaching more rows to nothing.
+      # create_image is the first moment this crawl's row references this
+      # object -- true for every unified? preset, not just the
+      # content-addressed ones. Until then a garbage-collection sweep sees
+      # the path as unreferenced and is entitled to delete it, and that loss
+      # is permanent -- but the guard against it differs by preset. For a
+      # content-addressed preset, Find's unchanged? matches a later crawl's
+      # row on original_fingerprint and skips reprocessing just because that
+      # row exists, without checking that its object still does. For the
+      # other unified presets, Dedupe#attach makes the same mistake from the
+      # other direction: it only checks that a row exists for the url, not
+      # that its object does, so it would keep attaching new rows to a dead
+      # path. (Content-addressed presets never reach Dedupe#attach -- Find
+      # dispatches content_addressed? to attempt_icon before unified? is
+      # even tested.)
       #
       # The lock serializes the sweep against create_image, so the object's
       # fate is settled by the time we get here -- but "the row exists"
       # only protects the path for as long as the row exists, and the
       # re-upload below runs outside the lock. So this does not guarantee
       # the object survives forever after; it guarantees perform never
-      # returns having left a row pointing at nothing. A confirmed,
+      # returns having left a row it knows points at nothing. A confirmed,
       # unrecoverable loss drops the row (see resurrect's rescue) rather
       # than leaving it dangling; a merely-unconfirmable check leaves it in
       # place, because it is not evidence of anything.
@@ -105,9 +111,13 @@ module ImageCrawler
         true
       end
 
-      # Split from ensure_stored so a failure re-uploading is handled here,
-      # not by ensure_stored's own catch-all for an unconfirmable HEAD --
-      # those are different situations needing different outcomes.
+      # Split from ensure_stored into its own method rather than a nested
+      # rescue inside ensure_stored's rescue Excon::Errors::NotFound branch:
+      # Ruby will not let a sibling rescue on the same begin catch an
+      # exception raised inside another rescue clause of that begin, so
+      # without the split a failed re-upload here would escape ensure_stored
+      # entirely, crashing this retry: false job and leaving the row
+      # dangling on an object confirmed gone.
       def resurrect
         Librato.increment("image.r2_resurrected")
         Sidekiq.logger.info "Upload: object vanished before the row existed, re-uploading id=#{@image.id} storage_path=#{@image.storage_path}"

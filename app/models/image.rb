@@ -57,7 +57,7 @@ class Image < ApplicationRecord
   # channel changes its avatar), so the URL answers "have we seen this source?"
   # and only the bytes answer "which object is this?".
   def self.content_storage_path_for(original_fingerprint, variant, extension)
-    path_for(Digest::MD5.hexdigest("#{variant}|#{original_fingerprint}"), extension)
+    path_for(Digest::MD5.hexdigest("#{variant}|#{original_fingerprint.to_s.delete("-")}"), extension)
   end
 
   def self.path_for(fingerprint, extension)

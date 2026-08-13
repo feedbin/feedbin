@@ -219,13 +219,16 @@ module ImageCrawler
     # create_image's counterpart, for when a re-upload after a confirmed-
     # vanished object also fails: the row create_image just wrote now
     # references a storage_path with nothing behind it, which is worse than
-    # no row at all -- unchanged? would pin every later crawl of a
-    # content-addressed preset on the dead path forever, and Dedupe#attach
-    # only checks that a row exists, not that its object does, so it would
-    # keep attaching more rows to nothing. Re-takes the lock create_image
-    # used (already released by the time we get here) and re-checks
-    # storage_path first, so a concurrent crawl that already replaced this
-    # row with a real object is left alone.
+    # no row at all. Left in place, that row would pin the path forever: for
+    # a content-addressed preset, unchanged? would match every later crawl
+    # on original_fingerprint and skip it on the strength of the row alone;
+    # for the other unified presets, Dedupe#attach would keep attaching new
+    # rows to it, since it only checks that a row exists for the url, not
+    # that its object does. (Content-addressed presets never reach
+    # Dedupe#attach -- see Pipeline::Find#perform.) Re-takes the lock
+    # create_image used (already released by the time we get here) and
+    # re-checks storage_path first, so a concurrent crawl that already
+    # replaced this row with a real object is left alone.
     def drop_image
       ::Image.with_storage_lock(storage_path) do
         record = ::Image.find_by(provider: provider, provider_id: provider_id.to_s)
@@ -239,6 +242,7 @@ module ImageCrawler
 
     def storage_path
       if content_addressed?
+        raise ArgumentError, "content-addressed preset #{preset_name} has no original_fingerprint" if original_fingerprint.blank?
         ::Image.content_storage_path_for(original_fingerprint, variant, preset.format)
       else
         ::Image.storage_path_for(original_url, variant, preset.format)

@@ -21,22 +21,25 @@ class ImageGarbageCollector
     return if rows.empty?
 
     grouped = rows.group_by(&:storage_path)
-    orphaned = []
+    surviving_legacy = []
 
     Image.with_storage_locks(grouped.keys) do
       Image.where(id: rows.map(&:id)).delete_all
+      surviving_legacy = Image.where(storage_path: grouped.keys).filter_map { _1.data["legacy_storage_url"] }
       orphaned = orphaned_paths(grouped.keys)
       delete_r2_objects(orphaned)
     end
 
-    # Exact because every row sharing a storage_path carries the same
-    # legacy_storage_url -- Dedupe.attach (dedupe.rb) copies it verbatim from
-    # the row it dedupes onto rather than fetching its own -- so it does not
-    # matter which row in an orphaned group we read it from, including
-    # whichever one happens to be deleted last.
-    legacy_urls = orphaned.flat_map { |path|
-      grouped[path].filter_map { _1.data["legacy_storage_url"] }
-    }.uniq
+    # Exact under both keying schemes. Entry previews share one legacy object
+    # per storage_path -- Dedupe.attach (dedupe.rb) copies legacy_storage_url
+    # verbatim onto every row it dedupes onto -- so a surviving row's value is
+    # the same one the deleted rows carried, and subtracting it leaves the
+    # still-referenced object alone. Content-addressed rows (the podcast
+    # family) never go through Dedupe, so each carries its own per-row legacy
+    # key even though the path is shared with a surviving show or sibling
+    # episode; that key is not one any survivor references, so it is never
+    # subtracted and is always queued for deletion.
+    legacy_urls = rows.filter_map { _1.data["legacy_storage_url"] }.uniq - surviving_legacy
     ImageDeleter.perform_async(legacy_urls) if legacy_urls.present?
 
     Librato.increment("image.gc_rows", by: rows.size)
