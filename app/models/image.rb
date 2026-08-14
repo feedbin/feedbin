@@ -13,6 +13,12 @@
 # t.jsonb  :data,              null: false, default: {}
 
 class Image < ApplicationRecord
+  # website_favicon and website_touch_icon are separate providers for the same
+  # host on purpose. Pipeline::Find#unchanged? keys on (provider, provider_id,
+  # original_fingerprint, variant), and (provider, provider_id) is unique --
+  # so collapsing them would let whichever preset crawled last own the row's
+  # original_fingerprint, and the other would short-circuit forever on a
+  # fingerprint belonging to a different variant's object.
   enum :provider, {
     entry_icon:         0,     # entry specific icon (microposts with avatar, twitter, podcasts, youtube)
     entry_link_preview: 1,     # link preview image
@@ -20,6 +26,8 @@ class Image < ApplicationRecord
     feed_icon:          3,     # feed-level icon (mastodon, podcast, youtube, twitter)
     remote_file:        4,     # adhoc images
     embed_icon:         5,     # embed-provider icon keyed by that provider's own id (YouTube channel avatars)
+    website_favicon:    6,     # a host's favicon, keyed by host ("medium.com")
+    website_touch_icon: 7,     # a host's apple-touch-icon, keyed by host; deliberately its own provider, see below
   }, prefix: true
 
   normalizes :url, with: -> url { url.strip }

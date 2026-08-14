@@ -271,6 +271,23 @@ module ImageCrawler
         FileUtils.rm limit.file
       end
 
+      # The other half of "variant names the recipe": icon_crop is a limit
+      # crop, so the 200x200 touch_icon preset leaves a 180x180 source alone.
+      # Upscaling would fabricate no detail and only make a larger, equally
+      # soft file.
+      def test_icon_crop_should_not_upscale_a_small_source
+        file = write_solid_png(180, 180, [40, 90, 200])
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 200, height: 200)
+        image = cropper.crop!
+
+        assert_equal(180, image.width)
+        assert_equal(180, image.height)
+        assert_equal("png", image.extension)
+        FileUtils.rm image.file
+      ensure
+        FileUtils.rm_f file
+      end
+
       # Deliberately not private: minitest collects public instance methods,
       # and a `private` section here would silently swallow any test appended
       # after it. Only methods named test_* are run, so a public helper is

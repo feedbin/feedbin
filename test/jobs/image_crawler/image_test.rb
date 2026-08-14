@@ -294,5 +294,51 @@ module ImageCrawler
 
       refute_equal avatar.storage_path, podcast.storage_path
     end
+
+    # variant names the rendering recipe, not the result. touch_icon is a
+    # limit crop, so a 180x180 source stays 180x180 -- but it must still live
+    # at variant 200x200, or two renditions of one recipe would land on
+    # different keys and dedup would fragment.
+    test "touch_icon storage_path ignores the size the render actually came out" do
+      fingerprint = Digest::MD5.hexdigest("icon bytes")
+      build = ->(width, height) {
+        Image.new_with_attributes(
+          id: "a", preset_name: "touch_icon", image_urls: [],
+          provider: ::Image.providers[:website_touch_icon], provider_id: "example.com",
+          original_url: "http://example.com/apple-touch-icon.png",
+          original_fingerprint: fingerprint, width: width, height: height
+        )
+      }
+
+      full  = build.call(200, 200)
+      small = build.call(180, 180)
+
+      assert_equal "200x200", small.variant
+      assert_equal full.storage_path, small.storage_path
+    end
+
+    # One host, two icons, two rows. The separation is load-bearing for
+    # correctness, not layout: Pipeline::Find#unchanged? keys on (provider,
+    # provider_id, original_fingerprint, variant) and (provider, provider_id)
+    # is unique, so a shared provider would let whichever preset ran last own
+    # the fingerprint and short-circuit the other forever.
+    test "a host's favicon and touch icon are separate rows and separate objects" do
+      fingerprint = Digest::MD5.hexdigest("icon bytes")
+      build = ->(preset, provider) {
+        Image.new_with_attributes(
+          id: "a", preset_name: preset, image_urls: [],
+          provider: ::Image.providers[provider], provider_id: "example.com",
+          original_url: "http://example.com/icon.png", original_fingerprint: fingerprint
+        )
+      }
+
+      favicon = build.call("favicon", :website_favicon)
+      touch   = build.call("touch_icon", :website_touch_icon)
+
+      assert_equal "32x32", favicon.variant
+      assert_equal "200x200", touch.variant
+      refute_equal favicon.storage_path, touch.storage_path
+      refute_equal favicon.provider, touch.provider
+    end
   end
 end
