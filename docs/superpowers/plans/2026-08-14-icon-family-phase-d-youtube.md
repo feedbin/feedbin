@@ -1106,10 +1106,11 @@ Append to `test/components/favicon_component_test.rb`:
 Append to `test/views/query_count_test.rb`, inside `class SidebarQueryCountTest`:
 
 ```ruby
-  # The existing test above uses create_feeds, whose feeds all have a nil
-  # channel_id -- and Rails' preloader skips owners with a nil key, so it
-  # would not notice an unpreloaded channel_image_record. These feeds have
-  # one, so the lookup is real and its count has to stay flat.
+  # The test above uses create_feeds, whose feeds all have a nil channel_id;
+  # the lazy path queries anyway (provider_id IS NULL), so it catches a
+  # dropped preload, but it never exercises the preloader's grouped lookup.
+  # These feeds have a real channel_id, so the preload has to actually match
+  # rows and its count has to stay flat.
   test "the sidebar does not query the channel avatar once per youtube feed" do
     login_as @user
     subscribe_to_channels(1)

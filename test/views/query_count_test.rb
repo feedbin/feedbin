@@ -114,10 +114,11 @@ class SidebarQueryCountTest < ActionController::TestCase
       "the sidebar's images lookup scales with the feed count"
   end
 
-  # The existing test above uses create_feeds, whose feeds all have a nil
-  # channel_id -- and Rails' preloader skips owners with a nil key, so it
-  # would not notice an unpreloaded channel_image_record. These feeds have
-  # one, so the lookup is real and its count has to stay flat.
+  # The test above uses create_feeds, whose feeds all have a nil channel_id;
+  # the lazy path queries anyway (provider_id IS NULL), so it catches a
+  # dropped preload, but it never exercises the preloader's grouped lookup.
+  # These feeds have a real channel_id, so the preload has to actually match
+  # rows and its count has to stay flat.
   test "the sidebar does not query the channel avatar once per youtube feed" do
     login_as @user
     subscribe_to_channels(1)
@@ -128,6 +129,7 @@ class SidebarQueryCountTest < ActionController::TestCase
 
     assert_response :success
     pattern = /FROM "images"/i
+    assert_operator matching(with_many, pattern).count, :>, 0
     assert_equal matching(with_few, pattern).count, matching(with_many, pattern).count,
       "the sidebar's images lookup scales with the youtube feed count"
   end
