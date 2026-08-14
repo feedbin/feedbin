@@ -633,6 +633,95 @@ YouTube feed (feedkit sets `itunes_image` only from `<itunes:image>`, and
 `Receiver` replaces `options` wholesale each crawl), but it is a tie that
 produces a *wrong shape* rather than merely a wrong source.
 
+## What Phase E learned — read before starting Phase F
+
+Added after favicons and touch icons shipped dual-write. Same rule as above: not
+relitigating design, recording what implementation and review found so Phase
+F inherits it.
+
+**There is no backfill path, and this is the single thing that most changes
+Phase F's shape.** Every `FaviconCrawler::Finder` trigger is event-driven:
+`Feed#refresh_favicon` and `Subscription#refresh_favicon` (both `after_create`),
+`app/jobs/feed_importer.rb` (two sites), `app/jobs/save_page.rb`,
+`app/jobs/feed_fixer.rb` (weekly, and only for feeds with `fixable_error?`), and
+the manual refresh in `app/controllers/settings/subscriptions_controller.rb`.
+`lib/clock.rb` contains no favicon sweep. So `images` rows accumulate in
+proportion to **new subscription churn**, not to the host corpus — a host that
+every existing user is already subscribed to, whose feed never errors, will
+never produce a row however long the bake runs. Phase F therefore cannot be
+"flip the read"; it must be **flip behind a fallback to the `favicons` row,
+sweep with a rate-limited force-crawl enqueuer over `Favicon.pluck(:host)`,
+then remove the fallback**. Related: `@favicon.save` issues no UPDATE for an
+unchanged row, so `favicons.updated_at` never moves and `Finder`'s one-hour
+`updated_recently?` gate is effectively inert for a stable favicon — which is
+why the doubled crawl traffic lands on every subscribe/import event rather
+than being throttled.
+
+**Conditional HTTP now reaches every content-addressed preset, not just
+favicons.** `Pipeline::Find#attempt_icon` serves all five: `podcast`,
+`podcast_feed`, `channel_avatar`, `favicon`, `touch_icon`. So Phase E changed
+fetch behaviour and `images.data` contents for three already-shipped tenants.
+Consequence for monitoring: `image.icon_not_modified` and
+`image.icon_unchanged` are **cross-tenant** counters and cannot isolate one
+family on their own.
+
+**`Down`'s 304 handling is backend-coupled, and the app pins the backend.**
+`config/initializers/down.rb` sets `Down.backend :http`. On that backend a 304
+arrives as `Down::ResponseError` with `response.code == "304"`; on `:net_http`
+it arrives as `Down::NotModified`, which is a **sibling** of `ResponseError`
+under `Down::Error`, not a subtype (`down-5.6.0/lib/down/errors.rb:17,19`).
+`ImageCrawler::Download#download_file` now rescues both. The same backend
+canonicalizes response header keys via split-on-hyphen-and-capitalize, so the
+key is `"Etag"`, never `"ETag"` — reading the wrong casing returns nil
+silently and disables conditional requests entirely with every test still
+green. That was a real defect in the Phase E plan, caught only because an
+implementer refused to transcribe code that did not work.
+
+**Validators are URL-scoped on both the read and the write path, and the
+write path is the one that is easy to get wrong.** `Pipeline::Find#validators_for`
+and `#store_validators` apply the identical `row && row.url == original_url`
+guard. Without the write-side guard, a candidate serving byte-identical bytes
+from a *different* URL writes its validators onto a row whose `url` still
+names the old one, and the next crawl sends one URL's validators to another —
+rebuilding the exact bug that disabled conditional requests in `98c39d3e`.
+Reachable with **conformant** servers, not just broken ones: `If-Modified-Since`
+means "304 if not modified since this date", so a borrowed `Last-Modified`
+later than the target's true mtime makes a correct server return a false 304.
+`ImageCrawler::Download#conditional_headers` also refuses to send validators
+when the URL actually being fetched is not the one they belong to, which is
+what stops a `Download::Youtube`/`Vimeo`/`Instagram` derived URL from
+inheriting them — note `Download::Vimeo`'s pattern matches
+`http://vimeo.com/favicon.ico`.
+
+**Skipping the validator write is permanent, not transient.** When the
+winning candidate serves bytes identical to the row's from a different URL,
+`unchanged?` short-circuits, `store_validators` skips, `create_image` never
+runs, and `row.url` is never re-pointed — so that host downloads in full on
+every future crawl. Rare (the homepage's link set must change while the bytes
+do not) and skipping is still the correct safe choice, but it is a stable
+state. Worth remembering if `image.icon_not_modified` plateaus below
+expectation. Refreshing `row.url` is **not** the fix: `Image` has a
+`before_save :fingerprint_url` callback deriving `url_fingerprint` from `url`,
+and `update_column` skips callbacks, so that would silently desync the two.
+
+**`images.updated_at` is a content version, not a row mtime.** Validator-only
+writes use `update_column` so the timestamp does not move; it moves only when
+the stored bytes move. That is what the touch rule always wanted rather than
+a compromise of it. Confirmed nothing in the codebase reads `updated_at` as
+"row last modified" — `ImageGarbageCollector`, `ImageReplacementCollector`,
+`ImageDeleter`, `Dedupe` and `ReuseRules` do not read it at all, and its only
+cache-key use today is `EntriesHelper.entries_cache_key` digesting
+`entry.preview_image_record`.
+
+**`FaviconCrawler::Finder#schedule_pipeline` deliberately swallows and logs
+exceptions.** It runs mid-method, before the legacy `Processor` call and
+`@favicon.save`, so an unhandled enqueue failure would take out the legacy
+write — and during dual-write the legacy write outranks the new one because
+nothing reads the new rows yet. Unlike the five other
+`Pipeline::Find.perform_async` call sites, which are all the final statement
+of a dedicated scheduler method and can safely raise. This should be
+revisited when the read flips.
+
 ## Open questions
 
 None outstanding *as of the original design*; see the section above for three

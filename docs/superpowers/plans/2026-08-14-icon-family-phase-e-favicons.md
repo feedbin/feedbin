@@ -281,7 +281,7 @@ Expected: FAIL — `Download#initialize` does not accept `etag:`/`last_modified:
 
 - [ ] **Step 3: Add conditional support**
 
-In `app/jobs/image_crawler/lib/download.rb`, replace `initialize` and `download_file`, and add the three readers:
+In `app/jobs/image_crawler/lib/download.rb`, replace `initialize`, `download_file`, and add `conditional_headers`, `conditional?`, and the three readers:
 
 ```ruby
     def initialize(url, camo: false, minimum_size: 20_000, etag: nil, last_modified: nil)
@@ -297,26 +297,55 @@ In `app/jobs/image_crawler/lib/download.rb`, replace `initialize` and `download_
 
 ```ruby
     def download_file(url)
+      requested_url = url
       url = @camo ? RemoteFile.camo_url(url) : url
-      @file = Down.download(url, max_size: 10 * 1024 * 1024, headers: conditional_headers, timeout_options: {read_timeout: 20, write_timeout: 5, connect_timeout: 5})
+      @file = Down.download(url, max_size: 10 * 1024 * 1024, headers: conditional_headers(requested_url), timeout_options: {read_timeout: 20, write_timeout: 5, connect_timeout: 5})
       @path = @file.path
+    # A 304 is the success case for a conditional request, not an error: the
+    # server is confirming the bytes we already hold are current. Which
+    # exception Down uses to say so depends on the backend: this app
+    # configures :http (config/initializers/down.rb), which raises
+    # Down::ResponseError with response.code == "304" -- Down has no other way
+    # to report a non-2xx on that backend. The :net_http backend instead
+    # raises Down::NotModified, a sibling of Down::ResponseError under
+    # Down::Error, not a subtype of it, so a backend swap without this second
+    # rescue would send its 304s through Default's blanket `rescue Down::Error`
+    # with not_modified? silently staying false -- a dead icon that looks
+    # permanently fresh. Both branches narrow the same way on purpose: a 404
+    # or a 500 must stay an error, or a dead icon would look permanently
+    # unchanged and never be re-fetched. Also gated on #conditional? -- a 304
+    # nobody asked for is a broken server, not a fresh icon, and must not be
+    # treated as "unchanged".
+    rescue Down::NotModified
+      raise unless conditional?
+      @not_modified = true
     rescue Down::ResponseError => exception
-      # A 304 is the success case for a conditional request, not an error: the
-      # server is confirming the bytes we already hold are current. Down has no
-      # other way to say it -- it raises on every non-2xx. Narrow on purpose:
-      # a 404 or a 500 must stay an error, or a dead icon would look
-      # permanently unchanged and never be re-fetched.
-      raise unless exception.response&.code.to_s == "304"
+      raise unless conditional? && exception.response&.code&.to_s == "304"
       @not_modified = true
     end
 
-    # Empty for every caller that passes no validators, which is all of them
-    # outside the icon family.
-    def conditional_headers
+    # Empty for every caller that passes no validators (all of them outside
+    # the icon family), and empty whenever this fetch is not actually for
+    # @url: Download::Youtube/Vimeo/Instagram's #download override fetches a
+    # *derived* URL (a thumbnail, an oEmbed target) while @etag/@last_modified
+    # were computed for the original url passed to Download.new. Sending them
+    # to the derived URL would risk a false 304 for a resource that was never
+    # actually validated -- concretely, Vimeo's own url pattern matches
+    # http://vimeo.com/favicon.ico, so a vimeo.com favicon crawl dispatches
+    # into an oEmbed lookup whose thumbnail url is a different resource
+    # entirely. `url` here is download_file's argument, compared against @url
+    # *before* download_file's own camo substitution, so a camo-wrapped fetch
+    # of the same logical resource still qualifies.
+    def conditional_headers(url)
+      return {} unless url == @url
       {}.tap do |headers|
         headers["If-None-Match"]     = @etag          if @etag.present?
         headers["If-Modified-Since"] = @last_modified if @last_modified.present?
       end
+    end
+
+    def conditional?
+      @etag.present? || @last_modified.present?
     end
 
     def not_modified?
@@ -326,11 +355,12 @@ In `app/jobs/image_crawler/lib/download.rb`, replace `initialize` and `download_
     # What the response carried, as opposed to what we sent. Stored against the
     # row so the next crawl of this same URL can ask conditionally.
     #
-    # "Etag", not "ETag": the configured :http backend (config/initializers/down.rb)
-    # canonicalizes header names to Title-Case-Per-Hyphen-Segment (the http gem's
-    # HTTP::Headers.canonicalize_name splits on "-"/"_" and capitalizes each
-    # segment), and "ETag" has no hyphen to split on, so it comes back "Etag".
-    # Verified directly against the installed gems.
+    # "Etag", not "ETag": the configured :http backend (see config/initializers/down.rb)
+    # canonicalizes header names to Title-Case-Per-Hyphen-Segment, and "ETag" has no
+    # hyphen to break on, so it comes back as "Etag". Verified directly against the
+    # installed gems -- "Content-Type" and "Last-Modified" both happen to already be
+    # hyphenated the same way the backend canonicalizes them, which is why file_extension's
+    # existing "Content-Type" lookup works without needing this note.
     def response_etag
       @file&.headers&.[]("Etag")
     end
