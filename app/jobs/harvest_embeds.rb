@@ -88,11 +88,27 @@ class HarvestEmbeds
 
     def update_related_records(ids)
       videos    = Embed.youtube_video.where(provider_id: ids).includes(:parent)
-      channels  = videos.map(&:parent).uniq
+      # filter_map, not map: parent is a lookup by provider_id, and the
+      # channels half of the API can come back empty (quota, terminated
+      # channels) while the videos half succeeded. A nil in here reached
+      # channel.provider_id and killed this retry: false job.
+      channels  = videos.filter_map(&:parent).uniq
       video_map = videos.index_by(&:provider_id)
 
       channels.each do |channel|
-        if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
+        # Scheduled for every harvested channel, feed or no feed: the row is
+        # keyed by the channel, so a playlist entry from a channel nobody
+        # subscribes to directly resolves through the same row.
+        ImageCrawler::ChannelImage.schedule(channel)
+
+        # where, not find_by: the same channel can own more than one feed row
+        # (http/https, with and without www), and the url this replaced could
+        # only ever match one exact spelling. custom_icon keeps the 88x88
+        # default thumbnail -- it is now only the fallback for a feed whose
+        # images row has not landed yet, and repointing it at the large
+        # thumbnail would cost a re-proxy and a cache invalidation per feed to
+        # improve a path the row is about to replace.
+        Feed.where(channel_id: channel.provider_id).find_each do |feed|
           feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
         end
       end

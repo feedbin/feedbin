@@ -183,6 +183,9 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
             thumbnails: {
               default: {
                 url: "image_url"
+              },
+              high: {
+                url: "https://yt3.ggpht.com/avatar.jpg"
               }
             }
           },
@@ -191,7 +194,57 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     }
     stub_request(:get, %r{www.googleapis.com/youtube/v3/channels})
       .to_return body: channels.to_json, headers: {content_type: "application/json"}
+
+    stub_request_file("image.png", "https://yt3.ggpht.com/avatar.jpg", headers: {content_type: "image/png"})
   end
 
+  test "schedules the channel avatar from the largest thumbnail" do
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    stub_youtube_api
 
+    HarvestEmbeds.new.perform(nil, true)
+    job = HarvestEmbeds::Download.jobs.shift
+
+    assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
+      HarvestEmbeds::Download.new.perform(*job["args"])
+    end
+
+    args = ImageCrawler::Pipeline::Find.jobs.last["args"].first
+    assert_equal ["https://yt3.ggpht.com/avatar.jpg"], args["image_urls"]
+    assert_equal "channel_avatar", args["preset_name"]
+    assert_equal "channel_id", args["provider_id"]
+  end
+
+  # The old lookup reconstructed one exact url string, so a feed subscribed
+  # through any other spelling of the same channel never got its icon.
+  test "updates every feed for the channel, not just the canonical url" do
+    other = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=channel_id")
+
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    stub_youtube_api
+
+    HarvestEmbeds.new.perform(nil, true)
+    job = HarvestEmbeds::Download.jobs.shift
+    HarvestEmbeds::Download.new.perform(*job["args"])
+
+    assert_equal "image_url", @feed.reload.custom_icon
+    assert_equal "image_url", other.reload.custom_icon
+  end
+
+  # The channels half of the API can come back empty while the videos half
+  # succeeded -- a quota trip, or every channel in the batch terminated. The
+  # video embeds still import, so their parent lookup finds nothing and puts a
+  # nil in the channels list, which killed this retry: false job on
+  # nil.provider_id.
+  test "survives videos whose channel embed was never imported" do
+    Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
+
+    assert_nothing_raised do
+      HarvestEmbeds::Download.new.update_related_records(["video_id"])
+    end
+  end
 end
