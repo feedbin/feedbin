@@ -73,7 +73,8 @@ module ImageCrawler
           original_url: "http://example.com/a.jpg", final_url: "http://example.com/a-final.jpg",
           storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
           width: 542, height: 304, bytesize: 9_999, placeholder_color: "aabbcc",
-          fingerprint: SecureRandom.hex(16)
+          fingerprint: SecureRandom.hex(16),
+          etag: "\"abc123\"", last_modified: "Wed, 21 Oct 2026 07:28:00 GMT"
         )
 
         record = image.create_image
@@ -85,6 +86,8 @@ module ImageCrawler
         assert_equal "https://s3.amazonaws.com/bucket/a/abc.jpg", record.data["legacy_storage_url"]
         assert_equal "primary", record.data["preset"]
         assert_equal "http://example.com/a-final.jpg", record.data["final_url"]
+        assert_equal "\"abc123\"", record.data["etag"]
+        assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", record.data["last_modified"]
       end
     end
 

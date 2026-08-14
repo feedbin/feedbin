@@ -492,6 +492,50 @@ module ImageCrawler
           assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", queued["last_modified"]
         end
       end
+
+      # store_validators needs the same url guard as validators_for's read
+      # side. unchanged? only compares variant and fingerprint, never url, so
+      # a different candidate that happens to serve byte-identical bytes -- a
+      # moved <link rel="icon">, an http/https or www variant -- must not have
+      # its validators written under this row's url. If it were, the next
+      # crawl would send that foreign validator back to the row's real url,
+      # and with If-Modified-Since a fully conformant server can confirm a
+      # false "unchanged" even though the row's own url never changed.
+      def test_should_not_store_a_different_candidates_validators_onto_this_row
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          url_a = "http://example.com/a.ico"
+          url_b = "http://example.com/b.ico"
+          fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
+
+          row = ::Image.create!(
+            provider: :website_favicon, provider_id: "example.com",
+            url: url_a, variant: "32x32",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: fingerprint,
+            storage_path: ::Image.content_storage_path_for(fingerprint, "32x32", "png"),
+            width: 32, height: 32, bytesize: 400, placeholder_color: "aabbcc",
+            data: {"etag" => "\"etagA\""}
+          )
+
+          # Byte-identical to the row's stored object, but served from a
+          # different url with its own, different validator.
+          stub_request(:get, url_b)
+            .to_return(body: File.new(support_file("favicon.ico")), status: 200,
+              headers: {"Content-Type" => "image/png", "ETag" => "\"etagB\""})
+
+          image = Image.new_with_attributes(
+            id: "example.com-favicon", preset_name: "favicon",
+            image_urls: [url_b, url_a],
+            provider: ::Image.providers[:website_favicon], provider_id: "example.com"
+          )
+
+          assert_no_difference -> { Process.jobs.size } do
+            Find.new.perform(image.to_h)
+          end
+
+          assert_equal "\"etagA\"", row.reload.data["etag"], "b's validators must not be written under a's url"
+        end
+      end
     end
   end
 end

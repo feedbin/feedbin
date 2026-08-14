@@ -139,7 +139,7 @@ module ImageCrawler
         if unchanged?(row)
           Librato.increment("image.icon_unchanged")
           Sidekiq.logger.info @image.trace(message: "icon unchanged", metadata: {original_url: original_url})
-          store_validators(row)
+          store_validators(row, original_url)
           begin
             File.unlink(@image.download_path)
           rescue Errno::ENOENT
@@ -152,8 +152,13 @@ module ImageCrawler
         true
       end
 
+      # Memoized: provider/provider_id cannot change within a perform, and
+      # this is queried once per candidate URL (up to 10). The `defined?`
+      # form, not `||=`, so a genuine "no row yet" answer is remembered too
+      # instead of re-querying on every remaining candidate.
       def existing_row
-        ::Image.find_by(provider: @image.provider, provider_id: @image.provider_id.to_s)
+        return @existing_row if defined?(@existing_row)
+        @existing_row = ::Image.find_by(provider: @image.provider, provider_id: @image.provider_id.to_s)
       end
 
       # Only for the URL the row actually came from. That restriction is the
@@ -167,12 +172,27 @@ module ImageCrawler
       # that rebuilds emits a fresh ETag for identical content. Store them so
       # the next crawl can get a 304 instead of a download.
       #
+      # Guarded on row.url == original_url, mirroring validators_for's read
+      # side: a different candidate URL can serve byte-identical bytes (a
+      # moved <link rel="icon">, an http/https or www variant), and unchanged?
+      # only compares variant and fingerprint, never url. Without this guard,
+      # that candidate's validators would be written under this row's url --
+      # and with If-Modified-Since, a later, fully conformant server could
+      # then confirm a false "unchanged" on the next crawl, since the header
+      # only promises "304 if not modified since this date". We could instead
+      # refresh row.url to the winning candidate, but Image's
+      # before_save :fingerprint_url derives url_fingerprint from url and
+      # update_column skips callbacks, so that would silently desync the two.
+      # Skipping the write is the correct minimal fix -- the cost is only a
+      # missed optimization (we never learn this candidate's validators), not
+      # a correctness bug.
+      #
       # update_column, not update: updated_at is a view cache key (Phase B) and
       # must move only when the stored bytes move. That makes images.updated_at
       # a content version rather than a row mtime, which is exactly what the
       # touch rule asks for -- not a compromise of it.
-      def store_validators(row)
-        return unless row
+      def store_validators(row, original_url)
+        return unless row && row.url == original_url
         merged = row.data.merge("etag" => @image.etag, "last_modified" => @image.last_modified).compact
         return if merged == row.data
         row.update_column(:data, merged)
