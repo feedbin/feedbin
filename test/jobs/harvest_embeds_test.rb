@@ -71,6 +71,20 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal("channel_id", @entry.reload.provider_parent_id)
   end
 
+  # The entry's own <yt:channelId>, which feedkit already parses onto data.
+  # Preferring it over the embed lookup means the channel is known the moment
+  # the entry is created, rather than after HarvestEmbeds' API round trip --
+  # and it keeps working when that round trip comes back empty, which is the
+  # ordinary answer for a rate-limited key or a video made private.
+  test "should take provider_parent_id from the entry's own channel id" do
+    @entry.update(data: {youtube_video_id: "video_id", youtube_channel_id: "UCfromentry"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    @entry.send(:provider_metadata)
+    @entry.save!
+
+    assert_equal("UCfromentry", @entry.reload.provider_parent_id)
+  end
+
   test "should requeue live videos scheduled in the future" do
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!

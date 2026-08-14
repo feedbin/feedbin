@@ -643,7 +643,8 @@ CREATE TABLE public.feeds (
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
     crawl_data jsonb,
-    redirected_to text
+    redirected_to text,
+    channel_id text
 );
 
 
@@ -2439,6 +2440,13 @@ CREATE INDEX index_feeds_on_active ON public.feeds USING btree (active);
 
 
 --
+-- Name: index_feeds_on_channel_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feeds_on_channel_id ON public.feeds USING btree (channel_id);
+
+
+--
 -- Name: index_feeds_on_feed_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3125,6 +3133,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260814120000'),
 ('20260813120500'),
 ('20260813120000'),
 ('20260813041030'),

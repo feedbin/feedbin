@@ -400,9 +400,15 @@ class Entry < ApplicationRecord
     elsif youtube?
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]
-      if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
-        self.provider_parent_id = embed.parent_id
-      end
+      # The entry's own <yt:channelId>, which feedkit already parses onto
+      # data, in preference to the embed lookup. That makes the channel known
+      # the moment the entry is created rather than after HarvestEmbeds' API
+      # round trip -- and it keeps working when that round trip returns
+      # nothing, which is the ordinary answer for a rate-limited key or a
+      # video that has been made private. A playlist feed whose videos come
+      # from many channels gets each entry's real channel from the XML alone.
+      self.provider_parent_id = data["youtube_channel_id"].presence ||
+        Embed.youtube_video.find_by_provider_id(self.provider_id)&.parent_id
     elsif feed.pages?
       self.provider = self.class.providers[:favicon]
       self.provider_id = hostname

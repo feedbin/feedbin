@@ -17,6 +17,7 @@ class Feed < ApplicationRecord
 
   before_create :set_host
   before_save :set_hubs
+  before_save :set_channel_id
   after_create :refresh_favicon
 
   after_commit :web_sub_subscribe, on: :create
@@ -227,6 +228,33 @@ class Feed < ApplicationRecord
     if known_hubs.present?
       self[:hubs] = known_hubs
     end
+  end
+
+  # Which YouTube channel this feed's videos come from, denormalized so a
+  # channel avatar harvested once can find the feeds that render it without
+  # reconstructing a url string.
+  #
+  # Deliberately wider than youtube_channel_id below, which answers a
+  # different question -- "is this the canonical channel feed whose self_url
+  # and hub we rewrite?" -- and requires feed_url and self_url to agree. That
+  # is the right guard for WebSub and the wrong one for icon resolution,
+  # where the feed url alone is exactly what the reverse lookup this replaces
+  # already keys on.
+  def derived_channel_id
+    options.safe_dig("youtube_channel_id").presence || channel_id_from_feed_url
+  end
+
+  # The parsed <yt:channelId> wins when both exist. This is the fallback for a
+  # feed that has not been crawled since feedkit started surfacing it, and for
+  # a brand-new feed that has not been parsed at all yet.
+  def channel_id_from_feed_url
+    return nil if feed_url.blank?
+    match = feed_url.match(%r{\Ahttps?://(?:www\.)?youtube\.com/feeds/videos\.xml\?channel_id=([^#?&]+)})
+    match && match[1]
+  end
+
+  def set_channel_id
+    self[:channel_id] = derived_channel_id
   end
 
   def youtube_channel_id

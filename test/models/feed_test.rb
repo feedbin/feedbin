@@ -25,4 +25,32 @@ class FeedTest < ActiveSupport::TestCase
   test "icon_url is nil when the feed has no icon at all" do
     assert_nil create_feeds(users(:ben)).first.icon_url
   end
+
+  test "channel_id comes from the parsed feed" do
+    feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "UC-lHJZR3Gqxm24_Vd_AJ5Yw"})
+    assert_equal "UC-lHJZR3Gqxm24_Vd_AJ5Yw", feed.channel_id
+  end
+
+  test "channel_id falls back to the feed url, and the parsed value wins" do
+    feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCfromurl")
+    assert_equal "UCfromurl", feed.channel_id
+
+    feed.update!(options: {"youtube_channel_id" => "UCparsed"})
+    assert_equal "UCparsed", feed.reload.channel_id
+  end
+
+  test "channel_id is nil for feeds that are not youtube" do
+    assert_nil create_feeds(users(:ben)).first.channel_id
+  end
+
+  # youtube_channel_id answers a different question and keeps its own,
+  # stricter rule: it drives self_url and the WebSub hub, so it requires
+  # feed_url and self_url to agree. Icon resolution needs no such guard --
+  # today's reverse lookup keys on the feed url alone.
+  test "channel_id does not require self_url the way youtube_channel_id does" do
+    feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
+
+    assert_nil feed.youtube_channel_id
+    assert_equal "UCabc", feed.channel_id
+  end
 end
