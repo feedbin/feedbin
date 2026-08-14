@@ -205,7 +205,7 @@ class EntriesController < ApplicationController
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
-    @entries = result.records(Entry).includes(feed: [:favicon, :icon_image_record]).preload(:preview_image_record)
+    @entries = result.records(Entry).includes(feed: [:favicon, :icon_image_record, :channel_image_record]).preload(:preview_image_record)
     @page_query = result.pagination
     @total_results = result.total
 
@@ -252,7 +252,7 @@ class EntriesController < ApplicationController
   private
 
   def entries_by_id(entry_ids)
-    entries = Entry.where(id: entry_ids).includes(feed: [:favicon, :icon_image_record])
+    entries = Entry.where(id: entry_ids).includes(feed: [:favicon, :icon_image_record, :channel_image_record])
     subscriptions = @user.subscriptions.pluck(:feed_id)
     @title = entries.present? ? "#{entries.first.title} - Feedbin" : "Feedbin"
     entries.each_with_object({}) do |entry, hash|

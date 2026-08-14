@@ -14,7 +14,7 @@ class CacheEntryViews
 
   def cache_views
     entry_ids = dequeue_ids(SET_NAME)
-    entries = Entry.where(id: entry_ids).includes(feed: [:favicon, :icon_image_record]).preload(:preview_image_record).to_a
+    entries = Entry.where(id: entry_ids).includes(feed: [:favicon, :icon_image_record, :channel_image_record]).preload(:preview_image_record).to_a
     favicons = Favicon.for_entries(entries)
 
     # The same lambda and the same locals the entry list renders with. A bare

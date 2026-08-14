@@ -14,6 +14,7 @@ class Feed < ApplicationRecord
   has_one :favicon, foreign_key: :host, primary_key: :host
   has_one :newsletter_sender
   has_one :icon_image_record, -> { provider_feed_icon }, class_name: "Image", foreign_key: :provider_id
+  has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :channel_id
 
   before_create :set_host
   before_save :set_hubs
@@ -98,14 +99,22 @@ class Feed < ApplicationRecord
     icon_options[base]
   end
 
-  # The renderable URL for the feed's own icon. New artwork lives on the
-  # images row and is served straight from our CDN; anything crawled before
-  # the R2 transition is a third-party url that still has to go through the
-  # signing proxy. icon/icon_options/default_icon_format are untouched -- they
-  # still answer "which source won and what shape is it", which is a different
+  # The renderable URL for the feed's own icon. New artwork lives on an images
+  # row and is served straight from our CDN; anything crawled before the R2
+  # transition is a third-party url that still has to go through the signing
+  # proxy. icon/icon_options/default_icon_format are untouched -- they still
+  # answer "which source won and what shape is it", which is a different
   # question from "what do I put in the src attribute".
+  #
+  # The feed's own row outranks the channel's: icon_image_record is keyed on
+  # this feed's id and belongs to it alone, while channel_image_record is one
+  # row shared by every feed for the channel. In practice a feed is never both
+  # a podcast and a YouTube channel, so the order is a tie-break that should
+  # never be exercised.
   def icon_url
-    Image.r2_url(icon_image_record&.storage_path) || (icon && RemoteFile.signed_url(icon))
+    Image.r2_url(icon_image_record&.storage_path) ||
+      Image.r2_url(channel_image_record&.storage_path) ||
+      (icon && RemoteFile.signed_url(icon))
   end
 
   def self.create_from_parsed_feed(parsed_feed)

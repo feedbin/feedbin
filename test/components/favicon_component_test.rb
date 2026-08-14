@@ -94,6 +94,54 @@ class FaviconComponentTest < ComponentTestCase
       assert_includes output.to_s, path
     end
   end
+
+  # The stored avatar is already on our own CDN. Wrapping it in the signing
+  # proxy would send a request we control back through a redirector built for
+  # third-party urls.
+  test "channel avatar from the stored row is served directly, not through the proxy" do
+    with_env("R2_IMAGE_HOST" => "images.example.com") do
+      feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
+      path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png")
+      Image.create!(
+        provider: :embed_icon, provider_id: "UCabc",
+        url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
+        storage_path: path,
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+      )
+
+      output = render FaviconComponent.new(feed: Feed.find(feed.id))
+
+      assert_includes output.to_s, "https://images.example.com/#{path}"
+      refute_includes output.to_s, "/files/icons/"
+    end
+  end
+
+  # A new subscription to a channel someone else already harvested finds the
+  # shared row before its own first harvest writes custom_icon. An empty
+  # format suffix is correct here: application.scss styles
+  # .twitter-profile-image round and only .icon-format-square overrides it.
+  test "channel avatar renders round when the feed has no custom_icon yet" do
+    with_env("R2_IMAGE_HOST" => "images.example.com") do
+      feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
+      assert_nil feed.custom_icon
+
+      Image.create!(
+        provider: :embed_icon, provider_id: "UCabc",
+        url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
+        image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
+        storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png"),
+        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+      )
+
+      output = render FaviconComponent.new(feed: Feed.find(feed.id))
+
+      assert_includes output.to_s, "twitter-profile-image"
+      refute_includes output.to_s, "icon-format-square"
+    end
+  end
 end
 
 

@@ -113,4 +113,31 @@ class SidebarQueryCountTest < ActionController::TestCase
     assert_equal matching(with_few, pattern).count, matching(with_many, pattern).count,
       "the sidebar's images lookup scales with the feed count"
   end
+
+  # The existing test above uses create_feeds, whose feeds all have a nil
+  # channel_id -- and Rails' preloader skips owners with a nil key, so it
+  # would not notice an unpreloaded channel_image_record. These feeds have
+  # one, so the lookup is real and its count has to stay flat.
+  test "the sidebar does not query the channel avatar once per youtube feed" do
+    login_as @user
+    subscribe_to_channels(1)
+
+    with_few = capture_sql { get :auto_update, params: {subscriptions_hash: "stale"}, xhr: true }
+    subscribe_to_channels(10)
+    with_many = capture_sql { get :auto_update, params: {subscriptions_hash: "stale"}, xhr: true }
+
+    assert_response :success
+    pattern = /FROM "images"/i
+    assert_equal matching(with_few, pattern).count, matching(with_many, pattern).count,
+      "the sidebar's images lookup scales with the youtube feed count"
+  end
+
+  def subscribe_to_channels(count)
+    count.times.map do
+      id = "UC#{SecureRandom.hex(8)}"
+      feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=#{id}")
+      @user.subscriptions.where(feed: feed).first_or_create
+      feed
+    end
+  end
 end
