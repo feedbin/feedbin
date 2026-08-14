@@ -41,7 +41,9 @@ The design doc sequences Phase E as "dual-write until rows have accumulated → 
 
 The resolution is `update_column`, and the design doc's worry about it is backwards. It frets that "the row's `updated_at` no longer tells the whole truth about when the row last changed" — but the touch rule already *demands* exactly that: `updated_at` may move only when the bytes move. Skipping the timestamp for a validators-only write is not a compromise of the rule, it is the rule. State it wherever it is relied on: **`images.updated_at` is a content version, not a row mtime.**
 
-**2. Conditional requests extend `ImageCrawler::Download` rather than swapping in `Feedkit::Request`.** The legacy crawler uses `Feedkit::Request.download`, which already supports `etag:`/`last_modified:` and exposes `not_modified?` — tempting to reuse. Rejected: it would fork the pipeline's download path for one preset family, losing `Download`'s size cap, timeouts, camo handling, and per-provider dispatch, and creating exactly the drift the design doc warns about for `IconLayer`. `Down` supports custom request headers, and reports a 304 as `Down::ResponseError` with `response.code == "304"` — both verified against the installed gems before writing this plan. Using an exception for an expected outcome is mildly ugly; it is contained in one rescue with a comment.
+**2. Conditional requests extend `ImageCrawler::Download` rather than swapping in `Feedkit::Request`.** The legacy crawler uses `Feedkit::Request.download`, which already supports `etag:`/`last_modified:` and exposes `not_modified?` — tempting to reuse. Rejected: it would fork the pipeline's download path for one preset family, losing `Download`'s size cap, timeouts, camo handling, and per-provider dispatch, and creating exactly the drift the design doc warns about for `IconLayer`. `Down` supports custom request headers, and — on the `:http` backend this app configures (`config/initializers/down.rb`) — reports a 304 as `Down::ResponseError` with `response.code == "304"`; both verified against the installed gems before writing this plan. That last fact is backend-specific: the `:net_http` backend instead raises `Down::NotModified`, a sibling of `Down::ResponseError` under `Down::Error`, not a subtype of it, so a bare `rescue Down::ResponseError` would not catch it on that backend and a 304 would fall through to `Download::Default`'s blanket `rescue Down::Error` with `not_modified?` silently staying false. Using an exception for an expected outcome is mildly ugly; it is contained in two rescues (one per backend's exception) with a shared comment.
+
+Because it lands in shared `Download`/`Pipeline::Find` code rather than anything favicon-specific, the blast radius is wider than "the icon family" suggests. `Pipeline::Find#attempt_icon` — and therefore conditional requests, the 304 handling, and `validators_for`/`store_validators` — is reached by every `content_addressed?` preset, not only `favicon`/`touch_icon`: `podcast`, `podcast_feed`, and `channel_avatar` as well, all three already shipped and serving traffic. This phase changes fetch behavior and `images.data` contents for those three tenants too, not just the two it adds. See the Deployment notes and "What Phase F must solve" for the consequence.
 
 **3. Favicon rows are never garbage collected — a stated decision, not an oversight.** `ImageGarbageCollector` harvests from entry ids and `Image.entry_owned` excludes both new providers. A row keyed by a **host** is owned by nothing that gets deleted: hosts are not records. `ImageReplacementCollector` still reclaims the old object whenever an icon's bytes change, which is the common case and the one that would otherwise grow without bound. What accumulates is one row plus one small PNG per host ever crawled. This is the same shape as Phase D's channel rows, whose storage cost was assessed and accepted.
 
@@ -323,8 +325,14 @@ In `app/jobs/image_crawler/lib/download.rb`, replace `initialize` and `download_
 
     # What the response carried, as opposed to what we sent. Stored against the
     # row so the next crawl of this same URL can ask conditionally.
+    #
+    # "Etag", not "ETag": the configured :http backend (config/initializers/down.rb)
+    # canonicalizes header names to Title-Case-Per-Hyphen-Segment (the http gem's
+    # HTTP::Headers.canonicalize_name splits on "-"/"_" and capitalizes each
+    # segment), and "ETag" has no hyphen to split on, so it comes back "Etag".
+    # Verified directly against the installed gems.
     def response_etag
-      @file&.headers&.[]("ETag")
+      @file&.headers&.[]("Etag")
     end
 
     def response_last_modified
@@ -633,7 +641,7 @@ In `app/jobs/image_crawler/pipeline/find.rb`, replace `attempt_icon` and `unchan
         if unchanged?(row)
           Librato.increment("image.icon_unchanged")
           Sidekiq.logger.info @image.trace(message: "icon unchanged", metadata: {original_url: original_url})
-          store_validators(row)
+          store_validators(row, original_url)
           begin
             File.unlink(@image.download_path)
           rescue Errno::ENOENT
@@ -661,12 +669,29 @@ In `app/jobs/image_crawler/pipeline/find.rb`, replace `attempt_icon` and `unchan
       # that rebuilds emits a fresh ETag for identical content. Store them so
       # the next crawl can get a 304 instead of a download.
       #
+      # Guarded on row.url == original_url, mirroring validators_for's read
+      # side: a different candidate URL can serve byte-identical bytes (a
+      # moved <link rel="icon">, an http/https or www variant), and unchanged?
+      # only compares variant and fingerprint, never url. Without this guard,
+      # that candidate's validators would be written under this row's url --
+      # and with If-Modified-Since, a later, fully conformant server could
+      # then confirm a false "unchanged" on the next crawl, since the header
+      # only promises "304 if not modified since this date". We could instead
+      # refresh row.url to the winning candidate, but Image's
+      # before_save :fingerprint_url derives url_fingerprint from url and
+      # update_column skips callbacks, so that would silently desync the two.
+      # Skipping the write is the correct minimal fix -- and the cost is
+      # permanent, not a one-time miss: as long as this candidate keeps
+      # serving the same bytes as the row, unchanged? keeps short-circuiting
+      # before create_image ever runs, so every future crawl of this host
+      # downloads this candidate in full rather than getting a 304.
+      #
       # update_column, not update: updated_at is a view cache key (Phase B) and
       # must move only when the stored bytes move. That makes images.updated_at
       # a content version rather than a row mtime, which is exactly what the
       # touch rule asks for -- not a compromise of it.
-      def store_validators(row)
-        return unless row
+      def store_validators(row, original_url)
+        return unless row && row.url == original_url
         merged = row.data.merge("etag" => @image.etag, "last_modified" => @image.last_modified).compact
         return if merged == row.data
         row.update_column(:data, merged)
@@ -697,7 +722,7 @@ Expected: PASS, including the pre-existing podcast short-circuit test (`test_sho
 source ~/.bash_profile && bundle exec rake
 ```
 
-Expected: PASS. 1665 runs (1653 + 2 + 5 + 5), 0 failures, 3 skips. If you see 1 failure with the assertion count unchanged, re-run — see Global Constraints.
+Expected: PASS. 1668 runs (1653 + 2 + 5 + 8), 0 failures, 3 skips. If you see 1 failure with the assertion count unchanged, re-run — see Global Constraints.
 
 - [ ] **Step 8: Commit**
 
@@ -707,7 +732,7 @@ git add app/models/image.rb app/jobs/image_crawler/lib/image.rb app/jobs/image_c
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
 
-Adds 5 runs (1 in `image_test.rb`, 4 in `find_test.rb`).
+Adds 8 runs (2 in `download_test.rb`, 1 in `image_test.rb`, 5 in `find_test.rb`).
 
 ---
 
@@ -1062,7 +1087,7 @@ Expected: PASS, including every pre-existing finder test untouched.
 source ~/.bash_profile && bundle exec rake
 ```
 
-Expected: PASS. 1673 runs (1653 + 2 + 5 + 5 + 5 + 3), 0 failures, 3 skips.
+Expected: PASS. 1676 runs (1653 + 2 + 5 + 8 + 5 + 3), 0 failures, 3 skips.
 
 - [ ] **Step 6: Commit**
 
@@ -1109,7 +1134,7 @@ There is no migration, no cache-key version bump, and no read change — so no c
 
 **Expect favicon-related outbound requests to roughly double.** Every favicon crawl now fetches its candidates twice: once for the legacy path, once for the pipeline. Crawls are event-triggered (subscribe, import, save-page, feed-fixer, feed creation) and gated by `updated_recently?`'s one-hour window, so this is not a sweep — but it is the largest single traffic increase in the whole icon migration, and it persists until the legacy crawler retires in Phase F. Conditional requests claw some of it back as rows accumulate validators, but only from the second crawl of a given URL onward.
 
-**Two new Librato counters worth watching:** `image.icon_not_modified` (a 304 — the ideal outcome, and it should climb steadily once rows exist) and `image.icon_unchanged` (a 200 whose bytes matched — the fallback outcome for hosts that send no validators). If `icon_not_modified` stays at zero after rows have accumulated, `validators_for` is not matching and the conditional half of this work is inert.
+**Two new Librato counters worth watching:** `image.icon_not_modified` (a 304 — the ideal outcome, and it should climb steadily once rows exist) and `image.icon_unchanged` (a 200 whose bytes matched — the fallback outcome for hosts that send no validators). Both are cross-tenant, not favicon-only: `attempt_icon` increments them for every `content_addressed?` preset, so `podcast`, `podcast_feed`, and `channel_avatar` crawls contribute to the same two counters as `favicon`/`touch_icon`. That matters for the diagnostic here: if `icon_not_modified` stays at zero after rows have accumulated, it does *not* isolate which family's `validators_for` is failing to match — it could mean the conditional half of this work specifically is inert while the three pre-existing tenants are fine, or the reverse. Read it alongside a query scoped to `provider: [:website_favicon, :website_touch_icon]` if you need to know which.
 
 **R2 object growth:** one small PNG per host per variant, and these rows are never garbage collected (see decision 3). The favicon variant is 32×32, so the objects are tiny; the touch-icon variant is up to 200×200.
 
@@ -1133,6 +1158,12 @@ Note this contradicts the design doc, which records "`favicons.favicon` (base64)
 
 **2. The cache digest has to gain the image record.** `EntriesHelper.entries_cache_key` currently digests `entry_favicon(entry, favicons)` — a `Favicon`. When the read flips, that element must become the `images` row, preloaded host-scoped the way `Favicon.for_entries` already is, or the key N+1s on every render. Note the test-suite blind spot the design doc records: `config/environments/test.rb` sets `perform_caching = false`, and Rails skips a collection-cache `cached:` lambda entirely when that is false — so **no controller test can observe a query issued from `entries_cache_key`**. Two N+1s reached review rather than CI in Phase B for exactly this reason.
 
+This is not the only cache digest that reads `favicon`. `FeedsHelper.sidebar_feeds_cache_key` and `.sidebar_tags_cache_key` both digest `feeds.map(&:favicon)` for the sidebar. Both need the `images` row substituted in **and** preloaded, for exactly the same reason and with exactly the same blind spot: `perform_caching = false` in test means no test will catch a regression here either. This is the same shape as the two N+1s referenced above, in a place easy to miss because it is not `EntriesHelper`.
+
 **3. `Favicon#host_class` has no equivalent on `Image`.** `FaviconComponent#icon_favicon` renders `class="favicon #{favicon.host_class}"`, which is `"host-#{host}".parameterize`. An `images` row has `provider_id` (the host) but no such helper. Trivial, but it is a rendering detail that will be missed if the flip is done by pattern-matching on `cdn_url` alone.
 
 **4. `ImportItem` and `Feed` both `has_one :favicon`** keyed on `host`. Both associations, and every `includes(:favicon)` that preloads them, need equivalents or removal.
+
+**5. There is no backfill path — the most important finding of this review.** Every `FaviconCrawler::Finder` trigger is event-driven: `Feed#refresh_favicon` and `Subscription#refresh_favicon` (both `after_create`), `feed_importer.rb` (on import, and again per newly-discovered host), `save_page.rb`, `feed_fixer.rb` (weekly via `lib/clock.rb`, and only for feeds with `fixable_error?`), and the manual refresh in `settings/subscriptions_controller.rb`. `lib/clock.rb` has no favicon sweep of any kind. So `images` rows accumulate in proportion to **new subscription churn**, not to the existing host corpus — a host every current user is already subscribed to, whose feed never errors, will never produce an `images` row no matter how long the bake window runs, because nothing ever re-triggers a crawl for it.
+
+This invalidates the "accumulate, then bake, then flip" sequencing this plan and the design doc both assume: accumulation does not approach full coverage on its own no matter how long it runs. Phase F needs either a one-shot backfill enqueuer over `Favicon.pluck(:host)` (force-crawl, rate-limited so it does not repeat this phase's traffic-doubling all at once) or a read that falls back to the `favicons` row whenever no `images` row exists yet. Either way, Phase F's shape changes from "flip the read" to "flip the read behind a fallback, sweep the backlog, then remove the fallback" — a third phase, not a cleanup step at the end of the second.
