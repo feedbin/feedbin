@@ -5,12 +5,14 @@ module ImageCrawler
       camo
       download_path
       entry_url
+      etag
       feed_id
       final_url
       height
       width
       id
       image_urls
+      last_modified
       meta_image_urls
       original_extension
       original_fingerprint
@@ -212,8 +214,10 @@ module ImageCrawler
           data: {
             "legacy_storage_url" => storage_url,
             "preset"             => preset_name,
-            "final_url"          => final_url
-          }
+            "final_url"          => final_url,
+            "etag"               => etag,
+            "last_modified"      => last_modified
+          }.compact
         )
       end
 

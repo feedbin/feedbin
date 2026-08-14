@@ -132,4 +132,20 @@ class ImageTest < ActiveSupport::TestCase
     assert_equal Image.content_storage_path_for(undashed, "200x200", "jpg"),
       Image.content_storage_path_for(dashed, "200x200", "jpg")
   end
+
+  # A uuid column reads back dashed; every fingerprint we compute is 32 bare
+  # hex characters. Comparing them directly is silently always false, which
+  # would make every icon look changed on every crawl -- the exact cost
+  # content-addressing exists to avoid.
+  test "same_fingerprint? compares a dashed uuid against a bare hex digest" do
+    bare = Digest::MD5.hexdigest("icon bytes")
+    dashed = [bare[0, 8], bare[8, 4], bare[12, 4], bare[16, 4], bare[20, 12]].join("-")
+
+    assert Image.same_fingerprint?(dashed, bare)
+    assert Image.same_fingerprint?(bare, dashed)
+    assert Image.same_fingerprint?(dashed.upcase, bare)
+    refute Image.same_fingerprint?(bare, Digest::MD5.hexdigest("other bytes"))
+    refute Image.same_fingerprint?(nil, bare)
+    refute Image.same_fingerprint?(bare, "")
+  end
 end

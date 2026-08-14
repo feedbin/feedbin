@@ -73,6 +73,17 @@ class Image < ApplicationRecord
     File.join(fingerprint[0..2], "#{fingerprint}.#{extension}")
   end
 
+  # A uuid column reads back dashed ("a1b2c3d4-..."); every fingerprint we
+  # compute is 32 bare hex characters. Comparing them directly is silently
+  # always false, which would make every icon look changed on every crawl --
+  # the exact cost content-addressing exists to avoid. The database comparison
+  # in a where() clause is safe because Postgres casts on the way in; only
+  # Ruby-side comparison needs this.
+  def self.same_fingerprint?(one, other)
+    return false if one.blank? || other.blank?
+    one.to_s.delete("-").casecmp?(other.to_s.delete("-"))
+  end
+
   # The public URL for a stored object. Nil until R2_IMAGE_HOST is set, which
   # is what keeps the read path on the legacy fallback during a transition.
   def self.r2_url(storage_path)

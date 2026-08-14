@@ -89,18 +89,35 @@ module ImageCrawler
 
       # Icons mutate under a stable URL, so a row for this URL says nothing
       # about the bytes behind it and Dedupe's skip-the-download shortcut is
-      # exactly wrong. Always fetch, then short-circuit on the original bytes:
-      # hashing the original rather than the processed output is what lets this
-      # skip *processing*, which for a 32x32 render is the expensive part.
+      # exactly wrong. Always fetch -- but ask conditionally when we can, then
+      # short-circuit on the original bytes. Hashing the original rather than
+      # the processed output is what lets this skip *processing*, which for a
+      # 32x32 render is the expensive part.
       def attempt_icon(original_url)
+        row = existing_row
+
         download = begin
-          Download.download!(original_url, camo: @image.camo, minimum_size: @image.preset.minimum_size)
+          Download.download!(original_url,
+            camo: @image.camo,
+            minimum_size: @image.preset.minimum_size,
+            **validators_for(row, original_url))
         rescue => exception
           Sidekiq.logger.info @image.trace(message: "download exception", metadata: {exception: exception, original_url: original_url})
           return false
         end
 
         return false unless download
+
+        # A 304 now means exactly what this assumes: this specific source is
+        # unchanged. It could not mean that before -- the favicons row held one
+        # validator pair per host, so sending it to a different candidate
+        # invited a 304 for content we had never seen, and 98c39d3e switched
+        # the headers off rather than act on it.
+        if download.not_modified?
+          Librato.increment("image.icon_not_modified")
+          Sidekiq.logger.info @image.trace(message: "icon not modified", metadata: {original_url: original_url})
+          return true
+        end
 
         unless download.valid?
           download.delete!
@@ -116,10 +133,13 @@ module ImageCrawler
         @image.original_url         = original_url
         @image.original_extension   = download.file_extension
         @image.original_fingerprint = Digest::MD5.file(@image.download_path).hexdigest
+        @image.etag                 = download.response_etag
+        @image.last_modified        = download.response_last_modified
 
-        if unchanged?
+        if unchanged?(row)
           Librato.increment("image.icon_unchanged")
           Sidekiq.logger.info @image.trace(message: "icon unchanged", metadata: {original_url: original_url})
+          store_validators(row)
           begin
             File.unlink(@image.download_path)
           rescue Errno::ENOENT
@@ -132,12 +152,40 @@ module ImageCrawler
         true
       end
 
-      def unchanged?
-        ::Image
-          .where(provider: @image.provider, provider_id: @image.provider_id.to_s)
-          .where(original_fingerprint: @image.original_fingerprint)
-          .where(variant: @image.variant)
-          .exists?
+      def existing_row
+        ::Image.find_by(provider: @image.provider, provider_id: @image.provider_id.to_s)
+      end
+
+      # Only for the URL the row actually came from. That restriction is the
+      # whole reason conditional requests can be switched back on.
+      def validators_for(row, original_url)
+        return {} unless row && row.url == original_url
+        {etag: row.data["etag"], last_modified: row.data["last_modified"]}
+      end
+
+      # The bytes are unchanged but the validators may not be -- a static host
+      # that rebuilds emits a fresh ETag for identical content. Store them so
+      # the next crawl can get a 304 instead of a download.
+      #
+      # update_column, not update: updated_at is a view cache key (Phase B) and
+      # must move only when the stored bytes move. That makes images.updated_at
+      # a content version rather than a row mtime, which is exactly what the
+      # touch rule asks for -- not a compromise of it.
+      def store_validators(row)
+        return unless row
+        merged = row.data.merge("etag" => @image.etag, "last_modified" => @image.last_modified).compact
+        return if merged == row.data
+        row.update_column(:data, merged)
+      end
+
+      # Compared in Ruby rather than SQL because the caller already holds the
+      # row (for its url and validators). Image.same_fingerprint? is required,
+      # not decorative: original_fingerprint is a uuid column and reads back
+      # dashed, while every fingerprint we compute is bare hex.
+      def unchanged?(row)
+        return false unless row
+        return false unless row.variant == @image.variant
+        ::Image.same_fingerprint?(row.original_fingerprint, @image.original_fingerprint)
       end
 
       def download_image(original_url, download_cache)

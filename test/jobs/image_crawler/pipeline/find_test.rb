@@ -346,6 +346,152 @@ module ImageCrawler
           assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
         end
       end
+
+      # The validators go back only to the URL they came from. With one pair
+      # per host (the favicons table) they could be sent to a candidate we had
+      # never fetched, and the resulting 304 aborted the whole crawl -- which
+      # is why conditional requests were switched off in 98c39d3e.
+      def test_should_send_stored_validators_only_for_the_url_they_came_from
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          stored_url = "http://example.com/stored.ico"
+          other_url  = "http://example.com/other.ico"
+
+          ::Image.create!(
+            provider: :website_favicon, provider_id: "example.com",
+            url: stored_url, variant: "32x32",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.content_storage_path_for(SecureRandom.hex(16), "32x32", "png"),
+            width: 32, height: 32, bytesize: 400, placeholder_color: "aabbcc",
+            data: {"etag" => "\"abc123\"", "last_modified" => "Wed, 21 Oct 2026 07:28:00 GMT"}
+          )
+
+          conditional = stub_request(:get, stored_url)
+            .with(headers: {"If-None-Match" => "\"abc123\""})
+            .to_return(status: 304, body: "")
+          # Constrained on the absence of the header (deviation from the plan's
+          # literal test code, which left this stub unconstrained): other_url
+          # tried first and succeeding would otherwise break the candidate loop
+          # before stored_url is ever reached regardless of what headers went
+          # out, leaving this test unable to catch the one bug it exists to
+          # guard against -- the stored row's validators leaking onto a
+          # candidate URL they were never issued for.
+          unconditional = stub_request(:get, other_url)
+            .with { |request| !request.headers.key?("If-None-Match") }
+            .to_return(body: File.new(support_file("favicon.ico")), status: 200, headers: {"Content-Type" => "image/png"})
+
+          image = Image.new_with_attributes(
+            id: "example.com-favicon", preset_name: "favicon",
+            image_urls: [other_url, stored_url],
+            provider: ::Image.providers[:website_favicon], provider_id: "example.com"
+          )
+          Find.new.perform(image.to_h)
+
+          assert_requested unconditional
+          # No message argument (deviation from the plan's literal test code):
+          # WebMock's refute_requested, given a stub object rather than a
+          # method+uri pair, treats a second positional argument as an
+          # options hash and calls .delete(:times) on it -- a string blows up
+          # with TypeError regardless of what attempt_icon actually did.
+          # The first candidate won, so the stored url was never re-fetched.
+          refute_requested conditional
+        end
+      end
+
+      # A 304 now means exactly what the code assumes: this specific source is
+      # unchanged. Stop, process nothing, write nothing.
+      def test_should_stop_on_a_304_without_processing_or_touching_the_row
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          url = "http://example.com/favicon.ico"
+          row = ::Image.create!(
+            provider: :website_favicon, provider_id: "example.com",
+            url: url, variant: "32x32",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: SecureRandom.hex(16),
+            storage_path: ::Image.content_storage_path_for(SecureRandom.hex(16), "32x32", "png"),
+            width: 32, height: 32, bytesize: 400, placeholder_color: "aabbcc",
+            data: {"etag" => "\"abc123\""},
+            updated_at: 1.year.ago
+          )
+          expected_updated_at = row.updated_at
+
+          stub_request(:get, url).with(headers: {"If-None-Match" => "\"abc123\""}).to_return(status: 304, body: "")
+
+          image = Image.new_with_attributes(
+            id: "example.com-favicon", preset_name: "favicon", image_urls: [url],
+            provider: ::Image.providers[:website_favicon], provider_id: "example.com"
+          )
+
+          assert_no_difference -> { Process.jobs.size } do
+            Find.new.perform(image.to_h)
+          end
+          assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
+        end
+      end
+
+      # The bytes are unchanged but the ETag moved -- every static site that
+      # rebuilds does this. Store the new validator so the next crawl can get a
+      # 304 instead of a download, but do NOT move updated_at: it is a view
+      # cache key, and the bytes did not change.
+      def test_should_store_new_validators_for_unchanged_bytes_without_moving_updated_at
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          url = "http://example.com/favicon.ico"
+          fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
+
+          row = ::Image.create!(
+            provider: :website_favicon, provider_id: "example.com",
+            url: url, variant: "32x32",
+            image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: fingerprint,
+            storage_path: ::Image.content_storage_path_for(fingerprint, "32x32", "png"),
+            width: 32, height: 32, bytesize: 400, placeholder_color: "aabbcc",
+            data: {"etag" => "\"old\""},
+            updated_at: 1.year.ago
+          )
+          expected_updated_at = row.updated_at
+
+          stub_request(:get, url)
+            .to_return(body: File.new(support_file("favicon.ico")), status: 200,
+              headers: {"Content-Type" => "image/png", "ETag" => "\"new\""})
+
+          image = Image.new_with_attributes(
+            id: "example.com-favicon", preset_name: "favicon", image_urls: [url],
+            provider: ::Image.providers[:website_favicon], provider_id: "example.com"
+          )
+
+          assert_no_difference -> { Process.jobs.size } do
+            Find.new.perform(image.to_h)
+          end
+
+          row.reload
+          assert_equal "\"new\"", row.data["etag"], "the new validator must be stored or the next crawl re-downloads"
+          assert_equal expected_updated_at.to_f, row.updated_at.to_f, "updated_at is a content version, not a row mtime"
+        end
+      end
+
+      # When the bytes DID change, the validators ride along into the row the
+      # pipeline is about to write -- no separate update needed.
+      def test_should_carry_the_response_validators_into_the_pipeline
+        with_env("R2_BUCKET_IMAGES" => "images-test") do
+          url = "http://example.com/favicon.ico"
+          stub_request(:get, url)
+            .to_return(body: File.new(support_file("favicon.ico")), status: 200,
+              headers: {"Content-Type" => "image/png", "ETag" => "\"fresh\"", "Last-Modified" => "Wed, 21 Oct 2026 07:28:00 GMT"})
+
+          image = Image.new_with_attributes(
+            id: "example.com-favicon", preset_name: "favicon", image_urls: [url],
+            provider: ::Image.providers[:website_favicon], provider_id: "example.com"
+          )
+
+          assert_difference -> { Process.jobs.size }, +1 do
+            Find.new.perform(image.to_h)
+          end
+
+          queued = Process.jobs.last["args"].first
+          assert_equal "\"fresh\"", queued["etag"]
+          assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", queued["last_modified"]
+        end
+      end
     end
   end
 end

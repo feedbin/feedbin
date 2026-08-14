@@ -108,6 +108,37 @@ module ImageCrawler
       end
     end
 
+    # The gate that gives not_modified? its meaning: without it, an
+    # unsolicited 304 from a non-conformant server (one that answers 304 even
+    # though no If-None-Match/If-Modified-Since went out) would be swallowed
+    # as "unchanged" the same way a real conditional 304 is. That is
+    # indistinguishable from a fresh icon at every other layer, so the gate
+    # has to live here, at the one place that knows whether a validator was
+    # actually sent.
+    def test_should_not_treat_an_unsolicited_304_as_not_modified
+      url = "http://example.com/favicon.ico"
+      stub_request(:get, url).to_return(status: 304, body: "")
+
+      download = Download.download!(url, minimum_size: nil)
+
+      refute download.not_modified?, "nobody asked conditionally, so this 304 is a broken server, not a fresh icon"
+    end
+
+    # Down::Default's own `rescue Down::Error` swallows whatever #download_file
+    # raises, so the sibling of test_should_still_raise_for_a_non_304_response_error
+    # above can only observe the outcome here, through the same entry point
+    # attempt_icon actually calls -- a real failure must never be reported as
+    # valid or as an unchanged (not_modified) icon.
+    def test_should_leave_a_404_invalid_and_not_modified_through_download_bang
+      url = "http://example.com/favicon.ico"
+      stub_request(:get, url).to_return(status: 404, body: "")
+
+      download = Download.download!(url, minimum_size: nil, etag: "\"abc123\"")
+
+      refute download.valid?
+      refute download.not_modified?
+    end
+
     def test_should_expose_the_response_validators
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(

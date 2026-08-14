@@ -32,8 +32,10 @@ module ImageCrawler
       # server is confirming the bytes we already hold are current. Down has no
       # other way to say it -- it raises on every non-2xx. Narrow on purpose:
       # a 404 or a 500 must stay an error, or a dead icon would look
-      # permanently unchanged and never be re-fetched.
-      raise unless exception.response&.code.to_s == "304"
+      # permanently unchanged and never be re-fetched. Also gated on having
+      # sent a validator: a 304 nobody asked for is a broken server, not a
+      # fresh icon, and must not be treated as "unchanged".
+      raise unless (@etag.present? || @last_modified.present?) && exception.response&.code.to_s == "304"
       @not_modified = true
     end
 
