@@ -31,6 +31,8 @@ module FaviconCrawler
         break
       end
 
+      schedule_pipeline
+
       return unless new_favicon.present?
 
       processor = Processor.new(new_favicon, @favicon.host)
@@ -56,6 +58,40 @@ module FaviconCrawler
         File.unlink(file)
       rescue Errno::ENOENT
       end
+    end
+
+    # Dual-store, the shape the entry-preview and podcast migrations both
+    # used: everything above keeps writing the favicons row and its S3 object
+    # exactly as before, and the shared pipeline produces an images row and an
+    # R2 object alongside. Rows accumulate while nothing reads them; the read
+    # flips in a later phase, and only then does the legacy store retire.
+    #
+    # Two schedules rather than one because the presets render at different
+    # sizes from different candidate lists -- and they must stay separate
+    # providers, since Pipeline::Find#unchanged? keys on (provider,
+    # provider_id, original_fingerprint, variant) and a shared provider would
+    # let whichever ran last own the fingerprint.
+    #
+    # This costs a second fetch per crawl: the legacy path downloads, and the
+    # pipeline downloads again. Accepted and temporary -- favicon crawls are
+    # event-triggered (subscribe, import, save-page, feed-fixer), not a sweep,
+    # and it ends when the legacy crawler is retired.
+    def schedule_pipeline
+      schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls)
+      schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls)
+    end
+
+    def schedule_icon(preset_name, provider, urls)
+      return if urls.empty?
+
+      image = ImageCrawler::Image.new_with_attributes(
+        id: "#{@favicon.host}-#{preset_name}",
+        preset_name: preset_name,
+        image_urls: urls.map(&:to_s),
+        provider: provider,
+        provider_id: @favicon.host
+      )
+      ImageCrawler::Pipeline::Find.perform_async(image.to_h)
     end
 
     # Parsed once and memoized including the failure case: all_favicon_urls and

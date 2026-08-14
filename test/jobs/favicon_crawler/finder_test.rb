@@ -330,5 +330,70 @@ module FaviconCrawler
       assert_empty finder.send(:touch_icon_urls)
       assert_requested request, times: 1
     end
+
+    # Dual-store: the legacy favicons row and its S3 object keep being written
+    # exactly as before, and the pipeline produces an images row and an R2
+    # object alongside. Nothing reads the new rows until a later phase.
+    test "schedules both presets from one crawl, keyed by host" do
+      body = <<~HTML
+        <html><head>
+          <link rel="icon" href="/icon-32.png">
+          <link rel="apple-touch-icon" href="/touch-180.png">
+        </head></html>
+      HTML
+      stub_request(:any, %r{s3\.amazonaws\.com})
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+      stub_request_file("favicon.ico", "http://example.com/icon-32.png")
+      stub_request_file("favicon.ico", "http://example.com/touch-180.png")
+      stub_request_file("favicon.ico", @default_url)
+
+      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +2 do
+        Finder.new.perform(@page_url.host)
+      end
+
+      jobs = ImageCrawler::Pipeline::Find.jobs.last(2).map { _1["args"].first }
+      favicon = jobs.find { _1["preset_name"] == "favicon" }
+      touch   = jobs.find { _1["preset_name"] == "touch_icon" }
+
+      assert_equal ::Image.providers[:website_favicon], favicon["provider"]
+      assert_equal "example.com", favicon["provider_id"]
+      assert_includes favicon["image_urls"], "http://example.com/icon-32.png"
+
+      assert_equal ::Image.providers[:website_touch_icon], touch["provider"]
+      assert_equal "example.com", touch["provider_id"]
+      assert_equal ["http://example.com/touch-180.png"], touch["image_urls"]
+    end
+
+    test "schedules only the favicon preset when the host advertises no touch icon" do
+      body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
+      stub_request(:any, %r{s3\.amazonaws\.com})
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+      stub_request_file("favicon.ico", "http://example.com/icon-32.png")
+      stub_request_file("favicon.ico", @default_url)
+
+      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
+        Finder.new.perform(@page_url.host)
+      end
+
+      assert_equal "favicon", ImageCrawler::Pipeline::Find.jobs.last["args"].first["preset_name"]
+    end
+
+    # The pipeline fetches and decides for itself. Gating it on the legacy
+    # path having produced a usable image would mean a host whose legacy
+    # resize failed never accumulates a row -- and that resize is the step
+    # this migration exists to replace.
+    test "schedules the pipeline even when the legacy path finds nothing usable" do
+      body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+      stub_request(:get, "http://example.com/icon-32.png").to_return(body: "not an image", status: 200)
+      stub_request(:get, @default_url).to_return(status: 404, body: "")
+
+      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
+        Finder.new.perform(@page_url.host)
+      end
+
+      assert_nil Favicon.unscoped.find_by(host: @page_url.host)&.url,
+        "the legacy path genuinely found nothing, which is the point of this test"
+    end
   end
 end
