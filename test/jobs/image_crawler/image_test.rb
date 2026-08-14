@@ -295,28 +295,6 @@ module ImageCrawler
       refute_equal avatar.storage_path, podcast.storage_path
     end
 
-    # variant names the rendering recipe, not the result. touch_icon is a
-    # limit crop, so a 180x180 source stays 180x180 -- but it must still live
-    # at variant 200x200, or two renditions of one recipe would land on
-    # different keys and dedup would fragment.
-    test "touch_icon storage_path ignores the size the render actually came out" do
-      fingerprint = Digest::MD5.hexdigest("icon bytes")
-      build = ->(width, height) {
-        Image.new_with_attributes(
-          id: "a", preset_name: "touch_icon", image_urls: [],
-          provider: ::Image.providers[:website_touch_icon], provider_id: "example.com",
-          original_url: "http://example.com/apple-touch-icon.png",
-          original_fingerprint: fingerprint, width: width, height: height
-        )
-      }
-
-      full  = build.call(200, 200)
-      small = build.call(180, 180)
-
-      assert_equal "200x200", small.variant
-      assert_equal full.storage_path, small.storage_path
-    end
-
     # One host, two icons, two rows. The separation is load-bearing for
     # correctness, not layout: Pipeline::Find#unchanged? keys on (provider,
     # provider_id, original_fingerprint, variant) and (provider, provider_id)

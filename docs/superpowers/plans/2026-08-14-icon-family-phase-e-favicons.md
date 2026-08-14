@@ -51,7 +51,7 @@ The resolution is `update_column`, and the design doc's worry about it is backwa
 
 ### Task 1: The two providers, and the size distinction a fill-only world never exercised
 
-`Image.provider` gains the two host-scoped providers. Alongside them, two tests the design doc explicitly asks for: **"`variant` names the rendering recipe, not the result"** — true of every preset, but never load-bearing until now, because every earlier preset was a fill crop whose output size always equalled its spec. `touch_icon` uses `resize_to_limit`, so a 180×180 source stays 180×180 while its variant is still `200x200`. Keying on the recipe is what makes two renditions interchangeable; keying on the actual output would fragment the namespace and break dedup.
+`Image.provider` gains the two host-scoped providers. This task pins **provider separation**, not the variant/recipe distinction: "`variant` names the rendering recipe, not the result" is already pinned for both icon presets by the pre-existing `test/jobs/image_crawler/image_test.rb:106` test, `"icon presets keep their recipe as the variant and store png"` — its comment already uses the same 180×180 touch_icon example, so a second test asserting `small.variant == "200x200"` here would be redundant and, worse, cannot even fail on this task's own deliverable: `variant` and `storage_path` never consult `provider`, so such a test would pass identically whether the new enum values existed or not. What this task's tests must guard, and do guard, is that `website_favicon` and `website_touch_icon` are two distinct provider values producing two distinct rows and two distinct storage objects for the same host — the reason that separation is load-bearing for `Pipeline::Find#unchanged?` is explained in the enum comment added in Step 3 below.
 
 **Files:**
 - Modify: `app/models/image.rb` (enum only)
@@ -66,28 +66,6 @@ The resolution is `update_column`, and the design doc's worry about it is backwa
 Append to `test/jobs/image_crawler/image_test.rb`, inside `class ImageTest`:
 
 ```ruby
-    # variant names the rendering recipe, not the result. touch_icon is a
-    # limit crop, so a 180x180 source stays 180x180 -- but it must still live
-    # at variant 200x200, or two renditions of one recipe would land on
-    # different keys and dedup would fragment.
-    test "touch_icon storage_path ignores the size the render actually came out" do
-      fingerprint = Digest::MD5.hexdigest("icon bytes")
-      build = ->(width, height) {
-        Image.new_with_attributes(
-          id: "a", preset_name: "touch_icon", image_urls: [],
-          provider: ::Image.providers[:website_touch_icon], provider_id: "example.com",
-          original_url: "http://example.com/apple-touch-icon.png",
-          original_fingerprint: fingerprint, width: width, height: height
-        )
-      }
-
-      full  = build.call(200, 200)
-      small = build.call(180, 180)
-
-      assert_equal "200x200", small.variant
-      assert_equal full.storage_path, small.storage_path
-    end
-
     # One host, two icons, two rows. The separation is load-bearing for
     # correctness, not layout: Pipeline::Find#unchanged? keys on (provider,
     # provider_id, original_fingerprint, variant) and (provider, provider_id)
@@ -140,7 +118,7 @@ Append to `test/jobs/image_crawler/processor/cropper_test.rb`, inside `class Cro
 source ~/.bash_profile && bin/rails test test/jobs/image_crawler/image_test.rb test/jobs/image_crawler/processor/cropper_test.rb
 ```
 
-Expected: the two `image_test.rb` tests FAIL — `::Image.providers[:website_touch_icon]` is nil, so `new_with_attributes` builds a row with a nil provider and the assertions on `provider` and the enum lookup blow up. The cropper test may already pass: `icon_crop` uses `resize_to_limit`, so no-upscale is existing behavior. **That is fine and expected** — it is a characterization test pinning behavior Phase F must not change, not a red-to-green step. Note in your report which of the three actually failed.
+Expected: a mixed RED step, one failure not two. The `image_test.rb` test `"a host's favicon and touch icon are separate rows and separate objects"` FAILS — `::Image.providers[:website_favicon]` and `::Image.providers[:website_touch_icon]` both resolve to nil before Step 3, so `favicon.provider` and `touch.provider` are both nil and `refute_equal favicon.provider, touch.provider` fails on `nil == nil`. The `cropper_test.rb` test passes already: `icon_crop` uses `resize_to_limit`, so no-upscale is existing behavior, not something this task changes. **That is fine and expected** — it is a characterization test pinning behavior a later phase must not change, not a red-to-green step. Note in your report which of the two actually failed.
 
 - [ ] **Step 3: Add the providers**
 
@@ -186,7 +164,7 @@ git add app/models/image.rb test/jobs/image_crawler/image_test.rb test/jobs/imag
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
 
-Adds 3 runs.
+Adds 2 runs.
 
 ---
 
@@ -719,7 +697,7 @@ Expected: PASS, including the pre-existing podcast short-circuit test (`test_sho
 source ~/.bash_profile && bundle exec rake
 ```
 
-Expected: PASS. 1666 runs (1653 + 3 + 5 + 5), 0 failures, 3 skips. If you see 1 failure with the assertion count unchanged, re-run — see Global Constraints.
+Expected: PASS. 1665 runs (1653 + 2 + 5 + 5), 0 failures, 3 skips. If you see 1 failure with the assertion count unchanged, re-run — see Global Constraints.
 
 - [ ] **Step 8: Commit**
 
@@ -1084,7 +1062,7 @@ Expected: PASS, including every pre-existing finder test untouched.
 source ~/.bash_profile && bundle exec rake
 ```
 
-Expected: PASS. 1674 runs (1653 + 3 + 5 + 5 + 5 + 3), 0 failures, 3 skips.
+Expected: PASS. 1673 runs (1653 + 2 + 5 + 5 + 5 + 3), 0 failures, 3 skips.
 
 - [ ] **Step 6: Commit**
 
