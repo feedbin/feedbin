@@ -550,6 +550,89 @@ indirectly, because `_entry.html.erb` reads `processed_image?` in the partial
 body; if that read ever moves, those guards go vacuous while the key still
 N+1s. Any future work that adds a read to a cache key has the same exposure.
 
+## What Phase D learned — read before starting Phase E
+
+Added after the YouTube channel-avatar tenant shipped. Same rule as above: not
+relitigating design, recording what implementation and review found so Phase
+E inherits it.
+
+**Channel-avatar rows are stored for every YouTube channel linked from
+anywhere in the corpus, not just subscribed ones — assessed and accepted.**
+`Entry#has_embeds?` (`app/models/entry.rb:538`) returns true for any entry
+whose content contains the string `iframe`, and `HarvestEmbeds#find_embeds`
+then extracts YouTube ids from every `iframe` *and* every `a` element;
+`SavePage` triggers the same path. So `ImageCrawler::ChannelImage.schedule`
+fires per harvested channel, and the population is "distinct channels ever
+linked", not "channels anyone subscribes to". Combined with the deliberate
+decision that channel-keyed rows are never garbage collected
+(`Image.entry_owned` excludes `embed_icon`, and `ImageGarbageCollector`
+harvests from entry ids), this is permanent growth. There is also a recurring
+cost: `Pipeline::Find#attempt_icon` deliberately has no `DownloadCache.failed!`
+backoff, so every harvest batch containing a new video from a channel
+re-downloads that channel's full-size avatar before short-circuiting on
+`unchanged?`. **The storage cost was assessed during Phase D and accepted by
+the maintainer; no gate was added.** Re-examine if the entry-level reader
+(which would make these rows renderable) is deferred much further, or if
+row/object counts grow beyond expectation. The cheap gate, if it is ever
+wanted, is `next unless Feed.exists?(channel_id: channel.provider_id)` in
+`HarvestEmbeds::Download#update_related_records` —
+`index_feeds_on_channel_id` already exists.
+
+**The `channel_avatar` / `touch_icon` shared storage key is guarded for
+single-layer sources only, and Phase E owns the other half.** Both presets are
+200×200 PNG and content-addressed, so identical source bytes produce one
+shared `storage_path` — intended dedup. Two tests pin it:
+`test_icon_crop_and_limit_png_agree_on_a_single_layer_source` (the recipes
+produce identical bytes) and the storage-path equality test in
+`test/jobs/image_crawler/image_test.rb` (the presets agree on variant and
+format). Neither covers **multi-page sources**, where the two recipes
+*already* differ by design: `icon_crop` runs `IconLayer.best` (scans pages
+0–4, rejects blank/white layers, takes the largest survivor) while `limit_png`
+takes page 0 unconditionally. That divergence is the entire reason `limit_png`
+exists. Reaching a real collision would need a site's `apple-touch-icon` to be
+byte-identical to a ggpht channel avatar *and* multi-page, which is
+vanishingly unlikely — and the blast radius is cosmetic anyway: the two rows
+are independent (`unchanged?` keys on provider + provider_id), last writer
+wins, and the loser serves the same source cropped slightly differently at 16
+rendered px. Nothing dangles and GC still reference-counts correctly. **Do not
+change `icon_crop`'s scaling in Phase E without re-reading that test — it
+promises less than it appears to.**
+
+**`feeds.channel_id`'s `before_save` costs one cache invalidation per YouTube
+feed at deploy time.** `FeedCrawler::Receiver#perform`'s closing
+`feed.update(...)` is a genuine no-op for a steady-state feed today. With
+`Feed#set_channel_id` in place, the first post-deploy crawl of any YouTube
+feed whose `channel_id` is still NULL dirties the column, so the UPDATE fires
+and `updated_at` moves — and `updated_at` is a view cache key via
+`sidebar_feeds_cache_key` and `entries_cache_key`. Bounded, one-time per feed,
+self-limiting. **The size of the wave is set by how fast
+`BackfillFeedChannelIds` runs relative to the crawl cycle — run it immediately
+after deploy, not at leisure.**
+
+**Phase D reintroduces a touch fan-out that the cache-digest design exists to
+remove, deliberately.** `ImageCrawler::ChannelImage#perform` touches every
+feed for the channel rather than putting `channel_image_record` in the view
+digests. Justified two ways: the fan-out is 1–5 rows for a channel (URL
+spellings of the same feed), nowhere near the 100,000-row medium.com favicon
+case; and four `FaviconComponent` render sites preload neither icon
+association (`app/views/components/dialog/add_feed.rb`,
+`app/views/subscriptions/new_view.rb`,
+`app/views/components/dialog/edit_subscription.rb`,
+`app/views/feeds/_feeds.html.erb`), so digesting the association would add a
+query there. The codebase now has both patterns; this is why.
+
+**Two read-path divergences exist by design and should be known before the
+legacy store retires.** `Feed#icon_url` serves the 200×200 R2 PNG while
+`feeds.custom_icon` still holds the 88×88 ggpht URL, and
+`EntryPresenter#media_image` reads `custom_icon` directly rather than
+`icon_url` — so the audio-player artwork path keeps the old soft image (not
+exercised for YouTube feeds today). Separately, `Feed#icon_options`'s
+`custom_icon && options["itunes_image"]` branch yields `"square"`, which would
+render a channel avatar with a square frame; believed unreachable from a real
+YouTube feed (feedkit sets `itunes_image` only from `<itunes:image>`, and
+`Receiver` replaces `options` wholesale each crawl), but it is a tie that
+produces a *wrong shape* rather than merely a wrong source.
+
 ## Open questions
 
 None outstanding *as of the original design*; see the section above for three

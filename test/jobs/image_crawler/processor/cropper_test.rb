@@ -254,7 +254,11 @@ module ImageCrawler
       # same export -- but it is only correct while the two recipes agree on
       # single-layer sources, which is every source either preset sees in
       # practice. If this ever fails, the two presets need distinct storage
-      # keys before Phase E ships touch_icon.
+      # keys before Phase E ships touch_icon. This does NOT pin multi-page
+      # sources: icon_crop's IconLayer.best scans pages 0-4 and takes the
+      # largest non-blank survivor, while limit_png always takes page 0 --
+      # they provably differ there, which is the entire reason limit_png
+      # exists instead of reusing icon_crop outright.
       def test_icon_crop_and_limit_png_agree_on_a_single_layer_source
         icon_file  = copy_support_file("image.png")
         limit_file = copy_support_file("image.png")

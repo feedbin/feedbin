@@ -1271,7 +1271,7 @@ Expect one element — that is "one row serves the channel's own feed and every 
 Run in this order:
 
 1. Deploy (the migration adds `feeds.channel_id`, nullable, with a concurrent index — no lock, no backfill).
-2. `BackfillFeedChannelIds.perform_async` from the console. Until it finishes, a YouTube feed whose `channel_id` is still nil renders its old proxied avatar and receives no `custom_icon` update from a harvest — a pause, not a break.
+2. `BackfillFeedChannelIds.perform_async` from the console. Until it finishes, a YouTube feed whose `channel_id` is still nil renders its old proxied avatar and receives no `custom_icon` update from a harvest — a pause, not a break. Promptness also bounds a churn cost: `Feed#set_channel_id`'s `before_save` means every YouTube feed the backfill does not reach first will instead dirty `channel_id` on its own next crawl, and that UPDATE moves `updated_at` — a sidebar and entry-list cache invalidation per feed. Running the backfill immediately keeps that wave small; leaving it at leisure lets ordinary crawl traffic generate it feed by feed instead.
 3. Harvests start storing avatars on their own from the next video in any subscribed channel. There is no sweep and no new scheduler, so coverage fills in over roughly a crawl cycle rather than all at once.
 
 `R2_IMAGE_HOST` is the read cutover switch and is **shared with entry previews and podcast artwork** — if either has been cut over it is already set, so there is no accumulate-then-flip step for this tenant. Reads flip **per row, the instant that row is written**, and the fallback is per-feed rather than all-or-nothing.
