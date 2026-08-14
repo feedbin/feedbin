@@ -242,10 +242,12 @@ module FaviconCrawler
     end
 
     # The legacy path consumes all_favicon_urls and its ordering is load-
-    # bearing: the first candidate that yields a usable image wins. This pins
-    # the whole list -- sorted by rel position in ICON_NAMES, then by declared
-    # size descending, with /favicon.ico last -- so the refactor that adds
-    # touch_icon_urls cannot quietly reorder it.
+    # bearing: the first candidate that yields a usable image wins. This
+    # fixture uses four distinct rel values, so it only pins the rel-position
+    # ordering (from ICON_NAMES) and the /favicon.ico fallback -- it has no
+    # same-rel pair, so it does not exercise the size-descending or
+    # dark-mode-last tie-breaking rules. Those are covered by the pre-existing
+    # "should prefer larger favicon" test above.
     test "all_favicon_urls keeps its ordering and its default fallback" do
       body = <<~HTML
         <html><head>
@@ -312,14 +314,21 @@ module FaviconCrawler
       assert_requested request, times: 1
     end
 
+    # The failed fetch must be memoized too, not just the successful one: this
+    # is the scenario the `defined?` guard (rather than `||=`) exists for. A
+    # regression back to `||=` would still pass -- `icon_links` returns a
+    # truthy `[]` on failure -- so the fetch count is the only thing that
+    # actually catches it, along with the more reachable regression of the
+    # rescue landing outside the memoized region.
     test "both lists degrade to the default when the homepage cannot be fetched" do
-      stub_request(:get, @page_url).to_timeout
+      request = stub_request(:get, @page_url).to_timeout
 
       finder = Finder.new
       finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
 
       assert_equal ["http://example.com/favicon.ico"], finder.send(:all_favicon_urls).map(&:to_s)
       assert_empty finder.send(:touch_icon_urls)
+      assert_requested request, times: 1
     end
   end
 end
