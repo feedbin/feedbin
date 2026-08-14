@@ -10,7 +10,8 @@ Rails.application.reloader.to_prepare do
 
       shared_settings = {
         index: {
-          number_of_shards: Rails.env.test? ? "1" : "6",
+          number_of_shards: Rails.env.local? ? "1" : "6",
+          number_of_replicas: ENV.fetch("ELASTICSEARCH_REPLICAS", "0")
         },
         analysis: {
           analyzer: {
