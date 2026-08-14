@@ -19,6 +19,7 @@ class Image < ApplicationRecord
     entry_preview:      2,     # main preview image
     feed_icon:          3,     # feed-level icon (mastodon, podcast, youtube, twitter)
     remote_file:        4,     # adhoc images
+    embed_icon:         5,     # embed-provider icon keyed by that provider's own id (YouTube channel avatars)
   }, prefix: true
 
   normalizes :url, with: -> url { url.strip }

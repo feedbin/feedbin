@@ -240,5 +240,59 @@ module ImageCrawler
       assert_equal "200x200", touch.variant
       refute_equal podcast.storage_path, touch.storage_path
     end
+
+    # Content-addressed and R2-only. Unlike podcast artwork there is no legacy
+    # object to dual-write: the fallback read path is a third-party ggpht url
+    # rendered through the signing proxy, which costs us no storage.
+    test "channel_avatar is content-addressed, R2-only, and keyed by the bytes" do
+      fingerprint = Digest::MD5.hexdigest("avatar bytes")
+      image = Image.new_with_attributes(
+        id: "UCabc-channel", preset_name: "channel_avatar", image_urls: [],
+        provider: ::Image.providers[:embed_icon], provider_id: "UCabc",
+        original_url: "https://yt3.ggpht.com/avatar.jpg", original_fingerprint: fingerprint
+      )
+
+      assert image.content_addressed?
+      refute image.legacy_store?, "there is no legacy object for this tenant"
+      assert_equal "200x200", image.variant
+      assert_equal "png", image.preset.format
+      assert_equal :limit_png, image.preset.crop
+      assert_equal ::Image.content_storage_path_for(fingerprint, "200x200", "png"), image.storage_path
+    end
+
+    # Not a collision: the two presets render the same recipe at the same size
+    # in the same format, so identical source bytes are meant to share one
+    # stored object. cropper_test pins the recipes byte-for-byte.
+    test "channel_avatar and touch_icon share an object for identical bytes" do
+      fingerprint = Digest::MD5.hexdigest("avatar bytes")
+      build = ->(preset, provider) {
+        Image.new_with_attributes(
+          id: "a", preset_name: preset, image_urls: [],
+          provider: ::Image.providers[provider], provider_id: "UCabc",
+          original_url: "https://yt3.ggpht.com/avatar.jpg", original_fingerprint: fingerprint
+        )
+      }
+
+      assert_equal build.call("touch_icon", :feed_icon).storage_path,
+        build.call("channel_avatar", :embed_icon).storage_path
+    end
+
+    # Same size, different format. podcast is jpg and the extension is the
+    # only thing keeping the two object keys apart.
+    test "channel_avatar does not collide with podcast at the same variant" do
+      fingerprint = Digest::MD5.hexdigest("avatar bytes")
+      avatar = Image.new_with_attributes(
+        id: "a", preset_name: "channel_avatar", image_urls: [],
+        provider: ::Image.providers[:embed_icon], provider_id: "UCabc",
+        original_url: "https://example.com/a.jpg", original_fingerprint: fingerprint
+      )
+      podcast = Image.new_with_attributes(
+        id: "b", preset_name: "podcast", image_urls: [],
+        provider: ::Image.providers[:entry_icon], provider_id: 1,
+        original_url: "https://example.com/a.jpg", original_fingerprint: fingerprint
+      )
+
+      refute_equal avatar.storage_path, podcast.storage_path
+    end
   end
 end
