@@ -139,6 +139,38 @@ module ImageCrawler
       refute download.not_modified?
     end
 
+    # The :net_http backend raises Down::NotModified for a 304, not
+    # Down::ResponseError -- a sibling under Down::Error, not a subtype (see
+    # download.rb's comment on download_file). This app configures :http
+    # (config/initializers/down.rb), which webmock can only make raise
+    # Down::ResponseError, so Down::NotModified is stubbed directly to prove
+    # the rescue branch itself still behaves correctly if the backend ever
+    # changes, rather than relying on today's backend choice to make it
+    # unreachable.
+    def test_should_treat_a_down_not_modified_error_as_not_modified_too
+      url = "http://example.com/favicon.ico"
+      download = Download.new(url, minimum_size: nil, etag: "\"abc123\"")
+
+      Down.stub(:download, ->(*) { raise Down::NotModified, "not modified" }) do
+        download.download_file(url)
+      end
+
+      assert download.not_modified?
+    end
+
+    # Same gate as the ResponseError branch: an unsolicited Down::NotModified
+    # (no validator was actually sent) must still raise, not be swallowed.
+    def test_should_still_raise_a_down_not_modified_error_when_not_conditional
+      url = "http://example.com/favicon.ico"
+      download = Download.new(url, minimum_size: nil)
+
+      Down.stub(:download, ->(*) { raise Down::NotModified, "not modified" }) do
+        assert_raises Down::NotModified do
+          download.download_file(url)
+        end
+      end
+    end
+
     def test_should_expose_the_response_validators
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(

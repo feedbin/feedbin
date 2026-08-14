@@ -93,6 +93,12 @@ module ImageCrawler
       # short-circuit on the original bytes. Hashing the original rather than
       # the processed output is what lets this skip *processing*, which for a
       # 32x32 render is the expensive part.
+      #
+      # Reached by every content_addressed? preset, not only the favicon
+      # family -- five today: favicon, touch_icon, podcast, podcast_feed, and
+      # channel_avatar. Conditional requests and the 304/unchanged? handling
+      # below therefore apply to three already-shipped tenants as well, not
+      # just the two this phase adds.
       def attempt_icon(original_url)
         row = existing_row
 
@@ -183,9 +189,13 @@ module ImageCrawler
       # refresh row.url to the winning candidate, but Image's
       # before_save :fingerprint_url derives url_fingerprint from url and
       # update_column skips callbacks, so that would silently desync the two.
-      # Skipping the write is the correct minimal fix -- the cost is only a
-      # missed optimization (we never learn this candidate's validators), not
-      # a correctness bug.
+      # Skipping the write is the correct minimal fix -- and the cost is
+      # permanent, not a one-time miss: as long as this candidate keeps
+      # serving the same bytes as the row, unchanged? keeps short-circuiting
+      # before create_image ever runs, row.url is never re-pointed, and every
+      # future crawl of this host downloads this candidate in full rather
+      # than getting a 304. Rare, and still the correct safe choice -- just
+      # not transient.
       #
       # update_column, not update: updated_at is a view cache key (Phase B) and
       # must move only when the stored bytes move. That makes images.updated_at

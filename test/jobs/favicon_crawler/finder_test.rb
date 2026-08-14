@@ -395,5 +395,52 @@ module FaviconCrawler
       assert_nil Favicon.unscoped.find_by(host: @page_url.host)&.url,
         "the legacy path genuinely found nothing, which is the point of this test"
     end
+
+    # schedule_pipeline sits mid-`update`, between the candidate loop and the
+    # legacy Processor#call/@favicon.save -- unlike every other
+    # Pipeline::Find.perform_async call site in the codebase, which is always
+    # the last statement of a dedicated scheduler method. An unrescued
+    # exception here (a Redis hiccup enqueuing the job, say) would take out
+    # the entire legacy write for a dual-write phase whose whole point is
+    # that the legacy path keeps behaving exactly as before.
+    test "still writes the legacy favicon row when scheduling the pipeline raises" do
+      body = <<~HTML
+        <html><head>
+          <link rel="icon" href="/icon-32.png">
+        </head></html>
+      HTML
+      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+      stub_request_file("favicon.ico", "http://example.com/icon-32.png")
+
+      ImageCrawler::Pipeline::Find.stub(:perform_async, ->(*) { raise "redis hiccup" }) do
+        assert_nothing_raised do
+          Finder.new.perform(@page_url.host)
+        end
+      end
+
+      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+    end
+
+    # A host advertising <link rel="icon" href="/favicon.ico"> makes
+    # all_favicon_urls yield that URL twice -- once discovered, once as the
+    # unconditional default fallback all_favicon_urls itself appends (which
+    # schedule_icon must not change the meaning of, since the legacy path
+    # depends on that return value). schedule_icon dedupes on the string form
+    # before building the pipeline payload, so the preset is fetched once
+    # instead of twice.
+    test "schedule_icon dedupes candidates that resolve to the same url" do
+      body = %(<html><head><link rel="icon" href="/favicon.ico"></head></html>)
+      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+      stub_request_file("favicon.ico", @default_url)
+
+      Finder.new.perform(@page_url.host)
+
+      favicon_job = ImageCrawler::Pipeline::Find.jobs.last["args"].first
+      assert_equal ["http://example.com/favicon.ico"], favicon_job["image_urls"]
+    end
   end
 end

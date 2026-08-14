@@ -76,12 +76,32 @@ module FaviconCrawler
     # pipeline downloads again. Accepted and temporary -- favicon crawls are
     # event-triggered (subscribe, import, save-page, feed-fixer), not a sweep,
     # and it ends when the legacy crawler is retired.
+    # Rescued, unlike every other Pipeline::Find.perform_async call site in
+    # this codebase (channel_image.rb, itunes_image.rb, itunes_feed_image.rb,
+    # entry_image.rb, twitter_link_image.rb): each of those is the final
+    # statement of a dedicated scheduler method, so a raise there skips
+    # nothing. This one sits mid-`update`, between the candidate loop and
+    # `return unless new_favicon.present?` -- an unrescued exception here
+    # (a Redis hiccup enqueuing the pipeline job, say) would abort `update`
+    # before the legacy Processor#call, its S3 write, and @favicon.save ever
+    # run. During dual-write nothing reads the new rows yet, so the legacy
+    # write outranks the new one: swallowing here is correct, not sloppy.
+    # Do not "tighten" this into a raise without re-reading that ordering.
     def schedule_pipeline
       schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls)
       schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls)
+    rescue => exception
+      Sidekiq.logger.info "schedule_pipeline exception=#{exception.inspect} host=#{@favicon.host}"
     end
 
     def schedule_icon(preset_name, provider, urls)
+      # .uniq(&:to_s), not .uniq: all_favicon_urls mixes Addressable::URI
+      # (from icon_links) with a plain URI::HTTP (default_favicon_location) --
+      # equal by string, distinct classes, so a bare .uniq would not catch the
+      # exact duplicate this exists to remove (a host advertising
+      # <link rel="icon" href="/favicon.ico">, which then equals the default
+      # fallback URL).
+      urls = urls.uniq(&:to_s)
       return if urls.empty?
 
       image = ImageCrawler::Image.new_with_attributes(
