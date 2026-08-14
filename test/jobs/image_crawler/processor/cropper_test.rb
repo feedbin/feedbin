@@ -200,6 +200,87 @@ module ImageCrawler
 
         assert_not cropper.valid?(false)
       end
+
+      def test_should_scale_down_to_png_without_selecting_a_layer
+        file = copy_support_file("image.png")
+        cropper = Processor::Cropper.new(file, crop: :limit_png, extension: "png", width: 200, height: 200)
+        image = cropper.crop!
+
+        assert_equal(200, image.width)
+        assert_equal(117, image.height)
+        assert_equal("png", image.extension)
+        assert_equal(:png, ImageFormat.detect(image.file))
+        FileUtils.rm image.file
+      end
+
+      # limit, not fit: upscaling fabricates no detail, it only makes a bigger
+      # file that is equally soft. A channel that has never uploaded anything
+      # larger than the 88x88 default thumbnail stays 88x88.
+      def test_should_not_upscale_a_small_source
+        file = write_solid_png(88, 88, [200, 100, 50])
+        cropper = Processor::Cropper.new(file, crop: :limit_png, extension: "png", width: 200, height: 200)
+        image = cropper.crop!
+
+        assert_equal(88, image.width)
+        assert_equal(88, image.height)
+        FileUtils.rm image.file
+      ensure
+        FileUtils.rm_f file
+      end
+
+      # icon_crop rejects a mostly-white source outright: IconLayer reads that
+      # as an .ico layer that is padding around the real icon, and valid?
+      # turns a nil layer into "skip this candidate entirely". For a channel
+      # avatar -- a dark logo on a white background is the commonest logo
+      # there is -- that would mean never storing one at all.
+      def test_should_accept_a_white_source_that_icon_crop_rejects
+        file = write_solid_png(300, 300, [255, 255, 255])
+
+        refute Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 200, height: 200).valid?(false)
+
+        cropper = Processor::Cropper.new(file, crop: :limit_png, extension: "png", width: 200, height: 200)
+        assert cropper.valid?(false)
+
+        image = cropper.crop!
+        assert_equal(200, image.width)
+        FileUtils.rm image.file
+      ensure
+        FileUtils.rm_f file
+      end
+
+      # channel_avatar and touch_icon are both 200x200 png, so identical source
+      # bytes content-address to one shared object. That is deliberate -- one
+      # file for a creator whose apple-touch-icon and channel avatar are the
+      # same export -- but it is only correct while the two recipes agree on
+      # single-layer sources, which is every source either preset sees in
+      # practice. If this ever fails, the two presets need distinct storage
+      # keys before Phase E ships touch_icon.
+      def test_icon_crop_and_limit_png_agree_on_a_single_layer_source
+        icon_file  = copy_support_file("image.png")
+        limit_file = copy_support_file("image.png")
+
+        icon  = Processor::Cropper.new(icon_file, crop: :icon_crop, extension: "png", width: 200, height: 200).crop!
+        limit = Processor::Cropper.new(limit_file, crop: :limit_png, extension: "png", width: 200, height: 200).crop!
+
+        assert_equal icon.fingerprint, limit.fingerprint
+        FileUtils.rm icon.file
+        FileUtils.rm limit.file
+      end
+
+      # Deliberately not private: minitest collects public instance methods,
+      # and a `private` section here would silently swallow any test appended
+      # after it. Only methods named test_* are run, so a public helper is
+      # safe.
+      def write_solid_png(width, height, rgb)
+        path = File.join(Dir.tmpdir, "#{SecureRandom.hex}.png")
+        Vips::Image.black(width, height)
+          .linear(1, rgb.first)
+          .cast(:uchar)
+          .bandjoin(rgb.drop(1))
+          .copy(interpretation: :srgb)
+          .write_to_file(path)
+        path
+      end
     end
   end
 end

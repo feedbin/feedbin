@@ -33,6 +33,7 @@ module ImageCrawler
 
       def crop!
         return limit_crop if @crop == :limit_crop
+        return limit_png  if @crop == :limit_png
         return icon_crop  if @crop == :icon_crop
         Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
       end
@@ -110,6 +111,30 @@ module ImageCrawler
       def icon_crop
         image = ImageProcessing::Vips
           .source(best_layer)
+          .resize_to_limit(@width, @height)
+
+        Processed.from_pipeline(save_as(image, "png", PNG_SAVER))
+      end
+
+      # icon_crop without the layer selection: scale the whole source down to
+      # fit the box, never up, always PNG.
+      #
+      # The "always PNG" half is what icon_crop gives us and limit_crop does
+      # not -- limit_crop picks png or jpg from the source's alpha channel and
+      # may return the original file untouched, so its output format is not a
+      # property of the preset. A content-addressed preset needs one, because
+      # storage_path's extension and the R2 Content-Type both come from
+      # preset.format.
+      #
+      # The "no layer selection" half is for sources that are one image rather
+      # than a container of candidates. A YouTube channel avatar is whatever
+      # the creator uploaded; IconLayer's heuristics would reject a perfectly
+      # good one for being mostly white, which for an .ico means "padding
+      # around the real icon" and for an avatar means "a dark logo on a white
+      # background".
+      def limit_png
+        image = ImageProcessing::Vips
+          .source(source)
           .resize_to_limit(@width, @height)
 
         Processed.from_pipeline(save_as(image, "png", PNG_SAVER))
