@@ -240,5 +240,86 @@ module FaviconCrawler
 
       assert_nil Favicon.unscoped.where(host: @page_url.host).take
     end
+
+    # The legacy path consumes all_favicon_urls and its ordering is load-
+    # bearing: the first candidate that yields a usable image wins. This pins
+    # the whole list -- sorted by rel position in ICON_NAMES, then by declared
+    # size descending, with /favicon.ico last -- so the refactor that adds
+    # touch_icon_urls cannot quietly reorder it.
+    test "all_favicon_urls keeps its ordering and its default fallback" do
+      body = <<~HTML
+        <html><head>
+          <link rel="apple-touch-icon" href="/touch-180.png" sizes="180x180">
+          <link rel="icon" href="/icon-32.png" sizes="32x32">
+          <link rel="shortcut icon" href="/shortcut.ico">
+          <link rel="apple-touch-icon-precomposed" href="/touch-old.png">
+        </head></html>
+      HTML
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+
+      finder = Finder.new
+      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+
+      assert_equal [
+        "http://example.com/shortcut.ico",
+        "http://example.com/icon-32.png",
+        "http://example.com/touch-180.png",
+        "http://example.com/touch-old.png",
+        "http://example.com/favicon.ico"
+      ], finder.send(:all_favicon_urls).map(&:to_s)
+    end
+
+    test "touch_icon_urls is the apple subset in the same order, with no default fallback" do
+      body = <<~HTML
+        <html><head>
+          <link rel="apple-touch-icon" href="/touch-180.png" sizes="180x180">
+          <link rel="icon" href="/icon-32.png" sizes="32x32">
+          <link rel="apple-touch-icon-precomposed" href="/touch-old.png">
+        </head></html>
+      HTML
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+
+      finder = Finder.new
+      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+
+      assert_equal [
+        "http://example.com/touch-180.png",
+        "http://example.com/touch-old.png"
+      ], finder.send(:touch_icon_urls).map(&:to_s)
+    end
+
+    test "touch_icon_urls is empty when the host advertises no touch icon" do
+      body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
+
+      finder = Finder.new
+      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+
+      assert_empty finder.send(:touch_icon_urls)
+    end
+
+    # One page fetch, two lists. Deriving them separately would double the
+    # homepage traffic for every crawl.
+    test "the homepage is fetched once even when both lists are read" do
+      body = %(<html><head><link rel="apple-touch-icon" href="/touch.png"></head></html>)
+      request = stub_request(:get, @page_url).to_return(body: body, status: 200)
+
+      finder = Finder.new
+      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+      finder.send(:all_favicon_urls)
+      finder.send(:touch_icon_urls)
+
+      assert_requested request, times: 1
+    end
+
+    test "both lists degrade to the default when the homepage cannot be fetched" do
+      stub_request(:get, @page_url).to_timeout
+
+      finder = Finder.new
+      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+
+      assert_equal ["http://example.com/favicon.ico"], finder.send(:all_favicon_urls).map(&:to_s)
+      assert_empty finder.send(:touch_icon_urls)
+    end
   end
 end
