@@ -105,6 +105,18 @@ class EntryDeleterTest < ActiveSupport::TestCase
     assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/link-new.jpg"
   end
 
+  # One collector job per feed-sized batch, not one per prune: a single job
+  # over a backfill-sized id list is what exhausts the server-wide lock table.
+  test "should slice image cleanup into batches" do
+    flush_redis
+    entry_ids = (1..2_500).to_a
+
+    EntryDeleter.new.delete_entries(@feed.id, entry_ids)
+
+    assert_equal 3, ImageGarbageCollector.jobs.size
+    assert_equal entry_ids, ImageGarbageCollector.jobs.flat_map { _1["args"].first }.sort
+  end
+
   private
 
   def removed_count

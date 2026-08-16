@@ -42,7 +42,7 @@ The failure is fail-safe — `delete_all` is inside the same transaction, so not
 
 - Prepend `source ~/.bash_profile` to every shell command (ruby version manager).
 - Full test suite: `bundle exec rake`. Single file: `bin/rails test <path>`. A single test: `bin/rails test <path> -n <name>`.
-- **Establish the test baseline before starting** and record it here. It could not be captured while writing this plan: the Postgres container's IP changed and macOS then denied the `ruby` binary Local Network access, so Rails cannot reach the database. `psql` and `nc` can. Fix that first (System Settings → Privacy & Security → Local Network, or publish 5432 on the container) — no task below can be verified without it.
+- **Test baseline**, captured before Task 3 with `bundle exec rake`: `1681 runs, 4097 assertions, 0 failures, 0 errors, 3 skips`. (The database problem described when this plan was written had resolved itself by then.)
 - **NEVER interpolate values into SQL strings** — hash conditions, bound parameters, or `sanitize_sql_array` only.
 - **`Image.provider` additions are append-only. NEVER renumber.** Nothing here adds one.
 - **The touch rule still governs.** An `images` row's `updated_at` may change only when the stored bytes change.
