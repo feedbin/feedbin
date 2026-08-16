@@ -143,3 +143,133 @@ class SidebarQueryCountTest < ActionController::TestCase
     end
   end
 end
+
+# Its own class for the same reason SidebarQueryCountTest is: ActionController::TestCase
+# binds one controller per class via `tests`.
+#
+# ?mode=extended is the documented way clients ask for images, and the endpoint
+# serves up to 100 entries. _entry_extended.json.jbuilder reaches
+# preview_image_record twice per entry -- through processed_image? and through
+# preview_image_data -- so a dropped preload is 100 queries a request.
+class ApiEntriesQueryCountTest < ApiControllerTestCase
+  tests Api::V2::EntriesController
+
+  setup do
+    @user = users(:new)
+    @feed = create_feeds(@user).first
+  end
+
+  def matching(statements, pattern)
+    statements.select { _1.match?(pattern) }
+  end
+
+  def seed_preview_images(entries)
+    entries.each do |entry|
+      url = "http://example.com/#{entry.id}.jpg"
+      Image.create!(
+        provider: :entry_preview, provider_id: entry.id.to_s, feed_id: @feed.id,
+        url: url, variant: "542x304",
+        image_fingerprint: SecureRandom.hex(16),
+        storage_path: Image.storage_path_for(url, "542x304"),
+        width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
+        data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/#{entry.id}.jpg"}
+      )
+    end
+  end
+
+  test "the extended entries feed does not query images once per entry" do
+    login_as @user
+    seed_preview_images(bulk_create_entries(@feed, 1))
+
+    with_one = capture_sql { get :index, params: {mode: "extended"}, format: :json }
+    seed_preview_images(bulk_create_entries(@feed, 4))
+    with_five = capture_sql { get :index, params: {mode: "extended"}, format: :json }
+
+    assert_response :success
+    pattern = /FROM "images"/i
+    assert_operator matching(with_five, pattern).count, :>, 0
+    assert_equal matching(with_one, pattern).count, matching(with_five, pattern).count,
+      "the extended entries payload's images lookup scales with the entry count"
+  end
+end
+
+# Dialog::ActionResults renders entries/_entry per result, and that partial
+# reaches processed_image? on every entry and link_image on the tweet ones.
+class ActionResultsQueryCountTest < ActiveSupport::TestCase
+  setup do
+    clear_search
+    flush_redis
+    @user = users(:ben)
+    @feed = @user.feeds.first
+  end
+
+  def matching(statements, pattern)
+    statements.select { _1.match?(pattern) }
+  end
+
+  def seed_image(entry, provider)
+    url = "http://example.com/#{provider}-#{entry.id}.jpg"
+    Image.create!(
+      provider: provider, provider_id: entry.id.to_s, feed_id: @feed.id,
+      url: url, variant: "542x304",
+      image_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for(url, "542x304"),
+      width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
+      data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/#{provider}-#{entry.id}.jpg"}
+    )
+  end
+
+  # A micropost with a link preview, which is the only shape of entry whose
+  # render reaches link_image. _entry only takes that branch when the entry is
+  # a tweet or micropost whose link_preview? is true, and link_preview? still
+  # gates on the legacy twitter_link_image_processed -- link_image then prefers
+  # the row over it.
+  def create_link_preview_entry
+    entry = create_entry(@feed)
+    entry.update!(
+      title: nil,
+      data: entry.data.merge(
+        "author" => {"name" => "Example", "_microblog" => {"username" => "example"}},
+        "urls" => ["https://example.com/p"],
+        "saved_pages" => {"https://example.com/p" => {"result" => {"title" => "Example page"}}},
+        "twitter_link_image_processed" => "https://bucket.s3.amazonaws.com/abc/link-legacy.jpg"
+      )
+    )
+    entry
+  end
+
+  # One plain entry with a preview image and one micropost with a link image,
+  # so both associations are on the page. Indexed and refreshed because
+  # Action#results is an Elasticsearch query.
+  def index_pair
+    plain = create_entry(@feed)
+    seed_image(plain, :entry_preview)
+
+    linked = create_link_preview_entry
+    seed_image(linked, :entry_link_preview)
+    assert linked.micropost&.link_preview?, "the render must reach link_image for this test to mean anything"
+
+    [plain, linked].each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
+    Search.client { _1.refresh }
+  end
+
+  def render_results
+    action = @user.actions.create!(feed_ids: [@feed.id], actions: ["mark_read"])
+    # ActionsController, not ApplicationController: the dialog renders
+    # actions/_text_description, which only resolves under that prefix.
+    ActionsController.render(Dialog::ActionResults.new(action: action), layout: nil)
+  end
+
+  test "the action results dialog does not query images once per entry" do
+    index_pair
+    with_two = capture_sql { render_results }
+
+    2.times { index_pair }
+    with_six = capture_sql { render_results }
+
+    pattern = /FROM "images"/i
+    assert_operator matching(with_six, pattern).count, :>, 0
+    assert_equal matching(with_two, pattern).count, matching(with_six, pattern).count,
+      "the action results dialog's images lookup scales with the result count"
+  end
+end

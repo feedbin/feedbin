@@ -252,15 +252,19 @@ end
 
 ## Task 2 — Fix the two lost preloads and cover them
 
-- [ ] **`app/controllers/api/v2/entries_controller.rb`** — add `.preload(:preview_image_record)` to both branches of `index`. `_entry_extended.json.jbuilder` reaches `preview_image_record` twice — through `entry.processed_image?` and through `entry.preview_image_data` — and nothing else in that template touches an images row, so this is the complete fix. `?mode=extended` is the documented option clients use to get images and the endpoint serves up to 100 entries, so this is 100 queries a request where `main` had none.
+- [x] **`app/controllers/api/v2/api_controller.rb`** — add `.preload(:preview_image_record)` to `@entries` in `entries_response`, gated on `params[:mode] == "extended"`.
 
-  Note while you are here, but do **not** fix in this commit: the non-`ids` branch has no `includes(:feed)` at all. That predates this branch.
+  **Corrected during implementation.** The plan said to add the preload to both branches of `Api::V2::EntriesController#index`. That is dead code: `entries_response` only ever plucks ids off `@page_query` and then rebuilds the rendered collection as `Entry.in_order_of(:id, ids).includes(:feed)`, discarding every preload the controller attached. Verified by test — the preload on `index` left the count at 4-vs-8, and moving it to `@entries` flattened it.
+
+  `_entry_extended.json.jbuilder` reaches `preview_image_record` twice — through `entry.processed_image?` and through `entry.preview_image_data` — and nothing else in that response touches an images row, hence the mode gate. `?mode=extended` is the documented option clients use to get images and the endpoint serves up to 100 entries, so this is 100 queries a request where `main` had none. Fixing it here also covers every other endpoint that routes through `entries_response`.
+
+  The plan's aside about the non-`ids` branch lacking `includes(:feed)` is moot for the same reason: `@page_query` never loads records, and `@entries` carries `includes(:feed)` either way.
 
 - [ ] **`app/models/action.rb`** — add `.preload(:preview_image_record, :link_image_record)` to `results`. `Dialog::ActionResults` renders `entries/_entry` per result, and that partial calls both `entry.processed_image?` and `entry.link_image`.
 
 - [ ] **`test/views/query_count_test.rb`** — two new cases in the existing shape: capture SQL at two collection sizes and assert the `FROM "images"` count does not grow.
   - A new `ApiEntriesQueryCountTest` bound to `Api::V2::EntriesController`, hitting `index` with `mode=extended`. It must be its own class — `ActionController::TestCase` binds one controller per class, which is why `SidebarQueryCountTest` is already separate. Reuse the existing API auth helper.
-  - An action-results case rendering `Dialog::ActionResults` for an `Action` whose results contain entries with preview and link images.
+  - An action-results case rendering `Dialog::ActionResults` for an `Action` whose results contain entries with preview and link images. The link half needs a micropost, not a plain entry: `entries/_entry` only reaches `link_image` on the `tweet?`/`micropost?` branch, and `link_preview?` still gates on the legacy `twitter_link_image_processed`. Both halves were confirmed load-bearing by removing each preload and watching the count grow.
 
 - [ ] `bin/rails test test/views/query_count_test.rb test/controllers`, then commit.
 

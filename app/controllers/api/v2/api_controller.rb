@@ -37,6 +37,16 @@ module Api
         ids = @page_query.pluck(:id)
         @entries = Entry.in_order_of(:id, ids).includes(:feed)
 
+        # Here rather than on @page_query, which is only ever plucked and
+        # counted -- the collection the templates render is this one.
+        # _entry_extended reaches preview_image_record twice per entry, through
+        # processed_image? and through preview_image_data, and it is the only
+        # template in this response that touches an images row. The endpoint
+        # serves up to 100 entries, so without this it is 100 queries a request.
+        if params[:mode] == "extended"
+          @entries = @entries.preload(:preview_image_record)
+        end
+
         entry_count(@page_query)
 
         if @page_query.out_of_bounds?
