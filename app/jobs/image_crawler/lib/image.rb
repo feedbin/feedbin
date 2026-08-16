@@ -197,59 +197,37 @@ module ImageCrawler
     end
 
     def create_image
-      record = ::Image.with_storage_lock(storage_path) do
-        ::Image.attach!(
-          provider: provider,
-          provider_id: provider_id,
-          feed_id: feed_id,
-          url: original_url,
-          variant: variant,
-          image_fingerprint: fingerprint,
-          original_fingerprint: original_fingerprint,
-          storage_path: storage_path,
-          width: width,
-          height: height,
-          bytesize: bytesize,
-          placeholder_color: placeholder_color,
-          data: {
-            "legacy_storage_url" => storage_url,
-            "preset"             => preset_name,
-            "final_url"          => final_url,
-            "etag"               => etag,
-            "last_modified"      => last_modified
-          }.compact
-        )
-      end
+      record = ::Image.attach!(
+        provider: provider,
+        provider_id: provider_id,
+        feed_id: feed_id,
+        url: original_url,
+        variant: variant,
+        image_fingerprint: fingerprint,
+        original_fingerprint: original_fingerprint,
+        storage_path: storage_path,
+        width: width,
+        height: height,
+        bytesize: bytesize,
+        placeholder_color: placeholder_color,
+        data: {
+          "legacy_storage_url" => storage_url,
+          "preset"             => preset_name,
+          "final_url"          => final_url,
+          "etag"               => etag,
+          "last_modified"      => last_modified
+        }.compact
+      )
 
       # The row moved to a different object, so the old one may now be
-      # unreferenced. Swept in its own job because it is a different lock key
-      # than the one held above, and taking both here would invert the sorted
-      # acquisition order that keeps GC batches from deadlocking.
+      # unreferenced. Deferred like every other object deletion: a concurrent
+      # crawl attaching to the old path has long since written its row by the
+      # time the sweep looks.
       if record.saved_change_to_storage_path? && (replaced = record.storage_path_before_last_save)
-        ImageReplacementCollector.perform_async([replaced])
+        SweepStoredImages.perform_in(ImageGarbageCollector::SWEEP_DELAY, [replaced])
       end
 
       record
-    end
-
-    # create_image's counterpart, for when a re-upload after a confirmed-
-    # vanished object also fails: the row create_image just wrote now
-    # references a storage_path with nothing behind it, which is worse than
-    # no row at all. Left in place, that row would pin the path forever: for
-    # a content-addressed preset, unchanged? would match every later crawl
-    # on original_fingerprint and skip it on the strength of the row alone;
-    # for the other unified presets, Dedupe#attach would keep attaching new
-    # rows to it, since it only checks that a row exists for the url, not
-    # that its object does. (Content-addressed presets never reach
-    # Dedupe#attach -- see Pipeline::Find#perform.) Re-takes the lock
-    # create_image used (already released by the time we get here) and
-    # re-checks storage_path first, so a concurrent crawl that already
-    # replaced this row with a real object is left alone.
-    def drop_image
-      ::Image.with_storage_lock(storage_path) do
-        record = ::Image.find_by(provider: provider, provider_id: provider_id.to_s)
-        record.destroy if record && record.storage_path == storage_path
-      end
     end
 
     def unified?

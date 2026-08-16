@@ -184,19 +184,21 @@ module ImageCrawler
         }
 
         first = build.call(Digest::MD5.hexdigest("old bytes"))
-        assert_no_difference -> { ImageReplacementCollector.jobs.size } do
+        assert_no_difference -> { SweepStoredImages.jobs.size } do
           first.create_image
         end
 
-        assert_no_difference -> { ImageReplacementCollector.jobs.size } do
+        assert_no_difference -> { SweepStoredImages.jobs.size } do
           build.call(Digest::MD5.hexdigest("old bytes")).create_image
         end
 
-        assert_difference -> { ImageReplacementCollector.jobs.size }, +1 do
+        assert_difference -> { SweepStoredImages.jobs.size }, +1 do
           build.call(Digest::MD5.hexdigest("new bytes")).create_image
         end
 
-        assert_equal [[first.storage_path]], ImageReplacementCollector.jobs.last["args"]
+        assert_equal [[first.storage_path]], SweepStoredImages.jobs.last["args"]
+        assert_in_delta (Time.now + ImageGarbageCollector::SWEEP_DELAY).to_f,
+          SweepStoredImages.jobs.last["at"], 5
       end
     end
 

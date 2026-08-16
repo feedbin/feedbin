@@ -45,7 +45,14 @@ class ImageTest < ActiveSupport::TestCase
     assert record.url_fingerprint.present?
   end
 
-  test "attach! recovers when it loses the insert race inside a transaction" do
+  # The second pass finds the row the racing writer inserted and updates it in
+  # place, rather than inserting a duplicate or raising. The violation is
+  # simulated rather than provoked: no attach! call site runs inside an outer
+  # transaction any more, so in production save!'s own transaction rolls the
+  # failed insert back and the retry sees a clean connection -- but a test
+  # cannot reproduce that, because transactional fixtures put one around every
+  # test and a real duplicate insert would poison it.
+  test "attach! recovers when it loses the insert race" do
     attributes = {
       provider: Image.providers[:entry_preview],
       provider_id: 321,
@@ -59,47 +66,65 @@ class ImageTest < ActiveSupport::TestCase
       bytesize: 10_000,
       placeholder_color: "aabbcc"
     }
+    # The row the racing writer inserted, which the first find_by misses.
     Image.attach!(attributes)
 
-    original = Image.method(:find_by)
-    calls = 0
+    original_find_by = Image.method(:find_by)
+    lookups = 0
     misser = ->(*args, **kwargs) do
-      calls += 1
-      calls == 1 ? nil : original.call(*args, **kwargs)
+      lookups += 1
+      (lookups == 1) ? nil : original_find_by.call(*args, **kwargs)
     end
+
+    # Stands in for the insert that loses the race. Returned for every new,
+    # not just the first, so a second pass that tried to insert again would
+    # exhaust the retry and fail this test rather than pass it quietly.
+    saboteur = Image.new
+    def saboteur.save!(**) = raise(ActiveRecord::RecordNotUnique, "duplicate key")
 
     record = nil
     Image.stub(:find_by, misser) do
-      Image.transaction do
+      Image.stub(:new, saboteur) do
         record = Image.attach!(attributes.merge(bytesize: 20_000))
       end
     end
 
+    assert_equal 2, lookups, "the retry re-runs the lookup"
     assert_equal 20_000, record.bytesize
     assert_equal 1, Image.where(provider: attributes[:provider], provider_id: "321").count
   end
 
-  test "with_storage_lock yields inside a transaction" do
-    yielded = false
-    Image.with_storage_lock("9e1/9e107d9d372bb6826bd81d3542a419d6.webp") do
-      yielded = true
-      assert Image.connection.transaction_open?
-    end
-    assert yielded
-  end
+  # One retry, not an open loop: a violation that survives the second pass is
+  # something the retry cannot fix, and spinning on it would hang the job.
+  test "attach! raises rather than looping when the unique violation persists" do
+    attributes = {
+      provider: Image.providers[:entry_preview],
+      provider_id: 654,
+      feed_id: 1,
+      url: "http://example.com/persistent.jpg",
+      variant: "542x304",
+      image_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for("http://example.com/persistent.jpg", "542x304"),
+      width: 542,
+      height: 304,
+      bytesize: 10_000,
+      placeholder_color: "aabbcc"
+    }
 
-  test "with_storage_locks takes many locks in one acquisition" do
-    yielded = false
-    paths = [
-      "9e1/9e107d9d372bb6826bd81d3542a419d6.webp",
-      "abc/abcdef00000000000000000000000000.png",
-      "abc/abcdef00000000000000000000000000.png"
-    ]
-    Image.with_storage_locks(paths) do
-      yielded = true
-      assert Image.connection.transaction_open?
+    saves = 0
+    saboteur = Image.new
+    saboteur.define_singleton_method(:save!) do |**|
+      saves += 1
+      raise ActiveRecord::RecordNotUnique, "duplicate key"
     end
-    assert yielded
+
+    Image.stub(:find_by, ->(*) { nil }) do
+      Image.stub(:new, saboteur) do
+        assert_raises(ActiveRecord::RecordNotUnique) { Image.attach!(attributes) }
+      end
+    end
+
+    assert_equal 2, saves, "one retry, then raise"
   end
 
   test "storage_path_for defaults to webp and accepts an extension" do

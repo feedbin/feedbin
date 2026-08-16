@@ -46,10 +46,9 @@ class Image < ApplicationRecord
   # Identity is (url, variant), where variant is the output geometry
   # ("542x304"). One URL rendered at two sizes is two stored objects — the
   # fingerprint drives dedup lookups, and folding the variant in here keeps
-  # storage_path variant-safe by extension: GC grouping and the advisory
-  # locks key on storage_path, and both storage_path_for (via this
-  # fingerprint) and content_storage_path_for (directly) fold the variant
-  # into it.
+  # storage_path variant-safe by extension: the sweep's survivor check keys
+  # on storage_path, and both storage_path_for (via this fingerprint) and
+  # content_storage_path_for (directly) fold the variant into it.
   def self.url_fingerprint_for(url, variant)
     Digest::MD5.hexdigest("#{variant}|#{url.to_s.strip}")
   end
@@ -94,43 +93,23 @@ class Image < ApplicationRecord
     [host.chomp("/"), storage_path].join("/")
   end
 
-  # Upsert keyed by (provider, provider_id). Not create_or_find_by: every
-  # call site runs inside Image.with_storage_lock's transaction, so a unique
-  # violation would otherwise poison that outer transaction. The
-  # requires_new: true save wraps it in a savepoint, scoping the violation
-  # so the rescue/retry below can actually recover instead of raising
-  # PG::InFailedSqlTransaction.
+  # Upsert keyed by (provider, provider_id). Not create_or_find_by: the
+  # find-then-save shape is what lets an existing row be updated in place
+  # rather than rescued. One retry, not an open loop -- the second pass finds
+  # the row the racing writer inserted and updates it.
   def self.attach!(attributes)
     attributes = attributes.symbolize_keys
     attributes[:provider_id] = attributes[:provider_id].to_s
-    record = find_by(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)) ||
-      new(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id))
-    record.assign_attributes(attributes)
-    transaction(requires_new: true) do
+    tries = 0
+    begin
+      record = find_by(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)) ||
+        new(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id))
+      record.assign_attributes(attributes)
       record.save!
-    end
-    record
-  rescue ActiveRecord::RecordNotUnique
-    retry
-  end
-
-  # Serializes attach vs. garbage collection for one stored object. The object
-  # is the shared resource -- one path can be referenced by rows from several
-  # providers and several URLs -- so the path is the lock key.
-  def self.with_storage_lock(storage_path, &block)
-    with_storage_locks([storage_path], &block)
-  end
-
-  # Takes every lock in one sorted acquisition so concurrent multi-lock
-  # holders (garbage collection batches) cannot deadlock each other.
-  # `execute`, not `select_all`: pg_advisory_xact_lock returns void, a type
-  # ActiveRecord's result decoder warns about (unknown OID 2278); the raw
-  # result is discarded either way.
-  def self.with_storage_locks(storage_paths)
-    keys = storage_paths.map(&:to_s).uniq.sort
-    transaction do
-      connection.execute(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtextextended(key, 0)) FROM unnest(ARRAY[?]) AS key", keys]))
-      yield
+      record
+    rescue ActiveRecord::RecordNotUnique
+      raise if (tries += 1) > 1
+      retry
     end
   end
 

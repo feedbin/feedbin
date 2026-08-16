@@ -59,17 +59,5 @@ module ImageCrawler
         assert_equal row.data["legacy_storage_url"], payload["processed_url"]
       end
     end
-
-    test "falls back to download when GC removed the rows mid-flight" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
-        seed_row
-
-        dedupe = Dedupe.new(@original_url, @image)
-        ::Image.delete_all
-
-        refute dedupe.attach
-        assert_equal 0, EntryImage.jobs.size
-      end
-    end
   end
 end
