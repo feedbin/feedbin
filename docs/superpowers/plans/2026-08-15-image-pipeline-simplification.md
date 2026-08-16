@@ -4,7 +4,7 @@
 
 **Goal:** Remove the advisory-lock refcount protocol that guards stored-object deletion, replacing it with a deferred best-effort sweep; fix two lost preloads that turned into N+1s; and bound the collector's batch size.
 
-**Architecture:** The `images` table stays the source of truth for images, and rows keep being deleted when their entry is. What changes is *object* deletion: instead of being exact and immediate — which requires serialising every attach against every collect — it becomes approximate and deferred by an hour, which requires nothing. An hour is ~60× the worst-case crawl window, so an in-flight crawl can no longer lose its object, and the entire protocol built to prevent that goes away.
+**Architecture:** The `images` table stays the source of truth for images, and rows keep being deleted when their entry is. What changes is *object* deletion: instead of being exact and immediate — which requires serialising every attach against every collect — it becomes approximate and deferred by fifteen minutes, which requires nothing. That is ~20× the worst-case crawl window, so an in-flight crawl can no longer lose its object, and the entire protocol built to prevent that goes away. (An earlier draft said an hour; decision 1 below settles it at fifteen minutes, and that is what shipped.)
 
 **Tech Stack:** Rails 8.1, Sidekiq, Fog::Storage (R2 is S3-compatible), Postgres, minitest + webmock.
 
@@ -82,7 +82,7 @@ Deferring both halves closes it with the mechanism already being introduced, and
 
 Lands first: it is one line, and until Task 1 lands it caps advisory locks per transaction at roughly 800 instead of unbounded.
 
-- [ ] **`app/jobs/entry_deleter.rb`** — in `delete_entries`, replace the single enqueue with a sliced one:
+- [x] **`app/jobs/entry_deleter.rb`** — in `delete_entries`, replace the single enqueue with a sliced one:
 
 ```ruby
 entry_ids.each_slice(1_000) { ImageGarbageCollector.perform_async(_1) }
@@ -90,9 +90,9 @@ entry_ids.each_slice(1_000) { ImageGarbageCollector.perform_async(_1) }
 
   Keep it after the transaction, for the reason the existing comment gives: if the deletes roll back, the usage rows must survive too.
 
-- [ ] **`test/jobs/entry_deleter_test.rb`** — deleting 2,500 entries enqueues 3 `ImageGarbageCollector` jobs, and the union of their args is the full id set.
+- [x] **`test/jobs/entry_deleter_test.rb`** — deleting 2,500 entries enqueues 3 `ImageGarbageCollector` jobs, and the union of their args is the full id set.
 
-- [ ] `bin/rails test test/jobs/entry_deleter_test.rb`, then commit.
+- [x] `bin/rails test test/jobs/entry_deleter_test.rb`, then commit.
 
 ---
 
@@ -100,7 +100,7 @@ entry_ids.each_slice(1_000) { ImageGarbageCollector.perform_async(_1) }
 
 ### 1a. New job
 
-- [ ] **Create `app/jobs/sweep_stored_images.rb`.** This is `ImageGarbageCollector#sweep` minus the lock and the transaction, plus the legacy-S3 half (decision 5), promoted to its own job so both callers — entry deletion and row replacement — share it. One query answers both survivor questions.
+- [x] **Create `app/jobs/sweep_stored_images.rb`.** This is `ImageGarbageCollector#sweep` minus the lock and the transaction, plus the legacy-S3 half (decision 5), promoted to its own job so both callers — entry deletion and row replacement — share it. One query answers both survivor questions.
 
 ```ruby
 # Deletes stored objects that no images row references any more, both the R2
@@ -142,15 +142,15 @@ class SweepStoredImages
 end
 ```
 
-- [ ] **Delete `app/jobs/image_replacement_collector.rb`.** No shim. Any job already enqueued under that class name when the deploy lands will fail with `NameError` and be lost — that is one un-swept object per lost job, which is inside the tolerance for orphaned objects and not worth carrying a file for.
+- [x] **Delete `app/jobs/image_replacement_collector.rb`.** No shim. Any job already enqueued under that class name when the deploy lands will fail with `NameError` and be lost — that is one un-swept object per lost job, which is inside the tolerance for orphaned objects and not worth carrying a file for.
 
   `ImageCrawler::Image#create_image` is its only caller; it passes no legacy url, so the replacement path keeps the known gap the deleted file documented (a show's `itunes_image` moving to a genuinely different URL orphans a legacy S3 object). Not made worse, not fixed here.
 
 ### 1b. Remove the locks
 
-- [ ] **`app/models/image.rb`** — delete `with_storage_lock` and `with_storage_locks` and their comments.
+- [x] **`app/models/image.rb`** — delete `with_storage_lock` and `with_storage_locks` and their comments.
 
-- [ ] **`app/models/image.rb`** — `attach!` loses the `transaction(requires_new: true)` wrapper, which existed only to savepoint a unique violation against the lock's outer transaction, and gains a retry bound. The current `retry` is unbounded:
+- [x] **`app/models/image.rb`** — `attach!` loses the `transaction(requires_new: true)` wrapper, which existed only to savepoint a unique violation against the lock's outer transaction, and gains a retry bound. The current `retry` is unbounded:
 
 ```ruby
   # Upsert keyed by (provider, provider_id). Not create_or_find_by: the
@@ -174,17 +174,17 @@ end
   end
 ```
 
-- [ ] **`app/jobs/image_crawler/lib/image.rb`** — `create_image` drops the `::Image.with_storage_lock(storage_path) do ... end` wrapper (keep the `attach!` call and the `saved_change_to_storage_path?` branch); the replacement enqueue becomes `SweepStoredImages.perform_in(ImageGarbageCollector::SWEEP_DELAY, [replaced])`; the comment about lock keys and sorted acquisition order goes with it.
+- [x] **`app/jobs/image_crawler/lib/image.rb`** — `create_image` drops the `::Image.with_storage_lock(storage_path) do ... end` wrapper (keep the `attach!` call and the `saved_change_to_storage_path?` branch); the replacement enqueue becomes `SweepStoredImages.perform_in(ImageGarbageCollector::SWEEP_DELAY, [replaced])`; the comment about lock keys and sorted acquisition order goes with it.
 
-- [ ] **`app/jobs/image_crawler/lib/image.rb`** — delete `drop_image` and its comment. Nothing calls it once `resurrect` is gone.
+- [x] **`app/jobs/image_crawler/lib/image.rb`** — delete `drop_image` and its comment. Nothing calls it once `resurrect` is gone.
 
-- [ ] **`app/jobs/image_crawler/pipeline/upload.rb`** — delete `ensure_stored` and `resurrect` and their comments, and the `r2_stored = ensure_stored if r2_stored` line with the paragraph above it. `perform` keeps the existing `upload_r2` → `create_image` → `rescue` → degrade-to-legacy block unchanged.
+- [x] **`app/jobs/image_crawler/pipeline/upload.rb`** — delete `ensure_stored` and `resurrect` and their comments, and the `r2_stored = ensure_stored if r2_stored` line with the paragraph above it. `perform` keeps the existing `upload_r2` → `create_image` → `rescue` → degrade-to-legacy block unchanged.
 
-- [ ] **`app/jobs/image_crawler/lib/dedupe.rb`** — `attach` loses the `::Image.with_storage_lock` wrapper and the `if ::Image.where(storage_path: record.storage_path).exists?` guard, so the `attach!` call is unconditional and the `return false if attached.nil?` goes. Replace the guard's comment with decision 3 above.
+- [x] **`app/jobs/image_crawler/lib/dedupe.rb`** — `attach` loses the `::Image.with_storage_lock` wrapper and the `if ::Image.where(storage_path: record.storage_path).exists?` guard, so the `attach!` call is unconditional and the `return false if attached.nil?` goes. Replace the guard's comment with decision 3 above.
 
 ### 1c. Rewrite the collector
 
-- [ ] **`app/jobs/image_garbage_collector.rb`** — no transaction, no locks, no knowledge of stored objects at all. It deletes rows and hands both object lists to the sweep. `sweep`, `orphaned_paths` and `delete_r2_objects` move to `SweepStoredImages`.
+- [x] **`app/jobs/image_garbage_collector.rb`** — no transaction, no locks, no knowledge of stored objects at all. It deletes rows and hands both object lists to the sweep. `sweep`, `orphaned_paths` and `delete_r2_objects` move to `SweepStoredImages`.
 
 ```ruby
 # Removes images-table usage rows for deleted entries and hands the objects
@@ -221,32 +221,32 @@ end
 
 **Delete** — these cover machinery that no longer exists:
 
-- [ ] `test/models/image_test.rb` — "with_storage_lock yields inside a transaction", "with_storage_locks takes many locks in one acquisition"
-- [ ] `test/jobs/image_crawler/pipeline/upload_test.rb` — `test_should_re_upload_when_the_object_vanished_before_the_row_existed`, `test_should_not_re_upload_when_the_object_is_still_there`, `test_should_keep_the_row_when_confirmation_fails_without_a_404`, `test_should_drop_the_row_and_fall_back_to_legacy_when_the_re_upload_also_fails`
-- [ ] `test/jobs/image_crawler/dedupe_test.rb` — "falls back to download when GC removed the rows mid-flight". The interleaving it constructs cannot happen any more. The nil-record path stays covered by "returns false when nothing is stored for the url" directly above it.
+- [x] `test/models/image_test.rb` — "with_storage_lock yields inside a transaction", "with_storage_locks takes many locks in one acquisition"
+- [x] `test/jobs/image_crawler/pipeline/upload_test.rb` — `test_should_re_upload_when_the_object_vanished_before_the_row_existed`, `test_should_not_re_upload_when_the_object_is_still_there`, `test_should_keep_the_row_when_confirmation_fails_without_a_404`, `test_should_drop_the_row_and_fall_back_to_legacy_when_the_re_upload_also_fails`
+- [x] `test/jobs/image_crawler/dedupe_test.rb` — "falls back to download when GC removed the rows mid-flight". The interleaving it constructs cannot happen any more. The nil-record path stays covered by "returns false when nothing is stored for the url" directly above it.
 
 **Move** — `test/jobs/image_replacement_collector_test.rb` becomes `test/jobs/sweep_stored_images_test.rb`, retargeted at the new class. Its three cases ("deletes an object nothing references any more", "keeps an object another row still references", "does nothing with no paths") transfer unchanged.
 
 **Rewrite** — `test/jobs/image_garbage_collector_test.rb`. The collector no longer deletes objects or computes legacy urls, so every assertion about either belongs to the sweep now. What is left here is thin by design:
 
-- [ ] Row-count assertions stay.
-- [ ] `stub_batch_delete`/`assert_requested` and the `ImageDeleter.jobs` assertions are replaced by one assertion per case that `SweepStoredImages` was scheduled with the right paths and the right legacy urls.
-- [ ] The four cases that exist to pin object-level and legacy-level refcounting — "keeps the objects while other entries reference them", "deletes orphaned objects in one batched call", "deletes the shared legacy object only with the last reference", "keeps an object shared by two different urls until the last row goes" — move wholesale into `sweep_stored_images_test.rb`, seeding rows and calling the sweep directly rather than going through the collector.
-- [ ] "deletes an episode's own legacy object when a surviving show row shares its storage_path" moves too. It is the sharpest test of the subtraction rule and it now lives where the subtraction does.
-- [ ] "entry_images excludes icon rows while entry_owned includes them" stays — it is about scopes, not collection.
+- [x] Row-count assertions stay.
+- [x] `stub_batch_delete`/`assert_requested` and the `ImageDeleter.jobs` assertions are replaced by one assertion per case that `SweepStoredImages` was scheduled with the right paths and the right legacy urls.
+- [x] The four cases that exist to pin object-level and legacy-level refcounting — "keeps the objects while other entries reference them", "deletes orphaned objects in one batched call", "deletes the shared legacy object only with the last reference", "keeps an object shared by two different urls until the last row goes" — move wholesale into `sweep_stored_images_test.rb`, seeding rows and calling the sweep directly rather than going through the collector.
+- [x] "deletes an episode's own legacy object when a surviving show row shares its storage_path" moves too. It is the sharpest test of the subtraction rule and it now lives where the subtraction does.
+- [x] "entry_images excludes icon rows while entry_owned includes them" stays — it is about scopes, not collection.
 
 **Add:**
 
-- [ ] `test/jobs/sweep_stored_images_test.rb` — "leaves a path that was re-referenced after the rows were deleted". This is the behaviour the whole deferral rests on and nothing covers it today: delete the rows, create a new row on the same `storage_path`, run the sweep, assert no R2 delete was issued.
-- [ ] `test/jobs/sweep_stored_images_test.rb` — the legacy counterpart, which is the race decision 5 exists to close: delete the rows, create a new row carrying the same `legacy_storage_url`, run the sweep with that url in the payload, assert `ImageDeleter` was **not** enqueued.
-- [ ] `test/models/image_test.rb` — `attach!` raises rather than looping when the unique violation persists across the retry.
-- [ ] `test/jobs/image_crawler/image_test.rb` — the four `ImageReplacementCollector.jobs` assertions retarget to `SweepStoredImages`, and the last one asserts the delay as well as the args.
+- [x] `test/jobs/sweep_stored_images_test.rb` — "leaves a path that was re-referenced after the rows were deleted". This is the behaviour the whole deferral rests on and nothing covers it today: delete the rows, create a new row on the same `storage_path`, run the sweep, assert no R2 delete was issued.
+- [x] `test/jobs/sweep_stored_images_test.rb` — the legacy counterpart, which is the race decision 5 exists to close: delete the rows, create a new row carrying the same `legacy_storage_url`, run the sweep with that url in the payload, assert `ImageDeleter` was **not** enqueued.
+- [x] `test/models/image_test.rb` — `attach!` raises rather than looping when the unique violation persists across the retry.
+- [x] `test/jobs/image_crawler/image_test.rb` — the four `ImageReplacementCollector.jobs` assertions retarget to `SweepStoredImages`, and the last one asserts the delay as well as the args.
 
 **Invariant:**
 
-- [ ] `grep -rn pg_advisory app/` returns nothing.
+- [x] `grep -rn pg_advisory app/` returns nothing.
 
-- [ ] `bin/rails test test/jobs test/models/image_test.rb`, then commit.
+- [x] `bin/rails test test/jobs test/models/image_test.rb`, then commit.
 
 ---
 
@@ -260,25 +260,33 @@ end
 
   The plan's aside about the non-`ids` branch lacking `includes(:feed)` is moot for the same reason: `@page_query` never loads records, and `@entries` carries `includes(:feed)` either way.
 
-- [ ] **`app/models/action.rb`** — add `.preload(:preview_image_record, :link_image_record)` to `results`. `Dialog::ActionResults` renders `entries/_entry` per result, and that partial calls both `entry.processed_image?` and `entry.link_image`.
+- [x] **`app/models/action.rb`** — add `.preload(:preview_image_record, :link_image_record)` to `results`. `Dialog::ActionResults` renders `entries/_entry` per result, and that partial calls both `entry.processed_image?` and `entry.link_image`.
 
-- [ ] **`test/views/query_count_test.rb`** — two new cases in the existing shape: capture SQL at two collection sizes and assert the `FROM "images"` count does not grow.
+- [x] **`test/views/query_count_test.rb`** — two new cases in the existing shape: capture SQL at two collection sizes and assert the `FROM "images"` count does not grow.
   - A new `ApiEntriesQueryCountTest` bound to `Api::V2::EntriesController`, hitting `index` with `mode=extended`. It must be its own class — `ActionController::TestCase` binds one controller per class, which is why `SidebarQueryCountTest` is already separate. Reuse the existing API auth helper.
   - An action-results case rendering `Dialog::ActionResults` for an `Action` whose results contain entries with preview and link images. The link half needs a micropost, not a plain entry: `entries/_entry` only reaches `link_image` on the `tweet?`/`micropost?` branch, and `link_preview?` still gates on the legacy `twitter_link_image_processed`. Both halves were confirmed load-bearing by removing each preload and watching the count grow.
 
-- [ ] `bin/rails test test/views/query_count_test.rb test/controllers`, then commit.
+- [x] `bin/rails test test/views/query_count_test.rb test/controllers`, then commit.
 
 ---
 
 ## Verification
 
-- [ ] Full suite green: `bundle exec rake`, compared against the baseline recorded at the top.
-- [ ] `grep -rn "with_storage_lock\|ensure_stored\|resurrect\|drop_image\|pg_advisory" app/` returns nothing.
-- [ ] Re-run the lock probe against a seeded database to confirm the failure is gone: four concurrent collector runs over 3,000-path batches, which previously failed two of four with `out of shared memory`.
+- [x] Full suite green: `bundle exec rake` — `1683 runs, 4100 assertions, 0 failures, 0 errors, 3 skips`, against a baseline of `1681 runs, 4097 assertions, 0 failures, 0 errors, 3 skips`.
+- [x] `grep -rn "with_storage_lock\|ensure_stored\|resurrect\|drop_image\|pg_advisory" app/` returns nothing.
+- [ ] **Not run: the lock probe.** It was to confirm four concurrent collector runs over 3,000-path batches no longer fail with `out of shared memory`. There is nothing left to probe — the collector takes no locks at all now, and the grep above proves `pg_advisory` has left the codebase. Re-running it would need the 7.9M-row seeded database rebuilt to measure the absence of a statement that no longer exists.
 
 ## What this removes
 
 Roughly 150 lines of code and 250 lines of comment, most of the latter explaining races that stop existing: `with_storage_lock`/`with_storage_locks`, `ensure_stored`, `resurrect`, `drop_image`, `attach!`'s savepoint, `Dedupe`'s post-lock re-check, `app/jobs/image_replacement_collector.rb` entirely, and the seven tests that exist only to pin their behaviour. `ImageGarbageCollector` drops to four statements and stops referring to stored objects at all.
+
+## Corrections made during implementation
+
+Two places where the plan as written did not work:
+
+1. **`attach!`'s savepoint had an eighth test depending on it**, which the plan's delete list missed: `test/models/image_test.rb`'s "attach! recovers when it loses the insert race inside a transaction". Removing the savepoint makes a real duplicate insert poison the surrounding transaction, and transactional fixtures put one around every test — so the recovery path can no longer be provoked with a real violation. Production is unaffected: both remaining `attach!` call sites (`create_image`, `Dedupe#attach`) now run outside any transaction, so `save!`'s own transaction rolls the failed insert back and the retry sees a clean connection. The test was rewritten to simulate the losing insert rather than provoke it, and renamed accordingly.
+
+2. **Task 2's API preload was in the wrong place** — see the corrected step in that task.
 
 ## Deployment notes
 
