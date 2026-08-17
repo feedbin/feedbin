@@ -6,20 +6,29 @@ module ImageCrawler
       PIGO_INSTALLED = File.executable?(PIGO)
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
-      JPG_SAVER  = {strip: true, quality: 80, background: 255}.freeze
-
-      # smart_subsample computes the chroma planes in linear light, which is
-      # what stops saturated edges — white text on red, mostly — from bleeding.
-      # It costs ~4% more bytes and buys enough quality to pay for the Q cut:
-      # measured over 89 real entry images, this pair is 7.4% smaller than the
-      # old quality: 65 and still better on median, p10 and worst case, with the
-      # images scoring under ssimulacra2 60 down from 8 to 2. effort: 6 is pure
-      # size savings at fixed Q. See tmp/images/README.md.
-      WEBP_SAVER = {strip: true, quality: 58, effort: 6, smart_subsample: true, smart_deblock: true}.freeze
+      # The mozjpeg options, which need a mozjpeg-linked libjpeg -- verify that
+      # before trusting the numbers, because vips accepts and ignores them
+      # otherwise, with no error and no saving. Measured over 40 real entry
+      # crops: these five alone are 16.5% smaller than a plain quality: 80, and
+      # quant_table 3 takes it to 20.4%; the Q cut to 76 makes it 29.2%. Worst
+      # case holds at a plain q80's (ssimulacra2 48.0 against 47.9) while the
+      # median gives up 5.7, so the saving comes off the images with headroom
+      # rather than the ones already struggling. See tmp/images/README.md.
+      #
+      # Not webp, though webp is both smaller and better at every setting
+      # measured: whatever is stored is the master, since the original download
+      # is discarded, and a lossy webp master makes every future format a
+      # lossy-to-lossy transcode. jpg is the more universally transcodable
+      # master, and the one API clients are known to handle.
+      JPG_SAVER = {
+        strip: true, quality: 76, background: 255,
+        optimize_coding: true, interlace: true, trellis_quant: true,
+        overshoot_deringing: true, optimize_scans: true, quant_table: 3
+      }.freeze
 
       # Icons are flat graphics with alpha; there is nothing to trade quality
       # against, so the only knob is dropping metadata.
-      PNG_SAVER  = {strip: true}.freeze
+      PNG_SAVER = {strip: true}.freeze
 
       attr_reader :path
 
@@ -31,27 +40,15 @@ module ImageCrawler
         @height    = height
       end
 
-      # Crops that pick their own output format and return a finished
-      # Processed. Everything else is a geometry pass whose encoding the
-      # caller chooses: crop! as the legacy jpg, crop_pair! as jpg + webp.
+      # Crops that own their output format and return a finished Processed:
+      # limit_crop picks png or jpg from the source's alpha and may keep the
+      # original file untouched, and the png crops are always png. Everything
+      # else is a geometry pass this encodes as jpg.
       SELF_ENCODING_CROPS = %i[limit_crop limit_png icon_crop]
 
       def crop!
         return send(@crop) if SELF_ENCODING_CROPS.include?(@crop)
         Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
-      end
-
-      # One geometry pass, two encodings. Only the fill/smart crops support
-      # this; limit_crop (the legacy remote-file icon preset) may keep the
-      # original file if resizing wouldn't shrink it. icon_crop (the
-      # favicon/touch_icon family) always re-encodes to PNG. Both pick their
-      # own format and never dual-write.
-      def crop_pair!
-        cropped = geometry
-        {
-          jpg:  Processed.from_pipeline(save_as(cropped, "jpg", JPG_SAVER)),
-          webp: Processed.from_pipeline(save_as(cropped, "webp", WEBP_SAVER))
-        }
       end
 
       def source

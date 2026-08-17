@@ -1,8 +1,8 @@
 module ImageCrawler
   # Attaches an entry to an already-stored unified image so the same
   # original_url is never downloaded or processed twice. Attaching is purely
-  # a database operation: the new row shares both stored objects — the R2
-  # webp and the legacy S3 jpg — with the rows that already reference them.
+  # a database operation: the new row shares both stored objects — the R2 one
+  # and the legacy S3 one — with the rows that already reference them.
   # SweepStoredImages refcounts both by storage_path, so shared objects live
   # as long as their last row.
   class Dedupe

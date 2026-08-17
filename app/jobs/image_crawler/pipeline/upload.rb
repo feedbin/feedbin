@@ -31,10 +31,6 @@ module ImageCrawler
         Sidekiq.logger.info "Upload: id=#{@image.id} original_url=#{@image.original_url} storage_url=#{@image.storage_url} width=#{@image.width} height=#{@image.height}"
       ensure
         File.unlink(@image.processed_path)
-        begin
-          File.unlink(@image.webp_path) if @image.webp_path
-        rescue Errno::ENOENT
-        end
       end
 
       def upload
@@ -58,8 +54,9 @@ module ImageCrawler
         end
       end
 
+      # Both stores get the same bytes: one encoding per image now.
       def upload_r2
-        File.open(@image.r2_source_path) do |file|
+        File.open(@image.processed_path) do |file|
           ::Image.r2_client.put_object(@image.r2_bucket, @image.storage_path, file, @image.r2_storage_options)
         end
       end

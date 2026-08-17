@@ -15,7 +15,7 @@ class ImageTest < ActiveSupport::TestCase
 
   test "storage_path_for is sharded by fingerprint prefix" do
     fingerprint = Image.url_fingerprint_for("http://example.com/a.jpg", "542x304")
-    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.webp"),
+    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.jpg"),
       Image.storage_path_for("http://example.com/a.jpg", "542x304")
   end
 
@@ -127,9 +127,9 @@ class ImageTest < ActiveSupport::TestCase
     assert_equal 2, saves, "one retry, then raise"
   end
 
-  test "storage_path_for defaults to webp and accepts an extension" do
+  test "storage_path_for defaults to jpg and accepts an extension" do
     fingerprint = Image.url_fingerprint_for("http://example.com/a.jpg", "32x32")
-    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.webp"),
+    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.jpg"),
       Image.storage_path_for("http://example.com/a.jpg", "32x32")
     assert_equal File.join(fingerprint[0..2], "#{fingerprint}.png"),
       Image.storage_path_for("http://example.com/a.jpg", "32x32", "png")

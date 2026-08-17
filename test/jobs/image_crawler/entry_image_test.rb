@@ -112,7 +112,7 @@ module ImageCrawler
         "height" => 304,
         "bytesize" => 12_345,
         "placeholder_color" => "aabbcc",
-        "storage_path" => "abc/abcdef.webp",
+        "storage_path" => "abc/abcdef.jpg",
         "provider" => "entry_preview"
       }
 

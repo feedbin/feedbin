@@ -167,14 +167,14 @@ class EntryTest < ActiveSupport::TestCase
     entry.update(image: {
       "original_url" => "http://example.com/image.jpg",
       "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg",
-      "storage_path" => "abc/abcdef123.webp",
+      "storage_path" => "abc/abcdef123.jpg",
       "width" => 542,
       "height" => 304,
       "placeholder_color" => "aabbcc"
     })
 
     with_env("R2_IMAGE_HOST" => "https://images.example.com") do
-      assert_equal "https://images.example.com/abc/abcdef123.webp", entry.processed_image
+      assert_equal "https://images.example.com/abc/abcdef123.jpg", entry.processed_image
       assert entry.processed_image?
     end
 
@@ -188,18 +188,18 @@ class EntryTest < ActiveSupport::TestCase
     entry.update(image: {
       "original_url" => "http://example.com/image.jpg",
       "processed_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg",
-      "storage_path" => "abc/abcdef123.webp",
+      "storage_path" => "abc/abcdef123.jpg",
       "width" => 542,
       "height" => 304,
       "placeholder_color" => "aabbcc"
     })
 
     with_env("R2_IMAGE_HOST" => "media.feedbin.org") do
-      assert_equal "https://media.feedbin.org/abc/abcdef123.webp", entry.processed_image
+      assert_equal "https://media.feedbin.org/abc/abcdef123.jpg", entry.processed_image
     end
 
     with_env("R2_IMAGE_HOST" => "http://minio.local:9000/images") do
-      assert_equal "http://minio.local:9000/images/abc/abcdef123.webp", entry.processed_image
+      assert_equal "http://minio.local:9000/images/abc/abcdef123.jpg", entry.processed_image
     end
   end
 

@@ -114,38 +114,51 @@ module ImageCrawler
         FileUtils.rm file
       end
 
-      def test_should_crop_pair_in_both_formats
+      # The mozjpeg options are the whole reason the entry presets can leave
+      # webp: they are what claws back most of the bytes webp was saving. vips
+      # accepts and ignores them on a libjpeg without mozjpeg, so assert they
+      # actually took effect rather than that they were merely passed.
+      def test_should_apply_the_mozjpeg_savings
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 542, height: 304)
-        pair = cropper.crop_pair!
+        tuned = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 542, height: 304).crop!
 
-        assert_equal(542, pair[:jpg].width)
-        assert_equal(304, pair[:jpg].height)
-        assert pair[:jpg].file.end_with?(".jpg")
-        assert_equal(:jpeg, ImageFormat.detect(pair[:jpg].file))
+        plain = ImageProcessing::Vips
+          .source(Vips::Image.new_from_file(copy_support_file("image.jpeg")))
+          .resize_to_fill(542, 304)
+          .convert("jpg")
+          .saver(strip: true, quality: 80, background: 255)
+          .call
 
-        assert_equal(542, pair[:webp].width)
-        assert_equal(304, pair[:webp].height)
-        assert pair[:webp].file.end_with?(".webp")
-        assert_equal(:webp, ImageFormat.detect(pair[:webp].file))
-        assert pair[:webp].size.positive?
+        assert_operator tuned.size, :<, File.size(plain.path),
+          "tuned jpg is not smaller than a plain quality: 80 -- is this libvips linked against mozjpeg?"
 
-        FileUtils.rm pair[:jpg].file
-        FileUtils.rm pair[:webp].file
+        FileUtils.rm tuned.file
       end
 
-      def test_should_crop_pair_with_smart_crop
+      def test_should_crop_to_a_single_jpg
+        file = copy_support_file("image.jpeg")
+        cropper = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 542, height: 304)
+        cropped = cropper.crop!
+
+        assert_equal(542, cropped.width)
+        assert_equal(304, cropped.height)
+        assert cropped.file.end_with?(".jpg")
+        assert_equal(:jpeg, ImageFormat.detect(cropped.file))
+        assert cropped.size.positive?
+
+        FileUtils.rm cropped.file
+      end
+
+      def test_should_crop_to_a_single_jpg_with_smart_crop
         file = copy_support_file("image.jpeg")
         cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
-        pair = cropper.crop_pair!
+        cropped = cropper.crop!
 
-        assert_equal(:jpeg, ImageFormat.detect(pair[:jpg].file))
-        assert_equal(:webp, ImageFormat.detect(pair[:webp].file))
-        assert_equal(pair[:jpg].width, pair[:webp].width)
-        assert_equal(pair[:jpg].height, pair[:webp].height)
+        assert_equal(:jpeg, ImageFormat.detect(cropped.file))
+        assert_equal(542, cropped.width)
+        assert_equal(304, cropped.height)
 
-        FileUtils.rm pair[:jpg].file
-        FileUtils.rm pair[:webp].file
+        FileUtils.rm cropped.file
       end
 
       def test_should_render_an_icon_as_png_from_the_best_layer

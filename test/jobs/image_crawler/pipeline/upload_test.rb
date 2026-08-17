@@ -45,7 +45,6 @@ module ImageCrawler
         with_env("R2_BUCKET_IMAGES" => "images-test") do
           id = SecureRandom.hex
           download_path = copy_support_file("image.jpeg")
-          webp_path = copy_support_file("image.jpeg")
           original_url = "http://example.com/image.jpg"
 
           image = Image.new_with_attributes(
@@ -54,13 +53,13 @@ module ImageCrawler
             fingerprint: SecureRandom.hex(16),
             original_url: original_url, final_url: original_url,
             download_path: download_path, processed_path: download_path,
-            webp_path: webp_path, bytesize: File.size(webp_path),
+            bytesize: File.size(download_path),
             width: 542, height: 304, placeholder_color: "0867e2"
           )
 
           stub_request(:put, /s3\.amazonaws\.com/)
           r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
-            .with(headers: {"Content-Type" => "image/webp"})
+            .with(headers: {"Content-Type" => "image/jpeg"})
 
           assert_difference -> { ::Image.count }, +1 do
             assert_difference -> { EntryImage.jobs.size }, +1 do
@@ -87,7 +86,6 @@ module ImageCrawler
         with_env("R2_BUCKET_IMAGES" => "images-test") do
           id = SecureRandom.hex
           download_path = copy_support_file("image.jpeg")
-          webp_path = copy_support_file("image.jpeg")
           original_url = "http://example.com/image.jpg"
 
           image = Image.new_with_attributes(
@@ -96,7 +94,7 @@ module ImageCrawler
             fingerprint: SecureRandom.hex(16),
             original_url: original_url, final_url: original_url,
             download_path: download_path, processed_path: download_path,
-            webp_path: webp_path, bytesize: File.size(webp_path),
+            bytesize: File.size(download_path),
             width: 542, height: 304, placeholder_color: "0867e2"
           )
 

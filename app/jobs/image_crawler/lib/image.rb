@@ -26,7 +26,6 @@ module ImageCrawler
       provider
       provider_id
       fingerprint
-      webp_path
     ]
 
 
@@ -34,9 +33,8 @@ module ImageCrawler
 
     BUCKET = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
     CONTENT_TYPES = {
-      "webp" => "image/webp",
-      "png"  => "image/png",
-      "jpg"  => "image/jpeg"
+      "png" => "image/png",
+      "jpg" => "image/jpeg"
     }.freeze
     PRESETS = {
       primary: {
@@ -44,7 +42,7 @@ module ImageCrawler
         height: 304,
         minimum_size: 20_000,
         crop: :smart_crop,
-        format: "webp",
+        format: "jpg",
         validate: true,
         unified: true,
         job_class: EntryImage
@@ -54,7 +52,7 @@ module ImageCrawler
         height: 304,
         minimum_size: 10_000,
         crop: :smart_crop,
-        format: "webp",
+        format: "jpg",
         validate: true,
         unified: true,
         job_class: TwitterLinkImage
@@ -64,7 +62,7 @@ module ImageCrawler
         height: 304,
         minimum_size: nil,
         crop: :fill_crop,
-        format: "webp",
+        format: "jpg",
         validate: true,
         unified: true,
         job_class: EntryImage
@@ -237,13 +235,6 @@ module ImageCrawler
       preset.unified == true && ::Image.r2_enabled?
     end
 
-    # The entry presets' arrangement: one geometry pass, a legacy jpg and an
-    # R2 webp. Content-addressed presets and legacy presets crop to a single
-    # output instead.
-    def dual_format?
-      unified? && !content_addressed?
-    end
-
     def storage_path
       if content_addressed?
         raise ArgumentError, "content-addressed preset #{preset_name} has no original_fingerprint" if original_fingerprint.blank?
@@ -259,22 +250,22 @@ module ImageCrawler
       preset.content_addressed == true
     end
 
-    # legacy_store? only decides whether the legacy S3 object gets written --
-    # dual-storing also requires unified?. Entry presets (primary/twitter/
-    # youtube) say nothing here and are unified?, so they dual-store; podcast
-    # and podcast_feed say legacy_store: true explicitly and are also
-    # unified?, so they dual-store too. The plain icon preset says nothing
-    # here either, but isn't unified?, so it writes only the legacy object.
-    # favicon/touch_icon are the only presets that turn this off, writing
-    # only the R2 object.
-    def legacy_store?
-      preset.legacy_store != false
+    # The counterpart: identity comes from the url, which is what makes the
+    # reuse rules meaningful. They police a candidate url repeated across a
+    # feed and bytes repeated across a feed, neither of which means anything
+    # for an icon keyed by its own bytes and shared on purpose.
+    def url_addressed?
+      unified? && !content_addressed?
     end
 
-    # The R2 object is the webp for the dual-format entry presets and the
-    # single PNG for icons.
-    def r2_source_path
-      webp_path || processed_path
+    # Whether the legacy S3 object gets written alongside the R2 one. Both
+    # stores hold the same bytes now that every preset produces a single
+    # encoding, so this is only about which buckets the object lands in during
+    # the migration, not about format. Entry, podcast and podcast_feed presets
+    # write both; the plain icon preset isn't unified? so it writes only the
+    # legacy object; favicon/touch_icon turn this off and write only R2.
+    def legacy_store?
+      preset.legacy_store != false
     end
 
     # The stored-object identity pairs variant with either the url (entry

@@ -147,26 +147,23 @@ class Entry < ApplicationRecord
     feed.pages? ? url : feed.site_url
   end
 
+  # New images live on the images row; entries crawled before the R2 transition
+  # keep their JSON. Within either source the R2 object wins, falling back to
+  # the legacy one -- a row that has neither does not fall through to the JSON,
+  # because the row is the newer answer.
   def processed_image
-    r2_processed_image || legacy_processed_image
-  end
-
-  # New images live on the images row; entries crawled before the R2
-  # transition keep their JSON. Reads prefer the row, then fall back.
-  def r2_processed_image
-    if preview_image_record
-      Image.r2_url(preview_image_record.storage_path)
+    if record = preview_image_record
+      Image.r2_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
     elsif image
-      Image.r2_url(image["storage_path"])
+      Image.r2_url(image["storage_path"]) || legacy_json_image
     end
   end
 
-  def legacy_processed_image
-    if preview_image_record
-      legacy_image_url(preview_image_record.legacy_storage_url)
-    elsif image && image["original_url"] && image["width"] && image["height"] && image["processed_url"]
-      legacy_image_url(image["processed_url"])
-    end
+  # The full guard is what the JSON needs and the row does not: these keys were
+  # written independently, and a half-written image hash has to read as absent.
+  def legacy_json_image
+    return nil unless image["original_url"] && image["width"] && image["height"] && image["processed_url"]
+    legacy_image_url(image["processed_url"])
   end
 
   def preview_image_data

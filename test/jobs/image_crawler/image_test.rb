@@ -96,9 +96,9 @@ module ImageCrawler
         provider: ::Image.providers[:entry_preview], provider_id: 1,
         original_url: "http://example.com/a.jpg"
       )
-      assert_equal "webp", image.preset.format
-      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "webp"), image.storage_path
-      assert_equal "image/webp", image.r2_storage_options["Content-Type"]
+      assert_equal "jpg", image.preset.format
+      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "jpg"), image.storage_path
+      assert_equal "image/jpeg", image.r2_storage_options["Content-Type"]
     end
 
     # variant names the rendering recipe, not the result. A 180x180 touch icon
@@ -166,7 +166,7 @@ module ImageCrawler
 
       assert_not image.content_addressed?
       assert image.legacy_store?
-      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "webp"), image.storage_path
+      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "jpg"), image.storage_path
     end
 
     test "create_image sweeps the object it replaced, and only when it changed" do

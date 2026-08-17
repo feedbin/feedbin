@@ -70,9 +70,9 @@ class Image < ApplicationRecord
   end
 
   # The extension is the stored object's format, which is a property of the
-  # preset: webp for entry previews, png for the icon family (alpha, and the
-  # ICO best-layer logic depends on it).
-  def self.storage_path_for(url, variant, extension = "webp")
+  # preset: jpg for entry previews and podcast artwork, png for the icon family
+  # (alpha, and the ICO best-layer logic depends on it).
+  def self.storage_path_for(url, variant, extension = "jpg")
     path_for(url_fingerprint_for(url, variant), extension)
   end
 

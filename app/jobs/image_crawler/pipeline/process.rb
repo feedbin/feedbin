@@ -18,21 +18,11 @@ module ImageCrawler
         )
 
         if processor.valid?(@image.validate?)
-          if @image.dual_format?
-            pair = processor.crop_pair!
-            cropped = pair[:jpg]
-            webp = pair[:webp]
-
-            @image.webp_path   = webp.file
-            @image.bytesize    = webp.size
-            @image.fingerprint = webp.fingerprint
-          else
-            cropped = processor.crop!
-            @image.bytesize    = cropped.size
-            @image.fingerprint = cropped.fingerprint
-          end
+          cropped = processor.crop!
 
           @image.processed_path      = cropped.file
+          @image.bytesize            = cropped.size
+          @image.fingerprint         = cropped.fingerprint
           @image.width               = cropped.width
           @image.height              = cropped.height
           @image.placeholder_color   = cropped.placeholder_color
@@ -41,7 +31,7 @@ module ImageCrawler
           if reuse_rejected?
             Librato.increment("image.reuse_rejected")
             Sidekiq.logger.info "Process: rejecting reused fingerprint public_id=#{@image.id} original_url=#{@image.original_url}"
-            discard_processed_files
+            File.unlink(@image.processed_path) rescue Errno::ENOENT
             requeue_remaining
           else
             Upload.perform_async(@image.to_h)
@@ -69,14 +59,8 @@ module ImageCrawler
       end
 
       def reuse_rejected?
-        return false unless @image.dual_format?
+        return false unless @image.url_addressed?
         ReuseRules.new(@image).fingerprint_used_in_feed?(@image.fingerprint)
-      end
-
-      def discard_processed_files
-        [@image.processed_path, @image.webp_path].compact.each do |path|
-          File.unlink(path) rescue Errno::ENOENT
-        end
       end
     end
   end
