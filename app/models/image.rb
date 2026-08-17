@@ -84,7 +84,7 @@ class Image < ApplicationRecord
     path_for(Digest::MD5.hexdigest("#{variant}|#{original_fingerprint.to_s.delete("-")}"), extension)
   end
 
-  # A storage key, not a filesystem path: it is the R2 object name and the
+  # A storage key, not a filesystem path: it is the unified object name and the
   # path of the public URL. Sharded on the first three characters so no single
   # prefix holds every object.
   def self.path_for(fingerprint, extension)
@@ -102,15 +102,16 @@ class Image < ApplicationRecord
     one.to_s.delete("-").casecmp?(other.to_s.delete("-"))
   end
 
-  # The public URL for a stored object. Nil until R2_IMAGE_HOST is set, which
-  # is what keeps the read path on the legacy fallback during a transition.
+  # The public URL for a stored object. Nil until UNIFIED_IMAGE_HOST is set,
+  # which is what keeps the read path on the legacy fallback during a
+  # transition.
   #
   # heuristic_parse supplies the scheme when the host is bare, which is how
   # every environment sets it, and accepts one that already carries a scheme
   # or a path prefix.
-  def self.r2_url(storage_path)
+  def self.unified_url(storage_path)
     return nil if storage_path.blank?
-    host = ENV["R2_IMAGE_HOST"]
+    host = ENV["UNIFIED_IMAGE_HOST"]
     return nil if host.blank?
 
     # hints is positional -- as a keyword it lands in the hash as :hints and
@@ -125,19 +126,19 @@ class Image < ApplicationRecord
     base.join(storage_path).to_s
   end
 
-  # The R2 write side, owned here so the deploy switch has one definition:
+  # The unified write side, owned here so the deploy switch has one definition:
   # the pipeline writes and the sweep deletes iff the bucket is configured,
   # and they must flip together.
-  def self.r2_bucket
-    ENV["R2_BUCKET_IMAGES"]
+  def self.unified_bucket
+    ENV["UNIFIED_BUCKET_IMAGES"]
   end
 
-  def self.r2_enabled?
-    r2_bucket.present?
+  def self.unified_enabled?
+    unified_bucket.present?
   end
 
-  def self.r2_client
-    Fog::Storage.new(STORAGE_R2)
+  def self.unified_client
+    Fog::Storage.new(STORAGE_UNIFIED)
   end
 
   # Upsert keyed by (provider, provider_id). Not create_or_find_by: the

@@ -96,7 +96,7 @@ module ImageCrawler
       assert_equal stamp.to_f, youtube.reload.updated_at.to_f
     end
 
-    # storage_path is absent when the R2 write failed and Upload degraded to
+    # storage_path is absent when the unified write failed and Upload degraded to
     # legacy -- and this preset has no legacy object. Nothing was stored, so
     # there is nothing to invalidate.
     test "touches nothing when nothing was stored" do

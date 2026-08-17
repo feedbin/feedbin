@@ -17,11 +17,11 @@ module ImageCrawler
       assert_equal ["http://example.com/a.jpg"], image.image_urls
     end
 
-    test "unified? requires an opted-in preset and the R2 bucket env" do
+    test "unified? requires an opted-in preset and the unified bucket env" do
       image = Image.new_with_attributes(id: "a", preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
       refute image.unified?
 
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         assert image.unified?
         icon = Image.new_with_attributes(id: "a", preset_name: "icon", image_urls: [], provider: ::Image.providers[:remote_file], provider_id: 1)
         refute icon.unified?
@@ -34,7 +34,7 @@ module ImageCrawler
     end
 
     test "send_to_feedbin includes unified metadata when unified" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         image = Image.new_with_attributes(
           id: "a", preset_name: "primary", image_urls: [],
           provider: ::Image.providers[:entry_preview], provider_id: 1,
@@ -65,7 +65,7 @@ module ImageCrawler
     end
 
     test "create_image records a usage row" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         image = Image.new_with_attributes(
           id: "a", preset_name: "primary", image_urls: [],
           provider: ::Image.providers[:entry_preview], provider_id: 42, feed_id: 7,
@@ -98,7 +98,7 @@ module ImageCrawler
       )
       assert_equal "jpg", image.preset.format
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "jpg"), image.storage_path
-      assert_equal "image/jpeg", image.r2_storage_options["Content-Type"]
+      assert_equal "image/jpeg", image.unified_storage_options["Content-Type"]
     end
 
     # variant names the rendering recipe, not the result. A 180x180 touch icon
@@ -115,7 +115,7 @@ module ImageCrawler
         )
         assert_equal variant, image.variant
         assert_equal "png", image.preset.format
-        assert_equal "image/png", image.r2_storage_options["Content-Type"]
+        assert_equal "image/png", image.unified_storage_options["Content-Type"]
         assert_equal :icon_crop, image.preset.crop
       end
     end
@@ -170,7 +170,7 @@ module ImageCrawler
     end
 
     test "create_image sweeps the object it replaced, and only when it changed" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         build = ->(fingerprint) {
           Image.new_with_attributes(
             id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
@@ -218,7 +218,7 @@ module ImageCrawler
       show = build.call("podcast_feed", :feed_icon, "http://example.com/show.jpg")
 
       assert episode.content_addressed?
-      assert episode.legacy_store?, "the legacy S3 object is still the fallback read path"
+      assert episode.legacy_store?, "the legacy object is still the fallback read path"
       assert_equal "200x200", episode.variant
       assert_equal "jpg", episode.preset.format
       assert_equal :fill_crop, episode.preset.crop
@@ -245,10 +245,10 @@ module ImageCrawler
       refute_equal podcast.storage_path, touch.storage_path
     end
 
-    # Content-addressed and R2-only. Unlike podcast artwork there is no legacy
+    # Content-addressed and unified-only. Unlike podcast artwork there is no legacy
     # object to dual-write: the fallback read path is a third-party ggpht url
     # rendered through the signing proxy, which costs us no storage.
-    test "channel_avatar is content-addressed, R2-only, and keyed by the bytes" do
+    test "channel_avatar is content-addressed, unified-only, and keyed by the bytes" do
       fingerprint = Digest::MD5.hexdigest("avatar bytes")
       image = Image.new_with_attributes(
         id: "UCabc-channel", preset_name: "channel_avatar", image_urls: [],

@@ -162,7 +162,7 @@ class EntryTest < ActiveSupport::TestCase
     assert_same @entry.tweet, @entry.tweet
   end
 
-  test "processed_image prefers R2 when configured" do
+  test "processed_image prefers the unified object when configured" do
     entry = create_entry(Feed.first)
     entry.update(image: {
       "original_url" => "http://example.com/image.jpg",
@@ -173,17 +173,17 @@ class EntryTest < ActiveSupport::TestCase
       "placeholder_color" => "aabbcc"
     })
 
-    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       assert_equal "https://images.example.com/abc/abcdef123.jpg", entry.processed_image
       assert entry.processed_image?
     end
 
-    with_env("R2_IMAGE_HOST" => nil) do
+    with_env("UNIFIED_IMAGE_HOST" => nil) do
       assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", entry.processed_image
     end
   end
 
-  test "processed_image tolerates a schemeless R2 host" do
+  test "processed_image tolerates a schemeless unified image host" do
     entry = create_entry(Feed.first)
     entry.update(image: {
       "original_url" => "http://example.com/image.jpg",
@@ -194,16 +194,16 @@ class EntryTest < ActiveSupport::TestCase
       "placeholder_color" => "aabbcc"
     })
 
-    with_env("R2_IMAGE_HOST" => "media.feedbin.org") do
+    with_env("UNIFIED_IMAGE_HOST" => "media.feedbin.org") do
       assert_equal "https://media.feedbin.org/abc/abcdef123.jpg", entry.processed_image
     end
 
-    with_env("R2_IMAGE_HOST" => "http://minio.local:9000/images") do
+    with_env("UNIFIED_IMAGE_HOST" => "http://minio.local:9000/images") do
       assert_equal "http://minio.local:9000/images/abc/abcdef123.jpg", entry.processed_image
     end
   end
 
-  test "processed_image ignores R2 host for legacy images without a storage_path" do
+  test "processed_image ignores the unified image host for legacy images without a storage_path" do
     entry = create_entry(Feed.first)
     entry.update(image: {
       "original_url" => "http://example.com/image.jpg",
@@ -212,7 +212,7 @@ class EntryTest < ActiveSupport::TestCase
       "height" => 304
     })
 
-    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       assert_equal "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", entry.processed_image
     end
   end
@@ -232,11 +232,11 @@ class EntryTest < ActiveSupport::TestCase
     entry = create_entry(Feed.first)
     row = create_image_row(entry)
 
-    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       assert_equal "https://images.example.com/#{row.storage_path}", entry.reload.processed_image
     end
 
-    with_env("R2_IMAGE_HOST" => nil) do
+    with_env("UNIFIED_IMAGE_HOST" => nil) do
       assert_equal "https://bucket.s3.amazonaws.com/abc/legacy.jpg", entry.reload.processed_image
     end
 
@@ -260,11 +260,11 @@ class EntryTest < ActiveSupport::TestCase
     entry = create_entry(Feed.first)
     row = create_image_row(entry, provider: :entry_link_preview, url: "http://example.com/link.jpg")
 
-    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       assert_equal "https://images.example.com/#{row.storage_path}", entry.reload.link_image
     end
 
-    with_env("R2_IMAGE_HOST" => nil) do
+    with_env("UNIFIED_IMAGE_HOST" => nil) do
       assert_equal "https://bucket.s3.amazonaws.com/abc/legacy.jpg", entry.reload.link_image
     end
 
@@ -272,7 +272,7 @@ class EntryTest < ActiveSupport::TestCase
   end
 
   test "itunes_image prefers the stored row over the legacy url" do
-    with_env("R2_IMAGE_HOST" => "images.example.com", "ENTRY_IMAGE_HOST" => "legacy.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com", "ENTRY_IMAGE_HOST" => "legacy.example.com") do
       feed = create_feeds(users(:ben)).first
       entry = create_entry(feed)
       entry.update!(media_image: "https://old.example.com/abc/cover.jpg")

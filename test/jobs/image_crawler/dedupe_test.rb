@@ -20,13 +20,13 @@ module ImageCrawler
     end
 
     test "returns false when nothing is stored for the url" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         refute Dedupe.attach(@original_url, @image)
       end
     end
 
     test "attaches to an existing image with no storage API calls" do
-      with_env("R2_BUCKET_IMAGES" => "images-test") do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         row = seed_row
 
         # No webmock stubs: any HTTP request here would raise. Attaching is

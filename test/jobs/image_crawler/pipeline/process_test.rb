@@ -51,7 +51,7 @@ module ImageCrawler
       # and fingerprint on the payload describe the file that is actually
       # uploaded to each.
       def test_should_produce_a_single_jpg_for_entry_presets
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           download_path = copy_support_file("image.jpeg")
           image = Image.new_with_attributes(
             id: SecureRandom.hex,
@@ -83,7 +83,7 @@ module ImageCrawler
       end
 
       def test_should_reject_repeated_fingerprint_in_feed
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           # Compute the fingerprint this exact source produces.
           reference = Processor::Cropper.new(copy_support_file("image.jpeg"), crop: :smart_crop, extension: "jpeg", width: 542, height: 304).crop!
           fingerprint = reference.fingerprint
@@ -123,7 +123,7 @@ module ImageCrawler
       # The icon presets keep their own format: crop! hands the png crops
       # straight back rather than encoding the geometry as jpg.
       def test_should_produce_a_single_png_for_content_addressed_presets
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           download_path = copy_support_file("favicon.ico")
           image = Image.new_with_attributes(
             id: SecureRandom.hex,

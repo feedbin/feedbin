@@ -7,11 +7,11 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   end
 
   def stub_batch_delete
-    stub_request(:post, "https://test-account.r2.cloudflarestorage.com/images-test/?delete")
+    stub_request(:post, "https://test-account.storage.example.com/images-test/?delete")
       .to_return(status: 200, body: "<DeleteResult/>", headers: {content_type: "application/xml"})
   end
 
-  # Rows sharing a url_fingerprint also share their legacy S3 object, so the
+  # Rows sharing a url_fingerprint also share their legacy object, so the
   # default legacy url is keyed by url, not by provider_id.
   def seed_row(provider_id:, url: @url, legacy_storage_url: nil, provider: :entry_preview)
     create_image_row(
@@ -35,13 +35,13 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   end
 
   test "deletes an object nothing references any more" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       stub_batch_delete
       orphan = Image.content_storage_path_for(SecureRandom.hex(16), "32x32", "png")
 
       SweepStoredImages.new.perform([orphan])
 
-      assert_requested :post, "https://test-account.r2.cloudflarestorage.com/images-test/?delete", times: 1 do |request|
+      assert_requested :post, "https://test-account.storage.example.com/images-test/?delete", times: 1 do |request|
         request.body.include?(orphan)
       end
     end
@@ -50,7 +50,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   # Two hosts can serve byte-identical icons. Replacing one host's icon must
   # not delete the object the other host is still pointing at.
   test "keeps an object another row still references" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       batch = stub_batch_delete
       shared = Image.content_storage_path_for(SecureRandom.hex(16), "32x32", "png")
       seed_icon_row(shared)
@@ -72,7 +72,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   # meantime keeps its object. Nothing else covers the interleaving the
   # advisory locks used to serialize.
   test "leaves a path that was re-referenced after the rows were deleted" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       batch = stub_batch_delete
       row = seed_row(provider_id: 1)
       path = row.storage_path
@@ -90,7 +90,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   # it the legacy object would be deleted while a row written milliseconds
   # later still pointed at it.
   test "leaves a legacy object that was re-referenced after the rows were deleted" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       stub_batch_delete
       legacy_url = "https://bucket.s3.amazonaws.com/abc/shared-legacy.jpg"
       row = seed_row(provider_id: 1, legacy_storage_url: legacy_url)
@@ -106,7 +106,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   end
 
   test "keeps the objects while other entries reference them" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       row = seed_row(provider_id: 1)
       seed_row(provider_id: 2)
       legacy_url = row.data["legacy_storage_url"]
@@ -123,7 +123,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   end
 
   test "deletes orphaned objects in one batched call" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       one = Image.storage_path_for(@url, "542x304")
       two = Image.storage_path_for("http://example.com/other.jpg", "542x304")
       batch = stub_batch_delete
@@ -131,14 +131,14 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
       SweepStoredImages.new.perform([one, two])
 
       assert_requested batch, times: 1
-      assert_requested :post, "https://test-account.r2.cloudflarestorage.com/images-test/?delete", times: 1 do |request|
+      assert_requested :post, "https://test-account.storage.example.com/images-test/?delete", times: 1 do |request|
         request.body.include?(one) && request.body.include?(two)
       end
     end
   end
 
   test "deletes the shared legacy object only with the last reference" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       stub_batch_delete
       legacy_url = "https://bucket.s3.amazonaws.com/abc/shared-legacy.jpg"
       one = seed_row(provider_id: 1, legacy_storage_url: legacy_url)
@@ -162,7 +162,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   # Two URLs serving identical bytes are one stored object. Refcounting by url
   # would delete it while the other row still points at it.
   test "keeps an object shared by two different urls until the last row goes" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       shared_path = Image.storage_path_for(@url, "542x304")
       one = seed_row(provider_id: 1)
       two = Image.create!(
@@ -180,7 +180,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
 
       two.delete
       SweepStoredImages.new.perform([shared_path])
-      assert_requested :post, "https://test-account.r2.cloudflarestorage.com/images-test/?delete", times: 1 do |request|
+      assert_requested :post, "https://test-account.storage.example.com/images-test/?delete", times: 1 do |request|
         request.body.include?(shared_path)
       end
     end
@@ -192,7 +192,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   # carries the identical legacy_storage_url. Sweeping the episode must queue
   # its own legacy object even though the path survives via the show's row.
   test "deletes an episode's own legacy object when a surviving show row shares its storage_path" do
-    with_env("R2_BUCKET_IMAGES" => "images-test") do
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       fingerprint = SecureRandom.hex(16)
       shared_path = Image.content_storage_path_for(fingerprint, "200x200", "jpg")
       episode_legacy = "https://bucket.s3.amazonaws.com/abc/episode-itunes.jpg"

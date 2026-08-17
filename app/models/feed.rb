@@ -105,7 +105,7 @@ class Feed < ApplicationRecord
   end
 
   # The renderable URL for the feed's own icon. New artwork lives on an images
-  # row and is served straight from our CDN; anything crawled before the R2
+  # row and is served straight from our CDN; anything crawled before the unified
   # transition is a third-party url that still has to go through the signing
   # proxy. icon/icon_options/default_icon_format are untouched -- they still
   # answer "which source won and what shape is it", which is a different
@@ -117,8 +117,8 @@ class Feed < ApplicationRecord
   # a podcast and a YouTube channel, so the order is a tie-break that should
   # never be exercised.
   def icon_url
-    Image.r2_url(icon_image_record&.storage_path) ||
-      Image.r2_url(channel_image_record&.storage_path) ||
+    Image.unified_url(icon_image_record&.storage_path) ||
+      Image.unified_url(channel_image_record&.storage_path) ||
       (icon && RemoteFile.signed_url(icon))
   end
 

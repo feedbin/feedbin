@@ -113,7 +113,7 @@ module ImageCrawler
       end
 
       def test_should_attach_existing_unified_image_without_downloading
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/image.jpg"
           ::Image.create!(
             provider: :entry_preview,
@@ -139,7 +139,7 @@ module ImageCrawler
       end
 
       def test_should_download_unified_image_on_dedupe_miss
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/image.jpg"
           stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
 
@@ -153,7 +153,7 @@ module ImageCrawler
       end
 
       def test_should_skip_page_fetched_meta_candidate_already_used_in_feed
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           page_url = "http://example.com/article"
           og_url = "http://example.com/og.jpg"
           fresh_url = "http://example.com/inline.jpg"
@@ -188,7 +188,7 @@ module ImageCrawler
       end
 
       def test_should_skip_reused_meta_candidate_and_try_the_next_url
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           reused_url = "http://example.com/og.jpg"
           fresh_url = "http://example.com/inline.jpg"
 
@@ -219,7 +219,7 @@ module ImageCrawler
       # the row proves nothing about the bytes behind the URL, so the fetch
       # always happens and the short circuit is after it.
       def test_should_always_download_an_icon_even_with_a_row_for_the_url
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/favicon.ico"
           stub_request_file("favicon.ico", original_url, headers: {content_type: "image/x-icon"})
 
@@ -249,7 +249,7 @@ module ImageCrawler
       # cache key, so a write here would invalidate every view referencing it
       # on every crawl.
       def test_should_stop_after_the_download_when_the_icon_is_unchanged
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/favicon.ico"
           stub_request_file("favicon.ico", original_url, headers: {content_type: "image/x-icon"})
           fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
@@ -288,7 +288,7 @@ module ImageCrawler
       # unchanged? matched on fingerprint alone, the crawl would short-circuit
       # forever and the fleet would freeze at the old geometry.
       def test_should_reprocess_the_icon_when_the_stored_row_is_a_different_variant
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/favicon.ico"
           stub_request_file("favicon.ico", original_url, headers: {content_type: "image/x-icon"})
           fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
@@ -318,7 +318,7 @@ module ImageCrawler
       # skip-the-download shortcut is wrong for it: always fetch, then
       # short-circuit on the original bytes.
       def test_should_short_circuit_unchanged_podcast_artwork
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/cover.jpg"
           stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
           fingerprint = Digest::MD5.file(support_file("image.jpeg")).hexdigest
@@ -352,7 +352,7 @@ module ImageCrawler
       # never fetched, and the resulting 304 aborted the whole crawl -- which
       # is why conditional requests were switched off in 98c39d3e.
       def test_should_send_stored_validators_only_for_the_url_they_came_from
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           stored_url = "http://example.com/stored.ico"
           other_url  = "http://example.com/other.ico"
 
@@ -401,7 +401,7 @@ module ImageCrawler
       # A 304 now means exactly what the code assumes: this specific source is
       # unchanged. Stop, process nothing, write nothing.
       def test_should_stop_on_a_304_without_processing_or_touching_the_row
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           url = "http://example.com/favicon.ico"
           row = ::Image.create!(
             provider: :website_favicon, provider_id: "example.com",
@@ -434,7 +434,7 @@ module ImageCrawler
       # 304 instead of a download, but do NOT move updated_at: it is a view
       # cache key, and the bytes did not change.
       def test_should_store_new_validators_for_unchanged_bytes_without_moving_updated_at
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           url = "http://example.com/favicon.ico"
           fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest
 
@@ -472,7 +472,7 @@ module ImageCrawler
       # When the bytes DID change, the validators ride along into the row the
       # pipeline is about to write -- no separate update needed.
       def test_should_carry_the_response_validators_into_the_pipeline
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           url = "http://example.com/favicon.ico"
           stub_request(:get, url)
             .to_return(body: File.new(support_file("favicon.ico")), status: 200,
@@ -502,7 +502,7 @@ module ImageCrawler
       # and with If-Modified-Since a fully conformant server can confirm a
       # false "unchanged" even though the row's own url never changed.
       def test_should_not_store_a_different_candidates_validators_onto_this_row
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           url_a = "http://example.com/a.ico"
           url_b = "http://example.com/b.ico"
           fingerprint = Digest::MD5.file(support_file("favicon.ico")).hexdigest

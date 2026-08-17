@@ -54,7 +54,7 @@ class FaviconComponentTest < ComponentTestCase
   end
 
   test "feed icon from the stored row is served directly, not through the proxy" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
       Image.create!(
         provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id,
@@ -69,14 +69,14 @@ class FaviconComponentTest < ComponentTestCase
 
       assert_includes output.to_s, "https://images.example.com/#{path}"
       refute_includes output.to_s, "/files/icons/",
-        "an R2 url is already on our own CDN and must not be wrapped in the signing proxy"
+        "a unified url is already on our own CDN and must not be wrapped in the signing proxy"
     end
   end
 
   # The branch cannot key on custom_icon: once the legacy store retires, a
   # row-backed feed has artwork and no custom_icon at all.
   test "feed icon renders from the row even with no custom_icon" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       assert_nil @feed.custom_icon
 
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
@@ -99,7 +99,7 @@ class FaviconComponentTest < ComponentTestCase
   # proxy would send a request we control back through a redirector built for
   # third-party urls.
   test "channel avatar from the stored row is served directly, not through the proxy" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png")
       Image.create!(
@@ -123,7 +123,7 @@ class FaviconComponentTest < ComponentTestCase
   # format suffix is correct here: application.scss styles
   # .twitter-profile-image round and only .icon-format-square overrides it.
   test "channel avatar renders round when the feed has no custom_icon yet" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       assert_nil feed.custom_icon
 

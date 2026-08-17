@@ -2,7 +2,7 @@ require "test_helper"
 
 class FeedTest < ActiveSupport::TestCase
   test "icon_url prefers the stored row and does not sign it" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = create_feeds(users(:ben)).first
       feed.update!(custom_icon: "https://old.example.com/abc/show.jpg")
 
@@ -55,7 +55,7 @@ class FeedTest < ActiveSupport::TestCase
   end
 
   test "icon_url prefers the channel row over the signed proxy" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       feed.update!(custom_icon: "https://yt3.ggpht.com/small.jpg")
 
@@ -78,7 +78,7 @@ class FeedTest < ActiveSupport::TestCase
   # One row serves every feed for the channel -- that is the whole point of
   # keying on the channel rather than on the feed.
   test "every feed for a channel resolves the same avatar row" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       one = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       two = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=UCabc")
 
@@ -100,7 +100,7 @@ class FeedTest < ActiveSupport::TestCase
   # A tie that should never happen -- no feed is both a podcast and a YouTube
   # channel -- written down so it is not decided by accident later.
   test "the feed's own icon row outranks the shared channel row" do
-    with_env("R2_IMAGE_HOST" => "images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
 
       own = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")

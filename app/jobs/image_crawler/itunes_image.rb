@@ -37,7 +37,7 @@ module ImageCrawler
       # path until the legacy store retires, and one write per episode is not
       # a fan-out worth avoiding.
       #
-      # No touch. The legacy S3 key comes from image_name, which is built
+      # No touch. The legacy storage key comes from image_name, which is built
       # from the job id ("<public_id>-itunes") and is therefore stable no
       # matter what the bytes are -- new artwork overwrites the same key and
       # yields the same processed_url, so the update above genuinely no-ops

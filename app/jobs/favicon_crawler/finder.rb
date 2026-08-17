@@ -61,10 +61,11 @@ module FaviconCrawler
     end
 
     # Dual-store, the shape the entry-preview and podcast migrations both
-    # used: everything above keeps writing the favicons row and its S3 object
-    # exactly as before, and the shared pipeline produces an images row and an
-    # R2 object alongside. Rows accumulate while nothing reads them; the read
-    # flips in a later phase, and only then does the legacy store retire.
+    # used: everything above keeps writing the favicons row and its legacy
+    # object exactly as before, and the shared pipeline produces an images row
+    # and a unified object alongside. Rows accumulate while nothing reads them;
+    # the read flips in a later phase, and only then does the legacy store
+    # retire.
     #
     # Two schedules rather than one because the presets render at different
     # sizes from different candidate lists -- and they must stay separate
@@ -83,7 +84,7 @@ module FaviconCrawler
     # nothing. This one sits mid-`update`, between the candidate loop and
     # `return unless new_favicon.present?` -- an unrescued exception here
     # (a Redis hiccup enqueuing the pipeline job, say) would abort `update`
-    # before the legacy Processor#call, its S3 write, and @favicon.save ever
+    # before the legacy Processor#call, its storage write, and @favicon.save ever
     # run. During dual-write nothing reads the new rows yet, so the legacy
     # write outranks the new one: swallowing here is correct, not sloppy.
     # Do not "tighten" this into a raise without re-reading that ordering.

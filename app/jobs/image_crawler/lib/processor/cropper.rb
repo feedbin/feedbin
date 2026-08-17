@@ -20,15 +20,26 @@ module ImageCrawler
       # is discarded, and a lossy webp master makes every future format a
       # lossy-to-lossy transcode. jpg is the more universally transcodable
       # master, and the one API clients are known to handle.
+      # optimize_scans is not independent: it splits a progressive scan sequence,
+      # so it does nothing without interlace and vips says so with another of its
+      # ignorable warnings ("ignoring optimize_scans for baseline"). Dropping
+      # interlace therefore silently costs two of these, not one.
+      #
+      # optimize_coding is deliberately absent: interlace implies it, libjpeg
+      # optimising the Huffman tables for a progressive file either way. Byte
+      # identical with and without across 25 of the sample crops.
+      #
+      # keep, not strip: strip was deprecated in 8.15 and no longer appears in
+      # `vips jpegsave`'s arguments, though it still works. Same output.
       JPG_SAVER = {
-        strip: true, quality: 76, background: 255,
-        optimize_coding: true, interlace: true, trellis_quant: true,
-        overshoot_deringing: true, optimize_scans: true, quant_table: 3
+        quality: 76, background: 255, keep: :none,
+        interlace: true, optimize_scans: true,
+        trellis_quant: true, overshoot_deringing: true, quant_table: 3
       }.freeze
 
       # Icons are flat graphics with alpha; there is nothing to trade quality
       # against, so the only knob is dropping metadata.
-      PNG_SAVER = {strip: true}.freeze
+      PNG_SAVER = {keep: :none}.freeze
 
       attr_reader :path
 
@@ -87,7 +98,7 @@ module ImageCrawler
           .source(source)
           .resize_to_limit(@width, @height)
           .convert(extension)
-          .saver(strip: true, quality: 80)
+          .saver(keep: :none, quality: 80)
 
         result = Processed.from_pipeline(image)
 
@@ -125,7 +136,7 @@ module ImageCrawler
       # limit_crop, which picks png or jpg from the source's alpha channel
       # and may return the original file untouched. A content-addressed
       # preset needs a fixed output format, because storage_path's extension
-      # and the R2 Content-Type both come from preset.format.
+      # and the unified Content-Type both come from preset.format.
       def scale_to_png(input)
         image = ImageProcessing::Vips
           .source(input)

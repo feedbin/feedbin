@@ -14,7 +14,7 @@ class EntryImageComponentTest < ComponentTestCase
   end
 
   test "renders the stored image with its placeholder colour" do
-    with_env("R2_IMAGE_HOST" => "https://images.example.com") do
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       output = render(App::EntryImageComponent.new(@entry)).to_s
 
       assert_equal 1, output.scan(%(class="entry-image")).count
@@ -23,9 +23,9 @@ class EntryImageComponentTest < ComponentTestCase
     end
   end
 
-  # The R2 host is what switches the read path over, so until it is set the
-  # component has to keep serving the legacy object.
-  test "falls back to the legacy url when the R2 host is not configured" do
+  # The unified image host is what switches the read path over, so until it is
+  # set the component has to keep serving the legacy object.
+  test "falls back to the legacy url when the unified image host is not configured" do
     output = render(App::EntryImageComponent.new(@entry)).to_s
 
     assert_equal 1, output.scan(%(class="entry-image")).count

@@ -37,7 +37,7 @@ module ImageCrawler
       # path until the legacy store retires, and it is what icon_options reads
       # to decide the icon's shape.
       #
-      # The touch is not redundant with that update. The legacy S3 key comes
+      # The touch is not redundant with that update. The legacy storage key comes
       # from image_name, built from the job id, whose only variable part is a
       # digest of the *source url* -- so a show that replaces its artwork at
       # the same url overwrites the same key, yields the same processed_url,

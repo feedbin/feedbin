@@ -147,15 +147,15 @@ class Entry < ApplicationRecord
     feed.pages? ? url : feed.site_url
   end
 
-  # New images live on the images row; entries crawled before the R2 transition
-  # keep their JSON. Within either source the R2 object wins, falling back to
-  # the legacy one -- a row that has neither does not fall through to the JSON,
-  # because the row is the newer answer.
+  # New images live on the images row; entries crawled before the unified
+  # transition keep their JSON. Within either source the unified object wins,
+  # falling back to the legacy one -- a row that has neither does not fall
+  # through to the JSON, because the row is the newer answer.
   def processed_image
     if record = preview_image_record
-      Image.r2_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
+      Image.unified_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
     elsif image
-      Image.r2_url(image["storage_path"]) || legacy_json_image
+      Image.unified_url(image["storage_path"]) || legacy_json_image
     end
   end
 
@@ -189,10 +189,10 @@ class Entry < ApplicationRecord
     processed_image ? true : false
   end
 
-  # New artwork lives on the images row; episodes crawled before the R2
+  # New artwork lives on the images row; episodes crawled before the unified
   # transition keep their settings value. Reads prefer the row, then fall back.
   def itunes_image
-    Image.r2_url(icon_image_record&.storage_path) ||
+    Image.unified_url(icon_image_record&.storage_path) ||
       legacy_image_url(media_image || data&.[]("itunes_image_processed"))
   end
 
@@ -334,7 +334,7 @@ class Entry < ApplicationRecord
 
   def link_image
     if record = link_image_record
-      Image.r2_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
+      Image.unified_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
     else
       legacy_image_url(data&.[]("twitter_link_image_processed"))
     end

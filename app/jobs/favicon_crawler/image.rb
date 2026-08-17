@@ -15,7 +15,7 @@ module FaviconCrawler
       ImageProcessing::Vips
         .source(image)
         .resize_to_fit(32, 32)
-        .saver(strip: true)
+        .saver(keep: :none)
         .convert("png")
         .call
     end

@@ -42,7 +42,7 @@ module ImageCrawler
       end
 
       def test_should_dual_write_unified_images
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           id = SecureRandom.hex
           download_path = copy_support_file("image.jpeg")
           original_url = "http://example.com/image.jpg"
@@ -58,7 +58,7 @@ module ImageCrawler
           )
 
           stub_request(:put, /s3\.amazonaws\.com/)
-          r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+          unified_put = stub_request(:put, "https://test-account.storage.example.com/images-test/#{image.storage_path}")
             .with(headers: {"Content-Type" => "image/jpeg"})
 
           assert_difference -> { ::Image.count }, +1 do
@@ -67,7 +67,7 @@ module ImageCrawler
             end
           end
 
-          assert_requested r2_put
+          assert_requested unified_put
 
           record = ::Image.entry_images.find_by(url_fingerprint: ::Image.url_fingerprint_for(original_url, "542x304"))
           assert_equal "1", record.provider_id
@@ -82,8 +82,8 @@ module ImageCrawler
         end
       end
 
-      def test_should_degrade_to_legacy_when_r2_upload_fails
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+      def test_should_degrade_to_legacy_when_unified_upload_fails
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           id = SecureRandom.hex
           download_path = copy_support_file("image.jpeg")
           original_url = "http://example.com/image.jpg"
@@ -99,7 +99,7 @@ module ImageCrawler
           )
 
           stub_request(:put, /s3\.amazonaws\.com/)
-          stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+          stub_request(:put, "https://test-account.storage.example.com/images-test/#{image.storage_path}")
             .to_return(status: 500)
 
           assert_no_difference -> { ::Image.count } do
@@ -115,8 +115,8 @@ module ImageCrawler
         end
       end
 
-      def test_should_store_icons_only_in_r2
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+      def test_should_store_icons_only_in_the_unified_bucket
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           processed_path = copy_support_file("image.png")
           original_url = "http://example.com/favicon.ico"
 
@@ -132,14 +132,14 @@ module ImageCrawler
           )
 
           legacy = stub_request(:put, /s3\.amazonaws\.com/)
-          r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+          unified_put = stub_request(:put, "https://test-account.storage.example.com/images-test/#{image.storage_path}")
             .with(headers: {"Content-Type" => "image/png"})
 
           assert_difference -> { ::Image.count }, +1 do
             Upload.new.perform(image.to_h)
           end
 
-          assert_requested r2_put
+          assert_requested unified_put
           assert_not_requested legacy
 
           record = ::Image.find_by(provider: ::Image.providers[:feed_icon], provider_id: "5")
@@ -151,13 +151,13 @@ module ImageCrawler
       # podcast is the first preset that is both content_addressed and
       # legacy_store: true -- everywhere else in this file those two are
       # mutually exclusive (favicon/touch_icon are content-addressed and
-      # R2-only; primary/twitter/youtube are legacy_store and url-keyed, not
+      # Unified-only; primary/twitter/youtube are legacy_store and url-keyed, not
       # content-addressed). Nothing else pins that the combination actually
-      # dual-writes: the legacy jpg at the id-derived S3 key, and the same
-      # jpg bytes again at the fingerprint-derived R2 key with a matching
+      # dual-writes: the legacy jpg at the id-derived legacy key, and the same
+      # jpg bytes again at the fingerprint-derived unified key with a matching
       # image/jpeg Content-Type.
-      def test_should_dual_write_podcast_artwork_to_s3_and_r2
-        with_env("R2_BUCKET_IMAGES" => "images-test") do
+      def test_should_dual_write_podcast_artwork_to_both_stores
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           processed_path = copy_support_file("image.jpeg")
           original_url = "http://example.com/cover.jpg"
 
@@ -174,7 +174,7 @@ module ImageCrawler
           )
 
           legacy = stub_request(:put, /s3\.amazonaws\.com/)
-          r2_put = stub_request(:put, "https://test-account.r2.cloudflarestorage.com/images-test/#{image.storage_path}")
+          unified_put = stub_request(:put, "https://test-account.storage.example.com/images-test/#{image.storage_path}")
             .with(headers: {"Content-Type" => "image/jpeg"})
 
           assert_difference -> { ::Image.count }, +1 do
@@ -184,7 +184,7 @@ module ImageCrawler
           end
 
           assert_requested legacy
-          assert_requested r2_put
+          assert_requested unified_put
           assert image.image_name.end_with?(".jpg")
           assert image.storage_path.end_with?(".jpg")
 

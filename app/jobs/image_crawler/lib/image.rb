@@ -232,7 +232,7 @@ module ImageCrawler
     end
 
     def unified?
-      preset.unified == true && ::Image.r2_enabled?
+      preset.unified == true && ::Image.unified_enabled?
     end
 
     def storage_path
@@ -258,12 +258,12 @@ module ImageCrawler
       unified? && !content_addressed?
     end
 
-    # Whether the legacy S3 object gets written alongside the R2 one. Both
+    # Whether the legacy object gets written alongside the unified one. Both
     # stores hold the same bytes now that every preset produces a single
     # encoding, so this is only about which buckets the object lands in during
     # the migration, not about format. Entry, podcast and podcast_feed presets
     # write both; the plain icon preset isn't unified? so it writes only the
-    # legacy object; favicon/touch_icon turn this off and write only R2.
+    # legacy object; favicon/touch_icon turn this off and write only unified.
     def legacy_store?
       preset.legacy_store != false
     end
@@ -281,11 +281,11 @@ module ImageCrawler
       "#{preset.width}x#{preset.height}"
     end
 
-    def r2_bucket
-      ::Image.r2_bucket
+    def unified_bucket
+      ::Image.unified_bucket
     end
 
-    def r2_storage_options
+    def unified_storage_options
       {
         "Content-Type"  => CONTENT_TYPES.fetch(preset.format),
         "Cache-Control" => "max-age=315360000, public, immutable"

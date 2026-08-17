@@ -6,7 +6,7 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
     @url = "http://example.com/shared.jpg"
   end
 
-  # Rows sharing a url_fingerprint also share their legacy S3 object, so the
+  # Rows sharing a url_fingerprint also share their legacy object, so the
   # default legacy url is keyed by url, not by provider_id.
   def seed_row(provider_id:, url: @url, legacy_storage_url: nil, provider: :entry_preview)
     create_image_row(

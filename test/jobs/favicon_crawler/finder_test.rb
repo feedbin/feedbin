@@ -331,8 +331,8 @@ module FaviconCrawler
       assert_requested request, times: 1
     end
 
-    # Dual-store: the legacy favicons row and its S3 object keep being written
-    # exactly as before, and the pipeline produces an images row and an R2
+    # Dual-store: the legacy favicons row and its stored object keep being written
+    # exactly as before, and the pipeline produces an images row and a unified
     # object alongside. Nothing reads the new rows until a later phase.
     test "schedules both presets from one crawl, keyed by host" do
       body = <<~HTML
