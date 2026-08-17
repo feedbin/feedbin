@@ -10,7 +10,7 @@ module ImageCrawler
 
     def download
       download_file(image_url)
-    rescue Down::Error => exception
+    rescue Feedkit::Error => exception
     end
 
     def image_url

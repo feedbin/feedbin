@@ -23,32 +23,30 @@ module ImageCrawler
       @url
     end
 
+    # Feedkit rather than Down for block_ssrf, matching FeedCrawler::Downloader
+    # and FeedFinder: every candidate url here comes out of feed content or a
+    # publisher's markup, so it is attacker-chosen, and without this a crawl
+    # can be aimed at the private network.
+    #
+    # Feedkit owns the conditional request too -- it builds If-None-Match and
+    # If-Modified-Since from the validators below, and treats a 304 as success,
+    # returning a bodiless Response instead of raising. That replaces a pair of
+    # rescues that had to know which exception the configured Down backend used
+    # to report a 304.
     def download_file(url)
       requested_url = url
       url = @camo ? RemoteFile.camo_url(url) : url
-      @file = Down.download(url, max_size: 10 * 1024 * 1024, headers: conditional_headers(requested_url), timeout_options: {read_timeout: 20, write_timeout: 5, connect_timeout: 5})
-      @path = @file.path
-    # A 304 is the success case for a conditional request, not an error: the
-    # server is confirming the bytes we already hold are current. Which
-    # exception Down uses to say so depends on the backend: this app
-    # configures :http (config/initializers/down.rb), which raises
-    # Down::ResponseError with response.code == "304" -- Down has no other way
-    # to report a non-2xx on that backend. The :net_http backend instead
-    # raises Down::NotModified, a sibling of Down::ResponseError under
-    # Down::Error, not a subtype of it, so a backend swap without this second
-    # rescue would send its 304s through Default's blanket `rescue Down::Error`
-    # with not_modified? silently staying false -- a dead icon that looks
-    # permanently fresh. Both branches narrow the same way on purpose: a 404
-    # or a 500 must stay an error, or a dead icon would look permanently
-    # unchanged and never be re-fetched. Also gated on #conditional? -- a 304
-    # nobody asked for is a broken server, not a fresh icon, and must not be
-    # treated as "unchanged".
-    rescue Down::NotModified
-      raise unless conditional?
-      @not_modified = true
-    rescue Down::ResponseError => exception
-      raise unless conditional? && exception.response&.code&.to_s == "304"
-      @not_modified = true
+      @response = Feedkit::Request.download(url, block_ssrf: true, **validators_for(requested_url))
+
+      if @response.status.code == 304
+        # Gated on conditional?: a 304 nobody asked for is a broken server, not
+        # a fresh image. Leaving @path nil makes the candidate read as invalid
+        # rather than as unchanged, so a dead icon cannot look permanently
+        # fresh and never be re-fetched.
+        @not_modified = conditional?
+      else
+        @path = @response.path
+      end
     end
 
     # Empty for every caller that passes no validators (all of them outside
@@ -63,19 +61,13 @@ module ImageCrawler
     # entirely. `url` here is download_file's argument, compared against @url
     # *before* download_file's own camo substitution, so a camo-wrapped fetch
     # of the same logical resource still qualifies.
-    def conditional_headers(url)
+    def validators_for(url)
       return {} unless url == @url
-      conditional_http.to_h
+      {etag: @etag, last_modified: @last_modified}
     end
 
-    # Derived from the same headers we would send, so the two can never
-    # disagree about whether a 304 was asked for.
     def conditional?
-      conditional_http.to_h.any?
-    end
-
-    def conditional_http
-      @conditional_http ||= ConditionalHttp.new(@etag, @last_modified)
+      @etag.present? || @last_modified.present?
     end
 
     def not_modified?
@@ -83,20 +75,15 @@ module ImageCrawler
     end
 
     # What the response carried, as opposed to what we sent. Stored against the
-    # row so the next crawl of this same URL can ask conditionally.
-    #
-    # "Etag", not "ETag": the configured :http backend (see config/initializers/down.rb)
-    # canonicalizes header names to Title-Case-Per-Hyphen-Segment, and "ETag" has no
-    # hyphen to break on, so it comes back as "Etag". Verified directly against the
-    # installed gems -- "Content-Type" and "Last-Modified" both happen to already be
-    # hyphenated the same way the backend canonicalizes them, which is why file_extension's
-    # existing "Content-Type" lookup works without needing this note.
+    # row so the next crawl of this same URL can ask conditionally. Feedkit
+    # reads both case-insensitively, so the header spelling is its problem
+    # rather than ours.
     def response_etag
-      @file&.headers&.[]("Etag")
+      @response&.etag
     end
 
     def response_last_modified
-      @file&.headers&.[]("Last-Modified")
+      @response&.last_modified
     end
 
     def persist!
@@ -108,8 +95,6 @@ module ImageCrawler
     end
 
     def delete!
-      @file.respond_to?(:close) && @file.close
-      @file.respond_to?(:unlink) && @file.unlink
       @path && File.unlink(@path)
     rescue Errno::ENOENT
     end
@@ -119,7 +104,7 @@ module ImageCrawler
     end
 
     def file_extension
-      content_type = @file.headers["Content-Type"]
+      content_type = @response&.headers&.[]("Content-Type")
 
       return unless content_type.respond_to?(:start_with?)
 
@@ -133,9 +118,9 @@ module ImageCrawler
     end
 
     def valid?
-      return false if @file.nil?
+      return false if @path.nil?
       return true if @minimum_size.nil?
-      @file.size >= @minimum_size
+      File.size(@path) >= @minimum_size
     end
 
     def provider_identifier

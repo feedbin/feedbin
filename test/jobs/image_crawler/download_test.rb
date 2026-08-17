@@ -73,9 +73,9 @@ module ImageCrawler
       download.delete!
     end
 
-    # A 304 is the success case for a conditional request, not a failure. Down
-    # raises on every non-2xx, so it arrives as an exception and has to be
-    # translated back into an ordinary answer.
+    # A 304 is the success case for a conditional request, not a failure.
+    # Feedkit treats it as success and returns a bodiless response, so it
+    # arrives as an ordinary answer rather than as an exception to translate.
     def test_should_treat_304_as_not_modified_rather_than_an_error
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(status: 304, body: "")
@@ -103,7 +103,7 @@ module ImageCrawler
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(status: 404, body: "")
 
-      assert_raises Down::ResponseError do
+      assert_raises Feedkit::NotFound do
         Download.new(url, minimum_size: nil, etag: "\"abc123\"").download_file(url)
       end
     end
@@ -139,36 +139,18 @@ module ImageCrawler
       refute download.not_modified?
     end
 
-    # The :net_http backend raises Down::NotModified for a 304, not
-    # Down::ResponseError -- a sibling under Down::Error, not a subtype (see
-    # download.rb's comment on download_file). This app configures :http
-    # (config/initializers/down.rb), which webmock can only make raise
-    # Down::ResponseError, so Down::NotModified is stubbed directly to prove
-    # the rescue branch itself still behaves correctly if the backend ever
-    # changes, rather than relying on today's backend choice to make it
-    # unreachable.
-    def test_should_treat_a_down_not_modified_error_as_not_modified_too
-      url = "http://example.com/favicon.ico"
-      download = Download.new(url, minimum_size: nil, etag: "\"abc123\"")
-
-      Down.stub(:download, ->(*) { raise Down::NotModified, "not modified" }) do
-        download.download_file(url)
+    # The whole reason this downloader is Feedkit's rather than Down's: a
+    # candidate url comes out of feed content or a publisher's markup, so it is
+    # attacker-chosen and a crawl must not be aimable at the private network.
+    # Asserted at the seam, because webmock intercepts above the socket layer
+    # that would otherwise refuse the address.
+    def test_should_block_private_network_addresses
+      captured = nil
+      Feedkit::Request.stub(:download, ->(_url, **args) { captured = args; raise Feedkit::Error }) do
+        Download.download!("http://example.com/favicon.ico", minimum_size: nil)
       end
 
-      assert download.not_modified?
-    end
-
-    # Same gate as the ResponseError branch: an unsolicited Down::NotModified
-    # (no validator was actually sent) must still raise, not be swallowed.
-    def test_should_still_raise_a_down_not_modified_error_when_not_conditional
-      url = "http://example.com/favicon.ico"
-      download = Download.new(url, minimum_size: nil)
-
-      Down.stub(:download, ->(*) { raise Down::NotModified, "not modified" }) do
-        assert_raises Down::NotModified do
-          download.download_file(url)
-        end
-      end
+      assert captured[:block_ssrf], "image downloads must refuse private-network addresses"
     end
 
     def test_should_expose_the_response_validators

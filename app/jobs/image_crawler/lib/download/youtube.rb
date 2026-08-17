@@ -24,7 +24,7 @@ module ImageCrawler
         @image_url = "https://i.ytimg.com/vi/#{provider_identifier}/#{option}.jpg"
         download_file(@image_url)
         break
-      rescue Down::Error
+      rescue Feedkit::Error
       end
     end
   end

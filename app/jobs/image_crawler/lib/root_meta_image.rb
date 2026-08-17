@@ -39,10 +39,13 @@ module ImageCrawler
       urls
     end
 
+    # block_ssrf: root_url is derived from the entry's page url, so it is
+    # attacker-chosen -- same reason ImageCrawler::Download fetches through
+    # Feedkit.
     def download
-      file = Down.download(root_url, max_size: 5 * 1024 * 1024)
-      MetaImages.parse_meta_urls(file.read, root_url).map(&:to_s)
-    rescue Down::Error
+      body = Feedkit::Request.download(root_url, block_ssrf: true).body
+      MetaImages.parse_meta_urls(body, root_url).map(&:to_s)
+    rescue Feedkit::Error
       []
     end
 

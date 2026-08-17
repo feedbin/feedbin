@@ -25,9 +25,10 @@ module ImageCrawler
 
     def download
       urls = []
-      file = Down.download(parsed_url, max_size: 5 * 1024 * 1024)
-      urls = parse(file)
-    rescue Down::Error => exception
+      # block_ssrf: the page url comes from the entry, so it is attacker-chosen
+      # -- same reason ImageCrawler::Download fetches through Feedkit.
+      urls = parse_meta_urls(Feedkit::Request.download(parsed_url, block_ssrf: true).body)
+    rescue Feedkit::Error => exception
       Sidekiq.logger.info "PageImages: exception=#{exception.inspect} url=#{@url}"
       urls
     ensure
@@ -43,8 +44,8 @@ module ImageCrawler
       end.compact
     end
 
-    def parse(file)
-      self.class.parse_meta_urls(file.read, parsed_url)
+    def parse_meta_urls(html)
+      self.class.parse_meta_urls(html, parsed_url)
     end
 
     def needs_download?
