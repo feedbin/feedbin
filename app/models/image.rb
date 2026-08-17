@@ -84,8 +84,11 @@ class Image < ApplicationRecord
     path_for(Digest::MD5.hexdigest("#{variant}|#{original_fingerprint.to_s.delete("-")}"), extension)
   end
 
+  # A storage key, not a filesystem path: it is the R2 object name and the
+  # path of the public URL. Sharded on the first three characters so no single
+  # prefix holds every object.
   def self.path_for(fingerprint, extension)
-    File.join(fingerprint[0..2], "#{fingerprint}.#{extension}")
+    "#{fingerprint[0..2]}/#{fingerprint}.#{extension}"
   end
 
   # A uuid column reads back dashed ("a1b2c3d4-..."); every fingerprint we
@@ -104,9 +107,7 @@ class Image < ApplicationRecord
   #
   # heuristic_parse supplies the scheme when the host is bare, which is how
   # every environment sets it, and accepts one that already carries a scheme
-  # or a path prefix. Assigning the path rather than joining a relative
-  # reference is what keeps such a prefix: join would resolve "abc/x.webp"
-  # against ".../images" and drop that last segment.
+  # or a path prefix.
   def self.r2_url(storage_path)
     return nil if storage_path.blank?
     host = ENV["R2_IMAGE_HOST"]
@@ -115,9 +116,13 @@ class Image < ApplicationRecord
     # hints is positional -- as a keyword it lands in the hash as :hints and
     # the scheme silently defaults to http, which for a bare hostname (how
     # every environment sets this) means serving images over plaintext.
-    url = Addressable::URI.heuristic_parse(host, {scheme: "https"})
-    url.path = File.join(url.path.presence || "/", storage_path)
-    url.to_s
+    base = Addressable::URI.heuristic_parse(host, {scheme: "https"})
+
+    # A relative reference resolves against the base's *directory*, so the base
+    # path has to end in a slash: against ".../images" the reference would
+    # replace that last segment rather than extend it.
+    base.path += "/" unless base.path.end_with?("/")
+    base.join(storage_path).to_s
   end
 
   # The R2 write side, owned here so the deploy switch has one definition:
