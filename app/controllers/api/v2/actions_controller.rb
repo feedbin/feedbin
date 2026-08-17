@@ -48,7 +48,7 @@ module Api
             query[:query] = [query[:query], token].compact.join(" ")
           end
           result = Entry.scoped_search(query, @user)
-          @entries = preload_for_mode(result.records(Entry).includes(:feed))
+          @entries = result.records(Entry).for_api(params[:mode])
         else
           @entries = []
         end

@@ -7,7 +7,7 @@ class Favicon < ApplicationRecord
   # so there is no association to preload. Resolve the whole collection in one
   # query instead of one per rendered row.
   def self.for_entries(entries)
-    hosts = Array(entries).filter_map { _1.hostname if _1.feed&.pages? }.uniq
+    hosts = Array(entries).filter_map { it.hostname if it.feed&.pages? }.uniq
     return {} if hosts.empty?
     where(host: hosts).index_by(&:host)
   end

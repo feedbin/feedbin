@@ -93,13 +93,13 @@ class Feed < ApplicationRecord
   end
 
   def icon
-    base = icon_options.keys.find { !_1.nil? }
+    base = icon_options.keys.find { !it.nil? }
     return nil if base.nil?
     feed_relative_url(base)
   end
 
   def default_icon_format
-    base = icon_options.keys.find { !_1.nil? }
+    base = icon_options.keys.find { !it.nil? }
     return nil if base.nil?
     icon_options[base]
   end

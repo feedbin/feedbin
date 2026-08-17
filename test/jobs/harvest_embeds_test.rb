@@ -11,7 +11,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   test "should harvest from iframe" do
     @entry.update(content: %(<iframe src="http://www.youtube.com/embed/video_id"></iframe>))
 
-    assert_difference -> { Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) } }, +1 do
+    assert_difference -> { Sidekiq.redis { it.scard(HarvestEmbeds::SET_NAME) } }, +1 do
       HarvestEmbeds.new.perform(@entry.id)
     end
 
@@ -20,7 +20,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   test "should harvest from youtube feed" do
     @entry.update(data: {youtube_video_id: "video_id"})
 
-    assert_difference -> { Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) } }, +1 do
+    assert_difference -> { Sidekiq.redis { it.scard(HarvestEmbeds::SET_NAME) } }, +1 do
       HarvestEmbeds.new.perform(@entry.id)
     end
   end
@@ -29,7 +29,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(
       live_broadcast_content: "live",
       live_streaming_details: {
@@ -90,7 +90,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.provider_youtube!
 
     scheduled_time = 1.day.from_now
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(
       live_broadcast_content: "upcoming",
       live_streaming_details: {
@@ -118,7 +118,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(
       live_broadcast_content: "live",
       live_streaming_details: {
@@ -142,7 +142,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(live_broadcast_content: "none")
 
     HarvestEmbeds.new.perform(nil, true)
@@ -201,7 +201,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   test "schedules the channel avatar from the largest thumbnail" do
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") }
     stub_youtube_api
 
     HarvestEmbeds.new.perform(nil, true)
@@ -224,7 +224,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
 
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") }
     stub_youtube_api
 
     HarvestEmbeds.new.perform(nil, true)

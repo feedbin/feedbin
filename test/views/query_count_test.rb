@@ -2,7 +2,7 @@ require "test_helper"
 
 module QueryCounting
   def matching(statements, pattern)
-    statements.select { _1.match?(pattern) }
+    statements.select { it.match?(pattern) }
   end
 end
 
@@ -244,8 +244,8 @@ class ActionResultsQueryCountTest < ActiveSupport::TestCase
     seed_image(linked, :entry_link_preview)
     assert linked.micropost&.link_preview?, "the render must reach link_image for this test to mean anything"
 
-    [plain, linked].each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
-    Search.client { _1.refresh }
+    [plain, linked].each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
   end
 
   def render_results

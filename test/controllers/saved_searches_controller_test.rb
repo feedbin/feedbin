@@ -40,8 +40,8 @@ class SavedSearchesControllerTest < ActionController::TestCase
       feed
     }
     few_entries = few_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    few_entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
-    Search.client { _1.refresh }
+    few_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
     saved_search = @user.saved_searches.create!(query: token, name: "preview image")
 
     with_few_feeds = capture_sql { get :show, params: {id: saved_search}, xhr: true }
@@ -52,16 +52,16 @@ class SavedSearchesControllerTest < ActionController::TestCase
       feed
     }
     many_entries = many_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    many_entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
-    Search.client { _1.refresh }
+    many_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
 
     with_many_feeds = capture_sql { get :show, params: {id: saved_search}, xhr: true }
 
     assert_response :success
     assert_operator assigns(:entries).to_a.size, :>=, 8
     pattern = /FROM "images"/i
-    few = with_few_feeds.count { _1.match?(pattern) }
-    many = with_many_feeds.count { _1.match?(pattern) }
+    few = with_few_feeds.count { it.match?(pattern) }
+    many = with_many_feeds.count { it.match?(pattern) }
     assert_equal few, many, "the images lookup scales with the number of distinct feeds: #{few} then #{many}"
   end
 

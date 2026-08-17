@@ -33,9 +33,9 @@ class EntriesSearchControllerTest < ActionController::TestCase
       @user.subscriptions.create!(feed: feed)
       feed
     }
-    entries = feeds.map { create_entry(_1).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
-    Search.client { _1.refresh }
+    entries = feeds.map { create_entry(it).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
 
     statements = capture_sql do
       get :search, params: {query: token}, xhr: true
@@ -43,7 +43,7 @@ class EntriesSearchControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_operator assigns(:entries).to_a.size, :>=, 5
-    favicons = statements.select { _1.match?(/FROM "favicons"/i) }
+    favicons = statements.select { it.match?(/FROM "favicons"/i) }
     assert_operator favicons.count, :<=, 1, "one favicon query per result: #{favicons.count}"
   end
 
@@ -73,8 +73,8 @@ class EntriesSearchControllerTest < ActionController::TestCase
       feed
     }
     few_entries = few_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    few_entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
-    Search.client { _1.refresh }
+    few_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
 
     with_few_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
 
@@ -84,16 +84,16 @@ class EntriesSearchControllerTest < ActionController::TestCase
       feed
     }
     many_entries = many_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    many_entries.each { Search::SearchIndexStore.new.perform("Entry", _1.id) }
-    Search.client { _1.refresh }
+    many_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
 
     with_many_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
 
     assert_response :success
     assert_operator assigns(:entries).to_a.size, :>=, 8
     pattern = /FROM "images"/i
-    few = with_few_feeds.count { _1.match?(pattern) }
-    many = with_many_feeds.count { _1.match?(pattern) }
+    few = with_few_feeds.count { it.match?(pattern) }
+    many = with_many_feeds.count { it.match?(pattern) }
     assert_equal few, many, "the images lookup scales with the number of distinct feeds: #{few} then #{many}"
   end
 
@@ -166,6 +166,6 @@ class EntriesSearchControllerTest < ActionController::TestCase
 
   def reindex_search
     Search::SearchIndexStore.new.perform("Entry", @entry.id)
-    Search.client { _1.refresh }
+    Search.client { it.refresh }
   end
 end

@@ -142,7 +142,7 @@ module ImageCrawler
     }
 
     def self.new_with_attributes(id:, preset_name:, image_urls:, provider:, provider_id:, **other)
-      arguments = Hash[binding.local_variables.map{ [_1, binding.local_variable_get(_1)]}]
+      arguments = Hash[binding.local_variables.map{ [it, binding.local_variable_get(it)]}]
       arguments.delete(:arguments)
       other = arguments.delete(:other)
       new(other.merge(arguments))

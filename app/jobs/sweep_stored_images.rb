@@ -19,7 +19,7 @@ class SweepStoredImages
     # referenced by an icon row and an entry row at once, and deleting it out
     # from under either is the same bug.
     surviving = Image.where(storage_path: paths)
-      .pluck(:storage_path, Arel.sql("data->>'legacy_storage_url'"))
+      .pluck(:storage_path, Image.data_projection(:legacy_storage_url))
 
     delete_r2_objects(paths - surviving.map(&:first).uniq)
 

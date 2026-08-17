@@ -31,7 +31,7 @@ module StablePagination
     @page_query = cursor_slice(scope, direction)
     rows = @page_query.pluck(:entry_id, :published)
     @page_cursor = next_page_cursor(rows)
-    Entry.entries_with_feed(rows.map(&:first), sort).entries_list
+    Entry.in_order_of(:id, rows.map(&:first)).entries_list
   end
 
   def pagination_anchor(scope, column: scope.arel_table[:entry_id])

@@ -31,7 +31,7 @@ module Api
           end
 
           result = Entry.scoped_search(params, @user)
-          @entries = preload_for_mode(result.records(Entry).includes(:feed))
+          @entries = result.records(Entry).for_api(params[:mode])
           @page_query = result.pagination
 
           page_data = result.pagination

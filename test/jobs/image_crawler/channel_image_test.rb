@@ -57,7 +57,7 @@ module ImageCrawler
     test "touches every feed for the channel when the avatar was stored" do
       one = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       two = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=UCabc")
-      [one, two].each { _1.update_column(:updated_at, 1.year.ago) }
+      [one, two].each { it.update_column(:updated_at, 1.year.ago) }
       before = one.reload.updated_at
 
       ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png", "provider_id" => "UCabc"})
@@ -88,7 +88,7 @@ module ImageCrawler
       stamp = 1.year.ago
       youtube = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       plain = Feed.create!(feed_url: "http://example.com/feed.xml")
-      [youtube, plain].each { _1.update_column(:updated_at, stamp) }
+      [youtube, plain].each { it.update_column(:updated_at, stamp) }
 
       ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png"})
 

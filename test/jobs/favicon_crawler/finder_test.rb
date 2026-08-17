@@ -351,9 +351,9 @@ module FaviconCrawler
         Finder.new.perform(@page_url.host)
       end
 
-      jobs = ImageCrawler::Pipeline::Find.jobs.last(2).map { _1["args"].first }
-      favicon = jobs.find { _1["preset_name"] == "favicon" }
-      touch   = jobs.find { _1["preset_name"] == "touch_icon" }
+      jobs = ImageCrawler::Pipeline::Find.jobs.last(2).map { it["args"].first }
+      favicon = jobs.find { it["preset_name"] == "favicon" }
+      touch   = jobs.find { it["preset_name"] == "touch_icon" }
 
       assert_equal ::Image.providers[:website_favicon], favicon["provider"]
       assert_equal "example.com", favicon["provider_id"]

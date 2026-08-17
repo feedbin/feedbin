@@ -11,7 +11,7 @@ module FactoryHelper
         end
       end
     }
-    entries = feeds.flat_map { bulk_create_entries(_1, 1, users: users) }
+    entries = feeds.flat_map { bulk_create_entries(it, 1, users: users) }
     index_entries(entries)
     feeds
   end
@@ -62,7 +62,7 @@ module FactoryHelper
 
     unreads = [*users].flat_map { |user|
       entries.map {
-        UnreadEntry.new(user_id: user.id, feed_id: feed.id, entry_id: _1.id, published: _1.published, entry_created_at: _1.created_at)
+        UnreadEntry.new(user_id: user.id, feed_id: feed.id, entry_id: it.id, published: it.published, entry_created_at: it.created_at)
       }
     }
     UnreadEntry.import(unreads, validate: false, on_duplicate_key_ignore: true) if unreads.present?

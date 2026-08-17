@@ -53,20 +53,30 @@ class Entry < ApplicationRecord
        .where(feed_id: feed_ids)
    }
 
-  def self.entries_with_feed(entry_ids, sort)
-    in_order_of(:id, entry_ids).includes(feed: Feed::ICON_PRELOADS)
-  end
+  # Everything entries/_entry touches beyond the entry itself: the feed and
+  # the sources FaviconComponent picks its icon from, plus the two images rows
+  # the partial renders -- the preview image (also part of the cache key) and
+  # the tweet/micropost link preview. Attaching less than this makes a
+  # cache-miss render cost a query per row.
+  scope :with_list_associations, -> {
+    includes(feed: Feed::ICON_PRELOADS).preload(:preview_image_record, :link_image_record)
+  }
 
-  # Everything entries/_entry reads from the images table: the preview image
-  # (rendered and part of the cache key) and the tweet/micropost link preview.
-  # Every path that renders that partial needs this attached, or a cache-miss
-  # render costs a query per row.
-  scope :preload_image_records, -> { preload(:preview_image_record, :link_image_record) }
-
+  # The same associations, plus only the columns that partial reads. Separate
+  # because the paths that build their relation from an Elasticsearch result,
+  # or materialize it into an Array before rendering, cannot take the select.
   def self.entries_list
     select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
-      .preload_image_records
+      .with_list_associations
   end
+
+  # What api/v2/entries/_entry.json renders: the feed in every mode, and for
+  # extended mode the preview image row _entry_extended reads (through
+  # processed_image? and preview_image_data). Those endpoints serve up to 100
+  # entries, so rendering extended without it is 100 queries a request.
+  scope :for_api, ->(mode = nil) {
+    mode.to_s == "extended" ? includes(:feed).preload(:preview_image_record) : includes(:feed)
+  }
 
   def self.sort_preference(sort)
     if sort == "ASC"
@@ -102,7 +112,7 @@ class Entry < ApplicationRecord
 
     authors = json_feed.safe_dig("authors")
     return authors unless authors.respond_to?(:filter_map)
-    authors = authors.filter_map { _1&.safe_dig("name") }
+    authors = authors.filter_map { it&.safe_dig("name") }
     authors.to_sentence
   rescue
     nil
@@ -350,7 +360,7 @@ class Entry < ApplicationRecord
 
   def chapter_titles
     return [] unless chapters.respond_to?(:map)
-    chapters.filter_map {_1.safe_dig("tags", "title")}.filter(&:present?).map(&:clean)
+    chapters.filter_map {it.safe_dig("tags", "title")}.filter(&:present?).map(&:clean)
   end
 
   def plain_title_with_default

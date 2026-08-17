@@ -143,7 +143,7 @@ module ImageCrawler
     end
 
     def self.recognize_url?(src_url)
-      if supported_urls.find { src_url.to_s =~ _1 }
+      if supported_urls.find { src_url.to_s =~ it }
         Regexp.last_match[1]
       else
         false

@@ -6,7 +6,7 @@ class SavedSearchesController < ApplicationController
     params[:query] = @saved_search.query
 
     result = Entry.scoped_search(params, @user)
-    @entries = result.records(Entry).includes(feed: Feed::ICON_PRELOADS).preload_image_records
+    @entries = result.records(Entry).with_list_associations
     @page_query = result.pagination
 
     @append = params[:page].present?

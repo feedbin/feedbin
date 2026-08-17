@@ -205,7 +205,7 @@ class EntriesController < ApplicationController
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
-    @entries = result.records(Entry).includes(feed: Feed::ICON_PRELOADS).preload_image_records
+    @entries = result.records(Entry).with_list_associations
     @page_query = result.pagination
     @total_results = result.total
 
@@ -277,6 +277,6 @@ class EntriesController < ApplicationController
 
   def matched_search_ids(params)
     query = Entry.build_query(user: @user, query: params[:query])
-    Search.client { _1.all_matches(Search.index_name(Entry.table_name), query: query) }
+    Search.client { it.all_matches(Search.index_name(Entry.table_name), query: query) }
   end
 end

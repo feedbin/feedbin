@@ -54,7 +54,7 @@ class FeedsHelperTest < ActiveSupport::TestCase
 
     statements = capture_sql { sidebar_feeds_cache_key(feeds) }
 
-    assert_empty statements.select { _1.match?(/FROM "favicons"/i) }
+    assert_empty statements.select { it.match?(/FROM "favicons"/i) }
   end
 
   # Tag#user_feeds is an attr_accessor populated by User#tag_group, not an
@@ -70,7 +70,7 @@ class FeedsHelperTest < ActiveSupport::TestCase
     key = nil
     statements = capture_sql { key = sidebar_tags_cache_key(tags) }
 
-    assert_empty statements.select { _1.match?(/FROM "favicons"/i) }
+    assert_empty statements.select { it.match?(/FROM "favicons"/i) }
     _, _, _, favicons, _ = key
     assert_includes favicons, favicon
   end

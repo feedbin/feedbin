@@ -99,7 +99,7 @@ class EntryDeleterTest < ActiveSupport::TestCase
     assert_equal 1, ImageGarbageCollector.jobs.size
     assert_includes ImageGarbageCollector.jobs.first["args"].first, entry.id
 
-    deleted_urls = ImageDeleter.jobs.flat_map { _1["args"].first }
+    deleted_urls = ImageDeleter.jobs.flat_map { it["args"].first }
     assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/preview.jpg"
     assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/link-legacy.jpg"
     assert_includes deleted_urls, "https://bucket.s3.amazonaws.com/abc/link-new.jpg"
@@ -114,7 +114,7 @@ class EntryDeleterTest < ActiveSupport::TestCase
     EntryDeleter.new.delete_entries(@feed.id, entry_ids)
 
     assert_equal 3, ImageGarbageCollector.jobs.size
-    assert_equal entry_ids, ImageGarbageCollector.jobs.flat_map { _1["args"].first }.sort
+    assert_equal entry_ids, ImageGarbageCollector.jobs.flat_map { it["args"].first }.sort
   end
 
   private

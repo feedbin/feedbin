@@ -54,7 +54,7 @@ class EntryDeleter
 
       # After the transaction: if the deletes roll back, the usage rows must
       # survive too.
-      entry_ids.each_slice(1_000) { ImageGarbageCollector.perform_async(_1) }
+      entry_ids.each_slice(1_000) { ImageGarbageCollector.perform_async(it) }
 
       Librato.increment("entry.destroy", by: entry_ids.count)
     end

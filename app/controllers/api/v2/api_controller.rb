@@ -35,7 +35,7 @@ module Api
         end
 
         ids = @page_query.pluck(:id)
-        @entries = preload_for_mode(Entry.in_order_of(:id, ids).includes(:feed))
+        @entries = Entry.in_order_of(:id, ids).for_api(params[:mode])
 
         entry_count(@page_query)
 
@@ -53,17 +53,6 @@ module Api
 
       def render_json(template)
         render template: "api/v2/#{template}", formats: :html, layout: nil, content_type: "application/json"
-      end
-
-      # For any collection rendered through entries/_entry.json: that partial
-      # switches every caller to _entry_extended on params[:mode], and
-      # _entry_extended reaches preview_image_record (through processed_image?
-      # and preview_image_data) -- the only images row these responses touch.
-      # Extended endpoints serve up to 100 entries, so rendering without the
-      # preload is 100 queries a request.
-      def preload_for_mode(entries)
-        return entries unless params[:mode] == "extended"
-        entries.preload(:preview_image_record)
       end
 
       def entry_count(collection)

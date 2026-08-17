@@ -10,7 +10,7 @@ class EntriesListTest < ActionController::TestCase
   end
 
   def favicon_queries(statements)
-    statements.select { _1.match?(/FROM "favicons"/i) }
+    statements.select { it.match?(/FROM "favicons"/i) }
   end
 
   # A Pages feed is one row holding articles from everywhere, so the favicon
@@ -53,10 +53,10 @@ class EntriesListTest < ActionController::TestCase
     entries = Entry.where(id: ids).includes(:feed).preload(:preview_image_record).to_a
     favicons = Favicon.for_entries(entries)
 
-    statements = capture_sql { entries.each { entry_cache_key(_1, favicons) } }
+    statements = capture_sql { entries.each { entry_cache_key(it, favicons) } }
 
     assert_empty favicon_queries(statements)
-    assert_empty statements.select { _1.match?(/FROM "images"/i) },
+    assert_empty statements.select { it.match?(/FROM "images"/i) },
       "the key reaches preview_image_record, so it must be preloaded"
   end
 
@@ -70,7 +70,7 @@ class EntriesListTest < ActionController::TestCase
     entries = Entry.where(id: ids).includes(feed: [:favicon]).preload(:preview_image_record).to_a
     favicons = Favicon.for_entries(entries)
 
-    statements = capture_sql { entries.each { entry_cache_key(_1, favicons) } }
+    statements = capture_sql { entries.each { entry_cache_key(it, favicons) } }
 
     assert_empty favicon_queries(statements)
     assert_not_nil EntriesHelper.entry_favicon(entries.first, favicons),

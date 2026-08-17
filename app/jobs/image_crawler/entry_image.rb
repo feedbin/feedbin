@@ -101,7 +101,7 @@ module ImageCrawler
       Nokogiri::HTML5(@entry.content)
         .css(IMAGE_SELECTORS.join(","))
         .sort_by do |element|
-          IMAGE_SELECTORS.index { element.matches?(_1) }
+          IMAGE_SELECTORS.index { element.matches?(it) }
         end
         .each_with_object([]) do |element, array|
           source =      case element.name

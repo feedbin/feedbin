@@ -93,7 +93,7 @@ class Action < ApplicationRecord
   end
 
   def query_valid
-    result = Search.client { _1.validate(Search.index_name(Entry.table_name), query: {query: search_body[:query]}) }
+    result = Search.client { it.validate(Search.index_name(Entry.table_name), query: {query: search_body[:query]}) }
     if result == false
       errors.add :base, "Search syntax invalid"
     end
@@ -105,8 +105,8 @@ class Action < ApplicationRecord
   # throttled keystroke. An Action does not outlive a request.
   def results
     @results ||= begin
-      response = Search.client { _1.search(Search.index_name(Entry.table_name), query: search_options) }
-      OpenStruct.new({total: response.total, records: response.records(Entry).includes(feed: Feed::ICON_PRELOADS).preload_image_records})
+      response = Search.client { it.search(Search.index_name(Entry.table_name), query: search_options) }
+      OpenStruct.new({total: response.total, records: response.records(Entry).with_list_associations})
     end
   end
 
@@ -128,6 +128,6 @@ class Action < ApplicationRecord
   end
 
   def _percolator
-    Search.client { _1.get(Search.index_name(Action.table_name), id: id) }
+    Search.client { it.get(Search.index_name(Action.table_name), id: id) }
   end
 end

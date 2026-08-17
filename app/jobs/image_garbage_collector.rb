@@ -12,13 +12,18 @@ class ImageGarbageCollector
     entry_ids = [*entry_ids].map(&:to_s)
     return if entry_ids.empty?
 
+    # pluck rather than instantiating: the rows are about to be deleted, and
+    # only these three values are needed. transpose turns the row tuples into
+    # one named array per column.
     rows = Image.entry_owned.where(provider_id: entry_ids)
-      .pluck(:id, :storage_path, Arel.sql("data->>'legacy_storage_url'"))
+      .pluck(:id, :storage_path, Image.data_projection(:legacy_storage_url))
     return if rows.empty?
 
-    Image.where(id: rows.map { _1[0] }).delete_all
+    ids, storage_paths, legacy_urls = rows.transpose
 
-    SweepStoredImages.perform_in(SWEEP_DELAY, rows.map { _1[1] }.uniq, rows.filter_map { _1[2] }.uniq)
-    Librato.increment("image.gc_rows", by: rows.size)
+    Image.where(id: ids).delete_all
+
+    SweepStoredImages.perform_in(SWEEP_DELAY, storage_paths.uniq, legacy_urls.compact.uniq)
+    Librato.increment("image.gc_rows", by: ids.size)
   end
 end

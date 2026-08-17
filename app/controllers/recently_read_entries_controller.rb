@@ -3,7 +3,7 @@ class RecentlyReadEntriesController < ApplicationController
     @user = current_user
 
     recently_read_entry_ids = @user.recently_read_entries.order(id: :desc).limit(100).pluck(:entry_id)
-    @entries = Entry.where(id: recently_read_entry_ids).includes(feed: Feed::ICON_PRELOADS).entries_list
+    @entries = Entry.where(id: recently_read_entry_ids).entries_list
     @entries = @entries.sort_by { |entry| recently_read_entry_ids.index(entry.id) }
 
     @type = "recently_read"

@@ -36,6 +36,18 @@ class Image < ApplicationRecord
   # into the hash with string keys at every call site.
   store_accessor :data, :legacy_storage_url, :final_url, :etag, :last_modified, :preset
 
+  # One of those keys as a SQL projection, for the garbage-collection plucks
+  # that read it without instantiating rows. The whitelist is store_accessor's
+  # own registry, so renaming a key above breaks this loudly instead of
+  # leaving a job matching a string that no longer exists. Arel quotes the
+  # key; it is never interpolated into the statement.
+  def self.data_projection(key)
+    unless stored_attributes[:data].include?(key.to_sym)
+      raise ArgumentError, "not a data accessor: #{key.inspect}"
+    end
+    Arel::Nodes::InfixOperation.new("->>", arel_table[:data], Arel::Nodes.build_quoted(key.to_s))
+  end
+
   scope :entry_images, -> { where(provider: %i[entry_link_preview entry_preview]) }
 
   # What an entry's deletion takes with it. Wider than entry_images because
@@ -89,12 +101,23 @@ class Image < ApplicationRecord
 
   # The public URL for a stored object. Nil until R2_IMAGE_HOST is set, which
   # is what keeps the read path on the legacy fallback during a transition.
+  #
+  # heuristic_parse supplies the scheme when the host is bare, which is how
+  # every environment sets it, and accepts one that already carries a scheme
+  # or a path prefix. Assigning the path rather than joining a relative
+  # reference is what keeps such a prefix: join would resolve "abc/x.webp"
+  # against ".../images" and drop that last segment.
   def self.r2_url(storage_path)
     return nil if storage_path.blank?
     host = ENV["R2_IMAGE_HOST"]
     return nil if host.blank?
-    host = "https://#{host}" unless host.match?(%r{\Ahttps?://})
-    [host.chomp("/"), storage_path].join("/")
+
+    # hints is positional -- as a keyword it lands in the hash as :hints and
+    # the scheme silently defaults to http, which for a bare hostname (how
+    # every environment sets this) means serving images over plaintext.
+    url = Addressable::URI.heuristic_parse(host, {scheme: "https"})
+    url.path = File.join(url.path.presence || "/", storage_path)
+    url.to_s
   end
 
   # The R2 write side, owned here so the deploy switch has one definition:
@@ -119,10 +142,17 @@ class Image < ApplicationRecord
   def self.attach!(attributes)
     attributes = attributes.symbolize_keys
     attributes[:provider_id] = attributes[:provider_id].to_s
+
+    # fetch rather than slice: a missing provider would otherwise key the
+    # lookup on provider_id alone and could attach to another provider's row.
+    key = {provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)}
+
     tries = 0
     begin
-      record = find_by(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)) ||
-        new(provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id))
+      # find_by || new rather than find_or_initialize_by: that routes the
+      # lookup through the relation, and the retry behaviour below is covered
+      # by tests that simulate the race by stubbing these two class methods.
+      record = find_by(key) || new(key)
       record.assign_attributes(attributes)
       record.save!
       record

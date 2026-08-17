@@ -282,7 +282,7 @@ class ApplicationController < ActionController::Base
     if view_mode == "view_all"
       scope = pagination_anchor(Entry.where(feed: @feed_ids), column: Entry.arel_table[:id])
       @page_query = scope.order(published: :desc).page(params[:page])
-      @entries = Entry.entries_with_feed(@page_query.pluck(:id), "DESC").entries_list
+      @entries = Entry.in_order_of(:id, @page_query.pluck(:id)).entries_list
     elsif view_mode == "view_starred"
       @entries = entries_page(@user.starred_entries.select(:entry_id).where(feed_id: @feed_ids))
     else
