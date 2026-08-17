@@ -115,9 +115,16 @@ class ActiveSupport::TestCase
       # so delete whatever indexes the worker's aliases point at now, then the
       # original physical names in case an index lost its alias.
       [Entry, Action, Feed].each do |model|
-        client.get_indexes_from_alias(Search.index_name(model.table_name)).each do |index|
+        alias_name = Search.index_name(model.table_name)
+        client.get_indexes_from_alias(alias_name).each do |index|
           client.delete_index(index)
         end
+        # An index Elasticsearch auto-created under the alias's own name is
+        # reachable from no alias, so the sweep above cannot see it -- and
+        # left behind it outlives the run and shadows the real index on every
+        # later one, which is what it did until 2026-08-18. Nothing
+        # legitimately answers to this name, so drop it unconditionally.
+        client.delete_index(alias_name)
       end
       $search[:config][:aliases].each_value do |index|
         client.delete_index(index)
