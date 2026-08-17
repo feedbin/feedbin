@@ -230,11 +230,12 @@ Rails.application.reloader.to_prepare do
   end
 
   Search.configure!
+end
 
-  unless Rails.env.production?
+unless Rails.env.production?
+  Rails.application.config.after_initialize do
     Search.setup
   end
-
 end
 
 if Rails.env.development?
