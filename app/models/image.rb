@@ -32,6 +32,10 @@ class Image < ApplicationRecord
 
   normalizes :url, with: -> url { url.strip }
 
+  # The data JSON's schema, so readers get real methods instead of reaching
+  # into the hash with string keys at every call site.
+  store_accessor :data, :legacy_storage_url, :final_url, :etag, :last_modified, :preset
+
   scope :entry_images, -> { where(provider: %i[entry_link_preview entry_preview]) }
 
   # What an entry's deletion takes with it. Wider than entry_images because
@@ -91,6 +95,21 @@ class Image < ApplicationRecord
     return nil if host.blank?
     host = "https://#{host}" unless host.match?(%r{\Ahttps?://})
     [host.chomp("/"), storage_path].join("/")
+  end
+
+  # The R2 write side, owned here so the deploy switch has one definition:
+  # the pipeline writes and the sweep deletes iff the bucket is configured,
+  # and they must flip together.
+  def self.r2_bucket
+    ENV["R2_BUCKET_IMAGES"]
+  end
+
+  def self.r2_enabled?
+    r2_bucket.present?
+  end
+
+  def self.r2_client
+    Fog::Storage.new(STORAGE_R2)
   end
 
   # Upsert keyed by (provider, provider_id). Not create_or_find_by: the

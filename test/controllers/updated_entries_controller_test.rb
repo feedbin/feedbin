@@ -35,6 +35,6 @@ class UpdatedEntriesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal @updated.length, assigns(:entries).length
     images = statements.select { _1.match?(/FROM "images"/i) }
-    assert_operator images.count, :<=, 2, "two flat images queries for the whole page (preview_image_record, icon_image_record): #{images.count}"
+    assert_operator images.count, :<=, 3, "flat images queries for the whole page (preview_image_record, link_image_record, icon_image_record): #{images.count}"
   end
 end

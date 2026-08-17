@@ -11,8 +11,8 @@ class FaviconComponent < ApplicationComponent
       icon_newsletter
     elsif @feed.twitter_user?
       icon_twitter_user
-    elsif @feed.icon_url
-      icon_feed
+    elsif (icon_url = @feed.icon_url)
+      icon_feed(icon_url)
     elsif @feed.pages? && @entry
       icon_pages
     elsif @feed.pages?
@@ -40,11 +40,13 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
-  def icon_feed
+  # Takes the url rather than re-asking the feed: the legacy fallback inside
+  # Feed#icon_url signs the url (an HMAC) on every call.
+  def icon_feed(icon_url)
     span class: "favicon-wrap twitter-profile-image icon-format-#{@feed.custom_icon_format || @feed.default_icon_format}" do
       image_tag_with_fallback(
         image_url("favicon-profile-default.png"),
-        @feed.icon_url,
+        icon_url,
         alt: ""
       )
     end

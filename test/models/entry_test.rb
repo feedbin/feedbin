@@ -300,17 +300,14 @@ class EntryTest < ActiveSupport::TestCase
 
   private
 
+  # FactoryHelper's factory, keyed to an entry and carrying the legacy urls
+  # the read-path tests exercise.
   def create_image_row(entry, provider: :entry_preview, url: "http://example.com/image.jpg")
-    Image.create!(
+    super(
       provider: provider,
-      provider_id: entry.id.to_s,
+      provider_id: entry.id,
       feed_id: entry.feed_id,
       url: url,
-      variant: "542x304",
-      image_fingerprint: SecureRandom.hex(16),
-      storage_path: Image.storage_path_for(url, "542x304"),
-      width: 542, height: 304, bytesize: 12_345,
-      placeholder_color: "aabbcc",
       data: {
         "legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg",
         "final_url" => "http://example.com/image-final.jpg"

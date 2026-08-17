@@ -40,7 +40,7 @@ module ImageCrawler
         bytesize: record.bytesize,
         placeholder_color: record.placeholder_color,
         data: {
-          "legacy_storage_url" => record.data["legacy_storage_url"],
+          "legacy_storage_url" => record.legacy_storage_url,
           "preset"             => @image.preset_name,
           "final_url"          => final_url
         }
@@ -48,7 +48,7 @@ module ImageCrawler
 
       @image.original_url      = @original_url
       @image.final_url         = final_url
-      @image.storage_url       = record.data["legacy_storage_url"]
+      @image.storage_url       = record.legacy_storage_url
       @image.width             = record.width
       @image.height            = record.height
       @image.bytesize          = record.bytesize
@@ -61,7 +61,7 @@ module ImageCrawler
     private
 
     def final_url
-      record.data["final_url"].presence || @original_url
+      record.final_url.presence || @original_url
     end
   end
 end

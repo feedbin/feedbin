@@ -46,8 +46,7 @@ module ImageCrawler
 
         _, payload = EntryImage.jobs.last["args"]
         assert_equal image.storage_path, payload["storage_path"]
-        assert_equal 9_999,              payload["bytesize"]
-        assert_equal "entry_preview",    payload["provider"]
+        assert_equal "1",                payload["provider_id"]
       end
     end
 

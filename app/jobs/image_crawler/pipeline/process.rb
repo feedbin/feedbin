@@ -18,11 +18,7 @@ module ImageCrawler
         )
 
         if processor.valid?(@image.validate?)
-          # Dual-format is the entry presets' arrangement: one geometry pass,
-          # a legacy jpg and an R2 webp. Everything else -- legacy/non-unified
-          # presets and the content-addressed favicon/touch_icon family alike
-          # -- crops to a single output instead.
-          if @image.unified? && !@image.content_addressed?
+          if @image.dual_format?
             pair = processor.crop_pair!
             cropped = pair[:jpg]
             webp = pair[:webp]
@@ -73,8 +69,7 @@ module ImageCrawler
       end
 
       def reuse_rejected?
-        return false unless @image.unified?
-        return false if @image.content_addressed?
+        return false unless @image.dual_format?
         ReuseRules.new(@image).fingerprint_used_in_feed?(@image.fingerprint)
       end
 

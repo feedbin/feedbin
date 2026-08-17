@@ -60,24 +60,40 @@ module ImageCrawler
       [one, two].each { _1.update_column(:updated_at, 1.year.ago) }
       before = one.reload.updated_at
 
-      ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png"})
+      ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png", "provider_id" => "UCabc"})
 
       assert_operator one.reload.updated_at, :>, before
       assert_operator two.reload.updated_at, :>, before
     end
 
     # Channel ids are base64url: "-" and "_" are ordinary characters in them,
-    # so the split("-").first idiom the other tenants use would truncate this
-    # one to "UC" and touch nothing.
-    test "recovers a channel id containing a dash from the job id" do
+    # which is why the channel comes from the payload's provider_id -- parsing
+    # it back out of the display id is what the other tenants' split("-")
+    # idiom gets wrong.
+    test "keys on the payload's channel id, not a parse of the job id" do
       channel_id = "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}")
       feed.update_column(:updated_at, 1.year.ago)
       before = feed.reload.updated_at
 
-      ChannelImage.new.perform("#{channel_id}-channel", {"storage_path" => "abc/abc123.png"})
+      ChannelImage.new.perform("#{channel_id}-channel", {"storage_path" => "abc/abc123.png", "provider_id" => channel_id})
 
       assert_operator feed.reload.updated_at, :>, before
+    end
+
+    # A payload written by a deploy predating provider_id must not fall
+    # through to Feed.where(channel_id: nil), which matches every
+    # non-YouTube feed in the table.
+    test "touches nothing when the payload carries no provider_id" do
+      stamp = 1.year.ago
+      youtube = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
+      plain = Feed.create!(feed_url: "http://example.com/feed.xml")
+      [youtube, plain].each { _1.update_column(:updated_at, stamp) }
+
+      ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png"})
+
+      assert_equal stamp.to_f, plain.reload.updated_at.to_f
+      assert_equal stamp.to_f, youtube.reload.updated_at.to_f
     end
 
     # storage_path is absent when the R2 write failed and Upload degraded to

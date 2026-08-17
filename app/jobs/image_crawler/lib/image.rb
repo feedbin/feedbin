@@ -181,6 +181,10 @@ module ImageCrawler
       # when it lands.
       return if preset.job_class.nil?
 
+      # storage_path is the receivers' row-backed gate; provider_id saves
+      # them re-deriving their entity key by parsing the display id. The
+      # row's other metadata is not duplicated into the payload -- receivers
+      # that need it have the row.
       payload = {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
@@ -190,8 +194,7 @@ module ImageCrawler
       }
       if unified? && include_unified
         payload["storage_path"] = storage_path
-        payload["bytesize"]     = bytesize
-        payload["provider"]     = provider_label
+        payload["provider_id"]  = provider_id.to_s
       end
       preset.job_class.perform_async(id, payload)
     end
@@ -231,7 +234,14 @@ module ImageCrawler
     end
 
     def unified?
-      preset.unified == true && ENV["R2_BUCKET_IMAGES"].present?
+      preset.unified == true && ::Image.r2_enabled?
+    end
+
+    # The entry presets' arrangement: one geometry pass, a legacy jpg and an
+    # R2 webp. Content-addressed presets and legacy presets crop to a single
+    # output instead.
+    def dual_format?
+      unified? && !content_addressed?
     end
 
     def storage_path
@@ -280,12 +290,8 @@ module ImageCrawler
       "#{preset.width}x#{preset.height}"
     end
 
-    def provider_label
-      ::Image.providers.key(provider)
-    end
-
     def r2_bucket
-      ENV["R2_BUCKET_IMAGES"]
+      ::Image.r2_bucket
     end
 
     def r2_storage_options

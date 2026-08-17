@@ -124,7 +124,7 @@ class Settings::SubscriptionsController < ApplicationController
       .default
       .select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host")
       .joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
-      .includes(feed: [:favicon, :icon_image_record, :channel_image_record, :discovered_feeds])
+      .includes(feed: Feed::ICON_PRELOADS + [:discovered_feeds])
     feed_ids = subscriptions.map(&:feed_id)
 
     start_date = 29.days.ago

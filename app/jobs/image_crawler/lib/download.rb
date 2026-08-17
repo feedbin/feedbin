@@ -65,14 +65,17 @@ module ImageCrawler
     # of the same logical resource still qualifies.
     def conditional_headers(url)
       return {} unless url == @url
-      {}.tap do |headers|
-        headers["If-None-Match"]     = @etag          if @etag.present?
-        headers["If-Modified-Since"] = @last_modified if @last_modified.present?
-      end
+      conditional_http.to_h
     end
 
+    # Derived from the same headers we would send, so the two can never
+    # disagree about whether a 304 was asked for.
     def conditional?
-      @etag.present? || @last_modified.present?
+      conditional_http.to_h.any?
+    end
+
+    def conditional_http
+      @conditional_http ||= ConditionalHttp.new(@etag, @last_modified)
     end
 
     def not_modified?

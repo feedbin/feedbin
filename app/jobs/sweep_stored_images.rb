@@ -38,11 +38,11 @@ class SweepStoredImages
 
   def delete_r2_objects(paths)
     return if paths.empty?
-    return if ENV["R2_BUCKET_IMAGES"].blank?
+    return unless Image.r2_enabled?
 
-    client = Fog::Storage.new(STORAGE_R2)
+    client = Image.r2_client
     paths.each_slice(999) do |slice|
-      client.delete_multiple_objects(ENV["R2_BUCKET_IMAGES"], slice, {quiet: true})
+      client.delete_multiple_objects(Image.r2_bucket, slice, {quiet: true})
     end
     Librato.increment("image.gc_objects", by: paths.size)
   end

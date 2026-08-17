@@ -1,18 +1,21 @@
 require "test_helper"
 
+module QueryCounting
+  def matching(statements, pattern)
+    statements.select { _1.match?(pattern) }
+  end
+end
+
 # Each of these asserts that a render's query count does not grow with the
 # number of rows it renders. They compare two sizes rather than a fixed number
 # so the request's constant cost does not have to be encoded in the test.
 class QueryCountTest < ActionController::TestCase
   tests ActionsController
+  include QueryCounting
 
   setup do
     @user = users(:ben)
     @feeds = create_feeds(@user)
-  end
-
-  def matching(statements, pattern)
-    statements.select { _1.match?(pattern) }
   end
 
   test "the actions list does not look the owner up once per action" do
@@ -85,13 +88,10 @@ end
 # auto_update, not ActionsController's.
 class SidebarQueryCountTest < ActionController::TestCase
   tests FeedsController
+  include QueryCounting
 
   setup do
     @user = users(:ben)
-  end
-
-  def matching(statements, pattern)
-    statements.select { _1.match?(pattern) }
   end
 
   # FaviconComponent now reads @feed.icon_url, which queries icon_image_record --
@@ -153,14 +153,11 @@ end
 # preview_image_data -- so a dropped preload is 100 queries a request.
 class ApiEntriesQueryCountTest < ApiControllerTestCase
   tests Api::V2::EntriesController
+  include QueryCounting
 
   setup do
     @user = users(:new)
     @feed = create_feeds(@user).first
-  end
-
-  def matching(statements, pattern)
-    statements.select { _1.match?(pattern) }
   end
 
   def seed_preview_images(entries)
@@ -196,15 +193,13 @@ end
 # Dialog::ActionResults renders entries/_entry per result, and that partial
 # reaches processed_image? on every entry and link_image on the tweet ones.
 class ActionResultsQueryCountTest < ActiveSupport::TestCase
+  include QueryCounting
+
   setup do
     clear_search
     flush_redis
     @user = users(:ben)
     @feed = @user.feeds.first
-  end
-
-  def matching(statements, pattern)
-    statements.select { _1.match?(pattern) }
   end
 
   def seed_image(entry, provider)

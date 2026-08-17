@@ -16,18 +16,7 @@ module ImageCrawler
     end
 
     def seed_row(provider_id: 1, data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", "final_url" => "http://example.com/image-final.jpg"})
-      ::Image.create!(
-        provider: :entry_preview,
-        provider_id: provider_id.to_s,
-        feed_id: 9,
-        url: @original_url,
-        variant: "542x304",
-        image_fingerprint: SecureRandom.hex(16),
-        storage_path: ::Image.storage_path_for(@original_url, "542x304"),
-        width: 542, height: 304, bytesize: 12_345,
-        placeholder_color: "aabbcc",
-        data: data
-      )
+      create_image_row(provider_id: provider_id, url: @original_url, data: data)
     end
 
     test "returns false when nothing is stored for the url" do
@@ -54,7 +43,7 @@ module ImageCrawler
 
         _, payload = EntryImage.jobs.last["args"]
         assert_equal row.storage_path, payload["storage_path"]
-        assert_equal 12_345, payload["bytesize"]
+        assert_equal "2", payload["provider_id"]
         assert_equal "http://example.com/image-final.jpg", payload["original_url"]
         assert_equal row.data["legacy_storage_url"], payload["processed_url"]
       end

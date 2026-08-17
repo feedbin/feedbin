@@ -5,7 +5,7 @@ var callback = function() {
         var entries = "<%= j render partial: "entries/no_entry" %>";
     <% else %>
         <% favicons = Favicon.for_entries(@entries) %>
-        var entries = "<%= j render partial: "entries/entry", collection: @entries, locals: {favicons: favicons}, cached: -> (entry) { entries_cache_key(entry, favicons) } %>";
+        var entries = "<%= j render EntriesHelper.entry_collection(@entries, favicons) %>";
     <% end %>
 
     <% if @append %>

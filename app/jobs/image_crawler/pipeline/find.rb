@@ -51,13 +51,16 @@ module ImageCrawler
           return false
         end
 
-        download_cache = DownloadCache.new(original_url, @image)
-
         if Dedupe.attach(original_url, @image)
           Librato.increment("image.dedupe_hit")
           Sidekiq.logger.info @image.trace(message: "attached existing image", metadata: {original_url: original_url})
-          true
-        elsif download_cache.download?
+          return true
+        end
+
+        # Only after the dedupe check: constructing a DownloadCache costs a
+        # cache read, wasted on every dedupe hit.
+        download_cache = DownloadCache.new(original_url, @image)
+        if download_cache.download?
           download_image(original_url, download_cache)
         else
           Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {original_url: original_url})
@@ -171,7 +174,7 @@ module ImageCrawler
       # whole reason conditional requests can be switched back on.
       def validators_for(row, original_url)
         return {} unless row && row.url == original_url
-        {etag: row.data["etag"], last_modified: row.data["last_modified"]}
+        {etag: row.etag, last_modified: row.last_modified}
       end
 
       # The bytes are unchanged but the validators may not be -- a static host

@@ -48,17 +48,13 @@ module ImageCrawler
         image_urls = [@entry.fully_qualified_url]
         preset_name = "youtube"
       elsif @entry.micropost?
-        found = find_image_urls
-        image_urls = found.map(&:first)
-        meta_image_urls = found.select(&:last).map(&:first)
+        image_urls, meta_image_urls = content_image_urls
         @entry.media.each do |media|
           image_urls.push(media.url) if media.type =~ /image/i
         end
       else
         entry_url = @entry.fully_qualified_url if same_domain?
-        found = find_image_urls
-        image_urls = found.map(&:first)
-        meta_image_urls = found.select(&:last).map(&:first)
+        image_urls, meta_image_urls = content_image_urls
       end
 
       if image_urls.present? || entry_url.present?
@@ -91,6 +87,14 @@ module ImageCrawler
       else
         @entry.update(image: @image)
       end
+    end
+
+    # find_image_urls tags each candidate with whether it came from a meta
+    # tag. Split that into the full ordered candidate list and the meta-only
+    # subset ReuseRules polices.
+    def content_image_urls
+      found = find_image_urls
+      [found.map(&:first), found.select(&:last).map(&:first)]
     end
 
     def find_image_urls

@@ -60,10 +60,9 @@ module ImageCrawler
 
       def upload_r2
         File.open(@image.r2_source_path) do |file|
-          Fog::Storage.new(STORAGE_R2).put_object(@image.r2_bucket, @image.storage_path, file, @image.r2_storage_options)
+          ::Image.r2_client.put_object(@image.r2_bucket, @image.storage_path, file, @image.r2_storage_options)
         end
       end
-
     end
   end
 end

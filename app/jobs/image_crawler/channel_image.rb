@@ -45,10 +45,17 @@ module ImageCrawler
     def perform(id, image)
       return if image["storage_path"].blank?
 
-      # delete_suffix, not split("-").first as the other tenants do: a
-      # YouTube channel id is base64url, so "-" and "_" are ordinary
-      # characters in it and UC-lHJZR3Gqxm24_Vd_AJ5Yw would come back as "UC".
-      Feed.where(channel_id: id.delete_suffix(SUFFIX)).find_each(&:touch)
+      # The payload carries the channel id; the display id is for tracing
+      # only (parsing it back apart is a trap -- a channel id is base64url,
+      # so "-" is an ordinary character in it). Blank means a payload from a
+      # deploy predating provider_id: skip the touch, the next harvest
+      # self-heals. Never fall through to a nil query -- channel_id is null
+      # for every non-YouTube feed, and touching all of those is the exact
+      # fan-out this job exists to avoid.
+      channel_id = image["provider_id"]
+      return if channel_id.blank?
+
+      Feed.where(channel_id: channel_id).find_each(&:touch)
     end
   end
 end

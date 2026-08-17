@@ -24,17 +24,7 @@ module ImageCrawler
     end
 
     def seed_row(provider_id:, feed_id: 9, url: @url, image_fingerprint: SecureRandom.hex(16))
-      ::Image.create!(
-        provider: :entry_preview,
-        provider_id: provider_id.to_s,
-        feed_id: feed_id,
-        url: url,
-        variant: "542x304",
-        image_fingerprint: image_fingerprint,
-        storage_path: ::Image.storage_path_for(url, "542x304"),
-        width: 542, height: 304, bytesize: 12_345,
-        placeholder_color: "aabbcc"
-      )
+      create_image_row(provider_id: provider_id, feed_id: feed_id, url: url, image_fingerprint: image_fingerprint)
     end
 
     test "skips a url already used by another entry in the feed" do

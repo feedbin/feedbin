@@ -14,28 +14,23 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
   # Rows sharing a url_fingerprint also share their legacy S3 object, so the
   # default legacy url is keyed by url, not by provider_id.
   def seed_row(provider_id:, url: @url, legacy_storage_url: nil, provider: :entry_preview)
-    Image.create!(
+    create_image_row(
       provider: provider,
-      provider_id: provider_id.to_s,
-      feed_id: 9,
+      provider_id: provider_id,
       url: url,
-      variant: "542x304",
-      image_fingerprint: SecureRandom.hex(16),
-      storage_path: Image.storage_path_for(url, "542x304"),
-      width: 542, height: 304, bytesize: 12_345,
-      placeholder_color: "aabbcc",
       data: {"legacy_storage_url" => legacy_storage_url || "https://bucket.s3.amazonaws.com/abc/#{Digest::MD5.hexdigest(url)}.jpg"}
     )
   end
 
   def seed_icon_row(storage_path)
-    Image.create!(
-      provider: :feed_icon, provider_id: SecureRandom.hex, feed_id: 9,
-      url: "http://example.com/favicon.ico", variant: "32x32",
-      image_fingerprint: SecureRandom.hex(16),
+    create_image_row(
+      provider: :feed_icon,
+      provider_id: SecureRandom.hex,
+      url: "http://example.com/favicon.ico",
+      variant: "32x32",
       original_fingerprint: SecureRandom.hex(16),
       storage_path: storage_path,
-      width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc"
+      width: 32, height: 32, bytesize: 500
     )
   end
 

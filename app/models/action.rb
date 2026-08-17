@@ -106,7 +106,7 @@ class Action < ApplicationRecord
   def results
     @results ||= begin
       response = Search.client { _1.search(Search.index_name(Entry.table_name), query: search_options) }
-      OpenStruct.new({total: response.total, records: response.records(Entry).includes(feed: [:favicon, :icon_image_record, :channel_image_record]).preload(:preview_image_record, :link_image_record)})
+      OpenStruct.new({total: response.total, records: response.records(Entry).includes(feed: Feed::ICON_PRELOADS).preload_image_records})
     end
   end
 

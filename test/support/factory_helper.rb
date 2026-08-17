@@ -113,4 +113,24 @@ module FactoryHelper
     end
     user
   end
+
+  # A valid images row with every NOT NULL column filled, so tests spell only
+  # the attributes they are about -- and the next NOT NULL column is a
+  # one-place fix. Entry-preset shape by default (url-keyed, 542x304);
+  # override variant/storage_path/fingerprints for the icon family.
+  def create_image_row(url: "http://example.com/image.jpg", variant: "542x304", **overrides)
+    Image.create!({
+      provider: :entry_preview,
+      provider_id: "1",
+      feed_id: 9,
+      url: url,
+      variant: variant,
+      image_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for(url, variant),
+      width: 542,
+      height: 304,
+      bytesize: 12_345,
+      placeholder_color: "aabbcc"
+    }.merge(overrides))
+  end
 end

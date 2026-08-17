@@ -54,12 +54,18 @@ class Entry < ApplicationRecord
    }
 
   def self.entries_with_feed(entry_ids, sort)
-    in_order_of(:id, entry_ids).includes(feed: [:favicon, :icon_image_record, :channel_image_record])
+    in_order_of(:id, entry_ids).includes(feed: Feed::ICON_PRELOADS)
   end
+
+  # Everything entries/_entry reads from the images table: the preview image
+  # (rendered and part of the cache key) and the tweet/micropost link preview.
+  # Every path that renders that partial needs this attached, or a cache-miss
+  # render costs a query per row.
+  scope :preload_image_records, -> { preload(:preview_image_record, :link_image_record) }
 
   def self.entries_list
     select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
-      .preload(:preview_image_record, :link_image_record)
+      .preload_image_records
   end
 
   def self.sort_preference(sort)
@@ -139,15 +145,15 @@ class Entry < ApplicationRecord
   # transition keep their JSON. Reads prefer the row, then fall back.
   def r2_processed_image
     if preview_image_record
-      r2_image_url(preview_image_record.storage_path)
+      Image.r2_url(preview_image_record.storage_path)
     elsif image
-      r2_image_url(image["storage_path"])
+      Image.r2_url(image["storage_path"])
     end
   end
 
   def legacy_processed_image
     if preview_image_record
-      legacy_image_url(preview_image_record.data["legacy_storage_url"])
+      legacy_image_url(preview_image_record.legacy_storage_url)
     elsif image && image["original_url"] && image["width"] && image["height"] && image["processed_url"]
       legacy_image_url(image["processed_url"])
     end
@@ -156,7 +162,7 @@ class Entry < ApplicationRecord
   def preview_image_data
     if record = preview_image_record
       {
-        "original_url" => record.data["final_url"] || record.url,
+        "original_url" => record.final_url || record.url,
         "width" => record.width,
         "height" => record.height
       }
@@ -176,27 +182,11 @@ class Entry < ApplicationRecord
     processed_image ? true : false
   end
 
-  def itunes_image
-    r2_itunes_image || legacy_itunes_image
-  end
-
   # New artwork lives on the images row; episodes crawled before the R2
   # transition keep their settings value. Reads prefer the row, then fall back.
-  def r2_itunes_image
-    r2_image_url(icon_image_record&.storage_path)
-  end
-
-  def legacy_itunes_image
-    if media_image || (data && data["itunes_image_processed"])
-      image_url = media_image || data["itunes_image_processed"]
-
-      host = ENV["ENTRY_IMAGE_HOST"]
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = "https"
-      url.to_s
-    end
+  def itunes_image
+    Image.r2_url(icon_image_record&.storage_path) ||
+      legacy_image_url(media_image || data&.[]("itunes_image_processed"))
   end
 
   def content_diff
@@ -337,16 +327,9 @@ class Entry < ApplicationRecord
 
   def link_image
     if record = link_image_record
-      r2_image_url(record.storage_path) || legacy_image_url(record.data["legacy_storage_url"])
-    elsif data && data["twitter_link_image_processed"]
-      image_url = data["twitter_link_image_processed"]
-
-      host = ENV["ENTRY_IMAGE_HOST"]
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = "https"
-      url.to_s
+      Image.r2_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
+    else
+      legacy_image_url(data&.[]("twitter_link_image_processed"))
     end
   end
 
@@ -375,10 +358,6 @@ class Entry < ApplicationRecord
   end
 
   private
-
-  def r2_image_url(storage_path)
-    Image.r2_url(storage_path)
-  end
 
   def legacy_image_url(image_url)
     return nil if image_url.blank?

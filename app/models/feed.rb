@@ -16,6 +16,11 @@ class Feed < ApplicationRecord
   has_one :icon_image_record, -> { provider_feed_icon }, class_name: "Image", foreign_key: :provider_id
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :channel_id
 
+  # Everything FaviconComponent (via #icon_url and #favicon) can read when
+  # rendering this feed's icon. Preload these wherever feeds render in a list,
+  # or the icon lookups become a query per feed.
+  ICON_PRELOADS = [:favicon, :icon_image_record, :channel_image_record].freeze
+
   before_create :set_host
   before_save :set_hubs
   before_save :set_channel_id

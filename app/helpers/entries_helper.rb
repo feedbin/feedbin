@@ -12,14 +12,11 @@ module EntriesHelper
   #
   # Every part must come from something already loaded, or the key becomes an
   # N+1 per render: favicons is the collection-wide map (Favicon.for_entries),
-  # feed.favicon comes from the includes(feed: [:favicon]) every entry-list
-  # path does, and preview_image_record from the preload every entry-list
-  # controller does -- most via Entry.entries_list, directly in
-  # entries_controller#search and saved_searches_controller#show because the
-  # relation is Elasticsearch-backed and can't take entries_list's column
-  # select, and directly in updated_entries_controller, whose .sort_by turns
-  # the relation into an Array so the preload must already be attached by
-  # then.
+  # feed.favicon comes from includes(feed: Feed::ICON_PRELOADS), and
+  # preview_image_record from Entry.preload_image_records -- attached by every
+  # entry-list path, via Entry.entries_list or directly on the paths that
+  # cannot use it (Elasticsearch-backed relations, and relations that become
+  # Arrays through .sort_by before rendering).
   def self.entries_cache_key(entry, favicons = {})
     [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, "v8"]
   end
@@ -32,6 +29,19 @@ module EntriesHelper
   def self.entry_favicon(entry, favicons)
     return favicons[entry.hostname] if entry.feed&.pages?
     entry.feed&.favicon
+  end
+
+  # The one render invocation for the entry list, shared by the view
+  # (shared/_entries.js.erb) and the cache warmer (CacheEntryViews). The two
+  # once drifted -- the warmer passed `cached: true` and warmed keys no view
+  # ever read -- and sharing the options is what rules that out.
+  def self.entry_collection(entries, favicons)
+    {
+      partial: "entries/entry",
+      collection: entries,
+      locals: {favicons: favicons},
+      cached: ->(entry) { entries_cache_key(entry, favicons) }
+    }
   end
 
   def entries_cache_key(entry, favicons = {})

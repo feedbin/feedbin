@@ -3,7 +3,7 @@ class QueuedEntriesController < ApplicationController
     @user = current_user
 
     queued_entry_ids = @user.queued_entries.order(order: :asc).pluck(:entry_id)
-    @entries = Entry.where(id: queued_entry_ids).includes(feed: [:favicon, :icon_image_record, :channel_image_record]).entries_list
+    @entries = Entry.where(id: queued_entry_ids).includes(feed: Feed::ICON_PRELOADS).entries_list
     @entries = @entries.sort_by { |entry| queued_entry_ids.index(entry.id) }
 
     @type = "queued_entries"

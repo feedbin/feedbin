@@ -14,18 +14,12 @@ class CacheEntryViews
 
   def cache_views
     entry_ids = dequeue_ids(SET_NAME)
-    entries = Entry.where(id: entry_ids).includes(feed: [:favicon, :icon_image_record, :channel_image_record]).preload(:preview_image_record).to_a
+    entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS).preload_image_records.to_a
     favicons = Favicon.for_entries(entries)
 
-    # The same lambda and the same locals the entry list renders with. A bare
-    # `cached: true` here would warm a key nothing ever looks up.
-    ApplicationController.render({
-      partial: "entries/entry",
-      collection: entries,
-      format: :html,
-      locals: {favicons: favicons},
-      cached: ->(entry) { EntriesHelper.entries_cache_key(entry, favicons) }
-    })
+    # The same invocation the entry list renders with, or this warms keys
+    # nothing ever looks up.
+    ApplicationController.render(EntriesHelper.entry_collection(entries, favicons).merge(format: :html))
     ApplicationController.render({
       layout: nil,
       template: "api/v2/entries/index",

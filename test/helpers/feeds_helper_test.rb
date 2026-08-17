@@ -1,6 +1,8 @@
 require "test_helper"
 
 class FeedsHelperTest < ActiveSupport::TestCase
+  include FeedsHelper
+
   setup do
     @user = users(:ben)
     @feed = create_feeds(@user).first
@@ -16,14 +18,14 @@ class FeedsHelperTest < ActiveSupport::TestCase
   test "the feeds key changes when a favicon changes, without touching the feed" do
     favicon = Favicon.create!(host: @feed.host, url: "http://example.com/a.png")
 
-    before = ActiveSupport::Cache.expand_cache_key(FeedsHelper.sidebar_feeds_cache_key(loaded_feeds))
+    before = ActiveSupport::Cache.expand_cache_key(sidebar_feeds_cache_key(loaded_feeds))
     feed_updated_at = @feed.reload.updated_at
 
     travel 1.minute do
       favicon.update!(url: "http://example.com/b.png")
     end
 
-    after = ActiveSupport::Cache.expand_cache_key(FeedsHelper.sidebar_feeds_cache_key(loaded_feeds))
+    after = ActiveSupport::Cache.expand_cache_key(sidebar_feeds_cache_key(loaded_feeds))
 
     refute_equal before, after
     assert_equal feed_updated_at.to_i, @feed.reload.updated_at.to_i
@@ -33,13 +35,13 @@ class FeedsHelperTest < ActiveSupport::TestCase
     @feed.tag("News", @user)
     favicon = Favicon.create!(host: @feed.host, url: "http://example.com/a.png")
 
-    before = ActiveSupport::Cache.expand_cache_key(FeedsHelper.sidebar_tags_cache_key(@user.tag_group))
+    before = ActiveSupport::Cache.expand_cache_key(sidebar_tags_cache_key(@user.tag_group))
 
     travel 1.minute do
       favicon.update!(url: "http://example.com/b.png")
     end
 
-    after = ActiveSupport::Cache.expand_cache_key(FeedsHelper.sidebar_tags_cache_key(@user.tag_group))
+    after = ActiveSupport::Cache.expand_cache_key(sidebar_tags_cache_key(@user.tag_group))
 
     refute_equal before, after
   end
@@ -50,7 +52,7 @@ class FeedsHelperTest < ActiveSupport::TestCase
     Favicon.create!(host: @feed.host, url: "http://example.com/a.png")
     feeds = loaded_feeds
 
-    statements = capture_sql { FeedsHelper.sidebar_feeds_cache_key(feeds) }
+    statements = capture_sql { sidebar_feeds_cache_key(feeds) }
 
     assert_empty statements.select { _1.match?(/FROM "favicons"/i) }
   end
@@ -66,7 +68,7 @@ class FeedsHelperTest < ActiveSupport::TestCase
     tags = @user.tag_group
 
     key = nil
-    statements = capture_sql { key = FeedsHelper.sidebar_tags_cache_key(tags) }
+    statements = capture_sql { key = sidebar_tags_cache_key(tags) }
 
     assert_empty statements.select { _1.match?(/FROM "favicons"/i) }
     _, _, _, favicons, _ = key
