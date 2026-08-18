@@ -50,7 +50,7 @@ class EntriesListTest < ActionController::TestCase
 
   test "building the cache key does not walk an association per entry" do
     ids = 5.times.map { create_entry(@feed).id }
-    entries = Entry.where(id: ids).includes(:feed).preload(:preview_image_record).to_a
+    entries = Entry.where(id: ids).includes(:feed).preload(:owned_image_records, :channel_image_record).to_a
     favicons = Favicon.for_entries(entries)
 
     statements = capture_sql { entries.each { entry_cache_key(it, favicons) } }
@@ -67,7 +67,7 @@ class EntriesListTest < ActionController::TestCase
     plain_feed = create_feeds(@user).first
     Favicon.create!(host: plain_feed.host, url: "http://example.com/a.png")
     ids = 3.times.map { create_entry(plain_feed).id }
-    entries = Entry.where(id: ids).includes(feed: [:favicon]).preload(:preview_image_record).to_a
+    entries = Entry.where(id: ids).includes(feed: [:favicon]).preload(:owned_image_records).to_a
     favicons = Favicon.for_entries(entries)
 
     statements = capture_sql { entries.each { entry_cache_key(it, favicons) } }
@@ -112,6 +112,49 @@ class EntriesListTest < ActionController::TestCase
     refute_equal before, entry_cache_key(Entry.find(entry.id))
   end
 
+  # The preview row and the tweet/micropost link-preview row are both keyed
+  # by the entry's own id, so the list preload fetches them in one images
+  # query (owned_image_records) rather than one per reader. The full budget
+  # for this load is three: the merged entry-owned query, the entry channel
+  # avatars (the factory's entries carry a provider_parent_id), and the
+  # feed's own icon row from Feed::ICON_PRELOADS.
+  test "the entry-owned image rows load in one query" do
+    ids = 3.times.map { create_entry(@feed).id }
+
+    statements = capture_sql { Entry.where(id: ids).with_list_associations.to_a }
+
+    images = statements.select { it.match?(/FROM "images"/i) }
+    assert_equal 3, images.count,
+      "expected owned + channel + feed icon, got #{images.count}:\n#{images.join("\n")}"
+  end
+
+  # The avatar a playlist entry renders belongs to the entry's own channel,
+  # The avatar a playlist entry renders belongs to the entry's own channel,
+  # and the touch that announces a landing avatar goes to feeds of that
+  # channel -- a playlist feed of a different channel never hears it. The key
+  # must read the row itself, like it does for the favicon above.
+  test "storing the entry's channel avatar changes the key without touching the feed" do
+    entry = create_entry(@feed)
+    entry.update!(provider: :youtube, provider_id: "video1", provider_parent_id: "UCvideochannel")
+    before = entry_cache_key(Entry.find(entry.id))
+    feed_updated_at = @feed.reload.updated_at
+
+    Image.create!(
+      provider: :embed_icon, provider_id: "UCvideochannel",
+      url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
+      image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png"),
+      width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+    )
+
+    refute_equal before, entry_cache_key(Entry.find(entry.id))
+    assert_equal feed_updated_at.to_i, @feed.reload.updated_at.to_i
+  end
+
+  private
+
+  # The lambda shared/_entries.js.erb uses to key the collection cache.
   private
 
   # The lambda shared/_entries.js.erb uses to key the collection cache.

@@ -137,6 +137,26 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil @entry.tweet
   end
 
+  # A playlist feed mixes videos from many channels, so the channel avatar is
+  # the entry's to resolve, not the feed's: provider_parent_id carries each
+  # video's own channel, keyed the same way the embed_icon rows are.
+  test "channel_image_record resolves the avatar row for the entry's own channel" do
+    feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?playlist_id=PLcurated")
+    entry = create_entry(feed)
+    entry.update!(provider: :youtube, provider_id: "video1", provider_parent_id: "UCvideochannel")
+
+    row = Image.create!(
+      provider: :embed_icon, provider_id: "UCvideochannel",
+      url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
+      image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png"),
+      width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+    )
+
+    assert_equal row, entry.reload.channel_image_record
+  end
+
   test "accessing tweet on a non-tweet entry raises no exceptions" do
     @entry.data = {"enclosure_url" => "http://example.com/a.mp3"}
 

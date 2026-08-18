@@ -11,6 +11,8 @@ class FaviconComponent < ApplicationComponent
       icon_newsletter
     elsif @feed.twitter_user?
       icon_twitter_user
+    elsif (channel_icon_url = entry_channel_icon_url)
+      icon_entry_channel(channel_icon_url)
     elsif (icon_url = @feed.icon_url)
       icon_feed(icon_url)
     elsif @feed.pages? && @entry
@@ -35,6 +37,29 @@ class FaviconComponent < ApplicationComponent
       image_tag_with_fallback(
         image_url("favicon-profile-default.png"),
         RemoteFile.signed_url(@feed.twitter_user.profile_image_uri_https(:original)),
+        alt: ""
+      )
+    end
+  end
+
+  # The avatar of the channel this entry's video belongs to, for entries
+  # whose channel is not the feed's own -- a playlist feed mixes videos from
+  # many channels, and the feed-level icon would brand them all with the
+  # playlist owner. When the channels match, the feed's resolution wins: its
+  # own icon row deliberately outranks the shared channel avatar, and this
+  # branch must not undo that.
+  def entry_channel_icon_url
+    return nil if @entry.nil? || @entry.provider_parent_id.blank?
+    return nil if @entry.provider_parent_id == @feed.channel_id
+    Image.unified_url(@entry.channel_image_record&.storage_path)
+  end
+
+  # Always round: an embed_icon row is a YouTube channel avatar.
+  def icon_entry_channel(url)
+    span class: "favicon-wrap twitter-profile-image icon-format-round" do
+      image_tag_with_fallback(
+        image_url("favicon-profile-default.png"),
+        url,
         alt: ""
       )
     end

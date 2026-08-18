@@ -257,7 +257,7 @@ class EntriesController < ApplicationController
     # EntryPresenter#media_image (icon_image_record). The preload endpoint
     # renders a client-sized batch of these at once.
     entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS)
-      .preload(:preview_image_record, :icon_image_record)
+      .preload(:owned_image_records, :icon_image_record)
     subscriptions = @user.subscriptions.pluck(:feed_id)
     @title = entries.present? ? "#{entries.first.title} - Feedbin" : "Feedbin"
     entries.each_with_object({}) do |entry, hash|

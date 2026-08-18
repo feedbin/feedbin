@@ -12,9 +12,20 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
-  has_one :preview_image_record, -> { provider_entry_preview }, class_name: "Image", foreign_key: :provider_id
-  has_one :link_image_record, -> { provider_entry_link_preview }, class_name: "Image", foreign_key: :provider_id
+  # The preview image and the tweet/micropost link preview are both rows
+  # keyed by this entry's own id, so one association fetches the pair in a
+  # single query wherever a list preloads it; the two readers below keep the
+  # call sites' vocabulary (and each is at most one row -- the images table
+  # is unique on provider + provider_id). entry_icon rows are deliberately
+  # not folded in: no list reads them, and every micropost/podcast/youtube
+  # entry would drag a wasted row into each page render.
+  has_many :owned_image_records, -> { entry_images }, class_name: "Image", foreign_key: :provider_id
   has_one :icon_image_record, -> { provider_entry_icon }, class_name: "Image", foreign_key: :provider_id
+  # The avatar of the channel this entry's video belongs to -- the entry's
+  # own, not the feed's: a playlist feed mixes videos from many channels, and
+  # provider_parent_id carries each video's channel (UC-form, same key the
+  # embed_icon rows use).
+  has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
 
   before_create :ensure_published
   before_create :create_summary
@@ -59,14 +70,14 @@ class Entry < ApplicationRecord
   # the tweet/micropost link preview. Attaching less than this makes a
   # cache-miss render cost a query per row.
   scope :with_list_associations, -> {
-    includes(feed: Feed::ICON_PRELOADS).preload(:preview_image_record, :link_image_record)
+    includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :channel_image_record)
   }
 
   # The same associations, plus only the columns that partial reads. Separate
   # because the paths that build their relation from an Elasticsearch result,
   # or materialize it into an Array before rendering, cannot take the select.
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
+    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings, :provider_parent_id)
       .with_list_associations
   end
 
@@ -75,7 +86,7 @@ class Entry < ApplicationRecord
   # processed_image? and preview_image_data). Those endpoints serve up to 100
   # entries, so rendering extended without it is 100 queries a request.
   scope :for_api, ->(mode = nil) {
-    mode.to_s == "extended" ? includes(:feed).preload(:preview_image_record) : includes(:feed)
+    mode.to_s == "extended" ? includes(:feed).preload(:owned_image_records) : includes(:feed)
   }
 
   def self.sort_preference(sort)
@@ -183,6 +194,14 @@ class Entry < ApplicationRecord
     if color.respond_to?(:length) && color.length == 6
       color
     end
+  end
+
+  def preview_image_record
+    owned_image_records.detect(&:provider_entry_preview?)
+  end
+
+  def link_image_record
+    owned_image_records.detect(&:provider_entry_link_preview?)
   end
 
   def processed_image?

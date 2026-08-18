@@ -25,6 +25,48 @@ class BackfillFeedChannelIdsTest < ActiveSupport::TestCase
     assert_equal "UCparsed", feed.reload.channel_id
   end
 
+  # Rows written while derived_channel_id trusted the channel feed's bare
+  # yt:channelId hold the 22-character suffix without its UC prefix, so they
+  # match no images row. The nil-only scope would skip them.
+  test "repairs a bare channel_id an earlier crawl stored" do
+    feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "BJycsmduvYEL83R_U4JriQ"})
+    feed.update_columns(channel_id: "BJycsmduvYEL83R_U4JriQ", updated_at: 1.year.ago)
+    before = feed.reload.updated_at
+
+    BackfillFeedChannelIds.new.perform
+
+    feed.reload
+    assert_equal "UCBJycsmduvYEL83R_U4JriQ", feed.channel_id
+    assert_equal before.to_f, feed.updated_at.to_f
+  end
+
+  # Sidebar and entry caches reach the channel avatar only through
+  # feed.updated_at, and the touch that surfaces a landing avatar
+  # (ChannelImage) fired against the wrong key for these rows -- it matched
+  # nothing, and it is not coming again. When the repair connects a feed to
+  # an avatar that already exists, the backfill must do the touch that
+  # missed. The quiet write above is only right while no avatar exists.
+  test "touches the feed when the repair connects it to an existing avatar" do
+    feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "BJycsmduvYEL83R_U4JriQ"})
+    feed.update_columns(channel_id: "BJycsmduvYEL83R_U4JriQ", updated_at: 1.year.ago)
+    Image.create!(
+      provider: :embed_icon, provider_id: "UCBJycsmduvYEL83R_U4JriQ",
+      url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
+      image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png"),
+      width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
+    )
+    before = feed.reload.updated_at
+
+    BackfillFeedChannelIds.new.perform
+
+    feed.reload
+    assert_equal "UCBJycsmduvYEL83R_U4JriQ", feed.channel_id
+    assert_operator feed.updated_at, :>, before,
+      "connecting the feed to an avatar it can now render must move its cache key"
+  end
+
   test "leaves feeds that are not youtube alone" do
     feed = create_feeds(users(:ben)).first
 

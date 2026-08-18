@@ -26,6 +26,18 @@ class FeedTest < ActiveSupport::TestCase
     assert_nil create_feeds(users(:ben)).first.icon_url
   end
 
+  # YouTube's ids share one 22-character identity wrapped in a container
+  # prefix -- UC the channel, UU its uploads playlist, UULF/UUSH the filtered
+  # views of it -- and the channel feed is the one place the feed-level
+  # yt:channelId arrives bare. Everything else in the system speaks UC-form
+  # (entry-level ids, the Data API, images.provider_id), so the prefix is
+  # restored here, keyed on length rather than prefix: a bare id may itself
+  # begin with "UC".
+  test "channel_id restores the UC prefix the channel feed strips" do
+    feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "BJycsmduvYEL83R_U4JriQ"})
+    assert_equal "UCBJycsmduvYEL83R_U4JriQ", feed.channel_id
+  end
+
   test "channel_id comes from the parsed feed" do
     feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "UC-lHJZR3Gqxm24_Vd_AJ5Yw"})
     assert_equal "UC-lHJZR3Gqxm24_Vd_AJ5Yw", feed.channel_id
@@ -52,6 +64,27 @@ class FeedTest < ActiveSupport::TestCase
 
     assert_nil feed.youtube_channel_id
     assert_equal "UCabc", feed.channel_id
+  end
+
+  # The strict matcher's old regex required "www." while the wide one made it
+  # optional -- an accident of two hand-rolled patterns for one url shape.
+  # With one shared pattern, a www-less canonical feed qualifies for WebSub
+  # like it always should have: the real guard is feed_url and self_url
+  # agreeing, not the spelling of the host.
+  test "youtube_channel_id accepts a www-less canonical feed" do
+    feed = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=UCwwwless")
+    feed.update_column(:self_url, "https://www.youtube.com/feeds/videos.xml?channel_id=UCwwwless")
+
+    assert_equal "UCwwwless", feed.reload.youtube_channel_id
+  end
+
+  # The old pattern's * matched an empty channel_id= and returned "" -- truthy,
+  # so self_url built a degenerate url around it. One character minimum.
+  test "youtube_channel_id is nil for an empty channel_id parameter" do
+    feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=")
+    feed.update_column(:self_url, "https://www.youtube.com/feeds/videos.xml?channel_id=")
+
+    assert_nil feed.reload.youtube_channel_id
   end
 
   test "icon_url prefers the channel row over the signed proxy" do

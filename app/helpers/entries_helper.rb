@@ -17,7 +17,7 @@ module EntriesHelper
   # attaches -- through Entry.entries_list where the narrow column select also
   # applies, on its own where it cannot.
   def self.entries_cache_key(entry, favicons = {})
-    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, "v8"]
+    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v9"]
   end
 
   # The same two sources FaviconComponent renders from, resolved the same way:
