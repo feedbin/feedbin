@@ -1,7 +1,5 @@
 # Removes images-table usage rows for deleted entries and hands the objects
-# they referenced to the sweep. Object deletion is deferred rather than
-# serialised against attachment: see
-# docs/superpowers/plans/2026-08-15-image-pipeline-simplification.md.
+# they referenced to the deferred sweep.
 class ImageGarbageCollector
   include Sidekiq::Worker
   sidekiq_options queue: :utility
@@ -12,9 +10,8 @@ class ImageGarbageCollector
     entry_ids = [*entry_ids].map(&:to_s)
     return if entry_ids.empty?
 
-    # pluck rather than instantiating: the rows are about to be deleted, and
-    # only these three values are needed. transpose turns the row tuples into
-    # one named array per column.
+    # pluck: the rows are about to be deleted and only three values are
+    # needed. transpose gives one array per column.
     rows = Image.entry_owned.where(provider_id: entry_ids)
       .pluck(:id, :storage_path, Image.data_projection(:legacy_storage_url))
     return if rows.empty?

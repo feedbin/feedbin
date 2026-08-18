@@ -14,8 +14,7 @@ module ImageCrawler
     end
 
     # The channels API returns default (88x88), medium (240x240) and high
-    # (800x800). Today's code takes default and hotlinks it, which is soft in
-    # every slot bigger than a favicon.
+    # (800x800); take the largest.
     test "schedules a Find job for the largest thumbnail" do
       record = channel({
         "default" => {"url" => "https://yt3.ggpht.com/small.jpg"},
@@ -66,10 +65,8 @@ module ImageCrawler
       assert_operator two.reload.updated_at, :>, before
     end
 
-    # Channel ids are base64url: "-" and "_" are ordinary characters in them,
-    # which is why the channel comes from the payload's provider_id -- parsing
-    # it back out of the display id is what the other tenants' split("-")
-    # idiom gets wrong.
+    # Channel ids are base64url ("-" is an ordinary character), so the
+    # channel must come from provider_id, never parsed from the display id.
     test "keys on the payload's channel id, not a parse of the job id" do
       channel_id = "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}")

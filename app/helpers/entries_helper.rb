@@ -1,39 +1,22 @@
 module EntriesHelper
-  # The entry summary renders the feed's title as well as its icon and
-  # favicon, so key on the feed record rather than enumerating the attributes
-  # the partial happens to use today.
-  #
-  # The favicon and the preview image are separate rows with their own
-  # timestamps, and both render into this partial. Digesting the records is
-  # what lets one row update invalidate every view referencing it: the
-  # alternative is touching every owner row, which is what TouchFeeds did for
-  # a favicon change -- 100,000 writes to invalidate views on a host like
-  # medium.com.
-  #
-  # Every part must come from something already loaded, or the key becomes an
-  # N+1 per render: favicons is the collection-wide map (Favicon.for_entries),
-  # and feed.favicon and preview_image_record both come from
-  # Entry.with_list_associations, which every path rendering this partial
-  # attaches -- through Entry.entries_list where the narrow column select also
-  # applies, on its own where it cannot.
+  # Digests the rows the partial renders, so one row update invalidates
+  # every view referencing it without touching owner rows. Every part must
+  # come from something already loaded (Favicon.for_entries map,
+  # with_list_associations) or the key is an N+1 per render.
   def self.entries_cache_key(entry, favicons = {})
     [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v9"]
   end
 
-  # The same two sources FaviconComponent renders from, resolved the same way:
-  # a Pages feed is one row holding articles from everywhere, so its entries
-  # key on their own host via the map; everything else keys on the feed's own
-  # favicon. Mirroring the component is what keeps the digest from drifting
-  # away from what actually got rendered.
+  # The same sources FaviconComponent renders from, resolved the same way:
+  # Pages entries key on their own host, everything else on the feed's
+  # favicon. Mirroring the component keeps the digest from drifting.
   def self.entry_favicon(entry, favicons)
     return favicons[entry.hostname] if entry.feed&.pages?
     entry.feed&.favicon
   end
 
-  # The one render invocation for the entry list, shared by the view
-  # (shared/_entries.js.erb) and the cache warmer (CacheEntryViews). The two
-  # once drifted -- the warmer passed `cached: true` and warmed keys no view
-  # ever read -- and sharing the options is what rules that out.
+  # The one render invocation for the entry list, shared by the view and the
+  # cache warmer so the warmer cannot warm keys no view reads.
   def self.entry_collection(entries, favicons)
     {
       partial: "entries/entry",

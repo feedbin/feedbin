@@ -71,11 +71,8 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal("channel_id", @entry.reload.provider_parent_id)
   end
 
-  # The entry's own <yt:channelId>, which feedkit already parses onto data.
-  # Preferring it over the embed lookup means the channel is known the moment
-  # the entry is created, rather than after HarvestEmbeds' API round trip --
-  # and it keeps working when that round trip comes back empty, which is the
-  # ordinary answer for a rate-limited key or a video made private.
+  # The entry's own <yt:channelId> outranks the embed lookup: known at
+  # creation, and still there when the API round trip comes back empty.
   test "should take provider_parent_id from the entry's own channel id" do
     @entry.update(data: {youtube_video_id: "video_id", youtube_channel_id: "UCfromentry"}, provider_id: "video_id")
     @entry.provider_youtube!
@@ -236,10 +233,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   # The channels half of the API can come back empty while the videos half
-  # succeeded -- a quota trip, or every channel in the batch terminated. The
-  # video embeds still import, so their parent lookup finds nothing and puts a
-  # nil in the channels list, which killed this retry: false job on
-  # nil.provider_id.
+  # succeeded; a nil parent must not kill this retry: false job.
   test "survives videos whose channel embed was never imported" do
     Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
 

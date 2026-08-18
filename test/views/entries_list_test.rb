@@ -13,10 +13,8 @@ class EntriesListTest < ActionController::TestCase
     statements.select { it.match?(/FROM "favicons"/i) }
   end
 
-  # A Pages feed is one row holding articles from everywhere, so the favicon
-  # each row needs belongs to the entry's host, not the feed's. The preload the
-  # controller does cannot reach it, so the list paid for a preload it could
-  # not use and then looked the rest up one at a time.
+  # Pages entries need their own host's favicon, which no feed preload can
+  # reach -- hence the collection-wide map.
   test "the Pages list does not query favicons once per entry" do
     login_as @user
     5.times do |index|
@@ -36,9 +34,8 @@ class EntriesListTest < ActionController::TestCase
       "the favicon lookups scale with the entry count: #{favicon_queries(statements).count}"
   end
 
-  # The key enumerated the feed attributes the partial happened to use, and the
-  # title was not among them -- so a publisher rename left every already
-  # rendered summary showing the old name.
+  # The key must include the feed record, or a publisher rename leaves
+  # rendered summaries showing the old name.
   test "renaming a feed changes the entry summary cache key" do
     entry = create_entry(@feed)
     before = entry_cache_key(entry)
@@ -77,10 +74,8 @@ class EntriesListTest < ActionController::TestCase
       "the branch must actually resolve a favicon, or this proves nothing"
   end
 
-  # The favicon is its own row with its own timestamp. Digesting the record is
-  # what lets one row update invalidate every view referencing it; the
-  # alternative was TouchFeeds writing to every feed on the host -- 100,000
-  # rows for a host like medium.com.
+  # Digesting the favicon row lets one update invalidate every view
+  # referencing it without touching every feed on the host.
   test "changing the favicon changes the key without touching the feed" do
     entry = create_entry(@feed)
     entry.update!(url: "http://icons.example.com/article")
@@ -112,12 +107,8 @@ class EntriesListTest < ActionController::TestCase
     refute_equal before, entry_cache_key(Entry.find(entry.id))
   end
 
-  # The preview row and the tweet/micropost link-preview row are both keyed
-  # by the entry's own id, so the list preload fetches them in one images
-  # query (owned_image_records) rather than one per reader. The full budget
-  # for this load is three: the merged entry-owned query, the entry channel
-  # avatars (the factory's entries carry a provider_parent_id), and the
-  # feed's own icon row from Feed::ICON_PRELOADS.
+  # Budget: one merged entry-owned query (owned_image_records), the entry
+  # channel avatars, and the feed's own icon row.
   test "the entry-owned image rows load in one query" do
     ids = 3.times.map { create_entry(@feed).id }
 
@@ -128,11 +119,8 @@ class EntriesListTest < ActionController::TestCase
       "expected owned + channel + feed icon, got #{images.count}:\n#{images.join("\n")}"
   end
 
-  # The avatar a playlist entry renders belongs to the entry's own channel,
-  # The avatar a playlist entry renders belongs to the entry's own channel,
-  # and the touch that announces a landing avatar goes to feeds of that
-  # channel -- a playlist feed of a different channel never hears it. The key
-  # must read the row itself, like it does for the favicon above.
+  # The avatar-landing touch goes to feeds of that channel; a playlist feed
+  # of a different channel never hears it, so the key must read the row.
   test "storing the entry's channel avatar changes the key without touching the feed" do
     entry = create_entry(@feed)
     entry.update!(provider: :youtube, provider_id: "video1", provider_parent_id: "UCvideochannel")
@@ -152,9 +140,6 @@ class EntriesListTest < ActionController::TestCase
     assert_equal feed_updated_at.to_i, @feed.reload.updated_at.to_i
   end
 
-  private
-
-  # The lambda shared/_entries.js.erb uses to key the collection cache.
   private
 
   # The lambda shared/_entries.js.erb uses to key the collection cache.

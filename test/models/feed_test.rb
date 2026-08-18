@@ -26,13 +26,8 @@ class FeedTest < ActiveSupport::TestCase
     assert_nil create_feeds(users(:ben)).first.icon_url
   end
 
-  # YouTube's ids share one 22-character identity wrapped in a container
-  # prefix -- UC the channel, UU its uploads playlist, UULF/UUSH the filtered
-  # views of it -- and the channel feed is the one place the feed-level
-  # yt:channelId arrives bare. Everything else in the system speaks UC-form
-  # (entry-level ids, the Data API, images.provider_id), so the prefix is
-  # restored here, keyed on length rather than prefix: a bare id may itself
-  # begin with "UC".
+  # The channel feed serves the feed-level yt:channelId bare; everything
+  # else speaks UC-form, so the prefix is restored, keyed on length.
   test "channel_id restores the UC prefix the channel feed strips" do
     feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "BJycsmduvYEL83R_U4JriQ"})
     assert_equal "UCBJycsmduvYEL83R_U4JriQ", feed.channel_id
@@ -55,10 +50,8 @@ class FeedTest < ActiveSupport::TestCase
     assert_nil create_feeds(users(:ben)).first.channel_id
   end
 
-  # youtube_channel_id answers a different question and keeps its own,
-  # stricter rule: it drives self_url and the WebSub hub, so it requires
-  # feed_url and self_url to agree. Icon resolution needs no such guard --
-  # today's reverse lookup keys on the feed url alone.
+  # youtube_channel_id drives self_url and the WebSub hub, so it requires
+  # feed_url and self_url to agree; icon resolution needs no such guard.
   test "channel_id does not require self_url the way youtube_channel_id does" do
     feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
 
@@ -66,11 +59,8 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal "UCabc", feed.channel_id
   end
 
-  # The strict matcher's old regex required "www." while the wide one made it
-  # optional -- an accident of two hand-rolled patterns for one url shape.
-  # With one shared pattern, a www-less canonical feed qualifies for WebSub
-  # like it always should have: the real guard is feed_url and self_url
-  # agreeing, not the spelling of the host.
+  # The real WebSub guard is feed_url and self_url agreeing, not the
+  # spelling of the host -- www-less canonical feeds qualify.
   test "youtube_channel_id accepts a www-less canonical feed" do
     feed = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=UCwwwless")
     feed.update_column(:self_url, "https://www.youtube.com/feeds/videos.xml?channel_id=UCwwwless")
@@ -78,8 +68,8 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal "UCwwwless", feed.reload.youtube_channel_id
   end
 
-  # The old pattern's * matched an empty channel_id= and returned "" -- truthy,
-  # so self_url built a degenerate url around it. One character minimum.
+  # An empty channel_id= must be nil, not "" -- a truthy "" builds a
+  # degenerate self_url.
   test "youtube_channel_id is nil for an empty channel_id parameter" do
     feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=")
     feed.update_column(:self_url, "https://www.youtube.com/feeds/videos.xml?channel_id=")

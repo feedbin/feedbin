@@ -67,10 +67,8 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
     end
   end
 
-  # The deferral is the whole design: the sweep runs a quarter of an hour after
-  # the rows went away, and anything that re-referenced the path in the
-  # meantime keeps its object. Nothing else covers the interleaving the
-  # advisory locks used to serialize.
+  # Anything that re-referenced the path during the 15-minute deferral
+  # keeps its object -- the interleaving the deferral replaces locks for.
   test "leaves a path that was re-referenced after the rows were deleted" do
     with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       batch = stub_batch_delete
@@ -86,9 +84,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
     end
   end
 
-  # The legacy counterpart, and the race the deferral exists to close: without
-  # it the legacy object would be deleted while a row written milliseconds
-  # later still pointed at it.
+  # Legacy counterpart of the race above.
   test "leaves a legacy object that was re-referenced after the rows were deleted" do
     with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       stub_batch_delete
@@ -186,11 +182,8 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
     end
   end
 
-  # Content-addressed rows never go through Dedupe, so each carries its own
-  # per-row legacy_storage_url even though the show and the episode share one
-  # storage_path -- unlike entry previews, where every row sharing a path
-  # carries the identical legacy_storage_url. Sweeping the episode must queue
-  # its own legacy object even though the path survives via the show's row.
+  # Content-addressed rows carry per-row legacy urls: sweeping the episode
+  # must queue its legacy object even though the path survives via the show.
   test "deletes an episode's own legacy object when a surviving show row shares its storage_path" do
     with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       fingerprint = SecureRandom.hex(16)

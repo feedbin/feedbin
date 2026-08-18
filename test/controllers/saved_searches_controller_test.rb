@@ -14,22 +14,10 @@ class SavedSearchesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  # The entry cache key also reads preview_image_record (Task 11), and
-  # entry.processed_image? -- rendered for every row regardless of caching --
-  # reads it too. This action builds @entries straight off the search result
-  # rather than through Entry.entries_list, so without its own preload this
-  # is a query per row. (A ".loaded?" assertion cannot tell a preload from an
-  # N+1 that happens to run before it is checked -- processed_image? would
-  # load the association either way -- so this counts queries instead.)
-  #
-  # Compares two distinct-feed counts rather than a fixed threshold, and
-  # spreads entries across feeds rather than reusing @feeds.first: a fixed
-  # number goes stale the moment a second images-backed association needs
-  # its own preload (icon_image_record did -- see the show-artwork work),
-  # and entries sharing one feed hide an unpreloaded icon_image_record
-  # behind Rails' per-instance association cache -- the "<= 1" bumped to
-  # "<= 2" for that reason still passed against a broken build, by luck of
-  # every entry here having come from the same feed.
+  # This action builds @entries off the search result, not entries_list, so
+  # it needs its own preload. Counts queries across two distinct-feed sizes,
+  # spread across feeds so a shared instance's association cache cannot hide
+  # a missing preload.
   test "should preload the preview image the entry cache key reads" do
     login_as @user
     token = "savedsearchpreviewtoken"

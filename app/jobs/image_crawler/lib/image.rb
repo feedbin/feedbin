@@ -179,10 +179,8 @@ module ImageCrawler
       # when it lands.
       return if preset.job_class.nil?
 
-      # storage_path is the receivers' row-backed gate; provider_id saves
-      # them re-deriving their entity key by parsing the display id. The
-      # row's other metadata is not duplicated into the payload -- receivers
-      # that need it have the row.
+      # storage_path is the receivers' row-backed gate; provider_id is their
+      # entity key. Other row metadata stays on the row.
       payload = {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
@@ -220,10 +218,9 @@ module ImageCrawler
         }.compact
       )
 
-      # The row moved to a different object, so the old one may now be
-      # unreferenced. Deferred like every other object deletion: a concurrent
-      # crawl attaching to the old path has long since written its row by the
-      # time the sweep looks.
+      # The row moved objects, so the old one may be unreferenced. Deferred
+      # so a concurrent crawl attaching to the old path has written its row
+      # by the time the sweep looks.
       if record.saved_change_to_storage_path? && (replaced = record.storage_path_before_last_save)
         SweepStoredImages.perform_in(ImageGarbageCollector::SWEEP_DELAY, [replaced])
       end
@@ -250,33 +247,23 @@ module ImageCrawler
       preset.content_addressed == true
     end
 
-    # The counterpart: identity comes from the url, which is what makes the
-    # reuse rules meaningful. They police a candidate url repeated across a
-    # feed and bytes repeated across a feed, neither of which means anything
-    # for an icon keyed by its own bytes and shared on purpose.
+    # Identity from the url -- what makes the reuse rules meaningful; they
+    # mean nothing for an icon keyed by its own bytes and shared on purpose.
     def url_addressed?
       unified? && !content_addressed?
     end
 
-    # Whether the legacy object gets written alongside the unified one. Both
-    # stores hold the same bytes now that every preset produces a single
-    # encoding, so this is only about which buckets the object lands in during
-    # the migration, not about format. Entry, podcast and podcast_feed presets
-    # write both; the plain icon preset isn't unified? so it writes only the
-    # legacy object; favicon/touch_icon turn this off and write only unified.
+    # Whether the legacy object is written alongside the unified one. Entry
+    # and podcast presets write both; icon writes legacy only (not unified?);
+    # favicon/touch_icon write unified only.
     def legacy_store?
       preset.legacy_store != false
     end
 
-    # The stored-object identity pairs variant with either the url (entry
-    # presets) or original_fingerprint (the content-addressed icon family --
-    # see content_addressed? above), then folds in the format as the file
-    # extension -- all three have to match to share an object. podcast and
-    # touch_icon both render 200x200 but never collide: podcast is jpg,
-    # touch_icon is png, and the format is the only thing keeping them
-    # apart. podcast and the entry presets never collide either, but for a
-    # different reason -- one is fingerprint-keyed, the other url-keyed, so
-    # they're not even hashing the same input regardless of geometry.
+    # Identity pairs variant with the url (entry presets) or
+    # original_fingerprint (content-addressed presets), plus the format as
+    # extension. All three must match to share an object: podcast and
+    # touch_icon both render 200x200 and only the format separates them.
     def variant
       "#{preset.width}x#{preset.height}"
     end

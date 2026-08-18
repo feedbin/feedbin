@@ -50,9 +50,8 @@ class HarvestEmbeds
       items = []
 
       videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
-      # No "items" key is the ordinary answer for ids that have been deleted,
-      # made private or region-blocked. Normalise once: a&.b.c only guards the
-      # first call, so the nil landed on .uniq and concat a few lines down.
+      # No "items" key is the ordinary answer for deleted, private, or
+      # region-blocked ids -- normalise to [].
       video_items = videos.safe_dig("items") || []
       channel_ids = video_items.map { |video| video.safe_dig("snippet", "channelId") }.uniq
       channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
@@ -88,10 +87,8 @@ class HarvestEmbeds
 
     def update_related_records(ids)
       videos    = Embed.youtube_video.where(provider_id: ids).includes(:parent)
-      # filter_map, not map: parent is a lookup by provider_id, and the
-      # channels half of the API can come back empty (quota, terminated
-      # channels) while the videos half succeeded. A nil in here reached
-      # channel.provider_id and killed this retry: false job.
+      # filter_map: the channels half of the API can come back empty (quota,
+      # terminated channels) while the videos half succeeded.
       channels  = videos.filter_map(&:parent).uniq
       video_map = videos.index_by(&:provider_id)
 
@@ -101,13 +98,9 @@ class HarvestEmbeds
         # subscribes to directly resolves through the same row.
         ImageCrawler::ChannelImage.schedule(channel)
 
-        # where, not find_by: the same channel can own more than one feed row
-        # (http/https, with and without www), and the url this replaced could
-        # only ever match one exact spelling. custom_icon keeps the 88x88
-        # default thumbnail -- it is now only the fallback for a feed whose
-        # images row has not landed yet, and repointing it at the large
-        # thumbnail would cost a re-proxy and a cache invalidation per feed to
-        # improve a path the row is about to replace.
+        # where: one channel can own several feed rows (http/https, www
+        # variants). custom_icon keeps the small default thumbnail -- it is
+        # only the fallback until the images row lands.
         Feed.where(channel_id: channel.provider_id).find_each do |feed|
           feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
         end

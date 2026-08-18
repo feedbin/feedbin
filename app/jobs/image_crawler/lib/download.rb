@@ -23,16 +23,9 @@ module ImageCrawler
       @url
     end
 
-    # Feedkit rather than Down for block_ssrf, matching FeedCrawler::Downloader
-    # and FeedFinder: every candidate url here comes out of feed content or a
-    # publisher's markup, so it is attacker-chosen, and without this a crawl
-    # can be aimed at the private network.
-    #
-    # Feedkit owns the conditional request too -- it builds If-None-Match and
-    # If-Modified-Since from the validators below, and treats a 304 as success,
-    # returning a bodiless Response instead of raising. That replaces a pair of
-    # rescues that had to know which exception the configured Down backend used
-    # to report a 304.
+    # Feedkit rather than Down for block_ssrf: candidate urls come out of
+    # publisher content, so they are attacker-chosen. Feedkit also owns the
+    # conditional request, treating a 304 as a bodiless success Response.
     def download_file(url)
       requested_url = url
       url = @camo ? RemoteFile.camo_url(url) : url
@@ -49,18 +42,11 @@ module ImageCrawler
       end
     end
 
-    # Empty for every caller that passes no validators (all of them outside
-    # the icon family), and empty whenever this fetch is not actually for
-    # @url: Download::Youtube/Vimeo/Instagram's #download override fetches a
-    # *derived* URL (a thumbnail, an oEmbed target) while @etag/@last_modified
-    # were computed for the original url passed to Download.new. Sending them
-    # to the derived URL would risk a false 304 for a resource that was never
-    # actually validated -- concretely, Vimeo's own url pattern matches
-    # http://vimeo.com/favicon.ico, so a vimeo.com favicon crawl dispatches
-    # into an oEmbed lookup whose thumbnail url is a different resource
-    # entirely. `url` here is download_file's argument, compared against @url
-    # *before* download_file's own camo substitution, so a camo-wrapped fetch
-    # of the same logical resource still qualifies.
+    # Empty when no validators were passed, and empty when the fetch is for
+    # a *derived* URL (Youtube/Vimeo/Instagram overrides fetch a thumbnail or
+    # oEmbed target): the validators were computed for @url, and sending them
+    # elsewhere risks a false 304 for a never-validated resource. Compared
+    # before camo substitution, so a camo-wrapped fetch still qualifies.
     def validators_for(url)
       return {} unless url == @url
       {etag: @etag, last_modified: @last_modified}
@@ -74,10 +60,8 @@ module ImageCrawler
       @not_modified
     end
 
-    # What the response carried, as opposed to what we sent. Stored against the
-    # row so the next crawl of this same URL can ask conditionally. Feedkit
-    # reads both case-insensitively, so the header spelling is its problem
-    # rather than ours.
+    # What the response carried, stored so the next crawl of this URL can
+    # ask conditionally.
     def response_etag
       @response&.etag
     end

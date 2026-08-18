@@ -281,12 +281,9 @@ module ImageCrawler
         end
       end
 
-      # The stored object's identity is MD5("<variant>|<original_fingerprint>"),
-      # so variant is half of it -- unchanged? must key on both. A row left
-      # over from a different preset geometry (say favicon moving from 32x32
-      # to 48x48) has the right fingerprint but names a different object; if
-      # unchanged? matched on fingerprint alone, the crawl would short-circuit
-      # forever and the fleet would freeze at the old geometry.
+      # unchanged? must key on variant as well as fingerprint: a row from an
+      # old preset geometry names a different object, and matching on
+      # fingerprint alone would freeze the fleet at the old geometry.
       def test_should_reprocess_the_icon_when_the_stored_row_is_a_different_variant
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/favicon.ico"
@@ -347,10 +344,8 @@ module ImageCrawler
         end
       end
 
-      # The validators go back only to the URL they came from. With one pair
-      # per host (the favicons table) they could be sent to a candidate we had
-      # never fetched, and the resulting 304 aborted the whole crawl -- which
-      # is why conditional requests were switched off in 98c39d3e.
+      # Validators go back only to the URL they came from -- sent to a
+      # never-fetched candidate, a 304 would confirm content we never saw.
       def test_should_send_stored_validators_only_for_the_url_they_came_from
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           stored_url = "http://example.com/stored.ico"
@@ -369,13 +364,9 @@ module ImageCrawler
           conditional = stub_request(:get, stored_url)
             .with(headers: {"If-None-Match" => "\"abc123\""})
             .to_return(status: 304, body: "")
-          # Constrained on the absence of the header (deviation from the plan's
-          # literal test code, which left this stub unconstrained): other_url
-          # tried first and succeeding would otherwise break the candidate loop
-          # before stored_url is ever reached regardless of what headers went
-          # out, leaving this test unable to catch the one bug it exists to
-          # guard against -- the stored row's validators leaking onto a
-          # candidate URL they were never issued for.
+          # Constrained on the header's absence: an unconstrained stub would
+          # succeed first and end the candidate loop before stored_url,
+          # hiding the validator-leak this test guards against.
           unconditional = stub_request(:get, other_url)
             .with { |request| !request.headers.key?("If-None-Match") }
             .to_return(body: File.new(support_file("favicon.ico")), status: 200, headers: {"Content-Type" => "image/png"})
@@ -388,12 +379,8 @@ module ImageCrawler
           Find.new.perform(image.to_h)
 
           assert_requested unconditional
-          # No message argument (deviation from the plan's literal test code):
-          # WebMock's refute_requested, given a stub object rather than a
-          # method+uri pair, treats a second positional argument as an
-          # options hash and calls .delete(:times) on it -- a string blows up
-          # with TypeError regardless of what attempt_icon actually did.
-          # The first candidate won, so the stored url was never re-fetched.
+          # No message argument: refute_requested given a stub treats a
+          # second positional as an options hash and TypeErrors on a string.
           refute_requested conditional
         end
       end
@@ -493,14 +480,10 @@ module ImageCrawler
         end
       end
 
-      # store_validators needs the same url guard as validators_for's read
-      # side. unchanged? only compares variant and fingerprint, never url, so
-      # a different candidate that happens to serve byte-identical bytes -- a
-      # moved <link rel="icon">, an http/https or www variant -- must not have
-      # its validators written under this row's url. If it were, the next
-      # crawl would send that foreign validator back to the row's real url,
-      # and with If-Modified-Since a fully conformant server can confirm a
-      # false "unchanged" even though the row's own url never changed.
+      # A byte-identical candidate at a different url must not write its
+      # validators under this row's url -- the next crawl would send the
+      # foreign validator to the row's real url and could confirm a false
+      # "unchanged".
       def test_should_not_store_a_different_candidates_validators_onto_this_row
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           url_a = "http://example.com/a.ico"

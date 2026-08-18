@@ -90,18 +90,11 @@ module ImageCrawler
         end
       end
 
-      # Icons mutate under a stable URL, so a row for this URL says nothing
-      # about the bytes behind it and Dedupe's skip-the-download shortcut is
-      # exactly wrong. Always fetch -- but ask conditionally when we can, then
-      # short-circuit on the original bytes. Hashing the original rather than
-      # the processed output is what lets this skip *processing*, which for a
-      # 32x32 render is the expensive part.
-      #
-      # Reached by every content_addressed? preset, not only the favicon
-      # family -- five today: favicon, touch_icon, podcast, podcast_feed, and
-      # channel_avatar. Conditional requests and the 304/unchanged? handling
-      # below therefore apply to three already-shipped tenants as well, not
-      # just the two this phase adds.
+      # Icons mutate under a stable URL, so Dedupe's skip-the-download
+      # shortcut is exactly wrong here. Always fetch -- conditionally when
+      # possible -- then short-circuit on the original bytes, which skips
+      # processing, the expensive part. Reached by every content_addressed?
+      # preset.
       def attempt_icon(original_url)
         row = existing_row
 
@@ -117,11 +110,8 @@ module ImageCrawler
 
         return false unless download
 
-        # A 304 now means exactly what this assumes: this specific source is
-        # unchanged. It could not mean that before -- the favicons row held one
-        # validator pair per host, so sending it to a different candidate
-        # invited a 304 for content we had never seen, and 98c39d3e switched
-        # the headers off rather than act on it.
+        # Safe to trust: validators are stored per url (see validators_for),
+        # so a 304 means this specific source is unchanged.
         if download.not_modified?
           Librato.increment("image.icon_not_modified")
           Sidekiq.logger.info @image.trace(message: "icon not modified", metadata: {original_url: original_url})
@@ -130,9 +120,8 @@ module ImageCrawler
 
         unless download.valid?
           download.delete!
-          # No DownloadCache.failed! here, unlike download_image: icons always
-          # fetch, so a URL that consistently serves undecodable bytes is
-          # retried every crawl with no backoff -- deliberate.
+          # No DownloadCache.failed!: icons always fetch, so undecodable
+          # bytes are retried every crawl with no backoff -- deliberate.
           Sidekiq.logger.info @image.trace(message: "download invalid", metadata: {original_url: original_url})
           return false
         end
@@ -161,49 +150,27 @@ module ImageCrawler
         true
       end
 
-      # Memoized: provider/provider_id cannot change within a perform, and
-      # this is queried once per candidate URL (up to 10). The `defined?`
-      # form, not `||=`, so a genuine "no row yet" answer is remembered too
-      # instead of re-querying on every remaining candidate.
+      # Memoized with `defined?`, not `||=`, so a "no row yet" answer is
+      # remembered instead of re-queried per candidate.
       def existing_row
         return @existing_row if defined?(@existing_row)
         @existing_row = ::Image.find_by(provider: @image.provider, provider_id: @image.provider_id.to_s)
       end
 
-      # Only for the URL the row actually came from. That restriction is the
-      # whole reason conditional requests can be switched back on.
+      # Only for the URL the row actually came from -- the restriction that
+      # makes conditional requests trustworthy.
       def validators_for(row, original_url)
         return {} unless row && row.url == original_url
         {etag: row.etag, last_modified: row.last_modified}
       end
 
-      # The bytes are unchanged but the validators may not be -- a static host
-      # that rebuilds emits a fresh ETag for identical content. Store them so
-      # the next crawl can get a 304 instead of a download.
-      #
-      # Guarded on row.url == original_url, mirroring validators_for's read
-      # side: a different candidate URL can serve byte-identical bytes (a
-      # moved <link rel="icon">, an http/https or www variant), and unchanged?
-      # only compares variant and fingerprint, never url. Without this guard,
-      # that candidate's validators would be written under this row's url --
-      # and with If-Modified-Since, a later, fully conformant server could
-      # then confirm a false "unchanged" on the next crawl, since the header
-      # only promises "304 if not modified since this date". We could instead
-      # refresh row.url to the winning candidate, but Image's
-      # before_save :fingerprint_url derives url_fingerprint from url and
-      # update_column skips callbacks, so that would silently desync the two.
-      # Skipping the write is the correct minimal fix -- and the cost is
-      # permanent, not a one-time miss: as long as this candidate keeps
-      # serving the same bytes as the row, unchanged? keeps short-circuiting
-      # before create_image ever runs, row.url is never re-pointed, and every
-      # future crawl of this host downloads this candidate in full rather
-      # than getting a 304. Rare, and still the correct safe choice -- just
-      # not transient.
-      #
-      # update_column, not update: updated_at is a view cache key (Phase B) and
-      # must move only when the stored bytes move. That makes images.updated_at
-      # a content version rather than a row mtime, which is exactly what the
-      # touch rule asks for -- not a compromise of it.
+      # Unchanged bytes can still carry fresh validators (a rebuilt static
+      # host re-etags identical content); store them so the next crawl can
+      # 304. Guarded on row.url == original_url, mirroring validators_for: a
+      # different candidate can serve byte-identical bytes, and writing its
+      # validators under this row's url would let If-Modified-Since confirm a
+      # false "unchanged" later. update_column, not update: updated_at is a
+      # view cache key and must move only when the stored bytes move.
       def store_validators(row, original_url)
         return unless row && row.url == original_url
         merged = row.data.merge("etag" => @image.etag, "last_modified" => @image.last_modified).compact
@@ -211,10 +178,8 @@ module ImageCrawler
         row.update_column(:data, merged)
       end
 
-      # Compared in Ruby rather than SQL because the caller already holds the
-      # row (for its url and validators). Image.same_fingerprint? is required,
-      # not decorative: original_fingerprint is a uuid column and reads back
-      # dashed, while every fingerprint we compute is bare hex.
+      # Image.same_fingerprint? is required: original_fingerprint reads back
+      # dashed uuid, computed fingerprints are bare hex.
       def unchanged?(row)
         return false unless row
         return false unless row.variant == @image.variant

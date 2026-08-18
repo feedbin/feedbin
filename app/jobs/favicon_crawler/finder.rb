@@ -60,34 +60,15 @@ module FaviconCrawler
       end
     end
 
-    # Dual-store, the shape the entry-preview and podcast migrations both
-    # used: everything above keeps writing the favicons row and its legacy
-    # object exactly as before, and the shared pipeline produces an images row
-    # and a unified object alongside. Rows accumulate while nothing reads them;
-    # the read flips in a later phase, and only then does the legacy store
-    # retire.
+    # Dual-store: the favicons row and legacy object keep being written
+    # unchanged while the shared pipeline writes an images row and unified
+    # object alongside. Two schedules because the presets render at different
+    # sizes from different candidate lists, and they must stay separate
+    # providers (unchanged? keys on the row's original_fingerprint).
     #
-    # Two schedules rather than one because the presets render at different
-    # sizes from different candidate lists -- and they must stay separate
-    # providers, since Pipeline::Find#unchanged? keys on (provider,
-    # provider_id, original_fingerprint, variant) and a shared provider would
-    # let whichever ran last own the fingerprint.
-    #
-    # This costs a second fetch per crawl: the legacy path downloads, and the
-    # pipeline downloads again. Accepted and temporary -- favicon crawls are
-    # event-triggered (subscribe, import, save-page, feed-fixer), not a sweep,
-    # and it ends when the legacy crawler is retired.
-    # Rescued, unlike every other Pipeline::Find.perform_async call site in
-    # this codebase (channel_image.rb, itunes_image.rb, itunes_feed_image.rb,
-    # entry_image.rb, twitter_link_image.rb): each of those is the final
-    # statement of a dedicated scheduler method, so a raise there skips
-    # nothing. This one sits mid-`update`, between the candidate loop and
-    # `return unless new_favicon.present?` -- an unrescued exception here
-    # (a Redis hiccup enqueuing the pipeline job, say) would abort `update`
-    # before the legacy Processor#call, its storage write, and @favicon.save ever
-    # run. During dual-write nothing reads the new rows yet, so the legacy
-    # write outranks the new one: swallowing here is correct, not sloppy.
-    # Do not "tighten" this into a raise without re-reading that ordering.
+    # Rescued because this sits mid-`update`: an enqueue failure here would
+    # abort the legacy write below, which is still the store readers use.
+    # Do not tighten into a raise while that ordering holds.
     def schedule_pipeline
       schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls)
       schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls)
@@ -96,12 +77,8 @@ module FaviconCrawler
     end
 
     def schedule_icon(preset_name, provider, urls)
-      # .uniq(&:to_s), not .uniq: all_favicon_urls mixes Addressable::URI
-      # (from icon_links) with a plain URI::HTTP (default_favicon_location) --
-      # equal by string, distinct classes, so a bare .uniq would not catch the
-      # exact duplicate this exists to remove (a host advertising
-      # <link rel="icon" href="/favicon.ico">, which then equals the default
-      # fallback URL).
+      # .uniq(&:to_s): the list mixes Addressable::URI and URI::HTTP --
+      # equal by string, distinct classes, invisible to a bare .uniq.
       urls = urls.uniq(&:to_s)
       return if urls.empty?
 
@@ -115,10 +92,7 @@ module FaviconCrawler
       ImageCrawler::Pipeline::Find.perform_async(image.to_h)
     end
 
-    # Parsed once and memoized including the failure case: all_favicon_urls and
-    # touch_icon_urls both derive from it, and re-deriving would mean a second
-    # homepage fetch per crawl. `defined?` rather than ||= so an empty result
-    # is not re-attempted.
+    # Memoized with `defined?` so a failed parse is not re-fetched.
     def icon_links
       return @icon_links if defined?(@icon_links)
       @icon_links = begin
@@ -151,9 +125,8 @@ module FaviconCrawler
       icon_links.map(&:last).push(default_favicon_location)
     end
 
-    # No default_favicon_location fallback here, unlike all_favicon_urls: every
-    # host has a /favicon.ico worth guessing at, and none has a guessable touch
-    # icon. A host that advertises none simply has none.
+    # No guessed fallback: /favicon.ico is worth trying, a touch icon
+    # location is not. A host that advertises none has none.
     def touch_icon_urls
       icon_links.filter_map { |rel, url| url if TOUCH_ICON_NAMES.include?(rel) }
     end

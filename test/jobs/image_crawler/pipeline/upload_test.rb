@@ -148,14 +148,8 @@ module ImageCrawler
         end
       end
 
-      # podcast is the first preset that is both content_addressed and
-      # legacy_store: true -- everywhere else in this file those two are
-      # mutually exclusive (favicon/touch_icon are content-addressed and
-      # Unified-only; primary/twitter/youtube are legacy_store and url-keyed, not
-      # content-addressed). Nothing else pins that the combination actually
-      # dual-writes: the legacy jpg at the id-derived legacy key, and the same
-      # jpg bytes again at the fingerprint-derived unified key with a matching
-      # image/jpeg Content-Type.
+      # podcast is the one preset that is both content_addressed and
+      # legacy_store; pin that the combination dual-writes both keys.
       def test_should_dual_write_podcast_artwork_to_both_stores
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           processed_path = copy_support_file("image.jpeg")

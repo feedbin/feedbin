@@ -19,15 +19,13 @@ class EntriesSearchControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:page_query).total_entries
   end
 
-  # shared/_entries.js.erb is the one template every entry list renders, and it
-  # reaches for the feed's favicon. Every other caller preloads it; the two
-  # search paths stopped at the feed.
+  # The entry list template reaches for the feed's favicon; the search
+  # paths must preload it like every other caller.
   test "search results preload the favicon the shared template renders" do
     login_as @user
     token = "faviconpreloadtoken"
-    # One feed per entry: the preloader shares a Feed instance between entries
-    # of the same feed, so the association cache hides the extra queries when
-    # every result comes from one source.
+    # One feed per entry: a shared Feed instance's association cache would
+    # hide the missing preload.
     feeds = 5.times.map { |index|
       feed = Feed.create!(feed_url: "http://preload#{index}.example.com/feed.xml", host: "preload#{index}.example.com", title: "Feed #{index}")
       @user.subscriptions.create!(feed: feed)
@@ -47,22 +45,11 @@ class EntriesSearchControllerTest < ActionController::TestCase
     assert_operator favicons.count, :<=, 1, "one favicon query per result: #{favicons.count}"
   end
 
-  # The entry cache key also reads preview_image_record (Task 11), and
-  # entry.processed_image? -- rendered for every row regardless of caching --
-  # reads it too. This path builds @entries straight off the search result
-  # rather than through Entry.entries_list, so without its own preload this
-  # is a query per row, same shape as the favicon test above. (A ".loaded?"
-  # assertion cannot tell a preload from an N+1 that happens to run before it
-  # is checked -- processed_image? would load the association either way --
-  # so this counts queries instead, like the favicon guard above does.)
-  #
-  # Compares two distinct-feed counts rather than a fixed threshold, and
-  # spreads entries across feeds rather than reusing @user.feeds.first: a
-  # fixed number goes stale the moment a second images-backed association
-  # needs its own preload (icon_image_record did -- see the show-artwork
-  # work), and entries sharing one feed hide an unpreloaded icon_image_record
-  # behind Rails' per-instance association cache, the same trap the favicon
-  # test above already sidesteps for the same reason.
+  # The search path builds @entries off the search result, not
+  # entries_list, so it needs its own preload. Counts queries (.loaded?
+  # cannot tell a preload from an early N+1) and compares two distinct-feed
+  # sizes rather than a fixed number, spread across feeds so a shared
+  # instance's association cache cannot hide a missing preload.
   test "search results preload the preview image entries render" do
     login_as @user
     token = "previewimagepreloadtoken"

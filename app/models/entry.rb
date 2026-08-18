@@ -12,19 +12,14 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
-  # The preview image and the tweet/micropost link preview are both rows
-  # keyed by this entry's own id, so one association fetches the pair in a
-  # single query wherever a list preloads it; the two readers below keep the
-  # call sites' vocabulary (and each is at most one row -- the images table
-  # is unique on provider + provider_id). entry_icon rows are deliberately
-  # not folded in: no list reads them, and every micropost/podcast/youtube
-  # entry would drag a wasted row into each page render.
+  # The preview image and the tweet/micropost link preview are both keyed by
+  # this entry's id, so one association fetches the pair in one query;
+  # preview_image_record/link_image_record read from it. entry_icon rows stay
+  # out -- no list reads them.
   has_many :owned_image_records, -> { entry_images }, class_name: "Image", foreign_key: :provider_id
   has_one :icon_image_record, -> { provider_entry_icon }, class_name: "Image", foreign_key: :provider_id
-  # The avatar of the channel this entry's video belongs to -- the entry's
-  # own, not the feed's: a playlist feed mixes videos from many channels, and
-  # provider_parent_id carries each video's channel (UC-form, same key the
-  # embed_icon rows use).
+  # The avatar of this video's own channel -- a playlist feed mixes videos
+  # from many channels, keyed by provider_parent_id (UC-form).
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
 
   before_create :ensure_published
@@ -64,27 +59,21 @@ class Entry < ApplicationRecord
        .where(feed_id: feed_ids)
    }
 
-  # Everything entries/_entry touches beyond the entry itself: the feed and
-  # the sources FaviconComponent picks its icon from, plus the two images rows
-  # the partial renders -- the preview image (also part of the cache key) and
-  # the tweet/micropost link preview. Attaching less than this makes a
-  # cache-miss render cost a query per row.
+  # Everything entries/_entry touches beyond the entry itself. Attaching
+  # less makes a cache-miss render cost a query per row.
   scope :with_list_associations, -> {
     includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :channel_image_record)
   }
 
-  # The same associations, plus only the columns that partial reads. Separate
-  # because the paths that build their relation from an Elasticsearch result,
-  # or materialize it into an Array before rendering, cannot take the select.
+  # The same associations plus a narrow column select; separate because
+  # search-result and materialized relations cannot take the select.
   def self.entries_list
     select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings, :provider_parent_id)
       .with_list_associations
   end
 
-  # What api/v2/entries/_entry.json renders: the feed in every mode, and for
-  # extended mode the preview image row _entry_extended reads (through
-  # processed_image? and preview_image_data). Those endpoints serve up to 100
-  # entries, so rendering extended without it is 100 queries a request.
+  # What api/v2/entries/_entry.json renders; extended mode also reads the
+  # preview image row, at up to 100 entries a request.
   scope :for_api, ->(mode = nil) {
     mode.to_s == "extended" ? includes(:feed).preload(:owned_image_records) : includes(:feed)
   }
@@ -158,10 +147,9 @@ class Entry < ApplicationRecord
     feed.pages? ? url : feed.site_url
   end
 
-  # New images live on the images row; entries crawled before the unified
-  # transition keep their JSON. Within either source the unified object wins,
-  # falling back to the legacy one -- a row that has neither does not fall
-  # through to the JSON, because the row is the newer answer.
+  # The images row wins over the legacy JSON; within either source the
+  # unified object wins over the legacy url. A row with neither does not
+  # fall through to the JSON -- the row is the newer answer.
   def processed_image
     if record = preview_image_record
       Image.unified_url(record.storage_path) || legacy_image_url(record.legacy_storage_url)
@@ -170,8 +158,8 @@ class Entry < ApplicationRecord
     end
   end
 
-  # The full guard is what the JSON needs and the row does not: these keys were
-  # written independently, and a half-written image hash has to read as absent.
+  # The JSON's keys were written independently; a half-written hash must
+  # read as absent.
   def legacy_json_image
     return nil unless image["original_url"] && image["width"] && image["height"] && image["processed_url"]
     legacy_image_url(image["processed_url"])
@@ -231,9 +219,8 @@ class Entry < ApplicationRecord
     end
   end
 
-  # nil, not 0, when the feed gave no itunes:duration -- the element is
-  # optional and plenty of feeds omit it. Returning 0 made every caller's nil
-  # guard dead code, so a durationless episode rendered as "0 minutes".
+  # nil, not 0, when the feed gave no itunes:duration -- 0 renders as
+  # "0 minutes" and makes callers' nil guards dead code.
   def audio_duration
     seconds = 0
     duration = data && data["itunes_duration"]
@@ -405,13 +392,9 @@ class Entry < ApplicationRecord
     elsif youtube?
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]
-      # The entry's own <yt:channelId>, which feedkit already parses onto
-      # data, in preference to the embed lookup. That makes the channel known
-      # the moment the entry is created rather than after HarvestEmbeds' API
-      # round trip -- and it keeps working when that round trip returns
-      # nothing, which is the ordinary answer for a rate-limited key or a
-      # video that has been made private. A playlist feed whose videos come
-      # from many channels gets each entry's real channel from the XML alone.
+      # The entry's own <yt:channelId> outranks the embed lookup: known at
+      # creation, and still there when the API round trip returns nothing
+      # (rate-limited key, private video).
       self.provider_parent_id = data["youtube_channel_id"].presence ||
         Embed.youtube_video.find_by_provider_id(self.provider_id)&.parent_id
     elsif feed.pages?

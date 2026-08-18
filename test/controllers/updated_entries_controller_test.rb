@@ -17,14 +17,9 @@ class UpdatedEntriesControllerTest < ActionController::TestCase
     assert_equal @updated.length, assigns(:entries).length
   end
 
-  # The entry cache key also reads preview_image_record (Task 11), and
-  # entry.processed_image? -- rendered for every row regardless of caching --
-  # reads it too. @entries here is built directly (then .sort_by, which
-  # converts it to an Array) rather than through Entry.entries_list, so
-  # without its own preload this is a query per row. (A ".loaded?" assertion
-  # cannot tell a preload from an N+1 that happens to run before it is
-  # checked -- processed_image? would load the association either way -- so
-  # this counts queries instead.)
+  # @entries is built directly (then .sort_by materializes it), not through
+  # entries_list, so it needs its own preload. Counts queries -- .loaded?
+  # cannot tell a preload from an early N+1.
   test "should preload the preview image the entry cache key reads" do
     login_as @user
 

@@ -12,9 +12,8 @@ class FeedsHelperTest < ActiveSupport::TestCase
     @user.feeds.where(id: @feed.id).includes(:favicon).to_a
   end
 
-  # The sidebar renders a FaviconComponent per feed, and a favicon is its own
-  # row with its own timestamp. The key used the feed record as a proxy for it,
-  # which only worked because TouchFeeds wrote to the feed.
+  # A favicon is its own row with its own timestamp; the key must digest
+  # it, not use the feed record as a proxy.
   test "the feeds key changes when a favicon changes, without touching the feed" do
     favicon = Favicon.create!(host: @feed.host, url: "http://example.com/a.png")
 

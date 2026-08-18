@@ -6,9 +6,7 @@ module ImageCrawler
     # white padding around a smaller real icon. Reject those and take the
     # largest of what is left.
     #
-    # Shared deliberately: FaviconCrawler::Image keeps running through the
-    # whole icon migration, and a forked copy of these heuristics would drift
-    # from the one the new presets use.
+    # Shared with FaviconCrawler::Image so the heuristics cannot drift.
     class IconLayer
       INVALID_COLORS = [
         -> (color) { color.nil? },

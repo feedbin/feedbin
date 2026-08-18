@@ -94,13 +94,9 @@ class SidebarQueryCountTest < ActionController::TestCase
     @user = users(:ben)
   end
 
-  # FaviconComponent now reads @feed.icon_url, which queries icon_image_record --
-  # a has_one nothing preloaded before Task 5. get_feeds_list (the untagged
-  # "Feeds" section) and User#tag_group (the tagged sections) both build the
-  # feed lists Common::FeedsList renders one FaviconComponent per row from, so
-  # both need the preload. subscriptions_hash: "stale" forces the full list
-  # partial to render instead of the lighter counts-only response, the same
-  # trick test/controllers/feeds_controller_test.rb already uses.
+  # FaviconComponent reads @feed.icon_url, which queries icon_image_record;
+  # the untagged and tagged sidebar sections both need the preload.
+  # subscriptions_hash: "stale" forces the full list partial to render.
   test "the sidebar does not query images once per feed" do
     login_as @user
 
@@ -114,11 +110,8 @@ class SidebarQueryCountTest < ActionController::TestCase
       "the sidebar's images lookup scales with the feed count"
   end
 
-  # The test above uses create_feeds, whose feeds all have a nil channel_id;
-  # the lazy path queries anyway (provider_id IS NULL), so it catches a
-  # dropped preload, but it never exercises the preloader's grouped lookup.
-  # These feeds have a real channel_id, so the preload has to actually match
-  # rows and its count has to stay flat.
+  # These feeds have a real channel_id, so the preload's grouped lookup has
+  # to actually match rows and its count stay flat.
   test "the sidebar does not query the channel avatar once per youtube feed" do
     login_as @user
     subscribe_to_channels(1)

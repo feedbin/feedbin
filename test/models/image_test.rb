@@ -45,13 +45,9 @@ class ImageTest < ActiveSupport::TestCase
     assert record.url_fingerprint.present?
   end
 
-  # The second pass finds the row the racing writer inserted and updates it in
-  # place, rather than inserting a duplicate or raising. The violation is
-  # simulated rather than provoked: no attach! call site runs inside an outer
-  # transaction any more, so in production save!'s own transaction rolls the
-  # failed insert back and the retry sees a clean connection -- but a test
-  # cannot reproduce that, because transactional fixtures put one around every
-  # test and a real duplicate insert would poison it.
+  # The second pass finds the row the racing writer inserted and updates it.
+  # The violation is simulated: a real duplicate insert would poison the
+  # transactional fixture wrapping every test.
   test "attach! recovers when it loses the insert race" do
     attributes = {
       provider: Image.providers[:entry_preview],

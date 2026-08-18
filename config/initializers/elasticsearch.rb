@@ -211,10 +211,8 @@ Rails.application.reloader.to_prepare do
     end
     module_function :client
 
-    # The alias each physical index is published under. Resolved at call time
-    # rather than held in a constant: this module is defined inside a reloader
-    # block, and naming the models at definition time would pin the classes
-    # from whichever generation defined it.
+    # Resolved at call time, not a constant: this module lives in a reloader
+    # block, and a constant would pin stale model classes.
     def index_targets
       {entries: Entry, actions: Action, feeds: Feed}
     end
@@ -231,12 +229,10 @@ Rails.application.reloader.to_prepare do
     end
     module_function :setup
 
-    # Connection#request hands back Elasticsearch's error body rather than
-    # raising on it, so a failure here is only visible to a caller that reads
-    # the response -- which is why the alias collision below went unnoticed
-    # for so long. Re-PUTting an index that already exists is the normal case
-    # on every boot after the first and stays quiet; anything else means the
-    # index does not have the mapping this process thinks it does.
+    # Connection#request returns Elasticsearch's error body rather than
+    # raising, so the response must be read. Already-exists is the normal
+    # case on every boot; any other error means the index does not have the
+    # mapping this process thinks it does.
     def create_index(index, mapping)
       response = Search.client(mirror: true) { it.request(:put, index, json: mapping) }
       type = response.safe_dig("error", "type")
@@ -245,13 +241,11 @@ Rails.application.reloader.to_prepare do
     end
     module_function :create_index
 
-    # Elasticsearch refuses an alias whose name a concrete index already
-    # holds. That is how a stray auto-created index shadows the real one: it
-    # answers to the name the alias should have, carrying whatever dynamic
-    # mapping it inferred from the first document written to it, so searches
-    # that depend on the real mapping quietly return nothing. Test indexes
-    # are disposable, so clear the squatter and alias properly. Anywhere else
-    # it may hold real data, so report it and leave it alone.
+    # Elasticsearch refuses an alias whose name a concrete index holds --
+    # a stray auto-created index shadows the real one with an inferred
+    # mapping, and searches quietly return nothing. Test indexes are
+    # disposable: clear the squatter and re-alias. Anywhere else it may hold
+    # real data: report and leave it.
     def publish_alias(index, alias_name)
       response = Search.client(mirror: true) { it.add_alias(index, alias_name: alias_name) }
       return unless response.safe_dig("error", "type") == "invalid_alias_name_exception"

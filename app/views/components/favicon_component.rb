@@ -42,12 +42,10 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
-  # The avatar of the channel this entry's video belongs to, for entries
-  # whose channel is not the feed's own -- a playlist feed mixes videos from
-  # many channels, and the feed-level icon would brand them all with the
-  # playlist owner. When the channels match, the feed's resolution wins: its
-  # own icon row deliberately outranks the shared channel avatar, and this
-  # branch must not undo that.
+  # The avatar of this video's own channel, for entries whose channel is
+  # not the feed's -- a playlist feed mixes videos from many channels. When
+  # they match, the feed's resolution wins (its own icon row outranks the
+  # shared channel avatar).
   def entry_channel_icon_url
     return nil if @entry.nil? || @entry.provider_parent_id.blank?
     return nil if @entry.provider_parent_id == @feed.channel_id

@@ -61,12 +61,9 @@ module ImageCrawler
 
       download = Download.download!(url, minimum_size: nil)
 
-      # No `headers:` filter here (deviation from the plan's literal test code):
-      # WebMock's `headers: {}` demands an exact match against an empty header set,
-      # which no real request ever has (Connection/Host/User-Agent are always present).
-      # Confirmed by direct experiment -- with that filter this assertion can never
-      # pass, regardless of what conditional_headers actually sends. The block alone
-      # already proves the absence of the two conditional headers.
+      # No `headers:` filter: WebMock's `headers: {}` demands an exactly
+      # empty header set, which no real request has. The block proves the
+      # absence of the two conditional headers.
       assert_requested :get, url do |request|
         !request.headers.key?("If-None-Match") && !request.headers.key?("If-Modified-Since")
       end
@@ -86,19 +83,9 @@ module ImageCrawler
       refute download.valid?, "a 304 carries no bytes, so there is nothing valid to process"
     end
 
-    # Only 304. A 404 or a 500 is still a real failure and must not be
-    # silently reported as "unchanged", which would make a dead icon look
-    # permanently current.
-    #
-    # Exercises #download_file directly (deviation from the plan's literal test
-    # code, which called Download.download!). That entry point resolves this URL
-    # to Download::Default, whose #download has its own long-standing, unrelated
-    # `rescue Down::Error` -- pre-dating this task and shared with Youtube/Instagram/
-    # Vimeo -- which would swallow the very re-raise this test means to observe.
-    # Task 3's attempt_icon wraps Download.download! in its own rescue too, so
-    # nothing downstream depends on the exception surviving past Default; the
-    # property this task owns is narrower and lives entirely in #download_file:
-    # a confirmed 304 sets not_modified? and nothing else may.
+    # Only 304: a 404 or 500 reported as "unchanged" would make a dead icon
+    # look permanently current. Exercises #download_file directly because
+    # Download::Default's `rescue Down::Error` would swallow the re-raise.
     def test_should_still_raise_for_a_non_304_response_error
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(status: 404, body: "")
@@ -108,13 +95,8 @@ module ImageCrawler
       end
     end
 
-    # The gate that gives not_modified? its meaning: without it, an
-    # unsolicited 304 from a non-conformant server (one that answers 304 even
-    # though no If-None-Match/If-Modified-Since went out) would be swallowed
-    # as "unchanged" the same way a real conditional 304 is. That is
-    # indistinguishable from a fresh icon at every other layer, so the gate
-    # has to live here, at the one place that knows whether a validator was
-    # actually sent.
+    # An unsolicited 304 (no validator sent) is a broken server, not an
+    # unchanged icon; only this layer knows whether a validator went out.
     def test_should_not_treat_an_unsolicited_304_as_not_modified
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(status: 304, body: "")
@@ -124,11 +106,8 @@ module ImageCrawler
       refute download.not_modified?, "nobody asked conditionally, so this 304 is a broken server, not a fresh icon"
     end
 
-    # Down::Default's own `rescue Down::Error` swallows whatever #download_file
-    # raises, so the sibling of test_should_still_raise_for_a_non_304_response_error
-    # above can only observe the outcome here, through the same entry point
-    # attempt_icon actually calls -- a real failure must never be reported as
-    # valid or as an unchanged (not_modified) icon.
+    # Through the real entry point (whose rescue swallows the raise): a
+    # failure must not read as valid or as unchanged.
     def test_should_leave_a_404_invalid_and_not_modified_through_download_bang
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(status: 404, body: "")
@@ -139,11 +118,9 @@ module ImageCrawler
       refute download.not_modified?
     end
 
-    # The whole reason this downloader is Feedkit's rather than Down's: a
-    # candidate url comes out of feed content or a publisher's markup, so it is
-    # attacker-chosen and a crawl must not be aimable at the private network.
-    # Asserted at the seam, because webmock intercepts above the socket layer
-    # that would otherwise refuse the address.
+    # Candidate urls are attacker-chosen; the crawl must not be aimable at
+    # the private network. Asserted at the seam -- webmock intercepts above
+    # the socket layer that would refuse the address.
     def test_should_block_private_network_addresses
       captured = nil
       Feedkit::Request.stub(:download, ->(_url, **args) { captured = args; raise Feedkit::Error }) do

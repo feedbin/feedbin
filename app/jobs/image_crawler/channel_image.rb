@@ -10,12 +10,10 @@ module ImageCrawler
     # today, which is soft in every slot bigger than a favicon.
     THUMBNAIL_SIZES = %w[high medium default].freeze
 
-    # Scoped to the channel, not to a feed and not to an entry: one row serves
-    # the channel's own feed and every playlist entry from that channel, which
-    # is the case that motivated splitting feed-level from entry-level in the
-    # first place. feed_id is left nil for the same reason -- a channel has no
-    # single feed, and feed_id only feeds ReuseRules, which a content-addressed
-    # preset never reaches.
+    # Scoped to the channel: one row serves the channel's own feed and every
+    # playlist entry from that channel. feed_id stays nil -- a channel has no
+    # single feed, and feed_id only feeds ReuseRules, which a
+    # content-addressed preset never reaches.
     def self.schedule(channel)
       url = THUMBNAIL_SIZES.filter_map { channel.data.safe_dig("snippet", "thumbnails", it, "url") }.first
       return if url.blank?
@@ -30,28 +28,17 @@ module ImageCrawler
       Pipeline::Find.perform_async(image.to_h)
     end
 
-    # Nothing is written onto a feed: the row is keyed by the channel and
-    # Feed#icon_url reads it. What is left is cache invalidation -- the
-    # sidebar's key and entries_cache_key both include the feed, not the icon
-    # row, so a feed rendering this channel keeps serving the old avatar
-    # unless it is touched. Bounded by design (a channel has one feed,
-    # occasionally a few url spellings of it), which is why this is a touch
-    # rather than a digest change; the fan-out this design exists to kill is
-    # the 100,000-row medium.com favicon case, not this.
-    #
-    # Only reached when the bytes actually changed: Pipeline::Find's
-    # unchanged? short circuit returns before Process for a re-crawl of the
-    # same avatar, so an unchanged channel costs no invalidation.
+    # Cache invalidation: the sidebar and entry keys include the feed, not
+    # this row, so feeds rendering the channel must be touched. Bounded -- a
+    # channel has one feed, occasionally a few url spellings. Only reached
+    # when the bytes changed (unchanged? returns before Process otherwise).
     def perform(id, image)
       return if image["storage_path"].blank?
 
-      # The payload carries the channel id; the display id is for tracing
-      # only (parsing it back apart is a trap -- a channel id is base64url,
-      # so "-" is an ordinary character in it). Blank means a payload from a
-      # deploy predating provider_id: skip the touch, the next harvest
-      # self-heals. Never fall through to a nil query -- channel_id is null
-      # for every non-YouTube feed, and touching all of those is the exact
-      # fan-out this job exists to avoid.
+      # Never fall through to a nil query: channel_id is null for every
+      # non-YouTube feed, and touching all of those is the fan-out this
+      # design avoids. Blank payload = pre-provider_id deploy; skip, the
+      # next harvest self-heals.
       channel_id = image["provider_id"]
       return if channel_id.blank?
 

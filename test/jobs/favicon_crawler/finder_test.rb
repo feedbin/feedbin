@@ -241,13 +241,9 @@ module FaviconCrawler
       assert_nil Favicon.unscoped.where(host: @page_url.host).take
     end
 
-    # The legacy path consumes all_favicon_urls and its ordering is load-
-    # bearing: the first candidate that yields a usable image wins. This
-    # fixture uses four distinct rel values, so it only pins the rel-position
-    # ordering (from ICON_NAMES) and the /favicon.ico fallback -- it has no
-    # same-rel pair, so it does not exercise the size-descending or
-    # dark-mode-last tie-breaking rules. Those are covered by the pre-existing
-    # "should prefer larger favicon" test above.
+    # Ordering is load-bearing: the first candidate that yields a usable
+    # image wins. Four distinct rel values, so this pins only the
+    # rel-position ordering and the /favicon.ico fallback.
     test "all_favicon_urls keeps its ordering and its default fallback" do
       body = <<~HTML
         <html><head>
@@ -314,12 +310,8 @@ module FaviconCrawler
       assert_requested request, times: 1
     end
 
-    # The failed fetch must be memoized too, not just the successful one: this
-    # is the scenario the `defined?` guard (rather than `||=`) exists for. A
-    # regression back to `||=` would still pass -- `icon_links` returns a
-    # truthy `[]` on failure -- so the fetch count is the only thing that
-    # actually catches it, along with the more reachable regression of the
-    # rescue landing outside the memoized region.
+    # The failed fetch must be memoized too; only the fetch count catches a
+    # regression back to `||=`.
     test "both lists degrade to the default when the homepage cannot be fetched" do
       request = stub_request(:get, @page_url).to_timeout
 
@@ -378,10 +370,9 @@ module FaviconCrawler
       assert_equal "favicon", ImageCrawler::Pipeline::Find.jobs.last["args"].first["preset_name"]
     end
 
-    # The pipeline fetches and decides for itself. Gating it on the legacy
-    # path having produced a usable image would mean a host whose legacy
-    # resize failed never accumulates a row -- and that resize is the step
-    # this migration exists to replace.
+    # The pipeline fetches and decides for itself; gating it on legacy
+    # success would keep a host whose legacy resize fails from ever
+    # accumulating a row.
     test "schedules the pipeline even when the legacy path finds nothing usable" do
       body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
       stub_request(:get, @page_url).to_return(body: body, status: 200)
@@ -396,13 +387,8 @@ module FaviconCrawler
         "the legacy path genuinely found nothing, which is the point of this test"
     end
 
-    # schedule_pipeline sits mid-`update`, between the candidate loop and the
-    # legacy Processor#call/@favicon.save -- unlike every other
-    # Pipeline::Find.perform_async call site in the codebase, which is always
-    # the last statement of a dedicated scheduler method. An unrescued
-    # exception here (a Redis hiccup enqueuing the job, say) would take out
-    # the entire legacy write for a dual-write phase whose whole point is
-    # that the legacy path keeps behaving exactly as before.
+    # schedule_pipeline sits mid-`update`: an unrescued enqueue failure
+    # would take out the legacy write below it.
     test "still writes the legacy favicon row when scheduling the pipeline raises" do
       body = <<~HTML
         <html><head>
@@ -423,13 +409,8 @@ module FaviconCrawler
       assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
     end
 
-    # A host advertising <link rel="icon" href="/favicon.ico"> makes
-    # all_favicon_urls yield that URL twice -- once discovered, once as the
-    # unconditional default fallback all_favicon_urls itself appends (which
-    # schedule_icon must not change the meaning of, since the legacy path
-    # depends on that return value). schedule_icon dedupes on the string form
-    # before building the pipeline payload, so the preset is fetched once
-    # instead of twice.
+    # A host advertising /favicon.ico yields that URL twice (discovered +
+    # default fallback); schedule_icon dedupes on the string form.
     test "schedule_icon dedupes candidates that resolve to the same url" do
       body = %(<html><head><link rel="icon" href="/favicon.ico"></head></html>)
       stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")

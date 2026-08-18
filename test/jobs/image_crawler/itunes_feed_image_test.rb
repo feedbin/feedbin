@@ -54,10 +54,8 @@ module ImageCrawler
     # keeps its legacy value for readers still on the fallback path.
     test "keeps writing the legacy url and touches the feed when row-backed" do
       processed_url = "https://cdn.example.com/cover.jpg"
-      # Pre-set every attribute receive writes -- custom_icon and
-      # custom_icon_format -- to what it will write again, the way a
-      # re-crawl of unchanged artwork finds the feed in production. That
-      # makes the update a true no-op, so only the touch can move updated_at.
+      # Pre-set every attribute receive writes, so the update is a no-op
+      # and only the touch can move updated_at.
       @feed.update!(
         custom_icon: processed_url,
         custom_icon_format: "square",

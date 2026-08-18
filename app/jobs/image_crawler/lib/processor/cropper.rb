@@ -6,31 +6,12 @@ module ImageCrawler
       PIGO_INSTALLED = File.executable?(PIGO)
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
-      # The mozjpeg options, which need a mozjpeg-linked libjpeg -- verify that
-      # before trusting the numbers, because vips accepts and ignores them
-      # otherwise, with no error and no saving. Measured over 40 real entry
-      # crops: these five alone are 16.5% smaller than a plain quality: 80, and
-      # quant_table 3 takes it to 20.4%; the Q cut to 76 makes it 29.2%. Worst
-      # case holds at a plain q80's (ssimulacra2 48.0 against 47.9) while the
-      # median gives up 5.7, so the saving comes off the images with headroom
-      # rather than the ones already struggling. See tmp/images/README.md.
-      #
-      # Not webp, though webp is both smaller and better at every setting
-      # measured: whatever is stored is the master, since the original download
-      # is discarded, and a lossy webp master makes every future format a
-      # lossy-to-lossy transcode. jpg is the more universally transcodable
-      # master, and the one API clients are known to handle.
-      # optimize_scans is not independent: it splits a progressive scan sequence,
-      # so it does nothing without interlace and vips says so with another of its
-      # ignorable warnings ("ignoring optimize_scans for baseline"). Dropping
-      # interlace therefore silently costs two of these, not one.
-      #
-      # optimize_coding is deliberately absent: interlace implies it, libjpeg
-      # optimising the Huffman tables for a progressive file either way. Byte
-      # identical with and without across 25 of the sample crops.
-      #
-      # keep, not strip: strip was deprecated in 8.15 and no longer appears in
-      # `vips jpegsave`'s arguments, though it still works. Same output.
+      # Tuned mozjpeg options (~29% smaller than plain q80 at equal worst-case
+      # quality) -- they need a mozjpeg-linked libjpeg; vips silently ignores
+      # them otherwise. jpg, not webp: the stored file is the master (the
+      # original is discarded), and a lossy webp master would make every
+      # future format a lossy-to-lossy transcode. optimize_scans requires
+      # interlace; interlace implies optimize_coding.
       JPG_SAVER = {
         quality: 76, background: 255, keep: :none,
         interlace: true, optimize_scans: true,
@@ -51,10 +32,9 @@ module ImageCrawler
         @height    = height
       end
 
-      # Crops that own their output format and return a finished Processed:
-      # limit_crop picks png or jpg from the source's alpha and may keep the
-      # original file untouched, and the png crops are always png. Everything
-      # else is a geometry pass this encodes as jpg.
+      # Crops that own their output format: limit_crop picks png or jpg from
+      # the source's alpha and may keep the original untouched; the png crops
+      # are always png. Everything else is encoded as jpg.
       SELF_ENCODING_CROPS = %i[limit_crop limit_png icon_crop]
 
       def crop!
@@ -110,10 +90,8 @@ module ImageCrawler
         result
       end
 
-      # Multi-layer sources have no single "the image"; the layer choice is the
-      # first real decision, so it happens before any resizing. Memoized
-      # including the nil case -- ||= would re-run the whole layer scan every
-      # time the answer was "nothing usable".
+      # Layer choice happens before any resizing. Memoized including the nil
+      # case -- ||= would re-run the scan whenever the answer was "nothing".
       def best_layer
         return @best_layer if defined?(@best_layer)
         @best_layer = IconLayer.best(ImageFormat.checked!(@file))
@@ -123,20 +101,16 @@ module ImageCrawler
         scale_to_png(best_layer)
       end
 
-      # icon_crop without the layer selection: a YouTube channel avatar is
-      # one image, not a container of candidates, and IconLayer's heuristics
-      # would reject a perfectly good avatar for being mostly white (which
-      # for an .ico means "padding around the real icon" and for an avatar
-      # means "a dark logo on a white background").
+      # icon_crop without layer selection: an avatar is one image, and
+      # IconLayer's mostly-white heuristic would reject a dark logo on a
+      # white background.
       def limit_png
         scale_to_png(source)
       end
 
-      # Scale down to fit the box, never up, and always emit PNG -- unlike
-      # limit_crop, which picks png or jpg from the source's alpha channel
-      # and may return the original file untouched. A content-addressed
-      # preset needs a fixed output format, because storage_path's extension
-      # and the unified Content-Type both come from preset.format.
+      # Scale down to fit, never up, always PNG: a content-addressed preset
+      # needs a fixed output format -- storage_path's extension and the
+      # Content-Type both come from preset.format.
       def scale_to_png(input)
         image = ImageProcessing::Vips
           .source(input)
@@ -219,16 +193,14 @@ module ImageCrawler
 
         return nil if faces.nil?
 
-        # filter_map on both: inside a map, a bare `next` yields nil into the
-        # array rather than skipping the element, so the guard below was turning
-        # a malformed face row into a nil that [nil].sum could not add.
+        # filter_map: inside a map, a bare `next` yields nil into the array
+        # instead of skipping the element.
         result = faces.filter_map { |face| face.safe_dig("face") }.filter_map do |face|
           next if face[axis].nil? || face["size"].nil?
           face[axis] + face["size"] / 2
         end
 
-        # A detector that ran and found nothing returns [], which is a different
-        # answer from the nil above but has the same meaning here: no position.
+        # [] (ran, found nothing) means the same as nil here: no position.
         return nil if result.empty?
 
         (result.sum(0.0) / result.size).to_i

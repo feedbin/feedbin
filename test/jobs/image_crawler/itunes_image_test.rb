@@ -48,13 +48,8 @@ module ImageCrawler
     # keeps its legacy value for readers still on the fallback path.
     test "keeps writing the legacy url and does not touch the entry when row-backed" do
       processed_url = "https://cdn.example.com/cover.jpg"
-      # Pre-set every attribute receive writes -- media_image, provider, and
-      # provider_id -- to what it will write again, the way a re-crawl of
-      # unchanged artwork finds the entry in production. That makes the
-      # update a true no-op, so this proves updated_at truly does not move --
-      # there is no touch to catch a regression that silently reintroduces
-      # one. No cached view renders episode artwork keyed on this entry (see
-      # receive's comment), so there is nothing for a touch to keep fresh.
+      # Pre-set every attribute receive writes, so the update is a true
+      # no-op and this proves updated_at does not move.
       @entry.update!(
         media_image: processed_url,
         provider: :entry_icon,

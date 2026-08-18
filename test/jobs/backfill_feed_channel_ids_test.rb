@@ -40,12 +40,8 @@ class BackfillFeedChannelIdsTest < ActiveSupport::TestCase
     assert_equal before.to_f, feed.updated_at.to_f
   end
 
-  # Sidebar and entry caches reach the channel avatar only through
-  # feed.updated_at, and the touch that surfaces a landing avatar
-  # (ChannelImage) fired against the wrong key for these rows -- it matched
-  # nothing, and it is not coming again. When the repair connects a feed to
-  # an avatar that already exists, the backfill must do the touch that
-  # missed. The quiet write above is only right while no avatar exists.
+  # ChannelImage's touch fired against the wrong key and is not coming
+  # again, so connecting a feed to an existing avatar must touch it here.
   test "touches the feed when the repair connects it to an existing avatar" do
     feed = Feed.create!(feed_url: "http://example.com/videos.xml", options: {"youtube_channel_id" => "BJycsmduvYEL83R_U4JriQ"})
     feed.update_columns(channel_id: "BJycsmduvYEL83R_U4JriQ", updated_at: 1.year.ago)

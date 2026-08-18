@@ -1,24 +1,14 @@
-# Everything Feed knows about being a YouTube channel feed, in one place:
-# deriving the channel id, the WebSub rewrites that depend on it, and the
-# avatar row keyed by it.
-#
-# Two derivations on purpose, answering different questions:
-#
-# - +derived_channel_id+ (wide) -- "which channel do this feed's videos come
-#   from?" Feeds the +channel_id+ column so a channel avatar harvested once
-#   can find every feed that renders it. The parsed feed-level value wins,
-#   falling back to the feed url for feeds not yet crawled.
-#
-# - +youtube_channel_id+ (strict) -- "is this the canonical channel feed
-#   whose self_url and hub we rewrite?" Requires feed_url and self_url to
-#   agree, which is the right guard for WebSub and the wrong one for icon
-#   resolution.
+# Feed's YouTube behavior: channel id derivation, the WebSub rewrites, and
+# the avatar row. Two derivations on purpose: derived_channel_id (wide)
+# answers "which channel do this feed's videos come from" and feeds the
+# channel_id column; youtube_channel_id (strict) answers "is this the
+# canonical feed whose self_url and hub we rewrite" and requires feed_url
+# and self_url to agree.
 module YoutubeChannel
   extend ActiveSupport::Concern
 
-  # The one url shape both derivations read. Multiple prefixes wrap the same
-  # 22-character identity (UC the channel, UU/UULF/UUSH its playlists), but a
-  # subscription by channel_id always carries UC-form here.
+  # Multiple prefixes wrap the same 22-character identity (UC the channel,
+  # UU/UULF/UUSH its playlists); a channel_id= url always carries UC-form.
   CHANNEL_FEED_URL = %r{\Ahttps?://(?:www\.)?youtube\.com/feeds/videos\.xml\?channel_id=([^#?&]+)}
 
   # The identity is the 22 characters after the container prefix.
@@ -59,19 +49,15 @@ module YoutubeChannel
 
   private
 
-  # The channel feed is the only place the feed-level yt:channelId arrives
-  # bare -- playlist feeds, entry-level ids, and the Data API all speak
-  # UC-form, and images.provider_id is keyed on it -- so restore the prefix.
-  # Keyed on length, not prefix: a bare id can itself begin with "UC", and if
-  # YouTube ever serves the channel feed in UC-form it passes through
-  # untouched.
+  # The channel feed serves the feed-level yt:channelId bare; everything
+  # else speaks UC-form, so restore the prefix. Keyed on length, not prefix:
+  # a bare id can itself begin with "UC".
   def canonical_channel_id(value)
     return value unless value&.length == ID_SUFFIX_LENGTH
     "UC#{value}"
   end
 
-  # The fallback for a feed that has not been crawled since feedkit started
-  # surfacing the parsed value, and for a brand-new feed not yet parsed at all.
+  # Fallback for feeds not yet crawled or parsed.
   def channel_id_from_feed_url
     return nil if feed_url.blank?
     match = feed_url.match(CHANNEL_FEED_URL)

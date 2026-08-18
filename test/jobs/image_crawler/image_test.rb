@@ -299,11 +299,8 @@ module ImageCrawler
       refute_equal avatar.storage_path, podcast.storage_path
     end
 
-    # One host, two icons, two rows. The separation is load-bearing for
-    # correctness, not layout: Pipeline::Find#unchanged? keys on (provider,
-    # provider_id, original_fingerprint, variant) and (provider, provider_id)
-    # is unique, so a shared provider would let whichever preset ran last own
-    # the fingerprint and short-circuit the other forever.
+    # One host, two icons, two rows: a shared provider would let whichever
+    # preset ran last own the fingerprint and short-circuit the other forever.
     test "a host's favicon and touch icon are separate rows and separate objects" do
       fingerprint = Digest::MD5.hexdigest("icon bytes")
       build = ->(preset, provider) {

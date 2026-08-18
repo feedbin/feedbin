@@ -10,11 +10,9 @@ class PagesEntriesController < ApplicationController
       @entries = pagination_anchor(@feed.entries, column: Entry.arel_table[:id]).page(params[:page]).order("created_at DESC").entries_list
       @page_query = @entries
     elsif view_mode == "view_starred"
-      # Both orders used to read "created_at DESC" and mean different columns:
-      # the inner one is when the user starred the entry, the outer is when
-      # Feedbin ingested it. The pages were cut by one and displayed in the
-      # other, so entries jumped across every page boundary. Display in the
-      # order the pagination actually used.
+      # Display in the order the pagination cut: starred_entries.created_at
+      # (when starred), not entries.created_at (when ingested), or entries
+      # jump across page boundaries.
       starred_entries = pagination_anchor(@user.starred_entries.select(:entry_id, :created_at).where(feed_id: @feed.id)).page(params[:page]).order("created_at DESC")
       entry_ids = starred_entries.map(&:entry_id)
       @entries = Entry.in_order_of(:id, entry_ids).where(id: entry_ids).entries_list

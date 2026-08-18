@@ -25,16 +25,9 @@ class CacheEntryViewsTest < ActiveSupport::TestCase
     assert_nil remaining_ids, "Queue should be empty after processing"
   end
 
-  # Fragment caching is off in the test environment, so this is about the key
-  # the job asks for, not about what lands in the store. A bare `cached: true`
-  # here warms a key the entry list never looks up: the warm pass and the live
-  # render would disagree, and every view would render cold anyway.
-  #
-  # The feed must be Pages: entry_favicon only consults the favicons map on
-  # that branch, keyed on the entry's own host rather than the feed's. Off
-  # that branch, favicons is ignored in favor of feed.favicon, so a job that
-  # closed over the wrong map -- or none at all -- would compute the right
-  # key by accident and this test would pass either way.
+  # About the key the job asks for, not what lands in the store (fragment
+  # caching is off in test). The feed must be Pages: only that branch reads
+  # the favicons map, so any other feed would pass vacuously.
   test "warms the key the entry list will look up" do
     feed = Feed.create!(feed_url: "https://pages.example/x", host: "pages.example", title: "P", feed_type: :pages)
     entry = create_entry(feed)

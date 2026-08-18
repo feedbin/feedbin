@@ -37,16 +37,10 @@ class SearchTest < ActiveSupport::TestCase
     Search.configure!
   end
 
-  # Elasticsearch auto-creates an index the first time a document is written
-  # to a name that does not exist yet. When that name is one of our aliases,
-  # the resulting index answers to it forever after -- an alias cannot be
-  # created over a concrete index of the same name -- and every read and
-  # write lands on its inferred dynamic mapping instead of the one setup
-  # installs. Searches that depend on the real mapping (title.exact, the
-  # actions percolator) then return nothing at all, with no error anywhere.
-  #
-  # Runs in a namespace of its own so it cannot disturb the indexes the rest
-  # of this worker's tests are using.
+  # A document written to a missing name auto-creates a concrete index that
+  # blocks the alias forever, and its inferred mapping makes searches
+  # quietly return nothing. Runs in its own namespace so it cannot disturb
+  # this worker's indexes.
   test "setup reclaims an alias name that a concrete index has taken over" do
     with_test_worker("squatter") do
       Search.configure!

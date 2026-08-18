@@ -23,10 +23,8 @@ module ImageCrawler
     def attach
       return false if record.nil?
 
-      # No re-check that the path is still referenced: under the deferred
-      # sweep the row we already found is that reference. The sweep deletes
-      # only paths with no rows at sweep time, fifteen minutes after the rows
-      # went away, and by then this attach has written its own row.
+      # No liveness re-check: the row we found is the reference, and the
+      # sweep only deletes paths with no rows at sweep time.
       ::Image.attach!(
         provider: @image.provider,
         provider_id: @image.provider_id,
