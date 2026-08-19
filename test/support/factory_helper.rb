@@ -126,6 +126,7 @@ module FactoryHelper
       url: url,
       variant: variant,
       image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
       storage_path: Image.storage_path_for(url, variant),
       width: 542,
       height: 304,

@@ -95,6 +95,7 @@ module ImageCrawler
             url: "http://example.com/cache-busted.jpg?v=1",
             variant: "542x304",
             image_fingerprint: fingerprint,
+            original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for("http://example.com/cache-busted.jpg?v=1", "542x304"),
             width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
           )

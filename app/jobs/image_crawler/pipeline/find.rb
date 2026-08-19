@@ -201,10 +201,11 @@ module ImageCrawler
         if download.valid?
           found = true
 
-          @image.download_path      = download.persist!
-          @image.final_url          = download.image_url
-          @image.original_url       = original_url
-          @image.original_extension = download.file_extension
+          @image.download_path        = download.persist!
+          @image.final_url            = download.image_url
+          @image.original_url         = original_url
+          @image.original_extension   = download.file_extension
+          @image.original_fingerprint = Digest::MD5.file(@image.download_path).hexdigest
 
           Process.perform_async(@image.to_h)
           Sidekiq.logger.info @image.trace(message: "download valid", metadata: {image_url: @image.final_url})

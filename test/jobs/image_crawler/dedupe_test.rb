@@ -38,6 +38,7 @@ module ImageCrawler
         attached = ::Image.entry_images.find_by(provider_id: "2")
         assert_equal row.storage_path, attached.storage_path
         assert_equal row.image_fingerprint, attached.image_fingerprint
+        assert_equal row.original_fingerprint, attached.original_fingerprint
         assert_equal 12_345, attached.bytesize
         assert_equal row.data["legacy_storage_url"], attached.data["legacy_storage_url"]
 

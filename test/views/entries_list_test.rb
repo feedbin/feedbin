@@ -100,6 +100,7 @@ class EntriesListTest < ActionController::TestCase
       provider: :entry_preview, provider_id: entry.id.to_s, feed_id: @feed.id,
       url: "http://example.com/a.jpg", variant: "542x304",
       image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
       storage_path: Image.storage_path_for("http://example.com/a.jpg", "542x304"),
       width: 542, height: 304, bytesize: 1, placeholder_color: "aabbcc"
     )

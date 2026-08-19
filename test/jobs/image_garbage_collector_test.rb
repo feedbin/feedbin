@@ -70,6 +70,7 @@ class ImageGarbageCollectorTest < ActiveSupport::TestCase
       url: "http://example.com/linked.jpg",
       variant: "542x304",
       image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
       storage_path: Image.storage_path_for("http://example.com/linked.jpg", "542x304"),
       width: 542, height: 304, bytesize: 1, placeholder_color: "aabbcc"
     )

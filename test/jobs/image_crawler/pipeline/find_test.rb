@@ -79,6 +79,22 @@ module ImageCrawler
         refute_requested :get, image_url
       end
 
+      # Every row records the provenance of the bytes it came from --
+      # images.original_fingerprint is NOT NULL -- so the ordinary download
+      # path must fingerprint the original file, not just the icon path.
+      def test_should_fingerprint_the_original_bytes_on_the_entry_path
+        url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
+        body = ("lorem " * 3_500)
+
+        stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: body)
+        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
+
+        Find.new.perform(image.to_h)
+
+        payload = Image.new(Process.jobs.first["args"][0])
+        assert_equal Digest::MD5.hexdigest(body), payload.original_fingerprint
+      end
+
       def test_should_try_all_urls
         urls = [
           "http://example.com/image_1.jpg",
@@ -122,6 +138,7 @@ module ImageCrawler
             url: original_url,
             variant: "542x304",
             image_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for(original_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345,
             placeholder_color: "aabbcc",
@@ -168,6 +185,7 @@ module ImageCrawler
           ::Image.create!(
             provider: :entry_preview, provider_id: "1", feed_id: 9,
             url: og_url, variant: "542x304", image_fingerprint: SecureRandom.hex(16),
+ original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for(og_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
             data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
@@ -195,6 +213,7 @@ module ImageCrawler
           ::Image.create!(
             provider: :entry_preview, provider_id: "1", feed_id: 9,
             url: reused_url, variant: "542x304", image_fingerprint: SecureRandom.hex(16),
+ original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for(reused_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
             data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}

@@ -50,7 +50,7 @@ module ImageCrawler
           image = Image.new_with_attributes(
             id: id, preset_name: "primary", image_urls: [],
             provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1,
-            fingerprint: SecureRandom.hex(16),
+            fingerprint: SecureRandom.hex(16), original_fingerprint: SecureRandom.hex(16),
             original_url: original_url, final_url: original_url,
             download_path: download_path, processed_path: download_path,
             bytesize: File.size(download_path),
@@ -91,7 +91,7 @@ module ImageCrawler
           image = Image.new_with_attributes(
             id: id, preset_name: "primary", image_urls: [],
             provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1,
-            fingerprint: SecureRandom.hex(16),
+            fingerprint: SecureRandom.hex(16), original_fingerprint: SecureRandom.hex(16),
             original_url: original_url, final_url: original_url,
             download_path: download_path, processed_path: download_path,
             bytesize: File.size(download_path),

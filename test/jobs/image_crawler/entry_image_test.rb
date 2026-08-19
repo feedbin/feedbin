@@ -132,6 +132,7 @@ module ImageCrawler
         url: "http://example.com/image.jpg",
         variant: "542x304",
         image_fingerprint: SecureRandom.hex(16),
+        original_fingerprint: SecureRandom.hex(16),
         storage_path: ::Image.storage_path_for("http://example.com/image.jpg", "542x304"),
         width: 542, height: 304, bytesize: 12_345,
         placeholder_color: "aabbcc",

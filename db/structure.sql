@@ -679,16 +679,16 @@ CREATE TABLE public.images (
     url text NOT NULL,
     url_fingerprint uuid NOT NULL,
     image_fingerprint uuid NOT NULL,
+    original_fingerprint uuid NOT NULL,
     storage_path text NOT NULL,
     width bigint NOT NULL,
     height bigint NOT NULL,
     bytesize bigint NOT NULL,
     placeholder_color text NOT NULL,
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
     variant text NOT NULL,
-    original_fingerprint uuid
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 

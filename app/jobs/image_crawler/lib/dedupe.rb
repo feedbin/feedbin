@@ -32,6 +32,7 @@ module ImageCrawler
         url: @original_url,
         variant: record.variant,
         image_fingerprint: record.image_fingerprint,
+        original_fingerprint: record.original_fingerprint,
         storage_path: record.storage_path,
         width: record.width,
         height: record.height,

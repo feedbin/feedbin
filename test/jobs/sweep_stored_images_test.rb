@@ -165,6 +165,7 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
         provider: :entry_preview, provider_id: "2", feed_id: 9,
         url: "http://example.com/a-different-url.jpg",
         variant: "542x304", image_fingerprint: one.image_fingerprint,
+ original_fingerprint: SecureRandom.hex(16),
         storage_path: shared_path,
         width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
       )
