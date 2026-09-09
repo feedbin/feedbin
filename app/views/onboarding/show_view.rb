@@ -19,6 +19,7 @@ module Onboarding
       )
 
       div data: stimulus_controller, class: "select-none group h-full w-full flex flex-col" do
+        div class: "shrink-0 h-[env(safe-area-inset-top)] bg-base"
         div class: "flex shrink-0 flex-center p-3 relative bg-base" do
           div class: "text-700 text-[15px] font-bold" do
             "Get Started"
@@ -56,6 +57,7 @@ module Onboarding
                   "Done"
                 end
               end
+              div class: "shrink-0 ease-out transition-[min-height] min-h-[max(var(--visual-viewport-offset,0px),env(safe-area-inset-bottom))]"
             end
           end
         end

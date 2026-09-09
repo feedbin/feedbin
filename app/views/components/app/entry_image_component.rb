@@ -12,9 +12,15 @@ module App
           end
         end
         span class: "entry-image" do
-          span data: {src: @entry.processed_image}, style: @entry.placeholder_color ? "background-color: ##{@entry.placeholder_color}" : ""
+          span data: {src: @entry.processed_image}, style: placeholder_style
         end
       end
+    end
+
+    private
+
+    def placeholder_style
+      @entry.placeholder_color ? "background-color: ##{@entry.placeholder_color}" : ""
     end
   end
 end

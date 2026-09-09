@@ -1,10 +1,10 @@
 require "test_helper"
 
 class TweetTest < ActiveSupport::TestCase
-  def make_tweet(option: "one", overrides: {}, image: nil)
+  def make_tweet(option: "one", overrides: {}, image: nil, link_image: nil)
     tweet_data = load_tweet(option)
     tweet_data.merge!(overrides)
-    Tweet.new({"tweet" => tweet_data}, image)
+    Tweet.new({"tweet" => tweet_data}, image, link_image)
   end
 
   test "main_tweet returns the wrapped tweet when not a retweet" do
@@ -131,7 +131,9 @@ class TweetTest < ActiveSupport::TestCase
     end
   end
 
-  test "link_preview? returns true with a valid saved_pages entry and processed link image" do
+  # The legacy data key is inert since the S3 backfill; only the link row
+  # gates a preview now.
+  test "link_preview? ignores the legacy data key without a link row" do
     fake_url = OpenStruct.new(expanded_url: URI.parse("https://example.com/p"), indices: [0, 10])
     tweet = make_tweet
     tweet.main_tweet.stub :urls, [fake_url] do
@@ -140,6 +142,20 @@ class TweetTest < ActiveSupport::TestCase
           "saved_pages" => {"https://example.com/p" => {"result" => {"ok" => true}}},
           "twitter_link_image_processed" => "x"
         )
+        refute tweet.link_preview?
+      end
+    end
+  end
+
+  # The unified pipeline stops writing twitter_link_image_processed once the
+  # image lives on a row; the gate must accept the row too, or previews for
+  # every newly crawled entry silently stop rendering.
+  test "link_preview? accepts a stored link image row in place of the legacy data key" do
+    fake_url = OpenStruct.new(expanded_url: URI.parse("https://example.com/p"), indices: [0, 10])
+    tweet = make_tweet(link_image: Object.new)
+    tweet.main_tweet.stub :urls, [fake_url] do
+      tweet.stub :link_tweet?, true do
+        tweet.data.merge!("saved_pages" => {"https://example.com/p" => {"result" => {"ok" => true}}})
         assert tweet.link_preview?
       end
     end

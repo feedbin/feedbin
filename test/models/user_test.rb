@@ -7,6 +7,30 @@ class UserTest < ActiveSupport::TestCase
     @entries = @user.entries
   end
 
+  # Suspension must silence a user's actions: deactivate removes their
+  # percolators, activate re-registers them. The action rows themselves
+  # survive a suspension untouched.
+  test "deactivate removes the user's action percolators" do
+    Sidekiq::Worker.clear_all
+
+    @user.deactivate
+
+    assert @user.reload.suspended
+    removed = Search::PercolateDestroy.jobs.map { |job| job["args"].first }
+    assert_equal @user.actions.pluck(:id).sort, removed.sort
+  end
+
+  test "activate re-registers the user's action percolators" do
+    @user.deactivate
+    Sidekiq::Worker.clear_all
+
+    @user.activate
+
+    assert_not @user.reload.suspended
+    added = Search::PercolateCreate.jobs.map { |job| job["args"].first }
+    assert_equal @user.actions.pluck(:id).sort, added.sort
+  end
+
   test "should filter by subscription" do
     @user.inspect
     ids = @user.entries.limit(1).pluck(:id)

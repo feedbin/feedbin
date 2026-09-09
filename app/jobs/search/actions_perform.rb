@@ -47,7 +47,10 @@ module Search
     private
 
     def star(user_ids, user_actions)
-      users = User.where(id: user_ids)
+      # A suspended account can still match here until its percolators are
+      # removed. Never write stars for it. Mirrors Entry#mark_as_unread,
+      # which filters unreads on Subscription.active.
+      users = User.where(id: user_ids, suspended: false)
       users.each do |user|
         message = "action"
         if user_actions[user.id].present?

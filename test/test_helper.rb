@@ -54,6 +54,18 @@ StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
 WebMock.disable_net_connect!(allow_localhost: true, allow: ENV['WEBMOCK_ALLOWED_HOSTS']&.split(","))
 Sidekiq.logger.level = Logger::WARN
 
+# fog-aws 3.33 builds DeleteObjects XML by mutating a string literal
+# (delete_multiple_objects.rb), which Ruby 4 deprecation-warns about on every
+# call. Silence that one gem warning until upstream is frozen-string-literal
+# clean; everything else still warns.
+module FogFrozenStringLiteralWarningFilter
+  def warn(message, **)
+    return if message.include?("fog-aws") && message.include?("literal string will be frozen")
+    super
+  end
+end
+Warning.extend(FogFrozenStringLiteralWarningFilter)
+
 
 # Writer for ActiveSupport::TestCase#outside_transaction. Its own connection
 # pool, named so that skip_transactional_tests_for_database can keep the
@@ -103,9 +115,14 @@ class ActiveSupport::TestCase
       # so delete whatever indexes the worker's aliases point at now, then the
       # original physical names in case an index lost its alias.
       [Entry, Action, Feed].each do |model|
-        client.get_indexes_from_alias(Search.index_name(model.table_name)).each do |index|
+        alias_name = Search.index_name(model.table_name)
+        client.get_indexes_from_alias(alias_name).each do |index|
           client.delete_index(index)
         end
+        # An index auto-created under the alias's own name is reachable from
+        # no alias, so the sweep above cannot see it -- left behind, it
+        # shadows the real index on every later run. Drop it unconditionally.
+        client.delete_index(alias_name)
       end
       $search[:config][:aliases].each_value do |index|
         client.delete_index(index)
@@ -143,6 +160,14 @@ class ActiveSupport::TestCase
         redis.flushdb
       end
     end
+  end
+
+  def with_env(vars)
+    previous = vars.keys.index_with { |key| ENV[key] }
+    vars.each { |key, value| ENV[key] = value }
+    yield
+  ensure
+    previous.each { |key, value| value.nil? ? ENV.delete(key) : ENV[key] = value }
   end
 
   def parse_json

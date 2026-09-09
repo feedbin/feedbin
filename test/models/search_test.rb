@@ -37,6 +37,43 @@ class SearchTest < ActiveSupport::TestCase
     Search.configure!
   end
 
+  # A document written to a missing name auto-creates a concrete index that
+  # blocks the alias forever, and its inferred mapping makes searches
+  # quietly return nothing. Runs in its own namespace so it cannot disturb
+  # this worker's indexes.
+  test "setup reclaims an alias name that a concrete index has taken over" do
+    with_test_worker("squatter") do
+      Search.configure!
+      index      = $search[:config][:aliases][:entries]
+      alias_name = Search.index_name(Entry.table_name)
+
+      Search.client { it.request(:post, "/#{alias_name}/_doc/1", params: {refresh: "true"}, json: {title: "auto-created"}) }
+      assert_equal [], Search.client { it.get_indexes_from_alias(alias_name) },
+        "precondition: the squatter answers to the alias name but is not an alias"
+
+      Search.setup
+
+      assert_equal [index], Search.client { it.get_indexes_from_alias(alias_name) },
+        "setup should have dropped the squatter and published #{index} under #{alias_name}"
+
+      mapping = Search.client { it.request(:get, "/#{alias_name}/_mapping") }
+      assert mapping.safe_dig(index, "mappings", "properties", "title", "fields", "exact"),
+        "the reclaimed index should carry our mapping, not an inferred one"
+    ensure
+      # setup builds all three namespaces, not just the one under test, so
+      # clean up all of them: the physical indexes first (which takes their
+      # aliases with them), then any name left holding a squatter of its own.
+      $search[:config][:aliases].each_value do |name|
+        Search.client { it.delete_index(name) }
+      end
+      [Entry, Action, Feed].each do |model|
+        Search.client { it.delete_index(Search.index_name(model.table_name)) }
+      end
+    end
+  ensure
+    Search.configure!
+  end
+
   private
 
   def with_test_worker(number)

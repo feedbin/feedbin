@@ -1,15 +1,39 @@
 module EntriesHelper
-  # The entry summary renders the feed's title as well as its icon and favicon,
-  # so key on the feed record rather than enumerating the attributes the
-  # partial happens to use today. feeds.updated_at covers all of them, and it
-  # costs no extra query when :feed is preloaded -- which reaching through to
-  # feed.favicon did not.
-  def self.entries_cache_key(entry)
-    [entry, entry.feed, "v7"]
+  # Digests the rows the partial renders, so one row update invalidates
+  # every view referencing it without touching owner rows. Every part must
+  # come from something already loaded (Favicon.for_entries map,
+  # with_list_associations) or the key is an N+1 per render.
+  def self.entries_cache_key(entry, favicons = {})
+    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v10"]
   end
 
-  def entries_cache_key(entry)
-    EntriesHelper.entries_cache_key(entry)
+  # The extended API fragment carries the same image urls as the list, so it
+  # needs the same lever: a version to bump when the read path changes.
+  def self.api_entries_cache_key(entry, include_content_diff)
+    [include_content_diff, entry, "v2"]
+  end
+
+  # The same sources FaviconComponent renders from, resolved the same way:
+  # Pages entries key on their own host, everything else on the feed's
+  # favicon. Mirroring the component keeps the digest from drifting.
+  def self.entry_favicon(entry, favicons)
+    return favicons[entry.hostname] if entry.feed&.pages?
+    entry.feed&.favicon
+  end
+
+  # The one render invocation for the entry list, shared by the view and the
+  # cache warmer so the warmer cannot warm keys no view reads.
+  def self.entry_collection(entries, favicons)
+    {
+      partial: "entries/entry",
+      collection: entries,
+      locals: {favicons: favicons},
+      cached: ->(entry) { entries_cache_key(entry, favicons) }
+    }
+  end
+
+  def entries_cache_key(entry, favicons = {})
+    EntriesHelper.entries_cache_key(entry, favicons)
   end
 
   def format_text(text)

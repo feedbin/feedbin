@@ -60,6 +60,18 @@ module Search
       end
     end
 
+    # A suspended account can still match here while its percolators linger.
+    # Without the guard its auto-stars grow without bound.
+    test "should not star for a suspended account" do
+      @user.update_columns(suspended: true)
+
+      assert_no_difference "StarredEntry.count" do
+        Throttle.stub :throttle!, true do
+          ActionsPerform.new.perform(@entry.id, [@action.id])
+        end
+      end
+    end
+
     test "should send_ios_notification" do
       assert_difference "DevicePushNotificationSend.jobs.size", +1 do
         Throttle.stub :throttle!, true do

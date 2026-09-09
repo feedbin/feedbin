@@ -107,6 +107,31 @@ class User < ApplicationRecord
   before_destroy :create_deleted_user
   before_destroy :record_stats
 
+  # `dependent: :delete_all` on starred, played and queued entries skips the
+  # counter caches those rows maintain on `entries`, so a destroy leaves the
+  # counts too high and EntryDeleter#prune_entries never frees the entries.
+  #
+  # prepend: true is required -- each `dependent:` association registers its
+  # own before_destroy when it is declared, all of them above this line, so
+  # without it the rows are already gone by the time this runs.
+  before_destroy :capture_counter_cache_targets, prepend: true
+  after_commit :repair_entry_counter_caches, on: :destroy
+
+  # How many distinct entry ids a destroy will carry before it stops
+  # collecting them and repairs whole feeds instead.
+  #
+  # Exact ids are far cheaper for an ordinary account: one that starred fifty
+  # things touches fifty entries, where its feeds hold thousands. They stop
+  # paying for themselves at the top end, where the list grows without bound
+  # -- and an account holding that many rows has starred a large share of its
+  # feeds anyway, so whole-feed repair costs about the same. 100,000 ids is
+  # roughly 800KB held here and 50 jobs of about 22KB each.
+  COUNTER_CACHE_ID_LIMIT = 100_000
+
+  def self.counter_cache_id_limit
+    COUNTER_CACHE_ID_LIMIT
+  end
+
   validate :changed_password, on: :update, unless: ->(user) { user.password_reset }
   validate :coupon_code_valid, on: :create, if: ->(user) { user.coupon_code }
   validate :plan_type_valid, on: :update
@@ -400,7 +425,7 @@ class User < ApplicationRecord
   def tag_group
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag
-    feeds_by_id = feeds.includes(:favicon).include_user_title
+    feeds_by_id = feeds.includes(*Feed::ICON_PRELOADS).include_user_title
     feeds_by_id = feeds_by_id.each_with_object({}) { |feed, hash|
       hash[feed.id] = feed
     }
@@ -501,6 +526,47 @@ class User < ApplicationRecord
     end
   end
 
+  # Collects the entries whose counter caches this destroy will invalidate.
+  # Runs before any row is deleted; see the callback declaration. Batched, so
+  # an account holding millions of rows never materialises them all at once.
+  def capture_counter_cache_targets
+    @counter_cache_entry_ids = nil
+    @counter_cache_feed_ids = nil
+
+    entry_ids = Set.new
+    [starred_entries, recently_played_entries, queued_entries].each do |relation|
+      relation.select(:entry_id).in_batches(of: 10_000) do |batch|
+        entry_ids.merge(batch.pluck(:entry_id))
+        next if entry_ids.size <= self.class.counter_cache_id_limit
+
+        # Too many to carry. Drop them and fall back to the feeds.
+        @counter_cache_feed_ids = counter_cache_feed_ids
+        return true
+      end
+    end
+
+    @counter_cache_entry_ids = entry_ids.to_a
+    true
+  end
+
+  # recently_played_entries carries no feed_id, so its feeds come through the
+  # entry.
+  def counter_cache_feed_ids
+    (
+      starred_entries.distinct.pluck(:feed_id) |
+      queued_entries.distinct.pluck(:feed_id) |
+      recently_played_entries.joins(:entry).distinct.pluck("entries.feed_id")
+    ).compact
+  end
+
+  def repair_entry_counter_caches
+    if @counter_cache_feed_ids
+      EntryCounterRepair::ForFeeds.enqueue(@counter_cache_feed_ids)
+    else
+      EntryCounterRepair.enqueue(@counter_cache_entry_ids)
+    end
+  end
+
   def billing_issue?
     billing_issue == "1"
   end
@@ -512,11 +578,13 @@ class User < ApplicationRecord
   def activate
     update(suspended: false, billing_issue: "0")
     subscriptions.update_all(active: true)
+    Search::PercolateCreate.for_users(id)
   end
 
   def deactivate
     update(suspended: true)
     subscriptions.update_all(active: false)
+    Search::PercolateDestroy.for_users(id)
   end
 
   def active?

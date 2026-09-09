@@ -25,14 +25,15 @@ module ImageCrawler
         provider: ::Image.providers[:entry_link_preview],
         provider_id: @entry.id,
         entry_url: @page_url,
+        feed_id: @entry.feed_id,
+        page_url: @page_url
       )
       Pipeline::Find.perform_async(image.to_h)
     end
 
     def receive
-      @entry.data["twitter_link_image_processed"] = @image["processed_url"]
-      @entry.data["twitter_link_image_placeholder_color"] = @image["placeholder_color"]
-      @entry.save!
+      @image.fetch("storage_path")
+      @entry.touch
     end
   end
 end

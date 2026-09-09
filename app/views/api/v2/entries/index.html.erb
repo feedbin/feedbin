@@ -5,7 +5,7 @@ if params.key?(:private)
   template = "entry_private"
 elsif params[:mode] == "extended"
   template = "entry_extended"
-  cached = Proc.new { |item| [params.key?(:include_content_diff), item] }
+  cached = Proc.new { |item| EntriesHelper.api_entries_cache_key(item, params.key?(:include_content_diff)) }
 end
 -%>
 <%= json_array { render partial: "api/v2/entries/#{template}", formats: :json, collection: @entries, as: :entry, spacer_template: "api/v2/shared/comma", cached: cached } -%>

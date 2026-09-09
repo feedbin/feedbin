@@ -17,3 +17,6 @@ end
 Sidekiq.configure_client do |config|
   config.redis = {id: "feedbin-client-#{::Process.pid}"}
 end
+
+require "sidekiq/web"
+Sidekiq::Web.app_url = ENV["FEEDBIN_URL"]

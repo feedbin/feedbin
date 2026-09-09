@@ -5,7 +5,7 @@ class RecentlyPlayedEntriesController < ApplicationController
     recently_played_entries = @user.recently_played_entries.order("created_at DESC").limit(100)
     recently_played_entry_ids = []
     recently_played_entries.each { |recently_played_entry| recently_played_entry_ids << recently_played_entry.entry_id }
-    @entries = Entry.where(id: recently_played_entry_ids).includes(feed: [:favicon]).entries_list
+    @entries = Entry.where(id: recently_played_entry_ids).entries_list
     @entries = @entries.sort_by { |entry| recently_played_entry_ids.index(entry.id) }
 
     @collection_title = "Recently Played"
@@ -37,7 +37,7 @@ class RecentlyPlayedEntriesController < ApplicationController
 
   def destroy_all
     @user = current_user
-    @user.recently_played_entries.delete_all
+    RecentlyPlayedEntry.clear_for_user(@user.id)
   end
 
   def progress

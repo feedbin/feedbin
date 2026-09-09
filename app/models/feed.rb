@@ -1,4 +1,6 @@
 class Feed < ApplicationRecord
+  include YoutubeChannel
+
   has_many :subscriptions
   has_many :podcast_subscriptions
   has_many :entries
@@ -13,13 +15,17 @@ class Feed < ApplicationRecord
 
   has_one :favicon, foreign_key: :host, primary_key: :host
   has_one :newsletter_sender
+  has_one :icon_image_record, -> { provider_feed_icon }, class_name: "Image", foreign_key: :provider_id
+
+  # Everything FaviconComponent (via #icon_url and #favicon) can read when
+  # rendering this feed's icon. Preload these wherever feeds render in a list,
+  # or the icon lookups become a query per feed.
+  ICON_PRELOADS = [:favicon, :icon_image_record, :channel_image_record].freeze
 
   before_create :set_host
-  before_save :set_hubs
   after_create :refresh_favicon
 
   after_commit :web_sub_subscribe, on: :create
-  after_commit :update_youtube_videos, on: :create
 
   attribute :crawl_data, CrawlDataType.new
   attr_accessor :count, :tags
@@ -30,8 +36,6 @@ class Feed < ApplicationRecord
   enum :feed_type, {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
   store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format, :meta_title, :meta_description, :meta_crawled_at], coder: JsonConverter
-
-  has_many :icons,  -> { feed_icons }, foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
 
   def twitter_user?
     twitter_user.present?
@@ -87,15 +91,25 @@ class Feed < ApplicationRecord
   end
 
   def icon
-    base = icon_options.keys.find { !_1.nil? }
+    base = icon_options.keys.find { !it.nil? }
     return nil if base.nil?
     feed_relative_url(base)
   end
 
   def default_icon_format
-    base = icon_options.keys.find { !_1.nil? }
+    base = icon_options.keys.find { !it.nil? }
     return nil if base.nil?
     icon_options[base]
+  end
+
+  # The renderable URL: images row from our CDN, else the legacy url through
+  # the signing proxy. The feed's own row outranks the shared channel row.
+  # icon/icon_options/default_icon_format still answer the separate question
+  # "which source won and what shape is it".
+  def icon_url
+    Image.unified_url(icon_image_record&.storage_path) ||
+      Image.unified_url(channel_image_record&.storage_path) ||
+      (icon && RemoteFile.signed_url(icon))
   end
 
   def self.create_from_parsed_feed(parsed_feed)
@@ -200,35 +214,6 @@ class Feed < ApplicationRecord
     end
   end
 
-  def self_url
-    if youtube_channel_id
-      "https://www.youtube.com/xml/feeds/videos.xml?channel_id=#{youtube_channel_id}"
-    else
-      self[:self_url]
-    end
-  end
-
-  def known_hubs
-    if youtube_channel_id
-      ["https://pubsubhubbub.appspot.com"]
-    end
-  end
-
-  def set_hubs
-    if known_hubs.present?
-      self[:hubs] = known_hubs
-    end
-  end
-
-  def youtube_channel_id
-    youtube_prefix = Regexp.new(/^https?:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=([^#\?&]*)/)
-    if feed_url =~ youtube_prefix && self[:self_url] =~ youtube_prefix
-      $1
-    else
-      nil
-    end
-  end
-
   def redirect_key
     "refresher_redirect_stable_%d" % id
   end
@@ -329,12 +314,6 @@ class Feed < ApplicationRecord
   end
 
   private
-
-  def update_youtube_videos
-    if youtube_channel_id
-      FeedCrawler::UpdateYoutubeVideos.perform_in(2.minutes, id)
-    end
-  end
 
   def refresh_favicon
     FaviconCrawler::Finder.perform_async(host)

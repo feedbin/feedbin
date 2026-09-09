@@ -1,2 +1,6 @@
 window.feedbin.refresh()
-feedbin.selectFirst()
+
+// only auto-select in three-up, where the feed list stays on screen
+if (document.body.classList.contains("three-up")) {
+  feedbin.selectFirst()
+}

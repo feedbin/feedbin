@@ -11,7 +11,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   test "should harvest from iframe" do
     @entry.update(content: %(<iframe src="http://www.youtube.com/embed/video_id"></iframe>))
 
-    assert_difference -> { Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) } }, +1 do
+    assert_difference -> { Sidekiq.redis { it.scard(HarvestEmbeds::SET_NAME) } }, +1 do
       HarvestEmbeds.new.perform(@entry.id)
     end
 
@@ -20,7 +20,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   test "should harvest from youtube feed" do
     @entry.update(data: {youtube_video_id: "video_id"})
 
-    assert_difference -> { Sidekiq.redis { _1.scard(HarvestEmbeds::SET_NAME) } }, +1 do
+    assert_difference -> { Sidekiq.redis { it.scard(HarvestEmbeds::SET_NAME) } }, +1 do
       HarvestEmbeds.new.perform(@entry.id)
     end
   end
@@ -29,7 +29,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(
       live_broadcast_content: "live",
       live_streaming_details: {
@@ -71,12 +71,23 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal("channel_id", @entry.reload.provider_parent_id)
   end
 
+  # The entry's own <yt:channelId> outranks the embed lookup: known at
+  # creation, and still there when the API round trip comes back empty.
+  test "should take provider_parent_id from the entry's own channel id" do
+    @entry.update(data: {youtube_video_id: "video_id", youtube_channel_id: "UCfromentry"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    @entry.send(:provider_metadata)
+    @entry.save!
+
+    assert_equal("UCfromentry", @entry.reload.provider_parent_id)
+  end
+
   test "should requeue live videos scheduled in the future" do
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
     scheduled_time = 1.day.from_now
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(
       live_broadcast_content: "upcoming",
       live_streaming_details: {
@@ -104,7 +115,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(
       live_broadcast_content: "live",
       live_streaming_details: {
@@ -128,7 +139,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
 
-    Sidekiq.redis { _1.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
     stub_youtube_api(live_broadcast_content: "none")
 
     HarvestEmbeds.new.perform(nil, true)
@@ -169,6 +180,9 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
             thumbnails: {
               default: {
                 url: "image_url"
+              },
+              high: {
+                url: "https://yt3.ggpht.com/avatar.jpg"
               }
             }
           },
@@ -177,7 +191,54 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     }
     stub_request(:get, %r{www.googleapis.com/youtube/v3/channels})
       .to_return body: channels.to_json, headers: {content_type: "application/json"}
+
+    stub_request_file("image.png", "https://yt3.ggpht.com/avatar.jpg", headers: {content_type: "image/png"})
   end
 
+  test "schedules the channel avatar from the largest thumbnail" do
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    stub_youtube_api
 
+    HarvestEmbeds.new.perform(nil, true)
+    job = HarvestEmbeds::Download.jobs.shift
+
+    assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
+      HarvestEmbeds::Download.new.perform(*job["args"])
+    end
+
+    args = ImageCrawler::Pipeline::Find.jobs.last["args"].first
+    assert_equal ["https://yt3.ggpht.com/avatar.jpg"], args["image_urls"]
+    assert_equal "channel_avatar", args["preset_name"]
+    assert_equal "channel_id", args["provider_id"]
+  end
+
+  # The old lookup reconstructed one exact url string, so a feed subscribed
+  # through any other spelling of the same channel never got its icon.
+  test "updates every feed for the channel, not just the canonical url" do
+    other = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=channel_id")
+
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") }
+    stub_youtube_api
+
+    HarvestEmbeds.new.perform(nil, true)
+    job = HarvestEmbeds::Download.jobs.shift
+    HarvestEmbeds::Download.new.perform(*job["args"])
+
+    assert_equal "image_url", @feed.reload.custom_icon
+    assert_equal "image_url", other.reload.custom_icon
+  end
+
+  # The channels half of the API can come back empty while the videos half
+  # succeeded; a nil parent must not kill this retry: false job.
+  test "survives videos whose channel embed was never imported" do
+    Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
+
+    assert_nothing_raised do
+      HarvestEmbeds::Download.new.update_related_records(["video_id"])
+    end
+  end
 end

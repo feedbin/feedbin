@@ -32,13 +32,25 @@ module ImageCrawler
       end
     end
 
-    test "updates the entry when an image hash is given" do
-      processed_url = "https://cdn.example.com/cover.jpg"
+    test "raises on a payload without storage_path" do
+      assert_raises(KeyError) { ItunesImage.new.perform(@entry.public_id, {"processed_url" => "https://cdn.example.com/cover.jpg"}) }
+      assert_nil @entry.reload.media_image
+    end
 
-      ItunesImage.new.perform(@entry.public_id, {"processed_url" => processed_url})
+    # Row-backed: Upload or Dedupe already wrote the images row before this
+    # callback. media_image is a legacy pointer, and a row-backed callback
+    # must not write one, or Dedupe keeps spreading legacy urls onto
+    # entries the unified store already serves.
+    test "does not write media_image when row-backed" do
+      @entry.update!(media_image: nil, provider: nil, provider_id: nil)
+
+      ItunesImage.new.perform(@entry.public_id, {
+        "processed_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg",
+        "storage_path" => "abc/abc123.jpg"
+      })
 
       @entry.reload
-      assert_equal processed_url, @entry.media_image
+      assert_nil @entry.media_image
       assert_equal "entry_icon", @entry.provider
       assert_equal @entry.id.to_s, @entry.provider_id
     end

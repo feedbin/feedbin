@@ -205,7 +205,7 @@ class EntriesController < ApplicationController
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
-    @entries = result.records(Entry).includes(feed: [:favicon])
+    @entries = result.records(Entry).with_list_associations
     @page_query = result.pagination
     @total_results = result.total
 
@@ -252,7 +252,12 @@ class EntriesController < ApplicationController
   private
 
   def entries_by_id(entry_ids)
-    entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
+    # The full-content render reaches the images rows too: a tweet through
+    # Entry#tweet (preview_image_record), a podcast through
+    # EntryPresenter#media_image (icon_image_record). The preload endpoint
+    # renders a client-sized batch of these at once.
+    entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS)
+      .preload(:owned_image_records, :icon_image_record)
     subscriptions = @user.subscriptions.pluck(:feed_id)
     @title = entries.present? ? "#{entries.first.title} - Feedbin" : "Feedbin"
     entries.each_with_object({}) do |entry, hash|
@@ -272,6 +277,6 @@ class EntriesController < ApplicationController
 
   def matched_search_ids(params)
     query = Entry.build_query(user: @user, query: params[:query])
-    Search.client { _1.all_matches(Search.index_name(Entry.table_name), query: query) }
+    Search.client { it.all_matches(Search.index_name(Entry.table_name), query: query) }
   end
 end

@@ -12,8 +12,15 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
-  has_many :images, -> { entry_images }, foreign_key: :provider_id, primary_key: :id
-  has_many :icons,  -> { entry_icons },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
+  # The preview image and the tweet/micropost link preview are both keyed by
+  # this entry's id, so one association fetches the pair in one query;
+  # preview_image_record/link_image_record read from it. entry_icon rows stay
+  # out -- no list reads them.
+  has_many :owned_image_records, -> { entry_images }, class_name: "Image", foreign_key: :provider_id
+  has_one :icon_image_record, -> { provider_entry_icon }, class_name: "Image", foreign_key: :provider_id
+  # The avatar of this video's own channel -- a playlist feed mixes videos
+  # from many channels, keyed by provider_parent_id (UC-form).
+  has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
 
   before_create :ensure_published
   before_create :create_summary
@@ -52,13 +59,24 @@ class Entry < ApplicationRecord
        .where(feed_id: feed_ids)
    }
 
-  def self.entries_with_feed(entry_ids, sort)
-    in_order_of(:id, entry_ids).includes(feed: [:favicon])
+  # Everything entries/_entry touches beyond the entry itself. Attaching
+  # less makes a cache-miss render cost a query per row.
+  scope :with_list_associations, -> {
+    includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :channel_image_record)
+  }
+
+  # The same associations plus a narrow column select; separate because
+  # search-result and materialized relations cannot take the select.
+  def self.entries_list
+    select(:id, :feed_id, :title, :summary, :published, :data, :author, :url, :updated_at, :settings, :provider_parent_id)
+      .with_list_associations
   end
 
-  def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
-  end
+  # What api/v2/entries/_entry.json renders; extended mode also reads the
+  # preview image row, at up to 100 entries a request.
+  scope :for_api, ->(mode = nil) {
+    mode.to_s == "extended" ? includes(:feed).preload(:owned_image_records) : includes(:feed)
+  }
 
   def self.sort_preference(sort)
     if sort == "ASC"
@@ -94,7 +112,7 @@ class Entry < ApplicationRecord
 
     authors = json_feed.safe_dig("authors")
     return authors unless authors.respond_to?(:filter_map)
-    authors = authors.filter_map { _1&.safe_dig("name") }
+    authors = authors.filter_map { it&.safe_dig("name") }
     authors.to_sentence
   rescue
     nil
@@ -129,23 +147,38 @@ class Entry < ApplicationRecord
     feed.pages? ? url : feed.site_url
   end
 
+  # The images row is the only source. The legacy JSON on the entry is
+  # inert data: nothing writes it since the S3 backfill and nothing reads
+  # it. An entry without a row renders no image.
   def processed_image
-    if image && image["original_url"] && image["width"] && image["height"] && image["processed_url"]
-      image_url = image["processed_url"]
-      host = ENV["ENTRY_IMAGE_HOST"]
-      url = URI(image_url)
-      unless Rails.env.development?
-        url.scheme = "https"
-      end
-      url.host = host if host
-      url.to_s
+    if record = preview_image_record
+      Image.unified_url(record.storage_path)
+    end
+  end
+
+  def preview_image_data
+    if record = preview_image_record
+      {
+        "original_url" => record.final_url || record.url,
+        "width" => record.width,
+        "height" => record.height
+      }
     end
   end
 
   def placeholder_color
-    if image && image["placeholder_color"].respond_to?(:length) && image["placeholder_color"].length == 6
-      image["placeholder_color"]
+    color = preview_image_record&.placeholder_color
+    if color.respond_to?(:length) && color.length == 6
+      color
     end
+  end
+
+  def preview_image_record
+    owned_image_records.detect(&:provider_entry_preview?)
+  end
+
+  def link_image_record
+    owned_image_records.detect(&:provider_entry_link_preview?)
   end
 
   def processed_image?
@@ -153,16 +186,7 @@ class Entry < ApplicationRecord
   end
 
   def itunes_image
-    if media_image || (data && data["itunes_image_processed"])
-      image_url = media_image || data["itunes_image_processed"]
-
-      host = ENV["ENTRY_IMAGE_HOST"]
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = "https"
-      url.to_s
-    end
+    Image.unified_url(icon_image_record&.storage_path)
   end
 
   def content_diff
@@ -181,9 +205,8 @@ class Entry < ApplicationRecord
     end
   end
 
-  # nil, not 0, when the feed gave no itunes:duration -- the element is
-  # optional and plenty of feeds omit it. Returning 0 made every caller's nil
-  # guard dead code, so a durationless episode rendered as "0 minutes".
+  # nil, not 0, when the feed gave no itunes:duration -- 0 renders as
+  # "0 minutes" and makes callers' nil guards dead code.
   def audio_duration
     seconds = 0
     duration = data && data["itunes_duration"]
@@ -218,7 +241,7 @@ class Entry < ApplicationRecord
   def micropost
     @micropost ||= begin
       if data.respond_to?(:has_key?)
-        post = Micropost.new(self.data, title, feed: feed)
+        post = Micropost.new(self.data, title, feed: feed, link_image: link_image_record)
         post.valid? ? post : nil
       end
     end
@@ -286,7 +309,7 @@ class Entry < ApplicationRecord
   def tweet
     @tweet ||=
       if data.is_a?(Hash) && data["tweet"].is_a?(Hash)
-        Tweet.new(data, image) rescue nil
+        Tweet.new(data, preview_image_record, link_image_record) rescue nil
       end
   end
 
@@ -302,21 +325,15 @@ class Entry < ApplicationRecord
   end
 
   def link_image
-    if data && data["twitter_link_image_processed"]
-      image_url = data["twitter_link_image_processed"]
-
-      host = ENV["ENTRY_IMAGE_HOST"]
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = "https"
-      url.to_s
+    if record = link_image_record
+      Image.unified_url(record.storage_path)
     end
   end
 
   def link_image_placeholder_color
-    if data && data["twitter_link_image_placeholder_color"].respond_to?(:length) && data["twitter_link_image_placeholder_color"].length == 6
-      data["twitter_link_image_placeholder_color"]
+    color = link_image_record&.placeholder_color
+    if color.respond_to?(:length) && color.length == 6
+      color
     end
   end
 
@@ -330,7 +347,7 @@ class Entry < ApplicationRecord
 
   def chapter_titles
     return [] unless chapters.respond_to?(:map)
-    chapters.filter_map {_1.safe_dig("tags", "title")}.filter(&:present?).map(&:clean)
+    chapters.filter_map {it.safe_dig("tags", "title")}.filter(&:present?).map(&:clean)
   end
 
   def plain_title_with_default
@@ -348,9 +365,11 @@ class Entry < ApplicationRecord
     elsif youtube?
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]
-      if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
-        self.provider_parent_id = embed.parent_id
-      end
+      # The entry's own <yt:channelId> outranks the embed lookup: known at
+      # creation, and still there when the API round trip returns nothing
+      # (rate-limited key, private video).
+      self.provider_parent_id = data["youtube_channel_id"].presence ||
+        Embed.youtube_video.find_by_provider_id(self.provider_id)&.parent_id
     elsif feed.pages?
       self.provider = self.class.providers[:favicon]
       self.provider_id = hostname
@@ -424,8 +443,11 @@ class Entry < ApplicationRecord
     end
 
     if queued_entries.present?
-      QueuedEntry.import(queued_entries, validate: false, on_duplicate_key_ignore: true)
-      increment!(:queued_entries_count, queued_entries.count)
+      # Count what was inserted, not what was offered: import skips callbacks,
+      # so the counter is maintained here, and on_duplicate_key_ignore drops
+      # any subscriber already holding this episode.
+      result = QueuedEntry.import(queued_entries, validate: false, on_duplicate_key_ignore: true)
+      increment!(:queued_entries_count, result.ids.count) if result.ids.any?
     end
 
     Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)

@@ -1,8 +1,9 @@
 class Tweet
   attr_accessor :tweet, :data
 
-  def initialize(data, image)
+  def initialize(data, image, link_image = nil)
     @image = image
+    @link_image = link_image
     @data = data
     @tweet = Twitter::Tweet.new(data["tweet"].deep_symbolize_keys)
   end
@@ -75,7 +76,9 @@ class Tweet
     return false if @image.present?
     return false unless data.safe_dig("saved_pages", main_tweet.urls.first.expanded_url.to_s).present?
     return false if data.safe_dig("saved_pages", main_tweet.urls.first.expanded_url.to_s, "result", "error")
-    data.safe_dig("twitter_link_image_processed").present?
+    # The row is the only gate. The legacy data key is inert since the S3
+    # backfill.
+    @link_image.present?
   end
 
   private

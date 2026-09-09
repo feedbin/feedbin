@@ -34,17 +34,52 @@ module ImageCrawler
       end
     end
 
-    test "stores processed_url and placeholder_color into entry data when image is given" do
-      image = {
-        "processed_url" => "https://cdn.example.com/twitter.jpg",
-        "placeholder_color" => "#abcdef"
+    test "should enqueue Find with feed context" do
+      entry = Feed.first.entries.create(
+        content: "content",
+        public_id: SecureRandom.hex,
+        url: "http://example.com/article"
+      )
+
+      TwitterLinkImage.new.perform(entry.public_id, nil, "http://example.com/linked-page")
+
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      assert_equal entry.feed_id, image.feed_id
+      assert_equal "http://example.com/linked-page", image.page_url
+      assert_equal "http://example.com/linked-page", image.entry_url
+    end
+
+    test "raises on a payload without storage_path" do
+      entry = Feed.first.entries.create(content: "content", public_id: SecureRandom.hex, url: "http://example.com/article", data: {})
+      payload = {"original_url" => "http://example.com/image.jpg", "processed_url" => "https://bucket.s3.amazonaws.com/abc/abc.jpg", "width" => 542, "height" => 304, "placeholder_color" => "aabbcc"}
+
+      assert_raises(KeyError) { TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload) }
+      assert_nil entry.reload.data["twitter_link_image_processed"]
+    end
+
+    test "should not duplicate row-backed images onto the entry" do
+      entry = Feed.first.entries.create(
+        content: "content",
+        public_id: SecureRandom.hex,
+        url: "http://example.com/article",
+        data: {}
+      )
+
+      payload = {
+        "original_url" => "http://example.com/image.jpg",
+        "processed_url" => "https://bucket.s3.amazonaws.com/abc/abc.jpg",
+        "width" => 542,
+        "height" => 304,
+        "bytesize" => 12_345,
+        "placeholder_color" => "aabbcc",
+        "storage_path" => "abc/abcdef.jpg",
+        "provider" => "entry_link_preview"
       }
+      TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload)
 
-      TwitterLinkImage.new.perform(@entry.public_id, image)
-
-      @entry.reload
-      assert_equal image["processed_url"], @entry.data["twitter_link_image_processed"]
-      assert_equal image["placeholder_color"], @entry.data["twitter_link_image_placeholder_color"]
+      entry.reload
+      assert_nil entry.data["link_image"]
+      assert_nil entry.data["twitter_link_image_processed"]
     end
   end
 end

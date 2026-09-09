@@ -32,6 +32,7 @@ json.items @entries do |entry|
   json.title          entry.try(:title).clean(transform: [:to_plain_text])
   json.url            entry.try(:url).clean
   json.date_published entry.published.iso8601(6)
+  json.date_modified  entry.updated_at.iso8601(6)
 
   json.attachment do
     json.url           entry.data&.safe_dig("enclosure_url").clean

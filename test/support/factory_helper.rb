@@ -11,7 +11,7 @@ module FactoryHelper
         end
       end
     }
-    entries = feeds.flat_map { bulk_create_entries(_1, 1, users: users) }
+    entries = feeds.flat_map { bulk_create_entries(it, 1, users: users) }
     index_entries(entries)
     feeds
   end
@@ -62,7 +62,7 @@ module FactoryHelper
 
     unreads = [*users].flat_map { |user|
       entries.map {
-        UnreadEntry.new(user_id: user.id, feed_id: feed.id, entry_id: _1.id, published: _1.published, entry_created_at: _1.created_at)
+        UnreadEntry.new(user_id: user.id, feed_id: feed.id, entry_id: it.id, published: it.published, entry_created_at: it.created_at)
       }
     }
     UnreadEntry.import(unreads, validate: false, on_duplicate_key_ignore: true) if unreads.present?
@@ -112,5 +112,26 @@ module FactoryHelper
       user.save
     end
     user
+  end
+
+  # A valid images row with every NOT NULL column filled, so tests spell only
+  # the attributes they are about -- and the next NOT NULL column is a
+  # one-place fix. Entry-preset shape by default (url-keyed, 542x304);
+  # override variant/storage_path/fingerprints for the icon family.
+  def create_image_row(url: "http://example.com/image.jpg", variant: "542x304", **overrides)
+    Image.create!({
+      provider: :entry_preview,
+      provider_id: "1",
+      feed_id: 9,
+      url: url,
+      variant: variant,
+      image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for(url, variant),
+      width: 542,
+      height: 304,
+      bytesize: 12_345,
+      placeholder_color: "aabbcc"
+    }.merge(overrides))
   end
 end

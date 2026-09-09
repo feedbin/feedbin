@@ -1,13 +1,14 @@
 class Micropost
   attr_reader :data
 
-  def initialize(data, title = nil, feed: nil)
+  def initialize(data, title = nil, feed: nil, link_image: nil)
     @data = data
     unless @data&.safe_dig("json_feed").nil?
       @data = @data.safe_dig("json_feed")
     end
     @title = title
     @feed = feed
+    @link_image = link_image
   end
 
   def valid?
@@ -67,7 +68,9 @@ class Micropost
   def link_preview?
     return false unless data.safe_dig("saved_pages", data.safe_dig("urls")&.first).present?
     return false if data.safe_dig("saved_pages", data.safe_dig("urls")&.first, "result", "error")
-    data.safe_dig("twitter_link_image_processed").present?
+    # The row is the only gate. The legacy data key is inert since the S3
+    # backfill.
+    @link_image.present?
   end
 
   private

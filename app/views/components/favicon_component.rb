@@ -11,8 +11,10 @@ class FaviconComponent < ApplicationComponent
       icon_newsletter
     elsif @feed.twitter_user?
       icon_twitter_user
-    elsif @feed.icon
-      icon_feed
+    elsif (channel_icon_url = entry_channel_icon_url)
+      icon_entry_channel(channel_icon_url)
+    elsif (icon_url = @feed.icon_url)
+      icon_feed(icon_url)
     elsif @feed.pages? && @entry
       icon_pages
     elsif @feed.pages?
@@ -40,11 +42,34 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
-  def icon_feed
+  # The avatar of this video's own channel, for entries whose channel is
+  # not the feed's -- a playlist feed mixes videos from many channels. When
+  # they match, the feed's resolution wins (its own icon row outranks the
+  # shared channel avatar).
+  def entry_channel_icon_url
+    return nil if @entry.nil? || @entry.provider_parent_id.blank?
+    return nil if @entry.provider_parent_id == @feed.channel_id
+    Image.unified_url(@entry.channel_image_record&.storage_path)
+  end
+
+  # Always round: an embed_icon row is a YouTube channel avatar.
+  def icon_entry_channel(url)
+    span class: "favicon-wrap twitter-profile-image icon-format-round" do
+      image_tag_with_fallback(
+        image_url("favicon-profile-default.png"),
+        url,
+        alt: ""
+      )
+    end
+  end
+
+  # Takes the url rather than re-asking the feed: the legacy fallback inside
+  # Feed#icon_url signs the url (an HMAC) on every call.
+  def icon_feed(icon_url)
     span class: "favicon-wrap twitter-profile-image icon-format-#{@feed.custom_icon_format || @feed.default_icon_format}" do
       image_tag_with_fallback(
         image_url("favicon-profile-default.png"),
-        RemoteFile.signed_url(@feed.icon),
+        icon_url,
         alt: ""
       )
     end

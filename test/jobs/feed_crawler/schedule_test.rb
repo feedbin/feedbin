@@ -84,5 +84,49 @@ module FeedCrawler
         end
       end
     end
+
+    test "does not crawl a flagged feed nobody has requested" do
+      stale = standalone_feed("stale", requested_at: (StandaloneRetention::TTL + 1.day).ago)
+
+      Schedule.new.perform
+
+      refute_includes enqueued_feed_ids, stale.id
+    end
+
+    test "still crawls a flagged feed requested inside the TTL" do
+      fresh = standalone_feed("fresh", requested_at: 1.day.ago)
+
+      Schedule.new.perform
+
+      assert_includes enqueued_feed_ids, fresh.id
+    end
+
+    # Schedule consults only `Subscription`; an Airshow feed reaches the
+    # crawler solely through the standalone flag, so without this term a
+    # listener silent for 90 days would stop getting new episodes.
+    test "crawls a stale flagged feed that has an Airshow subscription" do
+      stale = standalone_feed("podcast", requested_at: (StandaloneRetention::TTL + 1.day).ago)
+      PodcastSubscription.create!(user: @user, feed: stale, status: :subscribed)
+
+      Schedule.new.perform
+
+      assert_includes enqueued_feed_ids, stale.id
+    end
+
+    private
+
+    def standalone_feed(name, requested_at:)
+      feed = Feed.create!(
+        title: name,
+        feed_url: "https://#{name}.example.com/feed",
+        site_url: "https://#{name}.example.com"
+      )
+      feed.update_columns(standalone_request_at: requested_at)
+      feed
+    end
+
+    def enqueued_feed_ids
+      Downloader.jobs.map { |job| job["args"][0] }
+    end
   end
 end

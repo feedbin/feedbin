@@ -6,6 +6,22 @@ module ImageCrawler
       PIGO_INSTALLED = File.executable?(PIGO)
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
+      # Tuned mozjpeg options (~29% smaller than plain q80 at equal worst-case
+      # quality) -- they need a mozjpeg-linked libjpeg; vips silently ignores
+      # them otherwise. jpg, not webp: the stored file is the master (the
+      # original is discarded), and a lossy webp master would make every
+      # future format a lossy-to-lossy transcode. optimize_scans requires
+      # interlace; interlace implies optimize_coding.
+      JPG_SAVER = {
+        quality: 76, background: 255, keep: :none,
+        interlace: true, optimize_scans: true,
+        trellis_quant: true, overshoot_deringing: true, quant_table: 3
+      }.freeze
+
+      # Icons are flat graphics with alpha; there is nothing to trade quality
+      # against, so the only knob is dropping metadata.
+      PNG_SAVER = {keep: :none}.freeze
+
       attr_reader :path
 
       def initialize(file, crop:, extension:, width:, height:)
@@ -16,8 +32,14 @@ module ImageCrawler
         @height    = height
       end
 
+      # Crops that own their output format: limit_crop picks png or jpg from
+      # the source's alpha and may keep the original untouched; the png crops
+      # are always png. Everything else is encoded as jpg.
+      SELF_ENCODING_CROPS = %i[limit_crop limit_png icon_crop]
+
       def crop!
-        send(@crop)
+        return send(@crop) if SELF_ENCODING_CROPS.include?(@crop)
+        Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
       end
 
       def source
@@ -30,17 +52,24 @@ module ImageCrawler
 
       def valid?(validate)
         source.avg
+        return false if @crop == :icon_crop && best_layer.nil?
         validate ? (source.width >= @width && source.height >= @height) : true
       rescue ::Vips::Error, ImageFormat::Unsupported
         false
+      end
+
+      def geometry
+        @geometry ||= send(@crop)
+      end
+
+      def save_as(pipeline, format, saver)
+        pipeline.convert(format).saver(**saver)
       end
 
       def pipeline(width, height)
         ImageProcessing::Vips
           .source(source)
           .resize_to_fill(width, height)
-          .convert("jpg")
-          .saver(strip: true, quality: 80, background: 255)
       end
 
       def limit_crop
@@ -49,7 +78,7 @@ module ImageCrawler
           .source(source)
           .resize_to_limit(@width, @height)
           .convert(extension)
-          .saver(strip: true, quality: 80)
+          .saver(keep: :none, quality: 80)
 
         result = Processed.from_pipeline(image)
 
@@ -61,9 +90,37 @@ module ImageCrawler
         result
       end
 
+      # Layer choice happens before any resizing. Memoized including the nil
+      # case -- ||= would re-run the scan whenever the answer was "nothing".
+      def best_layer
+        return @best_layer if defined?(@best_layer)
+        @best_layer = IconLayer.best(ImageFormat.checked!(@file))
+      end
+
+      def icon_crop
+        scale_to_png(best_layer)
+      end
+
+      # icon_crop without layer selection: an avatar is one image, and
+      # IconLayer's mostly-white heuristic would reject a dark logo on a
+      # white background.
+      def limit_png
+        scale_to_png(source)
+      end
+
+      # Scale down to fit, never up, always PNG: a content-addressed preset
+      # needs a fixed output format -- storage_path's extension and the
+      # Content-Type both come from preset.format.
+      def scale_to_png(input)
+        image = ImageProcessing::Vips
+          .source(input)
+          .resize_to_limit(@width, @height)
+
+        Processed.from_pipeline(save_as(image, "png", PNG_SAVER))
+      end
+
       def fill_crop
-        image = pipeline(@width, @height)
-        Processed.from_pipeline(image)
+        pipeline(@width, @height)
       end
 
       def smart_crop
@@ -81,7 +138,7 @@ module ImageCrawler
           max = proposed_size.height - @height
         end
 
-        if PIGO_INSTALLED && center = average_face_position(axis, image.call)
+        if PIGO_INSTALLED && center = average_face_position(axis, save_as(image, "jpg", JPG_SAVER).call)
           point = {"x" => 0, "y" => 0}
           point[axis] = (center.to_f - contraint.to_f / 2.0).floor
 
@@ -96,7 +153,7 @@ module ImageCrawler
           image = image.resize_to_fill(@width, @height, crop: :attention)
         end
 
-        Processed.from_pipeline(image)
+        image
       end
 
       def proposed_size
@@ -136,16 +193,14 @@ module ImageCrawler
 
         return nil if faces.nil?
 
-        # filter_map on both: inside a map, a bare `next` yields nil into the
-        # array rather than skipping the element, so the guard below was turning
-        # a malformed face row into a nil that [nil].sum could not add.
+        # filter_map: inside a map, a bare `next` yields nil into the array
+        # instead of skipping the element.
         result = faces.filter_map { |face| face.safe_dig("face") }.filter_map do |face|
           next if face[axis].nil? || face["size"].nil?
           face[axis] + face["size"] / 2
         end
 
-        # A detector that ran and found nothing returns [], which is a different
-        # answer from the nil above but has the same meaning here: no position.
+        # [] (ran, found nothing) means the same as nil here: no position.
         return nil if result.empty?
 
         (result.sum(0.0) / result.size).to_i

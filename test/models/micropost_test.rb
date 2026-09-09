@@ -28,6 +28,16 @@ class MicropostTest < ActiveSupport::TestCase
     assert_not micropost.valid?
   end
 
+  # The unified pipeline stops writing twitter_link_image_processed once the
+  # image lives on a row; the gate must accept the row too.
+  test "link_preview? accepts a stored link image row in place of the legacy data key" do
+    data = @data.merge(
+      "urls" => ["https://example.com/p"],
+      "saved_pages" => {"https://example.com/p" => {"result" => {"ok" => true}}}
+    )
+    assert Micropost.new(data, nil, link_image: Object.new).link_preview?
+  end
+
   test "should have micropost properties" do
     micropost = Micropost.new(@data, nil)
 
@@ -37,5 +47,14 @@ class MicropostTest < ActiveSupport::TestCase
     assert_equal("username", micropost.author_username)
     assert_equal("@username", micropost.author_display_username)
     assert_equal("https://micro.blog/username/1234", micropost.url)
+  end
+
+  test "link_preview? ignores the legacy data key without a link row" do
+    data = @data.merge(
+      "urls" => ["https://example.com/p"],
+      "saved_pages" => {"https://example.com/p" => {"result" => {"ok" => true}}},
+      "twitter_link_image_processed" => "x"
+    )
+    refute Micropost.new(data, nil).link_preview?
   end
 end

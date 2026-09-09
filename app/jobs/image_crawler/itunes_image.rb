@@ -32,12 +32,11 @@ module ImageCrawler
       Pipeline::Find.perform_async(image.to_h)
     end
 
+    # Row-backed only. No touch needed: nothing renders episode artwork
+    # through a cache keyed on this entry.
     def receive
-      @entry.update(
-        media_image: @image["processed_url"],
-        provider: Entry.providers[:entry_icon],
-        provider_id: @entry.id
-      )
+      @image.fetch("storage_path")
+      @entry.update(provider: Entry.providers[:entry_icon], provider_id: @entry.id)
     end
   end
 end

@@ -44,40 +44,40 @@ if Rails.env.development?
   u2.update_auth_token = true
   u2.save
 
-  feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
-  subscription = u2.subscriptions.create(feed: feed)
-
-  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
-  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
-
-  feed = Feed.create!(title: "Kottke", feed_url: "https://kottke.org/index.xml", site_url: "https://kottke.org/")
-  subscription = u2.subscriptions.create(feed: feed)
-
-  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://kottke.org/two.xml")
-  DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://kottke.org/three.xml")
-
-  Feed.all.each {it.update(crawl_data: {error_count: 30}) }
-  Subscription.all.each {it.fix_suggestion_present!}
-
-  migration = u.account_migrations.create!(api_token: "asdf")
-  migration.account_migration_items.create!(data: {
-    title: "Daring Fireball",
-    feed_id: 290,
-    feed_url: "http://daringfireball.net/index.xml"
-  })
-  migration.account_migration_items.failed.create!(
-  message: "404 Not Found",
-  data: {
-    title: "Daring Fireball",
-    feed_id: 290,
-    feed_url: "http://daringfireball.net/index.xml"
-  })
-  migration.account_migration_items.complete.create!(
-  message: "Feed imported. Matched 3 of 3 unread articles.",
-  data: {
-    title: "Daring Fireball",
-    feed_id: 290,
-    feed_url: "http://daringfireball.net/index.xml"
-  })
+  # feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
+  # subscription = u2.subscriptions.create(feed: feed)
+  #
+  # DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
+  # DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
+  #
+  # feed = Feed.create!(title: "Kottke", feed_url: "https://kottke.org/index.xml", site_url: "https://kottke.org/")
+  # subscription = u2.subscriptions.create(feed: feed)
+  #
+  # DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://kottke.org/two.xml")
+  # DiscoveredFeed.create!(title: "Daring Fireball", site_url: feed.site_url, feed_url: "https://kottke.org/three.xml")
+  #
+  # Feed.all.each {it.update(crawl_data: {error_count: 30}) }
+  # Subscription.all.each {it.fix_suggestion_present!}
+  #
+  # migration = u.account_migrations.create!(api_token: "asdf")
+  # migration.account_migration_items.create!(data: {
+  #   title: "Daring Fireball",
+  #   feed_id: 290,
+  #   feed_url: "http://daringfireball.net/index.xml"
+  # })
+  # migration.account_migration_items.failed.create!(
+  # message: "404 Not Found",
+  # data: {
+  #   title: "Daring Fireball",
+  #   feed_id: 290,
+  #   feed_url: "http://daringfireball.net/index.xml"
+  # })
+  # migration.account_migration_items.complete.create!(
+  # message: "Feed imported. Matched 3 of 3 unread articles.",
+  # data: {
+  #   title: "Daring Fireball",
+  #   feed_id: 290,
+  #   feed_url: "http://daringfireball.net/index.xml"
+  # })
 
 end

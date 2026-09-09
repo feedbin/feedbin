@@ -7,3 +7,19 @@ STORAGE = {}.tap do |hash|
   hash[:endpoint]              = ENV["AWS_S3_ENDPOINT"]   if ENV["AWS_S3_ENDPOINT"]
   hash[:path_style]            = ENV["AWS_S3_PATH_STYLE"] if ENV["AWS_S3_PATH_STYLE"]
 end
+
+STORAGE_UNIFIED = {}.tap do |hash|
+  hash[:provider]              = "AWS"
+  hash[:aws_access_key_id]     = ENV["UNIFIED_ACCESS_KEY_ID"]
+  hash[:aws_secret_access_key] = ENV["UNIFIED_SECRET_ACCESS_KEY"]
+  hash[:endpoint]              = ENV["UNIFIED_ENDPOINT"] if ENV["UNIFIED_ENDPOINT"]
+  hash[:region]                = ENV["UNIFIED_REGION"] || "auto"
+  hash[:path_style]            = true
+  hash[:connection_options] = {connect_timeout: 5, read_timeout: 10, write_timeout: 10}
+end
+
+# Models are not autoloaded during initializer evaluation, so the check runs
+# once the app is up. A failure here stops the process, which is the point.
+Rails.application.config.after_initialize do
+  Image.check_unified_config!
+end

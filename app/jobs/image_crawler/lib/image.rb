@@ -1,16 +1,23 @@
 module ImageCrawler
   class Image
     ATTRIBUTES = %i[
+      bytesize
       camo
       download_path
       entry_url
+      etag
+      feed_id
       final_url
       height
       width
       id
       image_urls
+      last_modified
+      meta_image_urls
       original_extension
+      original_fingerprint
       original_url
+      page_url
       placeholder_color
       preset_name
       processed_extension
@@ -25,13 +32,20 @@ module ImageCrawler
     attr_accessor *ATTRIBUTES
 
     BUCKET = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+    CONTENT_TYPES = {
+      "png" => "image/png",
+      "jpg" => "image/jpeg"
+    }.freeze
     PRESETS = {
       primary: {
         width: 542,
         height: 304,
         minimum_size: 20_000,
         crop: :smart_crop,
+        format: "jpg",
         validate: true,
+        unified: true,
+        legacy_store: false,
         job_class: EntryImage
       },
       twitter: {
@@ -39,7 +53,10 @@ module ImageCrawler
         height: 304,
         minimum_size: 10_000,
         crop: :smart_crop,
+        format: "jpg",
         validate: true,
+        unified: true,
+        legacy_store: false,
         job_class: TwitterLinkImage
       },
       youtube: {
@@ -47,7 +64,10 @@ module ImageCrawler
         height: 304,
         minimum_size: nil,
         crop: :fill_crop,
+        format: "jpg",
         validate: true,
+        unified: true,
+        legacy_store: false,
         job_class: EntryImage
       },
       podcast: {
@@ -55,7 +75,11 @@ module ImageCrawler
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
+        format: "jpg",
         validate: true,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
         job_class: ItunesImage
       },
       podcast_feed: {
@@ -63,8 +87,24 @@ module ImageCrawler
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
+        format: "jpg",
         validate: true,
+        unified: true,
+        content_addressed: true,
+        legacy_store: true,
         job_class: ItunesFeedImage
+      },
+      channel_avatar: {
+        width: 200,
+        height: 200,
+        minimum_size: nil,
+        crop: :limit_png,
+        format: "png",
+        validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
+        job_class: ChannelImage
       },
       icon: {
         width: 400,
@@ -75,22 +115,47 @@ module ImageCrawler
         region: RemoteFile::REGION,
         validate: false,
         job_class: CacheRemoteFile
+      },
+      favicon: {
+        width: 32,
+        height: 32,
+        minimum_size: nil,
+        crop: :icon_crop,
+        format: "png",
+        validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
+        job_class: nil
+      },
+      touch_icon: {
+        width: 200,
+        height: 200,
+        minimum_size: nil,
+        crop: :icon_crop,
+        format: "png",
+        validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
+        job_class: nil
       }
     }
 
     def self.new_with_attributes(id:, preset_name:, image_urls:, provider:, provider_id:, **other)
-      arguments = Hash[binding.local_variables.map{ [_1, binding.local_variable_get(_1)]}]
+      arguments = Hash[binding.local_variables.map{ [it, binding.local_variable_get(it)]}]
       arguments.delete(:arguments)
       other = arguments.delete(:other)
       new(other.merge(arguments))
     end
 
+    # Ignores attributes it does not recognize: pipeline jobs are retry: false
+    # and run on host-local queues, so payloads written by a newer deploy must
+    # not crash a not-yet-deployed consumer (and vice versa).
     def initialize(data = {})
       data.each do |name, value|
         if ATTRIBUTES.include?(name.to_sym)
           instance_variable_set("@#{name}", value)
-        else
-          raise ArgumentError.new("Unknown #{self.class.name} attribute: #{name}")
         end
       end
     end
@@ -111,31 +176,111 @@ module ImageCrawler
       preset.validate || false
     end
 
-    def send_to_feedbin
-      preset.job_class.perform_async(id, {
+    def send_to_feedbin(include_unified: true)
+      # A preset with no callback job stores the row and stops. The icon
+      # presets ship before their tenants do; each tenant adds its job_class
+      # when it lands.
+      return if preset.job_class.nil?
+
+      # storage_path is the receivers' row-backed gate; provider_id is their
+      # entity key. Other row metadata stays on the row.
+      payload = {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
         "width"             => width,
         "height"            => height,
         "placeholder_color" => placeholder_color
-      })
-
-      # create_image
+      }
+      if unified? && include_unified
+        payload["storage_path"] = storage_path
+        payload["provider_id"]  = provider_id.to_s
+      end
+      preset.job_class.perform_async(id, payload)
     end
 
     def create_image
-      data = {
+      record = ::Image.attach!(
         provider: provider,
         provider_id: provider_id,
+        feed_id: feed_id,
         url: original_url,
-        storage_url: storage_url,
+        variant: variant,
         image_fingerprint: fingerprint,
+        original_fingerprint: original_fingerprint,
+        storage_path: storage_path,
         width: width,
         height: height,
-        placeholder_color: placeholder_color
+        bytesize: bytesize,
+        placeholder_color: placeholder_color,
+        data: {
+          "legacy_storage_url" => storage_url,
+          "preset"             => preset_name,
+          "final_url"          => final_url,
+          "etag"               => etag,
+          "last_modified"      => last_modified
+        }.compact
+      )
+
+      # The row moved objects, so the old one may be unreferenced. Deferred
+      # so a concurrent crawl attaching to the old path has written its row
+      # by the time the sweep looks.
+      if record.saved_change_to_storage_path? && (replaced = record.storage_path_before_last_save)
+        SweepStoredImages.perform_in(ImageGarbageCollector::SWEEP_DELAY, [replaced])
+      end
+
+      record
+    end
+
+    def unified?
+      preset.unified == true && ::Image.unified_enabled?
+    end
+
+    def storage_path
+      if content_addressed?
+        raise ArgumentError, "content-addressed preset #{preset_name} has no original_fingerprint" if original_fingerprint.blank?
+        ::Image.content_storage_path_for(original_fingerprint, variant, preset.format)
+      else
+        ::Image.storage_path_for(original_url, variant, preset.format)
+      end
+    end
+
+    # The icon family: storage identity comes from the original bytes rather
+    # than the URL, and the pipeline always downloads before deciding anything.
+    def content_addressed?
+      preset.content_addressed == true
+    end
+
+    # Identity from the url -- what makes the reuse rules meaningful; they
+    # mean nothing for an icon keyed by its own bytes and shared on purpose.
+    def url_addressed?
+      unified? && !content_addressed?
+    end
+
+    # Whether the legacy object is written alongside the unified one. Since
+    # the S3 backfill the entry presets write unified only, and so does
+    # podcast; podcast_feed still writes both because show art is a later
+    # phase; icon writes legacy only (not unified?).
+    def legacy_store?
+      preset.legacy_store != false
+    end
+
+    # Identity pairs variant with the url (entry presets) or
+    # original_fingerprint (content-addressed presets), plus the format as
+    # extension. All three must match to share an object: podcast and
+    # touch_icon both render 200x200 and only the format separates them.
+    def variant
+      "#{preset.width}x#{preset.height}"
+    end
+
+    def unified_bucket
+      ::Image.unified_bucket
+    end
+
+    def unified_storage_options
+      {
+        "Content-Type"  => CONTENT_TYPES.fetch(preset.format),
+        "Cache-Control" => "max-age=315360000, public, immutable"
       }
-      record = ::Image.create_with(data).find_or_create_by(provider:, provider_id:)
-      record.update(data)
     end
 
     def image_name

@@ -21,19 +21,46 @@ module ImageCrawler
           cropped = processor.crop!
 
           @image.processed_path      = cropped.file
+          @image.bytesize            = cropped.size
+          @image.fingerprint         = cropped.fingerprint
           @image.width               = cropped.width
           @image.height              = cropped.height
           @image.placeholder_color   = cropped.placeholder_color
           @image.processed_extension = cropped.extension
-          @image.fingerprint         = cropped.fingerprint
 
-          Upload.perform_async(@image.to_h)
+          if reuse_rejected?
+            Librato.increment("image.reuse_rejected")
+            Sidekiq.logger.info "Process: rejecting reused fingerprint public_id=#{@image.id} original_url=#{@image.original_url}"
+            File.unlink(@image.processed_path) rescue Errno::ENOENT
+            requeue_remaining
+          else
+            Upload.perform_async(@image.to_h)
+          end
         else
-          image = Image.new_with_attributes(id: @image.id, preset_name: @image.preset_name, image_urls: @image.image_urls, provider: @image.provider, provider_id: @image.provider_id)
-          FindCritical.perform_async(image.to_h) unless @image.image_urls.empty?
+          requeue_remaining
         end
       ensure
         File.unlink(@image.download_path) rescue Errno::ENOENT
+      end
+
+      def requeue_remaining
+        return if @image.image_urls.empty?
+        image = Image.new_with_attributes(
+          id: @image.id,
+          preset_name: @image.preset_name,
+          image_urls: @image.image_urls,
+          provider: @image.provider,
+          provider_id: @image.provider_id,
+          feed_id: @image.feed_id,
+          page_url: @image.page_url,
+          meta_image_urls: @image.meta_image_urls
+        )
+        FindCritical.perform_async(image.to_h)
+      end
+
+      def reuse_rejected?
+        return false unless @image.url_addressed?
+        ReuseRules.new(@image).fingerprint_used_in_feed?(@image.fingerprint)
       end
     end
   end

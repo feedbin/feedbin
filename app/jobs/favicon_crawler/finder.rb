@@ -4,6 +4,7 @@ module FaviconCrawler
     sidekiq_options retry: false
 
     ICON_NAMES = ["shortcut icon", "icon", "apple-touch-icon", "apple-touch-icon-precomposed"]
+    TOUCH_ICON_NAMES = ["apple-touch-icon", "apple-touch-icon-precomposed"]
 
     def perform(host, force = false)
       @favicon = Favicon.unscoped.where(host: host).first_or_initialize
@@ -29,6 +30,8 @@ module FaviconCrawler
 
         break
       end
+
+      schedule_pipeline
 
       return unless new_favicon.present?
 
@@ -57,33 +60,75 @@ module FaviconCrawler
       end
     end
 
-    def all_favicon_urls
-      homepage = download_homepage
-      links = Nokogiri::HTML5(homepage.to_s).search(xpath)
-
-      links = links.reject {
-        it["href"].to_s.strip.empty?
-      }
-      .sort_by {
-        -(it["sizes"] ? it["sizes"].scan(/\d+/).first.to_i : 0)
-      }
-      .sort_by {
-        it["media"] && it["media"].include?("dark") ? 1 : 0
-      }
-      .sort_by {
-        rel = it["rel"].to_s.strip.downcase
-        index = ICON_NAMES.index(rel)
-        index.nil? ? ICON_NAMES.length : index
-      }
-
-      urls = links.map do |link|
-        Addressable::URI.join(homepage.uri, link["href"])
-      end
-
-      urls.push(default_favicon_location)
+    # Dual-store: the favicons row and legacy object keep being written
+    # unchanged while the shared pipeline writes an images row and unified
+    # object alongside. Two schedules because the presets render at different
+    # sizes from different candidate lists, and they must stay separate
+    # providers (unchanged? keys on the row's original_fingerprint).
+    #
+    # Rescued because this sits mid-`update`: an enqueue failure here would
+    # abort the legacy write below, which is still the store readers use.
+    # Do not tighten into a raise while that ordering holds.
+    def schedule_pipeline
+      schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls)
+      schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls)
     rescue => exception
-      Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@favicon.host}"
-      [default_favicon_location]
+      Sidekiq.logger.info "schedule_pipeline exception=#{exception.inspect} host=#{@favicon.host}"
+    end
+
+    def schedule_icon(preset_name, provider, urls)
+      # .uniq(&:to_s): the list mixes Addressable::URI and URI::HTTP --
+      # equal by string, distinct classes, invisible to a bare .uniq.
+      urls = urls.uniq(&:to_s)
+      return if urls.empty?
+
+      image = ImageCrawler::Image.new_with_attributes(
+        id: "#{@favicon.host}-#{preset_name}",
+        preset_name: preset_name,
+        image_urls: urls.map(&:to_s),
+        provider: provider,
+        provider_id: @favicon.host
+      )
+      ImageCrawler::Pipeline::Find.perform_async(image.to_h)
+    end
+
+    # Memoized with `defined?` so a failed parse is not re-fetched.
+    def icon_links
+      return @icon_links if defined?(@icon_links)
+      @icon_links = begin
+        homepage = download_homepage
+        Nokogiri::HTML5(homepage.to_s).search(xpath)
+          .reject {
+            it["href"].to_s.strip.empty?
+          }
+          .sort_by {
+            -(it["sizes"] ? it["sizes"].scan(/\d+/).first.to_i : 0)
+          }
+          .sort_by {
+            it["media"] && it["media"].include?("dark") ? 1 : 0
+          }
+          .sort_by {
+            rel = it["rel"].to_s.strip.downcase
+            index = ICON_NAMES.index(rel)
+            index.nil? ? ICON_NAMES.length : index
+          }
+          .map {
+            [it["rel"].to_s.strip.downcase, Addressable::URI.join(homepage.uri, it["href"])]
+          }
+      rescue => exception
+        Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@favicon.host}"
+        []
+      end
+    end
+
+    def all_favicon_urls
+      icon_links.map(&:last).push(default_favicon_location)
+    end
+
+    # No guessed fallback: /favicon.ico is worth trying, a touch icon
+    # location is not. A host that advertises none has none.
+    def touch_icon_urls
+      icon_links.filter_map { |rel, url| url if TOUCH_ICON_NAMES.include?(rel) }
     end
 
     def default_favicon_location

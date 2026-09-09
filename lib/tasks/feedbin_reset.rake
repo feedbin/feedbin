@@ -19,5 +19,7 @@ namespace :feedbin do
     Search.client { _1.request(:delete, $search[:config][:aliases][:entries]) }
     Search.client { _1.request(:delete, $search[:config][:aliases][:actions]) }
     Search.client { _1.request(:delete, $search[:config][:aliases][:feeds]) }
+
+    Search.setup
   end
 end

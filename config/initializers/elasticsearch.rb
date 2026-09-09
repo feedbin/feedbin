@@ -10,7 +10,8 @@ Rails.application.reloader.to_prepare do
 
       shared_settings = {
         index: {
-          number_of_shards: Rails.env.test? ? "1" : "6",
+          number_of_shards: Rails.env.local? ? "1" : "6",
+          number_of_replicas: ENV.fetch("ELASTICSEARCH_REPLICAS", "0")
         },
         analysis: {
           analyzer: {
@@ -210,30 +211,70 @@ Rails.application.reloader.to_prepare do
     end
     module_function :client
 
-    def setup
-      begin
-        Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:entries], json: $search[:config][:mappings][:entries]) }
-        Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:actions], json: $search[:config][:mappings][:actions]) }
-        Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:feeds], json: $search[:config][:mappings][:feeds]) }
+    # Resolved at call time, not a constant: this module lives in a reloader
+    # block, and a constant would pin stale model classes.
+    def index_targets
+      {entries: Entry, actions: Action, feeds: Feed}
+    end
+    module_function :index_targets
 
-        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:entries], alias_name: Search.index_name(Entry.table_name)) }
-        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:actions], alias_name: Search.index_name(Action.table_name)) }
-        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:feeds], alias_name: Search.index_name(Feed.table_name)) }
-      rescue => exception
-        Rails.logger.error("---------------------------")
-        Rails.logger.error("Error initializing search: #{exception.inspect}")
-        Rails.logger.error("---------------------------")
+    def setup
+      index_targets.each do |key, model|
+        index = $search[:config][:aliases][key]
+        create_index(index, $search[:config][:mappings][key])
+        publish_alias(index, Search.index_name(model.table_name))
       end
+    rescue => exception
+      log_search_error("Error initializing search: #{exception.inspect}")
     end
     module_function :setup
+
+    # Connection#request returns Elasticsearch's error body rather than
+    # raising, so the response must be read. Already-exists is the normal
+    # case on every boot; any other error means the index does not have the
+    # mapping this process thinks it does.
+    def create_index(index, mapping)
+      response = Search.client(mirror: true) { it.request(:put, index, json: mapping) }
+      type = response.safe_dig("error", "type")
+      return if type.nil? || type == "resource_already_exists_exception"
+      log_search_error("Could not create index #{index}: #{response.safe_dig("error", "reason")}")
+    end
+    module_function :create_index
+
+    # Elasticsearch refuses an alias whose name a concrete index holds --
+    # a stray auto-created index shadows the real one with an inferred
+    # mapping, and searches quietly return nothing. Test indexes are
+    # disposable: clear the squatter and re-alias. Anywhere else it may hold
+    # real data: report and leave it.
+    def publish_alias(index, alias_name)
+      response = Search.client(mirror: true) { it.add_alias(index, alias_name: alias_name) }
+      return unless response.safe_dig("error", "type") == "invalid_alias_name_exception"
+
+      unless Rails.env.test?
+        log_search_error("#{alias_name} is a concrete index, so #{index} cannot be published under it. Searches will read the index of that name instead until it is removed.")
+        return
+      end
+
+      Search.client(mirror: true) { it.delete_index(alias_name) }
+      Search.client(mirror: true) { it.add_alias(index, alias_name: alias_name) }
+    end
+    module_function :publish_alias
+
+    def log_search_error(message)
+      Rails.logger.error("---------------------------")
+      Rails.logger.error(message)
+      Rails.logger.error("---------------------------")
+    end
+    module_function :log_search_error
   end
 
   Search.configure!
+end
 
-  unless Rails.env.production?
+unless Rails.env.production?
+  Rails.application.config.after_initialize do
     Search.setup
   end
-
 end
 
 if Rails.env.development?

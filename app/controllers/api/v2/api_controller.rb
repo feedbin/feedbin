@@ -35,7 +35,7 @@ module Api
         end
 
         ids = @page_query.pluck(:id)
-        @entries = Entry.in_order_of(:id, ids).includes(:feed)
+        @entries = Entry.in_order_of(:id, ids).for_api(params[:mode])
 
         entry_count(@page_query)
 

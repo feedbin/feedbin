@@ -24,8 +24,18 @@ module FeedCrawler
 
     def refresh_feeds
       subscribed_feed_ids = Subscription.where(active: true).pluck("DISTINCT feed_id")
-      standalone_feed_ids = Feed.where.not(standalone_request_at: nil).pluck(:id)
-      feed_ids = (subscribed_feed_ids + standalone_feed_ids).uniq.shuffle
+      # A feed not requested within the TTL has no live reader and leaves the
+      # crawl set; the podcast controller's touch re-adds it on its next
+      # request.
+      standalone_feed_ids = Feed
+        .where("standalone_request_at > ?", StandaloneRetention::TTL.ago)
+        .pluck(:id)
+      # Required, not defensive: this method consults only `Subscription`, so
+      # an Airshow feed reaches the crawler solely through the standalone
+      # flag. Without this term, a listener silent for 90 days would stop
+      # getting new episodes.
+      podcast_feed_ids = PodcastSubscription.distinct.pluck(:feed_id)
+      feed_ids = (subscribed_feed_ids + standalone_feed_ids + podcast_feed_ids).uniq.shuffle
 
       feed_ids.each_slice(5_000) do |ids|
         jobs = Feed.xml.where(id: ids).filter_map do |feed|

@@ -2,11 +2,14 @@ module ImageCrawler
   class Download
     attr_reader :path
 
-    def initialize(url, camo: false, minimum_size: 20_000)
+    def initialize(url, camo: false, minimum_size: 20_000, etag: nil, last_modified: nil)
       @url = url
       @valid = false
       @minimum_size = minimum_size
       @camo = camo
+      @etag = etag
+      @last_modified = last_modified
+      @not_modified = false
     end
 
     def self.download!(url, **args)
@@ -20,10 +23,51 @@ module ImageCrawler
       @url
     end
 
+    # Feedkit rather than Down for block_ssrf: candidate urls come out of
+    # publisher content, so they are attacker-chosen. Feedkit also owns the
+    # conditional request, treating a 304 as a bodiless success Response.
     def download_file(url)
+      requested_url = url
       url = @camo ? RemoteFile.camo_url(url) : url
-      @file = Down.download(url, max_size: 10 * 1024 * 1024, timeout_options: {read_timeout: 20, write_timeout: 5, connect_timeout: 5})
-      @path = @file.path
+      @response = Feedkit::Request.download(url, block_ssrf: true, **validators_for(requested_url))
+
+      if @response.status.code == 304
+        # Gated on conditional?: a 304 nobody asked for is a broken server, not
+        # a fresh image. Leaving @path nil makes the candidate read as invalid
+        # rather than as unchanged, so a dead icon cannot look permanently
+        # fresh and never be re-fetched.
+        @not_modified = conditional?
+      else
+        @path = @response.path
+      end
+    end
+
+    # Empty when no validators were passed, and empty when the fetch is for
+    # a *derived* URL (Youtube/Vimeo/Instagram overrides fetch a thumbnail or
+    # oEmbed target): the validators were computed for @url, and sending them
+    # elsewhere risks a false 304 for a never-validated resource. Compared
+    # before camo substitution, so a camo-wrapped fetch still qualifies.
+    def validators_for(url)
+      return {} unless url == @url
+      {etag: @etag, last_modified: @last_modified}
+    end
+
+    def conditional?
+      @etag.present? || @last_modified.present?
+    end
+
+    def not_modified?
+      @not_modified
+    end
+
+    # What the response carried, stored so the next crawl of this URL can
+    # ask conditionally.
+    def response_etag
+      @response&.etag
+    end
+
+    def response_last_modified
+      @response&.last_modified
     end
 
     def persist!
@@ -35,8 +79,6 @@ module ImageCrawler
     end
 
     def delete!
-      @file.respond_to?(:close) && @file.close
-      @file.respond_to?(:unlink) && @file.unlink
       @path && File.unlink(@path)
     rescue Errno::ENOENT
     end
@@ -46,7 +88,7 @@ module ImageCrawler
     end
 
     def file_extension
-      content_type = @file.headers["Content-Type"]
+      content_type = @response&.headers&.[]("Content-Type")
 
       return unless content_type.respond_to?(:start_with?)
 
@@ -60,9 +102,9 @@ module ImageCrawler
     end
 
     def valid?
-      return false if @file.nil?
+      return false if @path.nil?
       return true if @minimum_size.nil?
-      @file.size >= @minimum_size
+      File.size(@path) >= @minimum_size
     end
 
     def provider_identifier
@@ -70,7 +112,7 @@ module ImageCrawler
     end
 
     def self.recognize_url?(src_url)
-      if supported_urls.find { src_url.to_s =~ _1 }
+      if supported_urls.find { src_url.to_s =~ it }
         Regexp.last_match[1]
       else
         false

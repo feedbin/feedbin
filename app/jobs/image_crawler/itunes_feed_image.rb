@@ -33,7 +33,12 @@ module ImageCrawler
     end
 
     def receive
+      # custom_icon stays written: it is the fallback read path and decides
+      # the icon's shape. The touch is not redundant -- new artwork at the
+      # same url overwrites the same legacy key, so the update no-ops while
+      # the cached views still need busting.
       @feed.update(custom_icon: @image["processed_url"], custom_icon_format: "square")
+      @feed.touch if @image["storage_path"]
     end
   end
 end

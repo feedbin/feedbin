@@ -20,6 +20,9 @@ class TrialExpiration
       if user_ids.present?
         Subscription.where(user_id: user_ids).update_all(active: false)
         User.where(id: user_ids).update_all(suspended: true)
+        # update_all fires no callbacks, so this path removes the suspended
+        # accounts' action percolators itself, as User#deactivate does.
+        Search::PercolateDestroy.for_users(user_ids)
       end
     end
   end
