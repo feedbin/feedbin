@@ -14,9 +14,13 @@ module ImageCrawler
     # playlist entry from that channel. feed_id stays nil -- a channel has no
     # single feed, and feed_id only feeds ReuseRules, which a
     # content-addressed preset never reaches.
+    #
+    # Returns whether a job was enqueued. BackfillChannelImages counts on
+    # that, so it is stated here rather than left to whatever perform_async
+    # happens to return.
     def self.schedule(channel)
       urls = THUMBNAIL_SIZES.filter_map { channel.data.safe_dig("snippet", "thumbnails", it, "url").presence }.uniq
-      return if urls.empty?
+      return false if urls.empty?
 
       image = Image.new_with_attributes(
         id: "#{channel.provider_id}#{SUFFIX}",
@@ -26,6 +30,7 @@ module ImageCrawler
         provider_id: channel.provider_id
       )
       Pipeline::Find.perform_async(image.to_h)
+      true
     end
 
     # Cache invalidation: the sidebar and entry keys include the feed, not

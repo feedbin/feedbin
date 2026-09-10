@@ -14,8 +14,9 @@ module ImageCrawler
     end
 
     # The channels API returns default (88x88), medium (240x240) and high
-    # (800x800); take the largest.
-    test "schedules a Find job for the largest thumbnail" do
+    # (800x800). Every size is a candidate, largest first, so Find can fall
+    # down the ladder when a candidate fails to download.
+    test "schedules a Find job for every thumbnail, largest first" do
       record = channel({
         "default" => {"url" => "https://yt3.ggpht.com/small.jpg"},
         "medium"  => {"url" => "https://yt3.ggpht.com/medium.jpg"},
@@ -48,6 +49,13 @@ module ImageCrawler
       assert_no_difference -> { Pipeline::Find.jobs.size } do
         ChannelImage.schedule(record)
       end
+    end
+
+    # BackfillChannelImages counts scheduled channels off this return value,
+    # so it is part of the contract, not an accident of perform_async.
+    test "reports whether it enqueued a job" do
+      assert_equal true, ChannelImage.schedule(channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}}))
+      assert_equal false, ChannelImage.schedule(Embed.youtube_channel.create!(provider_id: "UCnone", data: {}))
     end
 
     test "ignores blank thumbnail urls and deduplicates fallback candidates" do

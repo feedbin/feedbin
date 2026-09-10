@@ -195,7 +195,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     stub_request_file("image.png", "https://yt3.ggpht.com/avatar.jpg", headers: {content_type: "image/png"})
   end
 
-  test "schedules the channel avatar from the largest thumbnail" do
+  test "schedules the channel avatar with every thumbnail as a candidate" do
     @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
     @entry.provider_youtube!
     Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") }
