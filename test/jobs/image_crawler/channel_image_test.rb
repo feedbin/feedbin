@@ -82,15 +82,18 @@ module ImageCrawler
     # through to Feed.where(channel_id: nil), which matches every
     # non-YouTube feed in the table.
     test "touches nothing when the payload carries no provider_id" do
-      stamp = 1.year.ago
       youtube = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       plain = Feed.create!(feed_url: "http://example.com/feed.xml")
-      [youtube, plain].each { it.update_column(:updated_at, stamp) }
+      [youtube, plain].each { it.update_column(:updated_at, 1.year.ago) }
+      # Read the stored value back. The column keeps microseconds and Time
+      # keeps nanoseconds, so the in-memory stamp is not a valid baseline.
+      youtube_before = youtube.reload.updated_at
+      plain_before = plain.reload.updated_at
 
       ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png"})
 
-      assert_equal stamp.to_f, plain.reload.updated_at.to_f
-      assert_equal stamp.to_f, youtube.reload.updated_at.to_f
+      assert_equal plain_before.to_f, plain.reload.updated_at.to_f
+      assert_equal youtube_before.to_f, youtube.reload.updated_at.to_f
     end
 
     # storage_path is absent when the unified write failed and Upload degraded to
