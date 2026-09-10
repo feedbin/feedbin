@@ -15,13 +15,13 @@ module ImageCrawler
     # single feed, and feed_id only feeds ReuseRules, which a
     # content-addressed preset never reaches.
     def self.schedule(channel)
-      url = THUMBNAIL_SIZES.filter_map { channel.data.safe_dig("snippet", "thumbnails", it, "url") }.first
-      return if url.blank?
+      urls = THUMBNAIL_SIZES.filter_map { channel.data.safe_dig("snippet", "thumbnails", it, "url").presence }.uniq
+      return if urls.empty?
 
       image = Image.new_with_attributes(
         id: "#{channel.provider_id}#{SUFFIX}",
         preset_name: "channel_avatar",
-        image_urls: [url],
+        image_urls: urls,
         provider: ::Image.providers[:embed_icon],
         provider_id: channel.provider_id
       )

@@ -27,7 +27,7 @@ module ImageCrawler
       end
 
       args = Pipeline::Find.jobs.last["args"].first
-      assert_equal ["https://yt3.ggpht.com/large.jpg"], args["image_urls"]
+      assert_equal ["https://yt3.ggpht.com/large.jpg", "https://yt3.ggpht.com/medium.jpg", "https://yt3.ggpht.com/small.jpg"], args["image_urls"]
       assert_equal "channel_avatar", args["preset_name"]
       assert_equal ::Image.providers[:embed_icon], args["provider"]
       assert_equal "UCabc", args["provider_id"]
@@ -48,6 +48,18 @@ module ImageCrawler
       assert_no_difference -> { Pipeline::Find.jobs.size } do
         ChannelImage.schedule(record)
       end
+    end
+
+    test "ignores blank thumbnail urls and deduplicates fallback candidates" do
+      record = channel({
+        "high" => {"url" => " "},
+        "medium" => {"url" => "https://yt3.ggpht.com/small.jpg"},
+        "default" => {"url" => "https://yt3.ggpht.com/small.jpg"}
+      })
+
+      ChannelImage.schedule(record)
+
+      assert_equal ["https://yt3.ggpht.com/small.jpg"], Pipeline::Find.jobs.last["args"].first["image_urls"]
     end
 
     # The sidebar's key and entries_cache_key both include the feed, not the

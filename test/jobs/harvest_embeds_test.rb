@@ -209,7 +209,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     end
 
     args = ImageCrawler::Pipeline::Find.jobs.last["args"].first
-    assert_equal ["https://yt3.ggpht.com/avatar.jpg"], args["image_urls"]
+    assert_equal ["https://yt3.ggpht.com/avatar.jpg", "image_url"], args["image_urls"]
     assert_equal "channel_avatar", args["preset_name"]
     assert_equal "channel_id", args["provider_id"]
   end
