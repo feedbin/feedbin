@@ -301,8 +301,10 @@ class EntryPresenter < BasePresenter
     entry.data["itunes_duration"] || ""
   end
 
+  # The episode's own art, else the show's: the feed_icon row, then the
+  # channel row. Never the legacy custom_icon.
   def media_image
-    entry.itunes_image || entry.feed.custom_icon
+    entry.itunes_image || entry.feed.icon_url
   end
 
   def extracted_articles

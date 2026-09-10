@@ -77,11 +77,7 @@ class Feed < ApplicationRecord
 
   def icon_options
     items = {}
-    if custom_icon && options.safe_dig("itunes_image")
-      items[custom_icon] = "square"
-    else
-      items[custom_icon] = "round"
-    end
+    items[custom_icon] = "round" unless options.safe_dig("itunes_image")
     if custom_icon_format == "round"
       items[options.safe_dig("image", "url")] = "square"
     end
@@ -96,7 +92,13 @@ class Feed < ApplicationRecord
     feed_relative_url(base)
   end
 
+  # A podcast's artwork is square whatever else the feed offers. That used
+  # to follow from the legacy custom_icon entry in icon_options; the entry
+  # is gone, so the shape comes from the feed being a podcast. Without this
+  # every show renders in the round frame FaviconComponent defaults to.
   def default_icon_format
+    return "square" if options.safe_dig("itunes_image")
+
     base = icon_options.keys.find { !it.nil? }
     return nil if base.nil?
     icon_options[base]

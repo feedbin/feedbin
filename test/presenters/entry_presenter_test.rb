@@ -18,7 +18,7 @@ class EntryPresenterTest < ActionView::TestCase
     }.merge(attributes))
   end
 
-  # media_image is entry.itunes_image || entry.feed.custom_icon. Distinct
+  # media_image is entry.itunes_image || entry.feed.icon_url. Distinct
   # values on each side so a regression that returned the show's icon here
   # would visibly fail rather than coincidentally match.
   test "media_image prefers the episode's artwork over the show's" do
@@ -34,14 +34,28 @@ class EntryPresenterTest < ActionView::TestCase
     end
   end
 
-  test "media_image falls back to the show's artwork when the episode has none" do
-    @feed.update!(custom_icon: "https://show.example.com/icon.jpg")
+  test "media_image falls back to the show's feed_icon row when the episode has none" do
+    @feed.update!(options: {"itunes_image" => "http://example.com/show.jpg"})
+    path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
+    create_image_row(
+      provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id,
+      url: "http://example.com/show.jpg", variant: "200x200", storage_path: path
+    )
     entry = entry_with({})
 
-    assert_equal "https://show.example.com/icon.jpg", presenter_for(entry).media_image
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
+      assert_equal "https://images.example.com/#{path}", presenter_for(Entry.find(entry.id)).media_image
+    end
   end
 
-  test "media_image is nil when neither the episode nor the show has artwork" do
+  # The legacy custom_icon is inert: a podcast with no row and no episode
+  # art shows no artwork.
+  test "media_image is nil when the show has only a legacy custom_icon" do
+    @feed.update!(
+      options: {"itunes_image" => "http://example.com/show.jpg"},
+      custom_icon: "https://bucket.s3.amazonaws.com/abc/show.jpg",
+      custom_icon_format: "square"
+    )
     entry = entry_with({})
 
     assert_nil presenter_for(entry).media_image

@@ -219,7 +219,7 @@ module ImageCrawler
 
       assert episode.content_addressed?
       assert_not episode.legacy_store?, "episode art is unified only since the S3 backfill"
-      assert show.legacy_store?, "show art keeps its legacy write until its own phase"
+      assert_not show.legacy_store?, "show art is unified only since the show-art re-crawl"
       assert_equal "200x200", episode.variant
       assert_equal "jpg", episode.preset.format
       assert_equal :fill_crop, episode.preset.crop

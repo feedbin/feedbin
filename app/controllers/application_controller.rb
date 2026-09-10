@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
       subscription_view_settings[subscription.feed_id] = subscription.view_mode
     end
 
-    @now_playing = Entry.where(id: @user.now_playing_entry).first
+    @now_playing = Entry.where(id: @user.now_playing_entry).includes(feed: Feed::ICON_PRELOADS).first
     @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first || @user.queued_entries.where(entry_id: @user.now_playing_entry).first
 
     @show_welcome = subscriptions.present? ? false : true

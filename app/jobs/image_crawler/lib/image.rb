@@ -31,7 +31,6 @@ module ImageCrawler
 
     attr_accessor *ATTRIBUTES
 
-    BUCKET = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
     CONTENT_TYPES = {
       "png" => "image/png",
       "jpg" => "image/jpeg"
@@ -91,7 +90,7 @@ module ImageCrawler
         validate: true,
         unified: true,
         content_addressed: true,
-        legacy_store: true,
+        legacy_store: false,
         job_class: ItunesFeedImage
       },
       channel_avatar: {
@@ -256,10 +255,10 @@ module ImageCrawler
       unified? && !content_addressed?
     end
 
-    # Whether the legacy object is written alongside the unified one. Since
-    # the S3 backfill the entry presets write unified only, and so does
-    # podcast; podcast_feed still writes both because show art is a later
-    # phase; icon writes legacy only (not unified?).
+    # Whether the legacy object is written alongside the unified one. Every
+    # unified preset writes unified only since the S3 backfill and the show
+    # art re-crawl; icon writes legacy only (not unified?), into its own
+    # bucket.
     def legacy_store?
       preset.legacy_store != false
     end
@@ -291,8 +290,11 @@ module ImageCrawler
       path
     end
 
+    # Only a preset that still writes a legacy object names a bucket, and
+    # only icon does: it writes RemoteFile's. Every other preset is unified
+    # only, so nothing reaches this without a preset bucket.
     def bucket
-      preset.bucket || BUCKET
+      preset.bucket
     end
 
     def trace(message:, metadata: {})

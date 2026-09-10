@@ -147,4 +147,48 @@ class FeedTest < ActiveSupport::TestCase
       assert_equal "https://images.example.com/#{own}", Feed.find(feed.id).icon_url
     end
   end
+
+  # A podcast's custom_icon is a legacy show-art pointer; its read path is
+  # the feed_icon row. Without a row the feed renders its fallback icon.
+  test "icon_options ignores a podcast feed's legacy custom_icon" do
+    feed = create_feeds(users(:ben)).first
+    feed.update!(
+      options: {"itunes_image" => "http://example.com/show.jpg"},
+      custom_icon: "https://bucket.s3.amazonaws.com/abc/show.jpg",
+      custom_icon_format: "square"
+    )
+
+    refute_includes feed.icon_options.keys, "https://bucket.s3.amazonaws.com/abc/show.jpg"
+    assert_nil feed.icon_url
+
+    path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
+    create_image_row(
+      provider: :feed_icon, provider_id: feed.id.to_s, feed_id: feed.id,
+      url: "http://example.com/show.jpg", variant: "200x200", storage_path: path
+    )
+
+    with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
+      assert_equal "https://images.example.com/#{path}", Feed.find(feed.id).icon_url
+    end
+  end
+
+# A podcast's artwork is square. That used to follow from the legacy
+# custom_icon entry in icon_options; with the entry gone, the format must
+# come from the feed being a podcast, or every show renders as a circle.
+test "default_icon_format is square for a podcast feed" do
+  feed = create_feeds(users(:ben)).first
+  feed.update!(options: {"itunes_image" => "http://example.com/show.jpg"}, custom_icon_format: nil)
+
+  assert_equal "square", feed.default_icon_format
+end
+
+  # A YouTube feed's custom_icon is a publisher thumbnail, not a legacy
+  # object; it still renders round.
+  test "icon_options keeps a non-podcast feed's custom_icon round" do
+    feed = create_feeds(users(:ben)).first
+    feed.update!(custom_icon: "https://yt3.ggpht.com/avatar.jpg")
+
+    assert_equal "round", feed.icon_options["https://yt3.ggpht.com/avatar.jpg"]
+    assert_match "/files/icons/", feed.icon_url
+  end
 end

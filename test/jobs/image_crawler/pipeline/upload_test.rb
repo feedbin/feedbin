@@ -26,41 +26,50 @@ module ImageCrawler
         assert_equal "http://localhost:9000/d73/d73dcf-icon.jpg", Upload.new.object_url(data)
       end
 
-      # podcast_feed is the surviving dual-write preset, so it is the one that
-      # still exercises the legacy upload end to end. With no unified bucket
-      # configured it takes the pure legacy path.
+      # podcast_feed is unified-only now, like every other unified preset: this
+      # pins Upload's default path, that it stores the unified object and
+      # hands ItunesFeedImage the payload the callback reads, storage_path
+      # included.
       def test_should_upload
-        id = SecureRandom.hex
-        download_path = copy_support_file("image.jpeg")
-        processed_path = download_path
-        original_url = "http://example.com/image.jpg"
-        final_url = original_url
-        placeholder_color = "0867e2"
-        width = 300
-        height = 200
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+          id = SecureRandom.hex
+          processed_path = copy_support_file("image.jpeg")
+          original_url = "http://example.com/image.jpg"
+          final_url = original_url
+          placeholder_color = "0867e2"
+          width = 300
+          height = 200
 
+          image = Image.new_with_attributes(
+            id:, preset_name: "podcast_feed", image_urls: [],
+            provider: ::Image.providers[:feed_icon], provider_id: 1, feed_id: 1,
+            fingerprint: SecureRandom.hex,
+            original_fingerprint: Digest::MD5.hexdigest("image bytes"),
+            original_url:, final_url:, processed_path:,
+            processed_extension: "jpg",
+            bytesize: File.size(processed_path),
+            width:, height:, placeholder_color:
+          )
 
-        image = Image.new_with_attributes(id:, preset_name: "podcast_feed", image_urls: [], provider: 0, provider_id: 1, fingerprint: SecureRandom.hex, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:)
+          legacy = stub_request(:put, /s3\.amazonaws\.com/)
+          unified_put = stub_request(:put, "https://test-account.storage.example.com/images-test/#{image.storage_path}")
+            .with(headers: {"Content-Type" => "image/jpeg"})
 
-        stub_request(:put, /s3\.amazonaws\.com/)
+          assert_difference -> { ItunesFeedImage.jobs.size }, +1 do
+            Upload.new.perform(image.to_h)
+          end
 
-        assert_difference -> { ItunesFeedImage.jobs.size }, +1 do
-          Upload.new.perform(image.to_h)
+          assert_not_requested legacy
+          assert_requested unified_put
+
+          saved_id, options = ItunesFeedImage.jobs.last.safe_dig("args")
+          assert_equal(id, saved_id)
+
+          assert_equal(original_url,       options["original_url"])
+          assert_equal(image.storage_path, options["storage_path"])
+          assert_equal(width,              options["width"])
+          assert_equal(height,             options["height"])
         end
-
-        saved_id, options = ItunesFeedImage.jobs.last.safe_dig("args")
-
-        download_cache = DownloadCache.new(original_url, image)
-        assert_equal(id, saved_id)
-
-        assert_equal(original_url,      download_cache.cached_image.final_url)
-        assert_equal("https:",          download_cache.cached_image.storage_url)
-        assert_equal(placeholder_color, download_cache.cached_image.placeholder_color)
-
-        assert_equal(original_url, options["original_url"])
-        assert_equal("https:",     options["processed_url"])
-        assert_equal(width,        options["width"])
-        assert_equal(height,       options["height"])
       end
 
       def test_should_store_entry_previews_only_in_the_unified_bucket
@@ -211,10 +220,10 @@ module ImageCrawler
         end
       end
 
-      # Show art is a later phase, so podcast_feed keeps its legacy write. It
-      # is now the only preset that is content_addressed and legacy_store at
-      # once; pin that the combination still writes both keys.
-      def test_should_dual_write_show_art_to_both_stores
+      # Show art writes the unified store only, like every entry preset: the
+      # feed_icon row is its read path. Content-addressed and unified-only
+      # together; pin that no legacy key is written or recorded.
+      def test_should_write_show_art_to_the_unified_store_only
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           processed_path = copy_support_file("image.jpeg")
           original_url = "http://example.com/show.jpg"
@@ -239,11 +248,11 @@ module ImageCrawler
             Upload.new.perform(image.to_h)
           end
 
-          assert_requested legacy
+          assert_not_requested legacy
           assert_requested unified_put
 
           record = ::Image.find_by(provider: ::Image.providers[:feed_icon], provider_id: "21")
-          assert record.data["legacy_storage_url"].present?
+          assert_nil record.data["legacy_storage_url"]
         end
       end
     end

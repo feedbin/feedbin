@@ -39,37 +39,30 @@ module ImageCrawler
       end
     end
 
-    test "updates the feed when a legacy-only image hash is given" do
-      processed_url = "https://cdn.example.com/cover.jpg"
-
-      ItunesFeedImage.new.perform(@feed.id, {"processed_url" => processed_url})
-
-      @feed.reload
-      assert_equal processed_url, @feed.custom_icon
-      assert_equal "square", @feed.custom_icon_format
+    # No callback carries a legacy-only payload now that podcast_feed writes
+    # the unified store only. A payload without storage_path is a regression,
+    # and it must raise rather than write a legacy pointer onto the feed.
+    test "raises on a payload without storage_path" do
+      assert_raises(KeyError) { ItunesFeedImage.new.perform(@feed.id, {"processed_url" => "https://cdn.example.com/cover.jpg"}) }
+      assert_nil @feed.reload.custom_icon
     end
 
-    # Row-backed: Upload already wrote the images row before enqueueing this
-    # callback, so the metadata is not duplicated onto the feed. custom_icon
-    # keeps its legacy value for readers still on the fallback path.
-    test "keeps writing the legacy url and touches the feed when row-backed" do
-      processed_url = "https://cdn.example.com/cover.jpg"
-      # Pre-set every attribute receive writes, so the update is a no-op
-      # and only the touch can move updated_at.
-      @feed.update!(
-        custom_icon: processed_url,
-        custom_icon_format: "square",
-        updated_at: 1.year.ago
-      )
+    # Row-backed: the feed_icon row is the read path. custom_icon stays
+    # whatever it was (an inert legacy value, or nil), custom_icon_format is
+    # the shape marker the icon component reads, and the touch busts the
+    # cached views because new artwork can land under the same path.
+    test "writes the format and touches the feed, never custom_icon" do
+      @feed.update!(custom_icon: "https://old.example.com/abc/show.jpg", updated_at: 1.year.ago)
       before = @feed.reload.updated_at
 
       ItunesFeedImage.new.perform(@feed.id, {
-        "processed_url" => processed_url,
+        "processed_url" => nil,
         "storage_path" => "abc/abc123.jpg"
       })
 
       @feed.reload
-      assert_equal processed_url, @feed.custom_icon
+      assert_equal "https://old.example.com/abc/show.jpg", @feed.custom_icon
+      assert_equal "square", @feed.custom_icon_format
       assert_operator @feed.updated_at, :>, before
     end
   end
