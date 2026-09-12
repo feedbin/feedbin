@@ -28,7 +28,8 @@ module ImageCrawler
         preset_name: "channel_avatar",
         image_urls: urls,
         provider: ::Image.providers[:embed_icon],
-        provider_id: channel.provider_id
+        provider_id: channel.provider_id,
+        camo: (OutsideCamo.pick if OutsideCamo.enabled?)
       )
       Pipeline::Find.perform_async(image.to_h)
       true

@@ -40,6 +40,19 @@ module ImageCrawler
       assert download.valid?
     end
 
+    # camo as a string is an outside origin: the fetch goes through that
+    # host with the outside key, and the image keeps its real url.
+    def test_should_use_an_outside_camo_host
+      url = "https://yt3.ggpht.com/avatar.jpg"
+      host = "http://146.190.44.162"
+      with_env("CAMO_OUTSIDE_HOSTS" => host, "CAMO_OUTSIDE_KEY" => "outside-key") do
+        stub_request(:get, OutsideCamo.url(url, host)).to_return(headers: {content_type: "image/jpg"}, body: "12345678")
+        download = Download.download!(url, camo: host, minimum_size: 8)
+        assert download.valid?
+        assert_equal url, download.image_url
+      end
+    end
+
     def test_should_send_conditional_headers_when_given
       url = "http://example.com/favicon.ico"
       request = stub_request(:get, url)

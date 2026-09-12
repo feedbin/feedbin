@@ -43,6 +43,40 @@ channels nobody subscribes to and channels with no remaining entries. Those
 cost a download for nothing. Compare `BackfillChannelImages.pending.count`
 against the YouTube feed count before you commit to the full run.
 
+## Outside camo fleet
+
+YouTube rate-limits per address and Feedbin's addresses are static. The
+download step can go through a fleet of `go-camo` hosts on other addresses.
+Each host is stateless and reaches nothing of ours: Feedbin makes one
+outbound HTTP request per fetch, signed with a key only the fleet shares,
+and the host fetches the real URL from its own address. The row keeps the
+YouTube URL, and the object is content-addressed on the original bytes, so
+a channel fetched through the fleet and one fetched directly store the same
+object.
+
+Two environment variables on the image workers turn it on. Unset means
+direct fetches.
+
+```
+CAMO_OUTSIDE_HOSTS=http://146.190.44.162,http://137.184.35.216,http://64.23.212.49
+CAMO_OUTSIDE_KEY=<the key in /etc/go-camo/env on any fleet host>
+```
+
+`ChannelImage.schedule` picks one host per channel, so the run spreads over
+every address. Only channel avatars use the fleet; live entry image crawls
+fetch directly as before. When the run is over, unset both variables and
+delete the hosts.
+
+Each fleet host runs `go-camo` under systemd, listening on port 80, with
+the key in `/etc/go-camo/env`. To check a host from the console:
+
+```ruby
+url = "https://yt3.ggpht.com/ytc/AIdro_kLLBqjbLLJfJf8qeqpcGxsPZC2eLa7RaHvbn6UUL5KRsw=s88-c-k-c0x00ffffff-no-rj"
+puts ImageCrawler::OutsideCamo.hosts.map { |host| [host, Feedkit::Request.download(ImageCrawler::OutsideCamo.url(url, host)).status.code] }.inspect
+```
+
+Every host should answer 200.
+
 ## Trial
 
 ```ruby

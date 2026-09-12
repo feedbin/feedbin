@@ -37,6 +37,21 @@ module ImageCrawler
       assert_nil args["feed_id"], "the row belongs to the channel, not to any one feed"
     end
 
+    # YouTube rate-limits per address. With an outside camo fleet configured
+    # each channel fetches through one of its hosts; without one, directly.
+    test "fetches through an outside camo host when one is configured" do
+      record = channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}})
+
+      ChannelImage.schedule(record)
+      assert_nil Pipeline::Find.jobs.last["args"].first["camo"]
+
+      hosts = "http://146.190.44.162,http://137.184.35.216"
+      with_env("CAMO_OUTSIDE_HOSTS" => hosts, "CAMO_OUTSIDE_KEY" => "outside-key") do
+        ChannelImage.schedule(record)
+      end
+      assert_includes hosts.split(","), Pipeline::Find.jobs.last["args"].first["camo"]
+    end
+
     test "falls back down the thumbnail ladder" do
       ChannelImage.schedule(channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}}))
 

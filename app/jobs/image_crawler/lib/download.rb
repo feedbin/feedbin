@@ -28,7 +28,7 @@ module ImageCrawler
     # conditional request, treating a 304 as a bodiless success Response.
     def download_file(url)
       requested_url = url
-      url = @camo ? RemoteFile.camo_url(url) : url
+      url = camo_url(url)
       @response = Feedkit::Request.download(url, block_ssrf: true, **validators_for(requested_url))
 
       if @response.status.code == 304
@@ -50,6 +50,16 @@ module ImageCrawler
     def validators_for(url)
       return {} unless url == @url
       {etag: @etag, last_modified: @last_modified}
+    end
+
+    # camo is true for production's camo, or an origin string for one of
+    # the OutsideCamo hosts. Either way the image keeps its real url.
+    def camo_url(url)
+      case @camo
+      when String then OutsideCamo.url(url, @camo)
+      when true then RemoteFile.camo_url(url)
+      else url
+      end
     end
 
     def conditional?
