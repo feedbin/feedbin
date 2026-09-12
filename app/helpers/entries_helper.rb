@@ -1,10 +1,10 @@
 module EntriesHelper
   # Digests the rows the partial renders, so one row update invalidates
   # every view referencing it without touching owner rows. Every part must
-  # come from something already loaded (Favicon.for_entries map,
+  # come from something already loaded (Image.favicons_for_entries map,
   # with_list_associations) or the key is an N+1 per render.
   def self.entries_cache_key(entry, favicons = {})
-    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v12"]
+    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v13"]
   end
 
   # The extended API fragment carries the same image urls as the list, so it
@@ -17,8 +17,8 @@ module EntriesHelper
   # Pages entries key on their own host, everything else on the feed's
   # favicon. Mirroring the component keeps the digest from drifting.
   def self.entry_favicon(entry, favicons)
-    return favicons[entry.hostname] if entry.feed&.pages?
-    entry.feed&.favicon
+    return favicons[entry.hostname&.downcase] if entry.feed&.pages?
+    entry.feed&.site_favicon
   end
 
   # The one render invocation for the entry list, shared by the view and the
