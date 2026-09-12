@@ -4,10 +4,14 @@ module Api
       respond_to :json
 
       def index
-        @user = current_user
-        feed_ids = @user.subscriptions.pluck(:feed_id)
-        hosts = Feed.where(id: feed_ids).pluck(:host)
-        @favicons = Favicon.where(host: hosts)
+        feed_ids = current_user.subscriptions.pluck(:feed_id)
+        hosts = Feed.where(id: feed_ids).distinct.pluck(:host).compact
+        rows = Image.provider_website_favicon.where(provider_id: hosts).index_by(&:provider_id)
+        # favicons fallback: remove with the favicons table
+        rows.merge!(Favicon.where(host: hosts - rows.keys).index_by(&:host))
+        @icons = rows.filter_map { |host, record|
+          {host: host, url: record.public_url} if record.public_url
+        }
       end
     end
   end
