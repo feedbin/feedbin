@@ -3,8 +3,14 @@
 # and every row since the 2026-08 recreate carries one, so the map below
 # classifies all of history. Nothing outside this job derives kind from a
 # preset: the crawler sets it at each call site.
+#
+# Fan-out in the SidekiqHelper style: perform(nil, true) pushes one job per
+# SidekiqHelper::BATCH_SIZE ids at once, and the utility workers drain them
+# in parallel. No delay and no chain, so the wall clock is the row work
+# divided by the queue's concurrency.
 class BackfillImageKinds
   include Sidekiq::Worker
+  include SidekiqHelper
   sidekiq_options queue: :utility
 
   # icon is absent on purpose: that preset writes remote_files, never an
@@ -20,36 +26,35 @@ class BackfillImageKinds
     "touch_icon"     => :site_icon
   }.freeze
 
-  BATCH_SIZE = 5_000
-  DELAY = 1
-
-  # after_id is exclusive, finish_id inclusive.
-  def self.window(after_id, finish_id)
-    id = Image.arel_table[:id]
-    Image.where(id.gt(after_id)).where(id.lteq(finish_id))
+  def perform(batch = nil, schedule = false)
+    if schedule
+      build
+    else
+      update(batch)
+    end
   end
 
-  # A fixed upper bound keeps the run finite while the crawler inserts.
-  # Rows inserted after the column landed already carry their kind. Supply
-  # a small cutoff for a trial, or the logged last_id to resume.
-  def perform(after_id = 0, finish_id = nil, batch_size = BATCH_SIZE, delay = DELAY)
-    batch_size = [batch_size.to_i, 1].max
-    delay = [delay.to_i, 0].max
+  # Rows inserted after the column landed already carry their kind, so a
+  # bound taken at schedule time covers everything that needs labeling.
+  # Reruns are safe: a row already at its mapped kind is skipped.
+  def build
+    last_id = Image.maximum(:id)
+    return unless last_id
 
-    finish_id ||= Image.maximum(:id)
-    return unless finish_id
+    job_args(last_id, Image.minimum(:id)).each_slice(10_000) do |jobs|
+      Sidekiq::Client.push_bulk("args" => jobs, "class" => self.class)
+    end
+  end
 
-    ids = self.class.window(after_id, finish_id).order(:id).limit(batch_size).pluck(:id)
-    return if ids.empty?
-
-    last_id = ids.last
-    batch = self.class.window(after_id, last_id)
+  def update(batch)
+    ids = build_ids(batch)
+    scope = Image.where(id: ids.first..ids.last)
     preset = Image.data_projection("preset")
 
     # Stop rather than leave the default in place quietly: a row this map
     # cannot classify is a row the recreate should not have produced.
-    unknown = batch.where(preset.not_in(PRESET_KINDS.keys).or(preset.eq(nil))).distinct.pluck(preset)
-    raise "BackfillImageKinds: unmapped presets #{unknown.inspect} between ids #{after_id} and #{last_id}" if unknown.any?
+    unknown = scope.where(preset.not_in(PRESET_KINDS.keys).or(preset.eq(nil))).distinct.pluck(preset)
+    raise "BackfillImageKinds: unmapped presets #{unknown.inspect} in batch #{batch} (ids #{ids.first}..#{ids.last})" if unknown.any?
 
     # update_all, not update: updated_at is a view cache key and must move
     # only when the stored bytes move. Rows already at the right kind (the
@@ -57,13 +62,9 @@ class BackfillImageKinds
     updated = 0
     PRESET_KINDS.group_by { |_, kind| kind }.each do |kind, pairs|
       presets = pairs.map(&:first)
-      updated += batch.where(preset.in(presets)).where.not(kind: kind).update_all(kind: Image.kinds.fetch(kind))
+      updated += scope.where(preset.in(presets)).where.not(kind: kind).update_all(kind: Image.kinds.fetch(kind))
     end
 
-    logger.info "BackfillImageKinds: scanned=#{ids.size} updated=#{updated} last_id=#{last_id} finish_id=#{finish_id}"
-
-    if ids.size == batch_size
-      self.class.perform_in(delay, last_id, finish_id, batch_size, delay)
-    end
+    logger.info "BackfillImageKinds: batch=#{batch} updated=#{updated}"
   end
 end

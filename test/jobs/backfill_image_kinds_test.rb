@@ -11,6 +11,16 @@ class BackfillImageKindsTest < ActiveSupport::TestCase
     create_image_row(provider: provider, provider_id: provider_id, data: {"preset" => preset})
   end
 
+  # The batch that holds an id, in SidekiqHelper's numbering. Sequences do
+  # not reset between tests, so the rows can straddle a batch boundary.
+  def batches_for(*rows)
+    rows.map { |record| ((record.id - 1) / SidekiqHelper::BATCH_SIZE) + 1 }.uniq
+  end
+
+  def perform_batches_for(*rows)
+    batches_for(*rows).each { |batch| BackfillImageKinds.new.perform(batch) }
+  end
+
   test "maps every preset to its kind" do
     expected = {
       "primary"        => :poster,
@@ -25,7 +35,7 @@ class BackfillImageKindsTest < ActiveSupport::TestCase
     assert_equal expected, BackfillImageKinds::PRESET_KINDS
 
     rows = expected.keys.index_with { |preset| row(preset) }
-    BackfillImageKinds.new.perform
+    perform_batches_for(*rows.values)
 
     rows.each do |preset, record|
       assert_equal expected.fetch(preset).to_s, record.reload.kind, preset
@@ -38,7 +48,7 @@ class BackfillImageKindsTest < ActiveSupport::TestCase
     updated_at = 1.day.ago
     Image.where(id: [right.id, wrong.id]).update_all(updated_at: updated_at)
 
-    BackfillImageKinds.new.perform
+    perform_batches_for(right, wrong)
 
     assert_equal updated_at.to_i, right.reload.updated_at.to_i, "an already-correct row is not touched"
     assert_equal "cover_art", wrong.reload.kind
@@ -46,31 +56,50 @@ class BackfillImageKindsTest < ActiveSupport::TestCase
     assert_equal updated_at.to_i, wrong.updated_at.to_i
   end
 
-  test "walks the table in id batches and stops at the frozen upper bound" do
+  test "a batch touches only its own ids" do
+    inside = row("podcast")
+    batch = batches_for(inside).first
+
+    BackfillImageKinds.new.perform(batch + 1)
+    assert_equal "poster", inside.reload.kind
+
+    BackfillImageKinds.new.perform(batch)
+    assert_equal "cover_art", inside.reload.kind
+  end
+
+  # The fan-out: one job per batch of ids, pushed at once, drained by the
+  # utility workers in parallel. No delay and no chain.
+  test "schedule pushes one job per batch of ids" do
     first = row("podcast")
-    second = row("podcast")
-    third = row("podcast")
+    last = row("favicon")
 
-    BackfillImageKinds.new.perform(0, second.id, 1, 0)
+    BackfillImageKinds.new.perform(nil, true)
 
-    assert_equal "cover_art", first.reload.kind
-    assert_equal "poster", second.reload.kind, "the batch was one row"
-    assert_equal 1, BackfillImageKinds.jobs.size
-    assert_equal [first.id, second.id, 1, 0], BackfillImageKinds.jobs.last["args"]
+    expected = BackfillImageKinds.new.job_args(Image.maximum(:id), Image.minimum(:id))
+    assert_equal expected, BackfillImageKinds.jobs.map { it["args"] }
+    assert_includes BackfillImageKinds.jobs.map { it["args"].first }, batches_for(first).first
+    assert_includes BackfillImageKinds.jobs.map { it["args"].first }, batches_for(last).first
 
     Sidekiq::Worker.drain_all
 
-    assert_equal "cover_art", second.reload.kind
-    assert_equal "poster", third.reload.kind, "beyond finish_id"
+    assert_equal "cover_art", first.reload.kind
+    assert_equal "site_icon", last.reload.kind
+  end
+
+  test "schedule with no rows pushes nothing" do
+    Image.delete_all
+
+    BackfillImageKinds.new.perform(nil, true)
+
     assert_empty BackfillImageKinds.jobs
   end
 
   # Nothing since the recreate should be unclassifiable. If a row is, the
-  # run must say so rather than leave the default in place silently.
+  # batch must say so rather than leave the default in place silently.
   test "raises on a preset outside the map" do
-    row("mystery")
+    mystery = row("mystery")
 
-    error = assert_raises(RuntimeError) { BackfillImageKinds.new.perform }
+    error = assert_raises(RuntimeError) { perform_batches_for(mystery) }
     assert_match(/mystery/, error.message)
   end
 end
