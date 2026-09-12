@@ -9,11 +9,23 @@ class BackfillChannelImagesTest < ActiveSupport::TestCase
     Embed.youtube_channel.create!(provider_id: id, data: {"snippet" => {"thumbnails" => thumbnails}})
   end
 
-  test "schedules cached channels without requiring a feed or fetching metadata" do
-    channel("UCplaylist")
-    Embed.youtube_video.create!(provider_id: "video", data: {})
+  # The batch that holds an id, in SidekiqHelper's numbering. Sequences do
+  # not reset between tests, so the rows can straddle a batch boundary.
+  def batches_for(*records)
+    records.map { |record| ((record.id - 1) / SidekiqHelper::BATCH_SIZE) + 1 }.uniq
+  end
 
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") { BackfillChannelImages.new.perform }
+  def perform_batches_for(*records)
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+      batches_for(*records).each { |batch| BackfillChannelImages.new.perform(batch) }
+    end
+  end
+
+  test "schedules cached channels without requiring a feed or fetching metadata" do
+    playlist = channel("UCplaylist")
+    video = Embed.youtube_video.create!(provider_id: "video", data: {})
+
+    perform_batches_for(playlist, video)
 
     jobs = ImageCrawler::Pipeline::Find.jobs
     assert_equal 1, jobs.size
@@ -22,115 +34,118 @@ class BackfillChannelImagesTest < ActiveSupport::TestCase
   end
 
   test "reruns skip stored avatars but retry channels whose image never landed" do
-    channel("UCstored")
-    channel("UCfailed")
+    stored = channel("UCstored")
+    failed = channel("UCfailed")
     create_image_row(provider: :embed_icon, provider_id: "UCstored")
     # The same id under another provider must not suppress an avatar.
     create_image_row(provider: :feed_icon, provider_id: "UCfailed")
 
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      2.times { BackfillChannelImages.new.perform }
-    end
+    2.times { perform_batches_for(stored, failed) }
 
     assert_equal ["UCfailed", "UCfailed"], ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["provider_id"] }
     assert_equal ["UCfailed"], BackfillChannelImages.pending.pluck(:provider_id)
   end
 
   test "skips absent thumbnails and continues to the next channel" do
-    channel("UCempty", {})
-    channel("UCvalid")
+    empty = channel("UCempty", {})
+    valid = channel("UCvalid")
 
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") { BackfillChannelImages.new.perform }
+    perform_batches_for(empty, valid)
 
     assert_equal ["UCvalid"], ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["provider_id"] }
     assert_equal 2, BackfillChannelImages.pending.count
   end
 
-  test "honors an exclusive resume cursor and inclusive trial cutoff" do
+  test "a batch schedules only its own ids" do
+    inside = channel("UCinside")
+    batch = batches_for(inside).first
+
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+      BackfillChannelImages.new.perform(batch + 1)
+      assert_empty ImageCrawler::Pipeline::Find.jobs
+
+      BackfillChannelImages.new.perform(batch)
+      assert_equal ["UCinside"], ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["provider_id"] }
+    end
+  end
+
+  # The fan-out: one job per batch of embed ids, pushed in one call with
+  # `at` timestamps spaced evenly over the spread, so the image queues see
+  # a steady rate instead of every download at once.
+  test "schedule pushes one job per batch of embed ids, spaced over the spread" do
     first = channel("UCfirst")
     last = channel("UClast")
-    channel("UClater")
 
     with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      BackfillChannelImages.new.perform(first.id, last.id)
+      BackfillChannelImages.new.perform(nil, true)
+
+      jobs = BackfillChannelImages.jobs
+      expected = BackfillChannelImages.new.job_args(Embed.youtube_channel.maximum(:id), Embed.youtube_channel.minimum(:id))
+      assert_equal expected, jobs.map { it["args"] }
+      assert_includes jobs.map { it["args"].first }, batches_for(first).first
+      assert_includes jobs.map { it["args"].first }, batches_for(last).first
+
+      step = BackfillChannelImages::SPREAD.to_f / jobs.size
+      jobs.each_with_index do |job, index|
+        assert_in_delta Time.now.to_f + (index * step), job["at"], 5
+      end
+
+      # Only the backfill jobs: draining Find would download for real.
+      BackfillChannelImages.drain
     end
 
-    assert_equal ["UClast"], ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["provider_id"] }
+    assert_equal ["UCfirst", "UClast"], ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["provider_id"] }.sort
+  end
+
+  test "schedule takes the spread as an argument" do
+    channel("UCone")
+
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+      BackfillChannelImages.new.perform(nil, true, 3_600)
+    end
+
+    jobs = BackfillChannelImages.jobs
+    step = 3_600.0 / jobs.size
+    assert_in_delta Time.now.to_f, jobs.first["at"], 5
+    assert_in_delta Time.now.to_f + ((jobs.size - 1) * step), jobs.last["at"], 5
+  end
+
+  test "schedule with no channels pushes nothing" do
+    Embed.youtube_video.create!(provider_id: "video", data: {})
+
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+      BackfillChannelImages.new.perform(nil, true)
+    end
+
     assert_empty BackfillChannelImages.jobs
-  end
-
-  test "continues a full batch with a stable upper bound" do
-    records = 501.times.map { |i| channel("UC#{i}") }
-
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      BackfillChannelImages.new.perform
-      assert_equal 500, ImageCrawler::Pipeline::Find.jobs.size
-      continuation = BackfillChannelImages.jobs.shift
-      assert_equal [records[499].id, records.last.id, 500, 10], continuation["args"]
-      assert continuation["at"]
-
-      channel("UCnew")
-      BackfillChannelImages.new.perform(*continuation["args"])
-    end
-
-    assert_equal 501, ImageCrawler::Pipeline::Find.jobs.size
-    assert_equal 501, ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["provider_id"] }.uniq.size
-    assert_empty BackfillChannelImages.jobs
-  end
-
-  # The image queues are shared with live crawling, so the operator can
-  # restart a flooded run slower without a deploy.
-  test "carries the operator's batch size and delay through the chain" do
-    3.times { |i| channel("UC#{i}") }
-
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      BackfillChannelImages.new.perform(0, nil, 2, 60)
-    end
-
-    assert_equal 2, ImageCrawler::Pipeline::Find.jobs.size
-    continuation = BackfillChannelImages.jobs.shift
-    assert_equal [2, 60], continuation["args"].last(2)
-    assert_in_delta 60, continuation["at"] - Time.now.to_f, 5
-  end
-
-  # limit(0) returns nothing and stops the chain, which is indistinguishable
-  # from a finished run.
-  test "clamps a batch size that would silently end the run" do
-    2.times { |i| channel("UC#{i}") }
-
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      BackfillChannelImages.new.perform(0, nil, 0, 0)
-    end
-
-    assert_equal 1, ImageCrawler::Pipeline::Find.jobs.size
-    assert_equal 1, BackfillChannelImages.jobs.size
   end
 
   # NOT IN would hash every embed_icon provider_id per query; a LEFT JOIN
   # anti-join uses index_images_on_provider_and_provider_id instead. The
   # join also puts images.id in scope, so an unqualified "id" is ambiguous.
-  test "scopes pending as an anti-join with a qualified id window" do
-    sql = BackfillChannelImages.window(1, 2).order(:id).to_sql
+  test "scopes a batch as an anti-join with a qualified id range" do
+    sql = BackfillChannelImages.batch_scope(1).order(:id).to_sql
 
     assert_includes sql, "LEFT OUTER JOIN"
     refute_includes sql, "NOT IN"
-    assert_includes sql, %("embeds"."id" > 1)
-    assert_includes sql, %("embeds"."id" <= 2)
-    assert_nothing_raised { BackfillChannelImages.window(1, 2).order(:id).load }
+    assert_includes sql, %("embeds"."id" BETWEEN 1 AND #{SidekiqHelper::BATCH_SIZE})
+    assert_nothing_raised { BackfillChannelImages.batch_scope(1).order(:id).load }
   end
 
   test "refuses to enqueue without unified storage configured" do
-    channel("UCvalid")
+    valid = channel("UCvalid")
 
     with_env("UNIFIED_BUCKET_IMAGES" => nil) do
-      assert_raises(RuntimeError) { BackfillChannelImages.new.perform }
+      assert_raises(RuntimeError) { BackfillChannelImages.new.perform(nil, true) }
+      assert_raises(RuntimeError) { BackfillChannelImages.new.perform(batches_for(valid).first) }
     end
 
+    assert_empty BackfillChannelImages.jobs
     assert_empty ImageCrawler::Pipeline::Find.jobs
   end
 
   test "a failed migration can rerun and store a smaller fallback avatar" do
-    channel("UCretry", {
+    retry_channel = channel("UCretry", {
       "high" => {"url" => "https://yt3.ggpht.com/large.jpg"},
       "default" => {"url" => "https://yt3.ggpht.com/small.jpg"}
     })
@@ -138,22 +153,20 @@ class BackfillChannelImagesTest < ActiveSupport::TestCase
     stub_request(:get, "https://yt3.ggpht.com/small.jpg").to_return(status: 503)
     stub_request(:put, /test-account\.storage\.example\.com/)
 
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      Sidekiq::Testing.inline! do
-        BackfillChannelImages.new.perform
-        assert_nil Image.provider_embed_icon.find_by(provider_id: "UCretry")
+    Sidekiq::Testing.inline! do
+      perform_batches_for(retry_channel)
+      assert_nil Image.provider_embed_icon.find_by(provider_id: "UCretry")
 
-        stub_request_file("image.png", "https://yt3.ggpht.com/small.jpg", headers: {content_type: "image/png"})
-        BackfillChannelImages.new.perform
+      stub_request_file("image.png", "https://yt3.ggpht.com/small.jpg", headers: {content_type: "image/png"})
+      perform_batches_for(retry_channel)
 
-        row = Image.provider_embed_icon.find_by!(provider_id: "UCretry")
-        assert_equal "https://yt3.ggpht.com/small.jpg", row.url
-        assert_equal "200x200", row.variant
-        assert_match(/\.png\z/, row.storage_path)
-        assert_nil row.feed_id
-        assert_no_difference -> { Image.count } do
-          BackfillChannelImages.new.perform
-        end
+      row = Image.provider_embed_icon.find_by!(provider_id: "UCretry")
+      assert_equal "https://yt3.ggpht.com/small.jpg", row.url
+      assert_equal "200x200", row.variant
+      assert_match(/\.png\z/, row.storage_path)
+      assert_nil row.feed_id
+      assert_no_difference -> { Image.count } do
+        perform_batches_for(retry_channel)
       end
     end
 

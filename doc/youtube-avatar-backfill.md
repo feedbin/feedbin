@@ -20,9 +20,23 @@ At migration scale it invalidates the sidebar and entry caches of every
 YouTube subscriber. Expect `default` queue depth to rise, and expect a period
 of colder caches for YouTube feeds.
 
-Image downloads land on the shared `crawl_images` queue. A large run competes
-with live entry image crawling. Use the rate knobs below rather than a deploy
-if the queue floods.
+The schedule step pushes one `utility` job per 5,000 embed ids in one
+call, the same fan-out `BackfillProviderIds` and `UpdateDefaultColumn` use,
+with `at` timestamps spaced evenly over 12 hours. Each job scans its id
+range for pending channels and pushes a `Find` job per channel onto the
+shared `crawl_images` queue. Two things follow:
+
+- The spread is the rate. At 1.9 million pending channels over 12 hours
+  that is about 44 downloads per second, on top of live entry image
+  crawling on the same queue. The image pipeline must sustain that, or
+  `crawl_images` grows for the whole run and drains after the schedule
+  ends.
+- The rate toward `yt3.ggpht.com` is that same 44 per second, capped by
+  the `crawl_images` concurrency. A refused download logs a `download
+  exception` trace line and leaves the channel pending; nothing retries
+  against Google. Grep the image worker logs for that line with `ggpht` in
+  the URL during the first hour and compare it with `attempting image
+  candidate` for the same period.
 
 `Embed.youtube_channel` holds every channel ever harvested. This includes
 channels nobody subscribes to and channels with no remaining entries. Those
@@ -35,11 +49,14 @@ against the YouTube feed count before you commit to the full run.
 # Channels without an avatar row, including missing thumbnails and failures.
 puts BackfillChannelImages.pending.count
 
-# Schedule at most 100 pending channels. Do not run the full migration
-# concurrently with the trial.
-trial_ids = BackfillChannelImages.pending.order(:id).limit(100).pluck(:id)
+# Trial: the batch that holds the lowest pending id, run inline. Batches
+# number embed ids in blocks of SidekiqHelper::BATCH_SIZE, starting at 1.
+# Do not run the full migration concurrently with the trial.
+batch = ((BackfillChannelImages.pending.minimum(:id) - 1) / SidekiqHelper::BATCH_SIZE) + 1
+puts batch
+trial_ids = BackfillChannelImages.batch_scope(batch).pluck(:id)
 puts trial_ids.inspect
-BackfillChannelImages.perform_async(0, trial_ids.last) if trial_ids.any?
+BackfillChannelImages.new.perform(batch)
 ```
 
 Wait for the image Find, Process, Upload, and `default` (ChannelImage
@@ -63,32 +80,31 @@ URLs. A nil CDN URL means `UNIFIED_IMAGE_HOST` is missing.
 ## Full run and recovery
 
 ```ruby
-BackfillChannelImages.perform_async
+BackfillChannelImages.perform_async(nil, true)
 ```
 
-Each utility job scans at most `BATCH_SIZE` (500) pending channels and
-schedules its successor `DELAY` (10) seconds later. This paces enqueueing; it
-does not cap image queue depth. The run captures an inclusive maximum embed ID
-so newly harvested channels do not extend it indefinitely. Each batch logs
-scanned/scheduled/no-thumbnail counts, `last_id`, and `finish_id`. A
-no-thumbnail line identifies the embed and channel. Scheduled counts are not
-successful uploads.
+The schedule job pushes every batch up to the highest channel id at that
+moment, so newly harvested channels do not extend the run. The batches sit
+in Sidekiq's scheduled set and fire evenly over the next 12 hours. Each
+batch logs `batch`, `scanned`, `scheduled`, and `no_thumbnail` counts. A
+no-thumbnail line identifies the embed and channel. Scheduled counts are
+not successful uploads.
 
-### Rate knobs
+### Rate knob
 
-The third and fourth arguments are the batch size and the delay in seconds.
-They carry through the whole chain, so one call sets the rate for the run:
+The third argument is the spread in seconds. It is read once, at schedule
+time, so one call sets the pace for the run:
 
 ```ruby
-# 100 channels every 60 seconds instead of 500 every 10.
-BackfillChannelImages.perform_async(0, nil, 100, 60)
+# The same batches over 48 hours instead of 12: about 11 downloads per second.
+BackfillChannelImages.perform_async(nil, true, 48.hours.to_i)
 ```
 
-To slow a run that is already flooding the image queues: delete the scheduled
-`BackfillChannelImages` job in the Sidekiq web UI, note the `last_id` and
-`finish_id` from the last log line, then restart from that cursor with a
-smaller batch size and a longer delay. A batch size below 1 is clamped to 1,
-because `limit(0)` would end the chain and look like a finished run.
+To slow a run that is already flooding the image queues: delete the
+remaining `BackfillChannelImages` jobs from the Scheduled tab in the
+Sidekiq web UI, wait for `crawl_images` to drain, then schedule again with
+a longer spread. Batches whose channels are stored scan and push nothing,
+so the rerun costs only the scans.
 
 ### Checking progress
 
@@ -101,35 +117,16 @@ puts BackfillChannelImages.pending.order(:id).limit(20).map { |channel|
 }.inspect
 ```
 
-Pipeline failures leave channels pending. Rerun from the start to retry them;
+Pipeline failures leave channels pending. Schedule again to retry them;
 stored avatars are skipped. Do not overlap runs unnecessarily: channels still
 in flight can be scheduled more than once, although row attachment upserts by
 provider/channel. Utility jobs use normal Sidekiq retries; image pipeline jobs
-do not, so a finished utility chain is not proof of migration completion.
+do not, so an empty scheduled set is not proof of migration completion.
 
-To resume only the unscanned portion of an interrupted run, pass the logged
-`last_id` and `finish_id` as the first two positional arguments to
-`perform_async`. Repeat the batch size and the delay as well if the
-interrupted run used non-default values; they do not survive the restart.
-Resuming does not retry failures before the cursor; rerun from the start
-afterward.
+To retry one batch, take its number from the log line and call
+`BackfillChannelImages.perform_async(batch)`.
 
 Missing thumbnail metadata and permanently unavailable URLs remain pending for
 manual review. Channels absent from `Embed.youtube_channel` are outside this
 backfill. Keep legacy fallback reads and writes until coverage is accepted;
 their retirement is a separate deployment after verification.
-
-## Known behavior: avatar flapping
-
-`ChannelImage` offers every advertised thumbnail size as a candidate, largest
-first. `Pipeline::Find` takes the first one that downloads. A transient
-failure on the largest size therefore stores the smaller bytes, which changes
-`original_fingerprint`, which flips `Image#url`, sweeps the old object, and
-touches the channel's feeds. The next successful crawl of the largest size
-flips it all back.
-
-The cycle is bounded and it corrects toward the largest size. Each flip costs
-one reprocess, one upload, one object sweep, and one cache invalidation. If
-the flapping shows up in `image.icon_unchanged` or sweep volume, the fix is to
-pin the ladder to the size the row already stored rather than to remove the
-ladder.
