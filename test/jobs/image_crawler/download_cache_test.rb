@@ -26,7 +26,9 @@ module ImageCrawler
     def build_duplicate_image(original_url)
       Image.new_with_attributes(
         id: SecureRandom.hex,
-        preset_name: "primary",
+        kind: ::Image.kinds[:poster],
+
+        kind: ::Image.kinds[:poster], preset_name: "primary",
         image_urls: [original_url],
         provider: ::Image.providers[:entry_content],
         provider_id: 1

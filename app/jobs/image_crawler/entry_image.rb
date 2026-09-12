@@ -60,6 +60,7 @@ module ImageCrawler
       if image_urls.present? || entry_url.present?
         Image.new_with_attributes(
           id:              @entry.public_id,
+          kind:            ::Image.kinds[:poster],
           preset_name:     preset_name,
           image_urls:      image_urls,
           provider:        ::Image.providers[:entry_preview],

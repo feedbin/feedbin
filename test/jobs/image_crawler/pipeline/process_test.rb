@@ -12,7 +12,7 @@ module ImageCrawler
         url = "http://example.com/image.jpg"
         cache_key = "cache_key"
 
-        image = Image.new_with_attributes(id: id, preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: [])
+        image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: [])
 
         assert_difference -> { Upload.jobs.size }, +1 do
           Process.new.perform(image.to_h)
@@ -34,7 +34,7 @@ module ImageCrawler
         url = "http://example.com/image.jpg"
         all_urls = ["http://example.com/image_2.jpg", "http://example.com/image_3.jpg"]
 
-        image = Image.new_with_attributes(id: id, preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: all_urls)
+        image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: all_urls)
 
         assert_difference -> { FindCritical.jobs.size }, +1 do
           Process.new.perform(image.to_h)
@@ -55,7 +55,9 @@ module ImageCrawler
           download_path = copy_support_file("image.jpeg")
           image = Image.new_with_attributes(
             id: SecureRandom.hex,
-            preset_name: "primary",
+            kind: ::Image.kinds[:poster],
+
+            kind: ::Image.kinds[:poster], preset_name: "primary",
             image_urls: [],
             provider: ::Image.providers[:entry_preview],
             provider_id: 1,
@@ -101,7 +103,7 @@ module ImageCrawler
           )
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "primary",
+            id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary",
             image_urls: ["http://example.com/next-candidate.jpg"],
             provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
             page_url: "http://example.com/article", meta_image_urls: [original_url],
@@ -128,7 +130,9 @@ module ImageCrawler
           download_path = copy_support_file("favicon.ico")
           image = Image.new_with_attributes(
             id: SecureRandom.hex,
-            preset_name: "favicon",
+            kind: ::Image.kinds[:site_icon],
+
+            kind: ::Image.kinds[:site_icon], preset_name: "favicon",
             image_urls: [],
             provider: ::Image.providers[:feed_icon],
             provider_id: 5,

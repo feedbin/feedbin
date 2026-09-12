@@ -12,6 +12,21 @@ module ImageCrawler
       }
     end
 
+    # The proxy stores no images row, so nothing derives the kind later; the
+    # caller is the only place that knows what it is asking to cache.
+    test "schedule requires kind and passes it to the pipeline" do
+      Sidekiq::Worker.clear_all
+      url = "https://example.com/avatar.jpg"
+
+      assert_raises(ArgumentError) { CacheRemoteFile.schedule(url) }
+
+      CacheRemoteFile.schedule(url, kind: ::Image.kinds[:avatar])
+      args = Pipeline::Find.jobs.last["args"].first
+      assert_equal ::Image.kinds[:avatar], args["kind"]
+      assert_equal "icon", args["preset_name"]
+      assert_equal ::Image.providers[:remote_file], args["provider"]
+    end
+
     test "creates a remote file" do
       assert_difference "RemoteFile.count", 1 do
         CacheRemoteFile.new.perform(@url, @image)

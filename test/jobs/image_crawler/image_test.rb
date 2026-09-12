@@ -17,26 +17,39 @@ module ImageCrawler
       assert_equal ["http://example.com/a.jpg"], image.image_urls
     end
 
+    # kind is not a property of the preset: the preset is a rendering recipe
+    # and the kind is what the picture is, known only at the call site.
+    test "new_with_attributes requires kind" do
+      error = assert_raises(ArgumentError) do
+        Image.new_with_attributes(id: "a", preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
+      end
+      assert_match(/kind/, error.message)
+
+      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
+      assert_equal ::Image.kinds[:poster], image.kind
+      assert_equal ::Image.kinds[:poster], image.to_h[:kind]
+    end
+
     test "unified? requires an opted-in preset and the unified bucket env" do
-      image = Image.new_with_attributes(id: "a", preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
+      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
       refute image.unified?
 
       with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         assert image.unified?
-        icon = Image.new_with_attributes(id: "a", preset_name: "icon", image_urls: [], provider: ::Image.providers[:remote_file], provider_id: 1)
+        icon = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:avatar], preset_name: "icon", image_urls: [], provider: ::Image.providers[:remote_file], provider_id: 1)
         refute icon.unified?
       end
     end
 
     test "storage_path is derived from original_url" do
-      image = Image.new_with_attributes(id: "a", preset_name: "primary", image_urls: [], provider: 2, provider_id: 1, original_url: "http://example.com/a.jpg")
+      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1, original_url: "http://example.com/a.jpg")
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304"), image.storage_path
     end
 
     test "send_to_feedbin includes unified metadata when unified" do
       with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         image = Image.new_with_attributes(
-          id: "a", preset_name: "primary", image_urls: [],
+          id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
           provider: ::Image.providers[:entry_preview], provider_id: 1,
           original_url: "http://example.com/a.jpg", final_url: "http://example.com/a.jpg",
           storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
@@ -52,7 +65,7 @@ module ImageCrawler
 
     test "send_to_feedbin keeps the legacy payload shape when not unified" do
       image = Image.new_with_attributes(
-        id: "a", preset_name: "primary", image_urls: [],
+        id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
         provider: ::Image.providers[:entry_preview], provider_id: 1,
         original_url: "http://example.com/a.jpg", final_url: "http://example.com/a.jpg",
         storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
@@ -67,7 +80,7 @@ module ImageCrawler
     test "create_image records a usage row" do
       with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         image = Image.new_with_attributes(
-          id: "a", preset_name: "primary", image_urls: [],
+          id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
           provider: ::Image.providers[:entry_preview], provider_id: 42, feed_id: 7,
           original_url: "http://example.com/a.jpg", final_url: "http://example.com/a-final.jpg",
           storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
@@ -79,6 +92,7 @@ module ImageCrawler
         record = image.create_image
 
         assert_equal "42", record.provider_id
+        assert_equal "poster", record.kind
         assert_equal 7, record.feed_id
         assert_equal image.storage_path, record.storage_path
         assert_equal 9_999, record.bytesize
@@ -92,7 +106,7 @@ module ImageCrawler
 
     test "storage_path and content type follow the preset format" do
       image = Image.new_with_attributes(
-        id: SecureRandom.hex, preset_name: "primary", image_urls: [],
+        id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
         provider: ::Image.providers[:entry_preview], provider_id: 1,
         original_url: "http://example.com/a.jpg"
       )
@@ -108,7 +122,7 @@ module ImageCrawler
     test "icon presets keep their recipe as the variant and store png" do
       %w[favicon touch_icon].zip(["32x32", "200x200"]).each do |preset_name, variant|
         image = Image.new_with_attributes(
-          id: SecureRandom.hex, preset_name: preset_name, image_urls: [],
+          id: SecureRandom.hex, kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset_name)), preset_name: preset_name, image_urls: [],
           provider: ::Image.providers[:feed_icon], provider_id: 1,
           original_url: "http://example.com/favicon.ico",
           width: 17, height: 17
@@ -127,7 +141,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("bytes")
       build = ->(url) {
         Image.new_with_attributes(
-          id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+          id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
           provider: ::Image.providers[:feed_icon], provider_id: 1,
           original_url: url, original_fingerprint: fingerprint
         )
@@ -148,7 +162,7 @@ module ImageCrawler
     # of surfacing the mismatch.
     test "storage_path raises for a content-addressed preset with no original_fingerprint" do
       image = Image.new_with_attributes(
-        id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+        id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
         provider: ::Image.providers[:feed_icon], provider_id: 1,
         original_url: "http://example.com/favicon.ico"
       )
@@ -159,7 +173,7 @@ module ImageCrawler
 
     test "entry presets stay keyed by url" do
       image = Image.new_with_attributes(
-        id: SecureRandom.hex, preset_name: "primary", image_urls: [],
+        id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
         provider: ::Image.providers[:entry_preview], provider_id: 1,
         original_url: "http://example.com/a.jpg", original_fingerprint: Digest::MD5.hexdigest("bytes")
       )
@@ -173,7 +187,7 @@ module ImageCrawler
       with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
         build = ->(fingerprint) {
           Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+            id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
             provider: ::Image.providers[:feed_icon], provider_id: 7,
             original_url: "http://example.com/favicon.ico",
             original_fingerprint: fingerprint,
@@ -208,7 +222,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("cover bytes")
       build = ->(preset, provider, url) {
         Image.new_with_attributes(
-          id: SecureRandom.hex, preset_name: preset, image_urls: [],
+          id: SecureRandom.hex, kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
           provider: ::Image.providers[provider], provider_id: 1,
           original_url: url, original_fingerprint: fingerprint
         )
@@ -232,12 +246,12 @@ module ImageCrawler
     test "podcast artwork does not collide with touch_icon at the same variant" do
       fingerprint = Digest::MD5.hexdigest("cover bytes")
       podcast = Image.new_with_attributes(
-        id: SecureRandom.hex, preset_name: "podcast", image_urls: [],
+        id: SecureRandom.hex, kind: ::Image.kinds[:cover_art], preset_name: "podcast", image_urls: [],
         provider: ::Image.providers[:entry_icon], provider_id: 1,
         original_url: "http://example.com/a.jpg", original_fingerprint: fingerprint
       )
       touch = Image.new_with_attributes(
-        id: SecureRandom.hex, preset_name: "touch_icon", image_urls: [],
+        id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "touch_icon", image_urls: [],
         provider: ::Image.providers[:feed_icon], provider_id: 1,
         original_url: "http://example.com/a.jpg", original_fingerprint: fingerprint
       )
@@ -252,7 +266,7 @@ module ImageCrawler
     test "channel_avatar is content-addressed, unified-only, and keyed by the bytes" do
       fingerprint = Digest::MD5.hexdigest("avatar bytes")
       image = Image.new_with_attributes(
-        id: "UCabc-channel", preset_name: "channel_avatar", image_urls: [],
+        id: "UCabc-channel", kind: ::Image.kinds[:avatar], preset_name: "channel_avatar", image_urls: [],
         provider: ::Image.providers[:embed_icon], provider_id: "UCabc",
         original_url: "https://yt3.ggpht.com/avatar.jpg", original_fingerprint: fingerprint
       )
@@ -272,7 +286,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("avatar bytes")
       build = ->(preset, provider) {
         Image.new_with_attributes(
-          id: "a", preset_name: preset, image_urls: [],
+          id: "a", kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
           provider: ::Image.providers[provider], provider_id: "UCabc",
           original_url: "https://yt3.ggpht.com/avatar.jpg", original_fingerprint: fingerprint
         )
@@ -287,12 +301,12 @@ module ImageCrawler
     test "channel_avatar does not collide with podcast at the same variant" do
       fingerprint = Digest::MD5.hexdigest("avatar bytes")
       avatar = Image.new_with_attributes(
-        id: "a", preset_name: "channel_avatar", image_urls: [],
+        id: "a", kind: ::Image.kinds[:avatar], preset_name: "channel_avatar", image_urls: [],
         provider: ::Image.providers[:embed_icon], provider_id: "UCabc",
         original_url: "https://example.com/a.jpg", original_fingerprint: fingerprint
       )
       podcast = Image.new_with_attributes(
-        id: "b", preset_name: "podcast", image_urls: [],
+        id: "b", kind: ::Image.kinds[:cover_art], preset_name: "podcast", image_urls: [],
         provider: ::Image.providers[:entry_icon], provider_id: 1,
         original_url: "https://example.com/a.jpg", original_fingerprint: fingerprint
       )
@@ -306,7 +320,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("icon bytes")
       build = ->(preset, provider) {
         Image.new_with_attributes(
-          id: "a", preset_name: preset, image_urls: [],
+          id: "a", kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
           provider: ::Image.providers[provider], provider_id: "example.com",
           original_url: "http://example.com/icon.png", original_fingerprint: fingerprint
         )

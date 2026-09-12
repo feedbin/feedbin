@@ -17,12 +17,12 @@ module ImageCrawler
         stub_request_file("image.jpeg", image_url, headers: {content_type: "image/jpeg"})
         stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
-        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "icon", image_urls: [original_url], provider: 0, provider_id: 1)
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:avatar], preset_name: "icon", image_urls: [original_url], provider: 0, provider_id: 1)
         Sidekiq::Testing.inline! do
           Find.perform_async(image.to_h)
         end
 
-        image_two = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "icon", image_urls: [original_url], provider: 0, provider_id: 1)
+        image_two = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:avatar], preset_name: "icon", image_urls: [original_url], provider: 0, provider_id: 1)
         Find.new.perform(image_two.to_h)
 
         assert_equal(image_url, CacheRemoteFile.jobs.first["args"][1]["original_url"])
@@ -43,7 +43,7 @@ module ImageCrawler
 
           stub_request(:put, /test-account\.storage\.example\.com/)
 
-          image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: urls, provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1, entry_url: page_url)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: urls, provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1, entry_url: page_url)
           Sidekiq::Testing.inline! do
             Find.perform_async(image.to_h)
           end
@@ -52,7 +52,7 @@ module ImageCrawler
           assert_requested :get, "http://example.com/image/twitter_image.jpg"
 
           assert_equal 0, EntryImage.jobs.size
-          image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: urls, provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 1)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: urls, provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 1)
           Find.new.perform(image.to_h)
           assert_equal 1, EntryImage.jobs.size
         end
@@ -65,7 +65,7 @@ module ImageCrawler
         stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
         id = SecureRandom.hex
 
-        image = Image.new_with_attributes(id: id, preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
+        image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
 
         assert_difference -> { Process.jobs.size }, +1 do
           Find.new.perform(image.to_h)
@@ -93,7 +93,7 @@ module ImageCrawler
         body = ("lorem " * 3_500)
 
         stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: body)
-        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
 
         Find.new.perform(image.to_h)
 
@@ -112,7 +112,7 @@ module ImageCrawler
           stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
         end
 
-        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: urls, provider: 0, provider_id: 1)
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: urls, provider: 0, provider_id: 1)
         Sidekiq::Testing.inline! do
           Find.perform_async(image.to_h)
         end
@@ -128,7 +128,7 @@ module ImageCrawler
 
         stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
 
-        image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, camo: true)
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, camo: true)
         Find.new.perform(image.to_h)
 
         assert_requested :get, camo_url
@@ -152,7 +152,7 @@ module ImageCrawler
           )
 
           # No storage stubs: a dedupe hit issues no storage API requests.
-          image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
           Find.new.perform(image.to_h)
 
           assert_equal 1, EntryImage.jobs.size
@@ -166,7 +166,7 @@ module ImageCrawler
           original_url = "http://example.com/image.jpg"
           stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
 
-          image = Image.new_with_attributes(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
 
           assert_difference -> { Process.jobs.size }, +1 do
             Find.new.perform(image.to_h)
@@ -198,7 +198,7 @@ module ImageCrawler
           )
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "primary",
+            id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary",
             image_urls: [fresh_url],
             provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
             entry_url: page_url, page_url: page_url
@@ -227,7 +227,7 @@ module ImageCrawler
           stub_request_file("image.jpeg", fresh_url, headers: {content_type: "image/jpeg"})
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "primary",
+            id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary",
             image_urls: [reused_url, fresh_url],
             provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
             page_url: "http://example.com/article", meta_image_urls: [reused_url]
@@ -258,7 +258,7 @@ module ImageCrawler
           )
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
+            id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [original_url],
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
@@ -294,7 +294,7 @@ module ImageCrawler
           expected_updated_at = row.updated_at
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
+            id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [original_url],
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
@@ -325,7 +325,7 @@ module ImageCrawler
           )
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "favicon", image_urls: [original_url],
+            id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [original_url],
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
@@ -357,7 +357,7 @@ module ImageCrawler
           expected_updated_at = row.updated_at
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "podcast", image_urls: [original_url],
+            id: SecureRandom.hex, kind: ::Image.kinds[:cover_art], preset_name: "podcast", image_urls: [original_url],
             provider: ::Image.providers[:entry_icon], provider_id: 5, feed_id: 9
           )
 
@@ -397,7 +397,7 @@ module ImageCrawler
             .to_return(body: File.new(support_file("favicon.ico")), status: 200, headers: {"Content-Type" => "image/png"})
 
           image = Image.new_with_attributes(
-            id: "example.com-favicon", preset_name: "favicon",
+            id: "example.com-favicon", kind: ::Image.kinds[:site_icon], preset_name: "favicon",
             image_urls: [other_url, stored_url],
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
@@ -430,7 +430,7 @@ module ImageCrawler
           stub_request(:get, url).with(headers: {"If-None-Match" => "\"abc123\""}).to_return(status: 304, body: "")
 
           image = Image.new_with_attributes(
-            id: "example.com-favicon", preset_name: "favicon", image_urls: [url],
+            id: "example.com-favicon", kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [url],
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
@@ -467,7 +467,7 @@ module ImageCrawler
               headers: {"Content-Type" => "image/png", "ETag" => "\"new\""})
 
           image = Image.new_with_attributes(
-            id: "example.com-favicon", preset_name: "favicon", image_urls: [url],
+            id: "example.com-favicon", kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [url],
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
@@ -491,7 +491,7 @@ module ImageCrawler
               headers: {"Content-Type" => "image/png", "ETag" => "\"fresh\"", "Last-Modified" => "Wed, 21 Oct 2026 07:28:00 GMT"})
 
           image = Image.new_with_attributes(
-            id: "example.com-favicon", preset_name: "favicon", image_urls: [url],
+            id: "example.com-favicon", kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [url],
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
@@ -532,7 +532,7 @@ module ImageCrawler
               headers: {"Content-Type" => "image/png", "ETag" => "\"etagB\""})
 
           image = Image.new_with_attributes(
-            id: "example.com-favicon", preset_name: "favicon",
+            id: "example.com-favicon", kind: ::Image.kinds[:site_icon], preset_name: "favicon",
             image_urls: [url_b, url_a],
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )

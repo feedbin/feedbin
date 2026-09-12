@@ -30,6 +30,7 @@ module ImageCrawler
       args = Pipeline::Find.jobs.last["args"].first
       assert_equal ["https://yt3.ggpht.com/large.jpg", "https://yt3.ggpht.com/medium.jpg", "https://yt3.ggpht.com/small.jpg"], args["image_urls"]
       assert_equal "channel_avatar", args["preset_name"]
+      assert_equal ::Image.kinds[:avatar], args["kind"], "keyed by channel, but it is still a picture of the channel"
       assert_equal ::Image.providers[:embed_icon], args["provider"]
       assert_equal "UCabc", args["provider_id"]
       assert_equal "UCabc-channel", args["id"]

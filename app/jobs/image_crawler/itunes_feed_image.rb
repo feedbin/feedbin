@@ -23,6 +23,7 @@ module ImageCrawler
 
         image = Image.new_with_attributes(
           id: "#{@feed.id}-#{name}-itunes",
+          kind: ::Image.kinds[:cover_art],
           preset_name: "podcast_feed",
           image_urls: [url],
           provider: ::Image.providers[:feed_icon],

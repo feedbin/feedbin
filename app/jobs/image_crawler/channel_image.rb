@@ -24,6 +24,7 @@ module ImageCrawler
 
       image = Image.new_with_attributes(
         id: "#{channel.provider_id}#{SUFFIX}",
+        kind: ::Image.kinds[:avatar],
         preset_name: "channel_avatar",
         image_urls: urls,
         provider: ::Image.providers[:embed_icon],

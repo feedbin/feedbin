@@ -41,7 +41,7 @@ module ImageCrawler
           height = 200
 
           image = Image.new_with_attributes(
-            id:, preset_name: "podcast_feed", image_urls: [],
+            id:, kind: ::Image.kinds[:cover_art], preset_name: "podcast_feed", image_urls: [],
             provider: ::Image.providers[:feed_icon], provider_id: 1, feed_id: 1,
             fingerprint: SecureRandom.hex,
             original_fingerprint: Digest::MD5.hexdigest("image bytes"),
@@ -79,7 +79,7 @@ module ImageCrawler
           original_url = "http://example.com/image.jpg"
 
           image = Image.new_with_attributes(
-            id: id, preset_name: "primary", image_urls: [],
+            id: id, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
             provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1,
             fingerprint: SecureRandom.hex(16), original_fingerprint: SecureRandom.hex(16),
             original_url: original_url, final_url: original_url,
@@ -123,7 +123,7 @@ module ImageCrawler
           original_url = "http://example.com/image.jpg"
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "primary", image_urls: [],
+            id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
             provider: ::Image.providers[:entry_preview], provider_id: 1, feed_id: 1,
             fingerprint: SecureRandom.hex(16), original_fingerprint: SecureRandom.hex(16),
             original_url: original_url, final_url: original_url,
@@ -153,7 +153,7 @@ module ImageCrawler
           original_url = "http://example.com/favicon.ico"
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "favicon", image_urls: [],
+            id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9,
             fingerprint: SecureRandom.hex(16),
             original_fingerprint: Digest::MD5.hexdigest("bytes"),
@@ -186,7 +186,7 @@ module ImageCrawler
           original_url = "http://example.com/cover.jpg"
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "podcast", image_urls: [],
+            id: SecureRandom.hex, kind: ::Image.kinds[:cover_art], preset_name: "podcast", image_urls: [],
             provider: ::Image.providers[:entry_icon], provider_id: 11, feed_id: 9,
             fingerprint: SecureRandom.hex(16),
             original_fingerprint: Digest::MD5.hexdigest("cover bytes"),
@@ -229,7 +229,7 @@ module ImageCrawler
           original_url = "http://example.com/show.jpg"
 
           image = Image.new_with_attributes(
-            id: SecureRandom.hex, preset_name: "podcast_feed", image_urls: [],
+            id: SecureRandom.hex, kind: ::Image.kinds[:cover_art], preset_name: "podcast_feed", image_urls: [],
             provider: ::Image.providers[:feed_icon], provider_id: 21, feed_id: 21,
             fingerprint: SecureRandom.hex(16),
             original_fingerprint: Digest::MD5.hexdigest("show bytes"),

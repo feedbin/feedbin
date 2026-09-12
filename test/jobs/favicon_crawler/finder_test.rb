@@ -348,10 +348,12 @@ module FaviconCrawler
       touch   = jobs.find { it["preset_name"] == "touch_icon" }
 
       assert_equal ::Image.providers[:website_favicon], favicon["provider"]
+      assert_equal ::Image.kinds[:site_icon], favicon["kind"]
       assert_equal "example.com", favicon["provider_id"]
       assert_includes favicon["image_urls"], "http://example.com/icon-32.png"
 
       assert_equal ::Image.providers[:website_touch_icon], touch["provider"]
+      assert_equal ::Image.kinds[:site_icon], touch["kind"]
       assert_equal "example.com", touch["provider_id"]
       assert_equal ["http://example.com/touch-180.png"], touch["image_urls"]
     end

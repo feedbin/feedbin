@@ -24,9 +24,12 @@ module ImageCrawler
 
       # No liveness re-check: the row we found is the reference, and the
       # sweep only deletes paths with no rows at sweep time.
+      # kind is the new row's own: the shared object says nothing about
+      # what the picture is to this row's caller.
       ::Image.attach!(
         provider: @image.provider,
         provider_id: @image.provider_id,
+        kind: @image.kind,
         feed_id: @image.feed_id,
         url: @original_url,
         variant: record.variant,

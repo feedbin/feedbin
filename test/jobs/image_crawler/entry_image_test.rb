@@ -40,6 +40,7 @@ module ImageCrawler
 
       image = Image.new(Pipeline::Find.jobs.first["args"].first)
       extracted_urls = image.image_urls
+      assert_equal ::Image.kinds[:poster], image.kind
 
       # should come back in the order of ImageCrawler::EntryImage::IMAGE_SELECTORS
       assert_equal "http://example.com/twitter", extracted_urls[0]
@@ -60,6 +61,7 @@ module ImageCrawler
       image = Image.new(Pipeline::Find.jobs.first["args"].first)
       extracted_urls = image.image_urls
       assert_equal([@entry.url], extracted_urls)
+      assert_equal ::Image.kinds[:poster], image.kind, "a video thumbnail stands for the item"
     end
 
     test "should enqueue Find with tweet url" do

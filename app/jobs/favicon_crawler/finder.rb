@@ -82,8 +82,10 @@ module FaviconCrawler
       urls = urls.uniq(&:to_s)
       return if urls.empty?
 
+      # Both presets are pictures of the site; only the rendering differs.
       image = ImageCrawler::Image.new_with_attributes(
         id: "#{@favicon.host}-#{preset_name}",
+        kind: ::Image.kinds[:site_icon],
         preset_name: preset_name,
         image_urls: urls.map(&:to_s),
         provider: provider,

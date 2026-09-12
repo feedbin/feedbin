@@ -37,7 +37,11 @@ class RemoteFilesController < ApplicationController
     proxy_url = if icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(url))
       icon.storage_url
     else
-      ImageCrawler::CacheRemoteFile.schedule(url)
+      # Every signed_url caller proxies a person's or channel's picture
+      # (micropost authors, tweet and embed profile images, feed icons),
+      # so the proxy caches as an avatar. Only the legacy remote_files
+      # store is written here; no images row carries this kind.
+      ImageCrawler::CacheRemoteFile.schedule(url, kind: Image.kinds[:avatar])
       camo_url
     end
     

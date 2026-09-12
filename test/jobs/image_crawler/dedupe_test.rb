@@ -7,7 +7,9 @@ module ImageCrawler
       @original_url = "http://example.com/image.jpg"
       @image = Image.new_with_attributes(
         id: SecureRandom.hex,
-        preset_name: "primary",
+        kind: ::Image.kinds[:poster],
+
+        kind: ::Image.kinds[:poster], preset_name: "primary",
         image_urls: [],
         provider: ::Image.providers[:entry_preview],
         provider_id: 2,
@@ -40,6 +42,7 @@ module ImageCrawler
         assert_equal row.image_fingerprint, attached.image_fingerprint
         assert_equal row.original_fingerprint, attached.original_fingerprint
         assert_equal 12_345, attached.bytesize
+        assert_equal ::Image.kinds.key(@image.kind), attached.kind, "the attached row carries its own kind, not the shared object's"
         assert_nil attached.data["legacy_storage_url"]
 
         _, payload = EntryImage.jobs.last["args"]

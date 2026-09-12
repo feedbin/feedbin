@@ -12,7 +12,9 @@ module ImageCrawler
       @url = "http://example.com/og.jpg"
       @image = Image.new_with_attributes(
         id: SecureRandom.hex,
-        preset_name: "primary",
+        kind: ::Image.kinds[:poster],
+
+        kind: ::Image.kinds[:poster], preset_name: "primary",
         image_urls: [],
         provider: ::Image.providers[:entry_preview],
         provider_id: 2,

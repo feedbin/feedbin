@@ -12,6 +12,7 @@ module ImageCrawler
       width
       id
       image_urls
+      kind
       last_modified
       meta_image_urls
       original_extension
@@ -141,7 +142,11 @@ module ImageCrawler
       }
     }
 
-    def self.new_with_attributes(id:, preset_name:, image_urls:, provider:, provider_id:, **other)
+    # kind is required alongside preset_name because they answer different
+    # questions: the preset is the rendering recipe, kind is what the
+    # picture is, which only the caller knows. Passed as ::Image.kinds[...]
+    # like provider, so the payload carries the enum value.
+    def self.new_with_attributes(id:, kind:, preset_name:, image_urls:, provider:, provider_id:, **other)
       arguments = Hash[binding.local_variables.map{ [it, binding.local_variable_get(it)]}]
       arguments.delete(:arguments)
       other = arguments.delete(:other)
@@ -201,6 +206,7 @@ module ImageCrawler
       record = ::Image.attach!(
         provider: provider,
         provider_id: provider_id,
+        kind: kind,
         feed_id: feed_id,
         url: original_url,
         variant: variant,

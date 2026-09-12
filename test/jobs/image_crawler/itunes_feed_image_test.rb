@@ -19,6 +19,7 @@ module ImageCrawler
       name = Digest::SHA1.hexdigest("http://example.com/cover.jpg")
       assert_equal "#{@feed.id}-#{name}-itunes", args["id"]
       assert_equal "podcast_feed", args["preset_name"]
+      assert_equal ::Image.kinds[:cover_art], args["kind"]
       assert_equal ["http://example.com/cover.jpg"], args["image_urls"]
     end
 

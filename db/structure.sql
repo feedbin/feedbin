@@ -688,7 +688,8 @@ CREATE TABLE public.images (
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
     variant text NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    kind bigint DEFAULT 3 NOT NULL
 );
 
 
@@ -3133,6 +3134,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260912120000'),
 ('20260814120000'),
 ('20260812105532'),
 ('20260604120000'),

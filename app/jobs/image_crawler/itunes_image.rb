@@ -24,6 +24,7 @@ module ImageCrawler
     def schedule
       image = Image.new_with_attributes(
         id: "#{@entry.public_id}-itunes",
+        kind: ::Image.kinds[:cover_art],
         preset_name: "podcast",
         image_urls: [@entry.rebase_url(@entry.data["itunes_image"])],
         provider: ::Image.providers[:entry_icon],

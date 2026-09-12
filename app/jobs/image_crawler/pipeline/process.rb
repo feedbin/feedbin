@@ -47,6 +47,7 @@ module ImageCrawler
         return if @image.image_urls.empty?
         image = Image.new_with_attributes(
           id: @image.id,
+          kind: @image.kind,
           preset_name: @image.preset_name,
           image_urls: @image.image_urls,
           provider: @image.provider,

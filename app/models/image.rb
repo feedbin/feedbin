@@ -28,6 +28,22 @@ class Image < ApplicationRecord
     website_touch_icon: 7,     # a host's apple-touch-icon, keyed by host; deliberately its own provider, see below
   }, prefix: true
 
+  # What the picture is, independent of provider. provider keys the row
+  # (feed id, entry id, channel id, host); kind says what the picture is. A
+  # YouTube channel avatar is embed_icon + avatar: keyed by channel because
+  # a playlist feed mixes channels, while still rendering as the feed's icon.
+  # Only the crawler knows which parser field a URL came from, so kind is
+  # set at each call site and never derived from the preset or the URL.
+  #
+  # The column default (poster) exists so the ADD COLUMN was a catalog
+  # change, not for callers: attach! insists on an explicit kind.
+  enum :kind, {
+    cover_art: 0,     # a work: <itunes:image>, per-episode art
+    avatar:    1,     # a person or a channel: YouTube channel, Mastodon account, micropost author
+    site_icon: 2,     # a site: favicon, apple-touch-icon
+    poster:    3,     # stands for the item: lead image, video thumbnail, og:image of a linked page
+  }, prefix: true
+
   normalizes :url, with: -> url { url.strip }
 
   # The data JSON's schema as real accessors.
@@ -141,6 +157,10 @@ class Image < ApplicationRecord
 
     # fetch: a missing provider must not key the lookup on provider_id alone.
     key = {provider: attributes.fetch(:provider), provider_id: attributes.fetch(:provider_id)}
+
+    # fetch: the column default would otherwise label a caller's omission as
+    # a poster and nothing downstream could tell.
+    attributes.fetch(:kind)
 
     tries = 0
     begin

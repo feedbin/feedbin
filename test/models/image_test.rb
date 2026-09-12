@@ -19,8 +19,48 @@ class ImageTest < ActiveSupport::TestCase
       Image.storage_path_for("http://example.com/a.jpg", "542x304")
   end
 
+  # kind is the second axis next to provider: provider keys the row, kind
+  # says what the picture is. Same enum style so the two read alike.
+  test "kind is an enum in the provider style" do
+    assert_equal({"cover_art" => 0, "avatar" => 1, "site_icon" => 2, "poster" => 3}, Image.kinds)
+    assert create_image_row(kind: :avatar).kind_avatar?
+  end
+
+  # NOT NULL with a default: the ADD COLUMN is a catalog change on a big
+  # table rather than a rewrite. The default is poster because entry
+  # previews are most of the table, so the backfill rewrites the fewest rows.
+  test "kind is not null and defaults to poster" do
+    column = Image.columns_hash.fetch("kind")
+    assert_not column.null
+    assert_equal "3", column.default.to_s
+    assert_equal "poster", Image.new.kind
+  end
+
+  # The column default exists for the migration, not for callers: a row
+  # written without a kind would silently be a poster.
+  test "attach! requires kind" do
+    attributes = {
+      provider: Image.providers[:entry_preview],
+      provider_id: 123,
+      feed_id: 1,
+      url: "http://example.com/a.jpg",
+      variant: "542x304",
+      image_fingerprint: SecureRandom.hex(16),
+      original_fingerprint: SecureRandom.hex(16),
+      storage_path: Image.storage_path_for("http://example.com/a.jpg", "542x304"),
+      width: 542,
+      height: 304,
+      bytesize: 10_000,
+      placeholder_color: "aabbcc"
+    }
+
+    assert_raises(KeyError) { Image.attach!(attributes) }
+    assert_equal "poster", Image.attach!(attributes.merge(kind: :poster)).kind
+  end
+
   test "attach! creates then updates rather than duplicating" do
     attributes = {
+      kind: :poster,
       provider: Image.providers[:entry_preview],
       provider_id: 123,
       feed_id: 1,
@@ -53,6 +93,7 @@ class ImageTest < ActiveSupport::TestCase
     attributes = {
       provider: Image.providers[:entry_preview],
       provider_id: 321,
+      kind: :poster,
       feed_id: 1,
       url: "http://example.com/race.jpg",
       variant: "542x304",
@@ -98,6 +139,7 @@ class ImageTest < ActiveSupport::TestCase
     attributes = {
       provider: Image.providers[:entry_preview],
       provider_id: 654,
+      kind: :poster,
       feed_id: 1,
       url: "http://example.com/persistent.jpg",
       variant: "542x304",

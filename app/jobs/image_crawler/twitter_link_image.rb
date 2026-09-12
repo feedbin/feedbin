@@ -20,6 +20,7 @@ module ImageCrawler
     def schedule
       image = Image.new_with_attributes(
         id: "#{@entry.public_id}-twitter",
+        kind: ::Image.kinds[:poster],
         preset_name: "twitter",
         image_urls: [],
         provider: ::Image.providers[:entry_link_preview],

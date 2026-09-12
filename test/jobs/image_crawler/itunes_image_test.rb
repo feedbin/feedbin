@@ -21,6 +21,7 @@ module ImageCrawler
       args = Pipeline::Find.jobs.last["args"].first
       assert_equal "#{@entry.public_id}-itunes", args["id"]
       assert_equal "podcast", args["preset_name"]
+      assert_equal ::Image.kinds[:cover_art], args["kind"]
       assert_equal ["http://example.com/cover.jpg"], args["image_urls"]
     end
 
