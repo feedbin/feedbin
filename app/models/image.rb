@@ -66,6 +66,20 @@ class Image < ApplicationRecord
   # an icon crawl cannot dedupe onto an entry-preview row.
   scope :entry_owned, -> { where(provider: %i[entry_link_preview entry_preview entry_icon]) }
 
+  # The website_favicon rows for the hosts of a collection's Pages entries,
+  # keyed by lower-cased host. Pages entries key on their own host rather
+  # than the feed's, so no feed preload reaches them; the entry list
+  # resolves the whole page in one query and hands the map down as a local.
+  def self.favicons_for_entries(entries)
+    hosts = Array(entries).filter_map { it.hostname&.downcase if it.feed&.pages? }.uniq
+    return {} if hosts.empty?
+    found = provider_website_favicon.where(provider_id: hosts).index_by(&:provider_id)
+    # favicons fallback: remove with the favicons table
+    missing = hosts - found.keys
+    found.merge!(Favicon.where(host: missing).index_by(&:host)) if missing.any?
+    found
+  end
+
   before_save :fingerprint_url
 
   # Identity is (url, variant): one URL rendered at two sizes is two stored

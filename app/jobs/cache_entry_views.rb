@@ -15,7 +15,7 @@ class CacheEntryViews
   def cache_views
     entry_ids = dequeue_ids(SET_NAME)
     entries = Entry.where(id: entry_ids).with_list_associations.to_a
-    favicons = Favicon.for_entries(entries)
+    favicons = Image.favicons_for_entries(entries)
 
     # The same invocation the entry list renders with, or this warms keys
     # nothing ever looks up.

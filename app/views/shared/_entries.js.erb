@@ -4,7 +4,7 @@ var callback = function() {
     <% elsif @entries.length == 0 %>
         var entries = "<%= j render partial: "entries/no_entry" %>";
     <% else %>
-        <% favicons = Favicon.for_entries(@entries) %>
+        <% favicons = Image.favicons_for_entries(@entries) %>
         var entries = "<%= j render EntriesHelper.entry_collection(@entries, favicons) %>";
     <% end %>
 

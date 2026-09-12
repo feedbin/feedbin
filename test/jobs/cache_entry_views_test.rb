@@ -32,7 +32,7 @@ class CacheEntryViewsTest < ActiveSupport::TestCase
     feed = Feed.create!(feed_url: "https://pages.example/x", host: "pages.example", title: "P", feed_type: :pages)
     entry = create_entry(feed)
     entry.update!(url: "http://site.example.com/article")
-    Favicon.create!(host: "site.example.com", url: "http://example.com/a.png")
+    create_favicon_row("site.example.com")
 
     CacheEntryViews.new.perform(entry.id)
 
@@ -52,7 +52,7 @@ class CacheEntryViewsTest < ActiveSupport::TestCase
     entry = captured[:collection].first
     favicons = captured[:locals][:favicons]
 
-    assert_equal Favicon.for_entries([entry]), favicons
+    assert_equal Image.favicons_for_entries([entry]), favicons
     refute_empty favicons, "fixture must exercise the Pages branch where favicons is load-bearing"
     assert_respond_to captured[:cached], :call
     assert_equal EntriesHelper.entries_cache_key(entry, favicons), captured[:cached].call(entry)

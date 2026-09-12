@@ -266,4 +266,44 @@ class ImageTest < ActiveSupport::TestCase
       assert_nil row.public_url
     end
   end
+
+  # Pages entries key on their own host, so no feed preload reaches them:
+  # the entry list resolves the whole collection in one query and hands the
+  # map down as a local. Keyed by lower-cased host, whatever case the entry
+  # url carries. favicons fallback: hosts with no row read the legacy row.
+  test "favicons_for_entries maps pages hosts to their rows in one query" do
+    feed = Feed.create!(feed_url: "https://pages.example/x", host: "pages.example", title: "P", feed_type: :pages)
+    entries = 3.times.map { |index|
+      create_entry(feed).tap { it.update!(url: "http://Site#{index}.example.com/article") }
+    }
+    rows = entries.map { create_favicon_row(it.hostname.downcase) }
+    legacy_entry = create_entry(feed).tap { it.update!(url: "http://legacy.example.com/article") }
+    legacy = Favicon.create!(host: "legacy.example.com", url: "http://example.com/legacy.png")
+
+    map = nil
+    statements = capture_sql { map = Image.favicons_for_entries(entries + [legacy_entry]) }
+
+    assert_equal rows, entries.map { map[it.hostname.downcase] }
+    assert_equal legacy, map["legacy.example.com"]
+    assert_equal 1, statements.count { it.match?(/FROM "images"/i) }
+    assert_equal 1, statements.count { it.match?(/FROM "favicons"/i) }
+  end
+
+  test "favicons_for_entries skips the legacy lookup when every host has a row" do
+    feed = Feed.create!(feed_url: "https://pages.example/y", host: "pages.example", title: "P", feed_type: :pages)
+    entry = create_entry(feed).tap { it.update!(url: "http://site.example.com/article") }
+    create_favicon_row("site.example.com")
+
+    statements = capture_sql { Image.favicons_for_entries([entry]) }
+
+    assert_empty statements.select { it.match?(/FROM "favicons"/i) }
+  end
+
+  test "favicons_for_entries ignores entries whose feed is not pages" do
+    feed = create_feeds(users(:ben)).first
+    entry = create_entry(feed)
+    create_favicon_row(entry.hostname.downcase)
+
+    assert_equal({}, Image.favicons_for_entries([entry]))
+  end
 end
