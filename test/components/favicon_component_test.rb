@@ -197,6 +197,75 @@ class FaviconComponentTest < ComponentTestCase
       refute_includes output.to_s, "icon-format-square"
     end
   end
+
+  test "favicon from the images row renders the unified url with the host class" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      row = create_favicon_row(@feed.host)
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_equal %(<span class="favicon-wrap"><span class="favicon host-daringfireball-net" style="background-image: url(https://images.example.com/#{row.storage_path});"></span></span>), output.to_s
+    end
+  end
+
+  # favicons fallback: the legacy row is second, never first.
+  test "the images row outranks the favicons row" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      Favicon.create!(url: "http://example.com/favicon.ico", host: @feed.host)
+      row = create_favicon_row(@feed.host)
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_includes output.to_s, "https://images.example.com/#{row.storage_path}"
+      refute_includes output.to_s, "favicons.example.com"
+    end
+  end
+
+  # The entry's host is lower-cased before the lookup and the class.
+  test "pages article favicon from the images row" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      @feed.pages!
+      entry = create_entry(@feed)
+      entry.update!(url: "http://Example.com/article")
+      row = create_favicon_row("example.com")
+
+      output = render FaviconComponent.new(feed: @feed, entry: entry)
+
+      assert_equal %(<span class="favicon-wrap"><span class="favicon host-example-com" style="background-image: url(https://images.example.com/#{row.storage_path});"></span></span>), output.to_s
+    end
+  end
+
+  # The map is the collection-wide lookup; a caller that hands one in must
+  # never trigger a per-entry query. provider_parent_id is set at create
+  # from the entry's first url, so it is cleared here, and the feed is
+  # loaded with its icon rows preloaded: what remains is the pages lookup.
+  test "pages article favicon reads the map when one is given" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      @feed.pages!
+      entry = create_entry(@feed)
+      entry.update!(url: "http://example.com/article", provider_parent_id: nil)
+      feed = Feed.includes(*Feed::ICON_PRELOADS).find(@feed.id)
+      row = create_favicon_row("example.com")
+
+      output = nil
+      statements = capture_sql do
+        output = render FaviconComponent.new(feed: feed, entry: entry, favicons: {"example.com" => row})
+      end
+
+      assert_includes output.to_s, row.storage_path
+      assert_empty statements.select { it.match?(/FROM "images"|FROM "favicons"/i) }
+    end
+  end
+
+  test "an images row with no unified host renders the generated favicon" do
+    with_env("UNIFIED_IMAGE_HOST" => nil) do
+      create_favicon_row(@feed.host)
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_includes output.to_s, "favicon-default"
+    end
+  end
   private
 
   def create_embed_icon(channel_id)

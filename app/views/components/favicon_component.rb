@@ -19,8 +19,8 @@ class FaviconComponent < ApplicationComponent
       icon_pages
     elsif @feed.pages?
       icon_pages_default
-    elsif @feed.favicon&.cdn_url
-      icon_favicon(@feed.favicon)
+    elsif (favicon_url = @feed.site_favicon&.public_url)
+      icon_favicon(favicon_url, @feed.host)
     else
       icon_generated
     end
@@ -75,10 +75,12 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
+  # A Pages entry keys on its own host, lower-cased, not the feed's.
   def icon_pages
-    icon = pages_favicon
-    if icon&.cdn_url
-      icon_favicon(icon)
+    host = @entry.hostname&.downcase
+    favicon_url = pages_favicon(host)&.public_url
+    if favicon_url
+      icon_favicon(favicon_url, host)
     else
       icon_pages_default
     end
@@ -88,12 +90,12 @@ class FaviconComponent < ApplicationComponent
   # back to a lookup for the callers that render one entry on its own.
   #
   # host is nullable, so an entry whose url will not parse would otherwise
-  # query host IS NULL and bind to an unrelated row.
-  def pages_favicon
-    hostname = @entry.hostname
-    return nil if hostname.blank?
-    return @favicons[hostname] if @favicons
-    Favicon.find_by_host(hostname)
+  # query provider_id IS NULL and bind to an unrelated row.
+  def pages_favicon(host)
+    return nil if host.blank?
+    return @favicons[host] if @favicons
+    Image.provider_website_favicon.find_by(provider_id: host) ||
+      Favicon.find_by(host: host) # favicons fallback: remove with the favicons table
   end
 
   def icon_pages_default
@@ -102,10 +104,18 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
-  def icon_favicon(favicon)
+  # The host comes from the feed or the entry, never from the record: an
+  # images row is keyed by host in provider_id and a favicons row in host,
+  # and the class must not care which record it got.
+  def icon_favicon(url, host)
     span class: "favicon-wrap" do
-      span class: "favicon #{favicon.host_class}", style: "background-image: url(#{favicon.cdn_url});"
+      span class: "favicon #{host_class(host)}", style: "background-image: url(#{url});"
     end
+  end
+
+  # application.scss keys on .host-feedbin-com and .host-twitter-com.
+  def host_class(host)
+    "host-#{host}".parameterize
   end
 
   def icon_generated
