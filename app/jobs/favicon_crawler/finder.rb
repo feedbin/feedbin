@@ -6,77 +6,40 @@ module FaviconCrawler
     ICON_NAMES = ["shortcut icon", "icon", "apple-touch-icon", "apple-touch-icon-precomposed"]
     TOUCH_ICON_NAMES = ["apple-touch-icon", "apple-touch-icon-precomposed"]
 
-    def perform(host, force = false)
-      @favicon = Favicon.unscoped.where(host: host).first_or_initialize
-      @force = force
-      update if should_update?
+    # At most one crawl per host per hour, whatever the number of subscribe
+    # events. A Redis key rather than a row timestamp: images.updated_at is
+    # a content version that moves only when the bytes move, so it cannot
+    # say when a host was last checked, and the favicons row is no longer
+    # written.
+    GATE = 1.hour
+
+    # force skips the gate: the manual refresh in settings passes true. The
+    # pipeline still decides on bytes, so force never re-uploads an
+    # unchanged icon. critical false keeps a caller's pipeline stages off
+    # the critical queues; nothing passes it today, it exists so a future
+    # sweep cannot land on the critical queues by omission.
+    def perform(host, force = false, critical = true)
+      @host = host.to_s.downcase
+      return if @host.blank?
+
+      unless force || RedisLock.acquire("favicon_crawl:#{@host}", GATE.to_i)
+        Librato.increment("favicon.gated")
+        return
+      end
+
+      schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls, critical)
+      schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls, critical)
+      Librato.increment("favicon.crawl")
     end
 
     private
 
-    def update
-      downloaded = []
-      new_favicon = nil
-      all_favicon_urls.each do |url|
-        response = download_favicon(url)
-        next if response.blank?
-        downloaded.push(response.path)
-        break if response.not_modified?
-        resized = Image.resize(response.path)
-        next if resized.blank?
-        downloaded.push(resized)
-
-        new_favicon = {resized: resized, original: response.path, response: response}
-
-        break
-      end
-
-      schedule_pipeline
-
-      return unless new_favicon.present?
-
-      processor = Processor.new(new_favicon, @favicon.host)
-      if @force || @favicon.data["favicon_hash"] != processor.favicon_hash
-        processor.call
-        return if processor.favicon_url.nil?
-        @favicon.favicon = processor.encoded_favicon
-        @favicon.url = processor.favicon_url
-        @favicon.data = {
-          "favicon_hash"  => processor.favicon_hash,
-          "Etag"          => new_favicon[:response].etag,
-          "Last-Modified" => new_favicon[:response].last_modified
-        }
-        Librato.increment("favicon.updated")
-      end
-
-      @favicon.save
-    # Every url that got as far as a file on disk, not just the one that won:
-    # a candidate rejected for being unreadable, or a 304 arriving before any
-    # resize, has already been written to the worker's tmpdir by then.
-    ensure
-      downloaded.each do |file|
-        File.unlink(file)
-      rescue Errno::ENOENT
-      end
-    end
-
-    # Dual-store: the favicons row and legacy object keep being written
-    # unchanged while the shared pipeline writes an images row and unified
-    # object alongside. Two schedules because the presets render at different
-    # sizes from different candidate lists, and they must stay separate
-    # providers (unchanged? keys on the row's original_fingerprint).
-    #
-    # Rescued because this sits mid-`update`: an enqueue failure here would
-    # abort the legacy write below, which is still the store readers use.
-    # Do not tighten into a raise while that ordering holds.
-    def schedule_pipeline
-      schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls)
-      schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls)
-    rescue => exception
-      Sidekiq.logger.info "schedule_pipeline exception=#{exception.inspect} host=#{@favicon.host}"
-    end
-
-    def schedule_icon(preset_name, provider, urls)
+    # Two schedules because the presets render at different sizes from
+    # different candidate lists, and they must stay separate providers
+    # (Pipeline::Find#unchanged? keys on the row's original_fingerprint).
+    # The pipeline walks the candidates in order and decides on bytes; the
+    # crawler downloads nothing itself.
+    def schedule_icon(preset_name, provider, urls, critical)
       # .uniq(&:to_s): the list mixes Addressable::URI and URI::HTTP --
       # equal by string, distinct classes, invisible to a bare .uniq.
       urls = urls.uniq(&:to_s)
@@ -84,12 +47,13 @@ module FaviconCrawler
 
       # Both presets are pictures of the site; only the rendering differs.
       image = ImageCrawler::Image.new_with_attributes(
-        id: "#{@favicon.host}-#{preset_name}",
+        id: "#{@host}-#{preset_name}",
         kind: ::Image.kinds[:site_icon],
         preset_name: preset_name,
         image_urls: urls.map(&:to_s),
         provider: provider,
-        provider_id: @favicon.host
+        provider_id: @host,
+        critical: critical
       )
       ImageCrawler::Pipeline::Find.perform_async(image.to_h)
     end
@@ -118,7 +82,7 @@ module FaviconCrawler
             [it["rel"].to_s.strip.downcase, Addressable::URI.join(homepage.uri, it["href"])]
           }
       rescue => exception
-        Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@favicon.host}"
+        Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@host}"
         []
       end
     end
@@ -134,35 +98,12 @@ module FaviconCrawler
     end
 
     def default_favicon_location
-      URI::HTTP.build(host: @favicon.host, path: "/favicon.ico")
+      URI::HTTP.build(host: @host, path: "/favicon.ico")
     end
 
     def download_homepage
-      url = URI::HTTP.build(host: @favicon.host)
+      url = URI::HTTP.build(host: @host)
       HTTP.timeout(write: 5, connect: 5, read: 5).follow.get(url)
-    end
-
-    def download_favicon(url)
-      options = {}.tap do |hash|
-        hash[:user_agent] = "Mozilla/5.0"
-        # unless @force
-        #   hash[:etag]          = @favicon.data["Etag"]
-        #   hash[:last_modified] = @favicon.data["Last-Modified"]
-        # end
-      end
-      Feedkit::Request.download(url.to_s, **options)
-    rescue Feedkit::Error => exception
-      Sidekiq.logger.info "download_favicon exception=#{exception.inspect} url=#{url}"
-      nil
-    end
-
-    def should_update?
-      return true if @force
-      !updated_recently?
-    end
-
-    def updated_recently?
-      @favicon.updated_at && @favicon.updated_at.after?(1.hour.ago)
     end
 
     def xpath

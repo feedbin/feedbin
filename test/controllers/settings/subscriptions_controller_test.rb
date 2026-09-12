@@ -121,6 +121,8 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
       post :refresh_favicon, params: {id: subscription}, xhr: true
       assert_response :success
     end
+    # An explicit refresh skips the crawler's one-hour gate.
+    assert_equal [subscription.feed.host, true], FaviconCrawler::Finder.jobs.last["args"]
   end
 
   test "should unsubscribe from newsletter" do

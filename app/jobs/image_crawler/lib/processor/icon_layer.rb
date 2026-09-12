@@ -6,7 +6,7 @@ module ImageCrawler
     # white padding around a smaller real icon. Reject those and take the
     # largest of what is left.
     #
-    # Shared with FaviconCrawler::Image so the heuristics cannot drift.
+    # Once shared with the legacy FaviconCrawler::Image; the pipeline is the only caller now.
     class IconLayer
       INVALID_COLORS = [
         -> (color) { color.nil? },

@@ -3,249 +3,173 @@ require "test_helper"
 module FaviconCrawler
   class FinderTest < ActiveSupport::TestCase
     setup do
+      flush_redis
       @page_url = URI.parse("http://example.com")
-      @icon_url = @page_url.dup
-      @icon_url.path = "/icons/favicon.ico"
       @default_url = @page_url.dup
       @default_url.path = "/favicon.ico"
     end
 
-    test "should get favicon from icon link" do
-      body = <<-eot
-      <html>
-          <head>
-              <link rel="icon" href="#{@icon_url.path}">
-          </head>
-      </html>
-      eot
+    ONE_ICON = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
 
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
-
-      stub_request_file("favicon.ico", @icon_url)
-
-      Finder.new.perform(@page_url.host)
-
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+    def find_jobs
+      ImageCrawler::Pipeline::Find.jobs.map { it["args"].first }
     end
 
-    test "should get favicon from shortcut icon link" do
-      body = <<-eot
-      <html>
-          <head>
-              <link rel="shortcut icon" href="#{@icon_url}">
-          </head>
-      </html>
-      eot
-
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
-
-      stub_request_file("favicon.ico", @icon_url)
-
-      Finder.new.perform(@page_url.host)
-
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+    def stub_homepage(body = ONE_ICON)
+      stub_request(:get, @page_url).to_return(body: body, status: 200)
     end
 
-    test "should get favicon from default location" do
-      body = <<-eot
-      <html>
-          <head>
-          </head>
-      </html>
-      eot
+    # Dual-store is over: the crawler discovers and schedules, and the
+    # pipeline downloads and decides. Nothing here writes a favicons row.
+    test "schedules both presets from one crawl, keyed by host" do
+      stub_homepage(<<~HTML)
+        <html><head>
+          <link rel="icon" href="/icon-32.png">
+          <link rel="apple-touch-icon" href="/touch-180.png">
+        </head></html>
+      HTML
 
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +2 do
+        Finder.new.perform(@page_url.host)
+      end
 
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
+      favicon = find_jobs.find { it["preset_name"] == "favicon" }
+      touch   = find_jobs.find { it["preset_name"] == "touch_icon" }
 
-      stub_request_file("favicon.ico", @default_url)
+      assert_equal ::Image.providers[:website_favicon], favicon["provider"]
+      assert_equal ::Image.kinds[:site_icon], favicon["kind"]
+      assert_equal "example.com", favicon["provider_id"]
+      assert_equal true, favicon["critical"]
+      assert_equal ["http://example.com/icon-32.png", "http://example.com/touch-180.png", "http://example.com/favicon.ico"], favicon["image_urls"]
 
-      Finder.new.perform(@page_url.host)
+      assert_equal ::Image.providers[:website_touch_icon], touch["provider"]
+      assert_equal ::Image.kinds[:site_icon], touch["kind"]
+      assert_equal "example.com", touch["provider_id"]
+      assert_equal ["http://example.com/touch-180.png"], touch["image_urls"]
 
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+      assert_nil Favicon.unscoped.find_by(host: @page_url.host)
+      assert_not_requested :get, "http://example.com/icon-32.png"
+      assert_not_requested :get, "http://example.com/touch-180.png"
+      assert_not_requested :get, @default_url
     end
 
-    test "should prefer larger favicon" do
-      body = <<-eot
-      <html>
-          <head>
-            <link rel="icon" type="image/png" sizes="32x32" href="/not_me_1" media="(prefers-color-scheme: light)"/>
-            <link rel="icon" type="image/png" sizes="64x64" href="/pick_me" media="(prefers-color-scheme: light)"/>
-            <link rel="icon" type="image/png" sizes="128x128" href="/not_me_2" media="(prefers-color-scheme: dark)"/>
-            <link rel="apple-touch-icon" type="image/png" sizes="128x128" href="/not_me_3" media="(prefers-color-scheme: light)"/>
-          </head>
-      </html>
-      eot
+    test "schedules only the favicon preset when the host advertises no touch icon" do
+      stub_homepage
 
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
+        Finder.new.perform(@page_url.host)
+      end
 
-
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
-
-
-      stub_request_file("favicon.ico", "http://example.com/pick_me")
-
-      Finder.new.perform(@page_url.host)
-
-      assert_requested :get, "http://example.com/pick_me"
-
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+      assert_equal "favicon", find_jobs.last["preset_name"]
     end
 
-    test "should skip blank favicon" do
-      body = <<-eot
-      <html>
-          <head>
-          </head>
-      </html>
-      eot
-
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
-
-      stub_request_file("favicon-blank.ico", @default_url)
-
-      Finder.new.perform(@page_url.host)
-
-      assert_nil Favicon.unscoped.where(host: @page_url.host).take
-    end
-
-    test "should fall through to default location when homepage download errors" do
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-
-      stub_request(:get, @page_url)
-        .to_timeout
-
-      stub_request_file("favicon.ico", @default_url)
+    test "schedules the default location when the homepage cannot be fetched" do
+      stub_request(:get, @page_url).to_timeout
 
       assert_nothing_raised do
         Finder.new.perform(@page_url.host)
       end
 
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+      assert_equal 1, find_jobs.size
+      assert_equal ["http://example.com/favicon.ico"], find_jobs.last["image_urls"]
     end
 
-    test "should fall through to default location when icon download errors" do
-      body = <<-eot
-      <html>
-          <head>
-              <link rel="icon" href="#{@icon_url.path}">
-          </head>
-      </html>
-      eot
-
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
-
-      stub_request(:get, @icon_url)
-        .to_return(status: 429)
-
-      stub_request_file("favicon.ico", @default_url)
-
-      assert_nothing_raised do
-        Finder.new.perform(@page_url.host)
-      end
-
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
-    end
-
-    test "should skip a favicon that is not an image and keep looking" do
-      body = <<-eot
-      <html>
-          <head>
-              <link rel="icon" href="#{@icon_url.path}">
-          </head>
-      </html>
-      eot
-
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
-
-      # PostScript reaches Ghostscript if it gets as far as magickload
-      stub_request(:get, @icon_url)
-        .to_return(body: "%!PS-Adobe-3.0\n/Times findfont", status: 200)
-
-      stub_request_file("favicon.ico", @default_url)
+    # A host advertising /favicon.ico yields that URL twice (discovered +
+    # default fallback); schedule_icon dedupes on the string form.
+    test "schedule_icon dedupes candidates that resolve to the same url" do
+      stub_homepage(%(<html><head><link rel="icon" href="/favicon.ico"></head></html>))
 
       Finder.new.perform(@page_url.host)
 
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
+      assert_equal ["http://example.com/favicon.ico"], find_jobs.last["image_urls"]
     end
 
-    # The crawl runs across the whole host table on a schedule, so anything it
-    # leaves in the worker's tmpdir accumulates on every box until something
-    # else sweeps /tmp.
-    test "should remove the files it downloaded and resized" do
-      body = <<-eot
-      <html>
-          <head>
-              <link rel="icon" href="#{@icon_url.path}">
-          </head>
-      </html>
-      eot
+    test "the host is lower-cased before anything keys on it" do
+      stub_homepage
 
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+      Finder.new.perform("Example.COM")
 
-      stub_request(:get, @page_url)
-        .to_return(body: body, status: 200)
+      assert_equal "example.com", find_jobs.last["provider_id"]
+      assert_equal "example.com-favicon", find_jobs.last["id"]
+      assert_requested :get, @page_url
+    end
 
-      stub_request_file("favicon.ico", @icon_url)
+    test "a blank host schedules nothing" do
+      Finder.new.perform(nil)
+      Finder.new.perform("")
 
-      downloaded = nil
-      build_processor = Processor.method(:new)
-      capture = ->(favicon, host) {
-        downloaded = favicon
-        build_processor.call(favicon, host)
-      }
+      assert_empty ImageCrawler::Pipeline::Find.jobs
+    end
 
-      Processor.stub(:new, capture) do
+    # One crawl per host per hour, whatever the number of subscribe events.
+    test "the gate admits one crawl per host per hour" do
+      stub_homepage
+
+      Finder.new.perform(@page_url.host)
+      Finder.new.perform(@page_url.host)
+
+      assert_equal 1, ImageCrawler::Pipeline::Find.jobs.size
+      assert_requested :get, @page_url, times: 1
+
+      ttl = Sidekiq.redis { it.ttl("favicon_crawl:example.com") }
+      assert_operator ttl, :>, 0
+      assert_operator ttl, :<=, Finder::GATE.to_i
+    end
+
+    test "the gate is per host" do
+      stub_homepage
+      stub_request(:get, "http://other.example.com").to_return(body: ONE_ICON, status: 200)
+
+      Finder.new.perform(@page_url.host)
+      Finder.new.perform("other.example.com")
+
+      assert_equal 2, ImageCrawler::Pipeline::Find.jobs.size
+    end
+
+    test "force skips the gate" do
+      stub_homepage
+
+      Finder.new.perform(@page_url.host)
+      Finder.new.perform(@page_url.host, true)
+
+      assert_equal 2, ImageCrawler::Pipeline::Find.jobs.size
+    end
+
+    test "a crawl and a gated crawl each count once" do
+      stub_homepage
+      counted = []
+
+      Librato.stub(:increment, ->(name, *) { counted << name }) do
+        Finder.new.perform(@page_url.host)
         Finder.new.perform(@page_url.host)
       end
 
-      assert_not_nil downloaded, "the crawl should have found a favicon to process"
-      assert_not File.exist?(downloaded[:original]), "the downloaded favicon should not be left on disk"
-      assert_not File.exist?(downloaded[:resized].to_path), "the resized favicon should not be left on disk"
+      assert_equal ["favicon.crawl", "favicon.gated"], counted
     end
 
-    test "should not save a favicon when nothing served is an image" do
-      stub_request(:get, @page_url)
-        .to_return(body: "<html><head></head></html>", status: 200)
+    test "critical false rides into the pipeline payload" do
+      stub_homepage
 
-      stub_request(:get, @default_url)
-        .to_return(body: "%PDF-1.4\n1 0 obj", status: 200)
+      Finder.new.perform(@page_url.host, false, false)
 
-      Finder.new.perform(@page_url.host)
+      assert_equal false, find_jobs.last["critical"]
+    end
 
-      assert_nil Favicon.unscoped.where(host: @page_url.host).take
+    # The legacy write this rescue once protected is gone. An enqueue
+    # failure is the job's failure: retry: false, logged by Sidekiq.
+    test "an enqueue failure raises" do
+      stub_homepage
+
+      ImageCrawler::Pipeline::Find.stub(:perform_async, ->(*) { raise "redis hiccup" }) do
+        assert_raises(RuntimeError) { Finder.new.perform(@page_url.host) }
+      end
     end
 
     # Ordering is load-bearing: the first candidate that yields a usable
     # image wins. Four distinct rel values, so this pins only the
     # rel-position ordering and the /favicon.ico fallback.
     test "all_favicon_urls keeps its ordering and its default fallback" do
-      body = <<~HTML
+      stub_homepage(<<~HTML)
         <html><head>
           <link rel="apple-touch-icon" href="/touch-180.png" sizes="180x180">
           <link rel="icon" href="/icon-32.png" sizes="32x32">
@@ -253,10 +177,9 @@ module FaviconCrawler
           <link rel="apple-touch-icon-precomposed" href="/touch-old.png">
         </head></html>
       HTML
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
 
       finder = Finder.new
-      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+      finder.instance_variable_set(:@host, @page_url.host)
 
       assert_equal [
         "http://example.com/shortcut.ico",
@@ -268,17 +191,16 @@ module FaviconCrawler
     end
 
     test "touch_icon_urls is the apple subset in the same order, with no default fallback" do
-      body = <<~HTML
+      stub_homepage(<<~HTML)
         <html><head>
           <link rel="apple-touch-icon" href="/touch-180.png" sizes="180x180">
           <link rel="icon" href="/icon-32.png" sizes="32x32">
           <link rel="apple-touch-icon-precomposed" href="/touch-old.png">
         </head></html>
       HTML
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
 
       finder = Finder.new
-      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+      finder.instance_variable_set(:@host, @page_url.host)
 
       assert_equal [
         "http://example.com/touch-180.png",
@@ -287,11 +209,10 @@ module FaviconCrawler
     end
 
     test "touch_icon_urls is empty when the host advertises no touch icon" do
-      body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
+      stub_homepage
 
       finder = Finder.new
-      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+      finder.instance_variable_set(:@host, @page_url.host)
 
       assert_empty finder.send(:touch_icon_urls)
     end
@@ -299,11 +220,10 @@ module FaviconCrawler
     # One page fetch, two lists. Deriving them separately would double the
     # homepage traffic for every crawl.
     test "the homepage is fetched once even when both lists are read" do
-      body = %(<html><head><link rel="apple-touch-icon" href="/touch.png"></head></html>)
-      request = stub_request(:get, @page_url).to_return(body: body, status: 200)
+      request = stub_homepage(%(<html><head><link rel="apple-touch-icon" href="/touch.png"></head></html>))
 
       finder = Finder.new
-      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+      finder.instance_variable_set(:@host, @page_url.host)
       finder.send(:all_favicon_urls)
       finder.send(:touch_icon_urls)
 
@@ -316,114 +236,11 @@ module FaviconCrawler
       request = stub_request(:get, @page_url).to_timeout
 
       finder = Finder.new
-      finder.instance_variable_set(:@favicon, Favicon.new(host: @page_url.host))
+      finder.instance_variable_set(:@host, @page_url.host)
 
       assert_equal ["http://example.com/favicon.ico"], finder.send(:all_favicon_urls).map(&:to_s)
       assert_empty finder.send(:touch_icon_urls)
       assert_requested request, times: 1
-    end
-
-    # Dual-store: the legacy favicons row and its stored object keep being written
-    # exactly as before, and the pipeline produces an images row and a unified
-    # object alongside. Nothing reads the new rows until a later phase.
-    test "schedules both presets from one crawl, keyed by host" do
-      body = <<~HTML
-        <html><head>
-          <link rel="icon" href="/icon-32.png">
-          <link rel="apple-touch-icon" href="/touch-180.png">
-        </head></html>
-      HTML
-      stub_request(:any, %r{s3\.amazonaws\.com})
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
-      stub_request_file("favicon.ico", "http://example.com/icon-32.png")
-      stub_request_file("favicon.ico", "http://example.com/touch-180.png")
-      stub_request_file("favicon.ico", @default_url)
-
-      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +2 do
-        Finder.new.perform(@page_url.host)
-      end
-
-      jobs = ImageCrawler::Pipeline::Find.jobs.last(2).map { it["args"].first }
-      favicon = jobs.find { it["preset_name"] == "favicon" }
-      touch   = jobs.find { it["preset_name"] == "touch_icon" }
-
-      assert_equal ::Image.providers[:website_favicon], favicon["provider"]
-      assert_equal ::Image.kinds[:site_icon], favicon["kind"]
-      assert_equal "example.com", favicon["provider_id"]
-      assert_includes favicon["image_urls"], "http://example.com/icon-32.png"
-
-      assert_equal ::Image.providers[:website_touch_icon], touch["provider"]
-      assert_equal ::Image.kinds[:site_icon], touch["kind"]
-      assert_equal "example.com", touch["provider_id"]
-      assert_equal ["http://example.com/touch-180.png"], touch["image_urls"]
-    end
-
-    test "schedules only the favicon preset when the host advertises no touch icon" do
-      body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
-      stub_request(:any, %r{s3\.amazonaws\.com})
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
-      stub_request_file("favicon.ico", "http://example.com/icon-32.png")
-      stub_request_file("favicon.ico", @default_url)
-
-      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
-        Finder.new.perform(@page_url.host)
-      end
-
-      assert_equal "favicon", ImageCrawler::Pipeline::Find.jobs.last["args"].first["preset_name"]
-    end
-
-    # The pipeline fetches and decides for itself; gating it on legacy
-    # success would keep a host whose legacy resize fails from ever
-    # accumulating a row.
-    test "schedules the pipeline even when the legacy path finds nothing usable" do
-      body = %(<html><head><link rel="icon" href="/icon-32.png"></head></html>)
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
-      stub_request(:get, "http://example.com/icon-32.png").to_return(body: "not an image", status: 200)
-      stub_request(:get, @default_url).to_return(status: 404, body: "")
-
-      assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
-        Finder.new.perform(@page_url.host)
-      end
-
-      assert_nil Favicon.unscoped.find_by(host: @page_url.host)&.url,
-        "the legacy path genuinely found nothing, which is the point of this test"
-    end
-
-    # schedule_pipeline sits mid-`update`: an unrescued enqueue failure
-    # would take out the legacy write below it.
-    test "still writes the legacy favicon row when scheduling the pipeline raises" do
-      body = <<~HTML
-        <html><head>
-          <link rel="icon" href="/icon-32.png">
-        </head></html>
-      HTML
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
-      stub_request_file("favicon.ico", "http://example.com/icon-32.png")
-
-      ImageCrawler::Pipeline::Find.stub(:perform_async, ->(*) { raise "redis hiccup" }) do
-        assert_nothing_raised do
-          Finder.new.perform(@page_url.host)
-        end
-      end
-
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
-    end
-
-    # A host advertising /favicon.ico yields that URL twice (discovered +
-    # default fallback); schedule_icon dedupes on the string form.
-    test "schedule_icon dedupes candidates that resolve to the same url" do
-      body = %(<html><head><link rel="icon" href="/favicon.ico"></head></html>)
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:get, @page_url).to_return(body: body, status: 200)
-      stub_request_file("favicon.ico", @default_url)
-
-      Finder.new.perform(@page_url.host)
-
-      favicon_job = ImageCrawler::Pipeline::Find.jobs.last["args"].first
-      assert_equal ["http://example.com/favicon.ico"], favicon_job["image_urls"]
     end
   end
 end

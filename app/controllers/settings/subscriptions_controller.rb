@@ -57,7 +57,7 @@ class Settings::SubscriptionsController < ApplicationController
   def refresh_favicon
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
-    FaviconCrawler::Finder.perform_async(@subscription.feed.host)
+    FaviconCrawler::Finder.perform_async(@subscription.feed.host, true)
     flash[:notice] = "Favicon will be refreshed shortly"
     flash.discard
     render "settings/subscriptions/update"
