@@ -251,4 +251,19 @@ class ImageTest < ActiveSupport::TestCase
     assert_nil Image.check_unified_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "images", "UNIFIED_IMAGE_HOST" => "https://images.example.com"})
     assert_nil Image.check_unified_config!(env: development, vars: {})
   end
+
+  # The icon family's readers call public_url on whatever record resolved
+  # (an images row, or a favicons row during the cutover) and never inspect
+  # its class. Nil until UNIFIED_IMAGE_HOST is set, like unified_url.
+  test "public_url is the unified url of the storage path" do
+    row = create_image_row
+
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      assert_equal "https://images.example.com/#{row.storage_path}", row.public_url
+    end
+
+    with_env("UNIFIED_IMAGE_HOST" => nil) do
+      assert_nil row.public_url
+    end
+  end
 end

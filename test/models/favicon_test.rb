@@ -21,4 +21,14 @@ class FaviconTest < ActiveSupport::TestCase
 
     assert_empty Sidekiq::Worker.jobs
   end
+
+  # favicons fallback: remove with the favicons table. The same name as
+  # Image#public_url, so a reader resolves either record and never asks
+  # which one it got.
+  test "public_url is the cdn url" do
+    favicon = Favicon.create!(host: "example.com", url: "http://example.com/favicon.ico")
+
+    assert_equal "https://favicons.example.com/favicon.ico", favicon.public_url
+    assert_equal favicon.cdn_url, favicon.public_url
+  end
 end

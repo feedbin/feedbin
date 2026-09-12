@@ -32,4 +32,9 @@ class Favicon < ApplicationRecord
       end
     end
   end
+
+  # favicons fallback: remove with the favicons table
+  def public_url
+    cdn_url
+  end
 end

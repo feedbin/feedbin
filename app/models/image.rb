@@ -174,6 +174,14 @@ class Image < ApplicationRecord
     end
   end
 
+  # The public URL of the stored object, or nil until UNIFIED_IMAGE_HOST is
+  # set. The icon family's readers call this on whatever record resolved and
+  # never the class method, so a Favicon row, which answers the same name,
+  # can stand in during the favicons cutover.
+  def public_url
+    self.class.unified_url(storage_path)
+  end
+
   private
 
   def fingerprint_url
