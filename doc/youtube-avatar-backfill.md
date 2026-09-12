@@ -38,6 +38,15 @@ shared `crawl_images` queue. Two things follow:
   the URL during the first hour and compare it with `attempting image
   candidate` for the same period.
 
+Past `Find`, the backfill cannot hold live images back. `ChannelImage.schedule`
+marks a backfill image `critical: false`, so its `Process` and `Upload` jobs
+run on `process_<host>` and `crawl_<host>`. A live image (every other caller,
+including the harvest) runs on `process_critical_<host>` and
+`crawl_critical_<host>` at weight 2, and wins most picks. The upload unit
+(`feedbin-sidekiq-upload@` in feedbin-machines) owns both crawl queues; the
+crawl unit no longer reads `crawl_<host>`. The units must be on the hosts
+before the code deploys, or live images wait on queues nobody reads.
+
 `Embed.youtube_channel` holds every channel ever harvested. This includes
 channels nobody subscribes to and channels with no remaining entries. Those
 cost a download for nothing. Compare `BackfillChannelImages.pending.count`

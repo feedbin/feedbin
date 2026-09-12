@@ -3,6 +3,7 @@ module ImageCrawler
     ATTRIBUTES = %i[
       bytesize
       camo
+      critical
       download_path
       entry_url
       etag
@@ -146,7 +147,11 @@ module ImageCrawler
     # questions: the preset is the rendering recipe, kind is what the
     # picture is, which only the caller knows. Passed as ::Image.kinds[...]
     # like provider, so the payload carries the enum value.
-    def self.new_with_attributes(id:, kind:, preset_name:, image_urls:, provider:, provider_id:, **other)
+    #
+    # critical defaults to true: a live image runs on the critical queues,
+    # ahead of a backfill. Only a backfill passes false, so forgetting the
+    # flag at a new call site cannot demote live work.
+    def self.new_with_attributes(id:, kind:, preset_name:, image_urls:, provider:, provider_id:, critical: true, **other)
       arguments = Hash[binding.local_variables.map{ [it, binding.local_variable_get(it)]}]
       arguments.delete(:arguments)
       other = arguments.delete(:other)
@@ -174,6 +179,13 @@ module ImageCrawler
 
     def preset
       OpenStruct.new(PRESETS[preset_name.to_sym])
+    end
+
+    # Which queue the next stage takes. A payload from before the flag
+    # carries no key and reads as not critical: the plain queue, which is
+    # where every stage ran before, so a deploy in either direction is safe.
+    def critical?
+      critical == true
     end
 
     def validate?

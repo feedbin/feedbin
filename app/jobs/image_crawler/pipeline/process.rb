@@ -34,7 +34,7 @@ module ImageCrawler
             File.unlink(@image.processed_path) rescue Errno::ENOENT
             requeue_remaining
           else
-            Upload.perform_async(@image.to_h)
+            upload_class.perform_async(@image.to_h)
           end
         else
           requeue_remaining
@@ -54,9 +54,14 @@ module ImageCrawler
           provider_id: @image.provider_id,
           feed_id: @image.feed_id,
           page_url: @image.page_url,
-          meta_image_urls: @image.meta_image_urls
+          meta_image_urls: @image.meta_image_urls,
+          critical: @image.critical?
         )
-        FindCritical.perform_async(image.to_h)
+        (image.critical? ? FindCritical : Find).perform_async(image.to_h)
+      end
+
+      def upload_class
+        @image.critical? ? UploadCritical : Upload
       end
 
       def reuse_rejected?

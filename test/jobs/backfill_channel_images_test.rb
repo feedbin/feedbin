@@ -30,6 +30,7 @@ class BackfillChannelImagesTest < ActiveSupport::TestCase
     jobs = ImageCrawler::Pipeline::Find.jobs
     assert_equal 1, jobs.size
     assert_equal "UCplaylist", jobs.first["args"].first["provider_id"]
+    assert_equal false, jobs.first["args"].first["critical"], "a backfill image stays off the critical queues"
     assert_empty BackfillChannelImages.jobs
   end
 

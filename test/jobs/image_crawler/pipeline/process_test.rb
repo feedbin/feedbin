@@ -14,11 +14,11 @@ module ImageCrawler
 
         image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: [])
 
-        assert_difference -> { Upload.jobs.size }, +1 do
+        assert_difference -> { UploadCritical.jobs.size }, +1 do
           Process.new.perform(image.to_h)
         end
 
-        image = Image.new(Upload.jobs.first["args"].first)
+        image = Image.new(UploadCritical.jobs.first["args"].first)
 
         assert_equal(id, image.id)
         assert_equal("primary", image.preset_name)
@@ -26,6 +26,30 @@ module ImageCrawler
         assert_equal(url, image.original_url)
         assert_equal(url, image.final_url)
         assert_equal(6, image.placeholder_color.length)
+      end
+
+      # A backfill image stays on the plain queues at every stage: Upload
+      # when the candidate is good, Find when it is not.
+      def test_should_enqueue_plain_upload_and_find_for_a_non_critical_image
+        url = "http://example.com/image.jpg"
+
+        path = copy_support_file("image.jpeg")
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: [], critical: false)
+        assert_difference -> { Upload.jobs.size }, +1 do
+          assert_no_difference -> { UploadCritical.jobs.size } do
+            Process.new.perform(image.to_h)
+          end
+        end
+        assert_equal false, Upload.jobs.first["args"].first["critical"]
+
+        path = Tempfile.new.path
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: ["http://example.com/image_2.jpg"], critical: false)
+        assert_difference -> { Find.jobs.size }, +1 do
+          assert_no_difference -> { FindCritical.jobs.size } do
+            Process.new.perform(image.to_h)
+          end
+        end
+        assert_equal false, Find.jobs.first["args"].first["critical"]
       end
 
       def test_should_enqueue_find
@@ -68,11 +92,11 @@ module ImageCrawler
             original_extension: "jpeg"
           )
 
-          assert_difference -> { Upload.jobs.size }, +1 do
+          assert_difference -> { UploadCritical.jobs.size }, +1 do
             Process.new.perform(image.to_h)
           end
 
-          queued = Image.new(Upload.jobs.last["args"].first)
+          queued = Image.new(UploadCritical.jobs.last["args"].first)
           assert_equal "jpg", queued.processed_extension
           assert_equal :jpeg, ImageFormat.detect(queued.processed_path)
           assert_equal File.size(queued.processed_path), queued.bytesize
@@ -111,7 +135,7 @@ module ImageCrawler
             download_path: copy_support_file("image.jpeg"), original_extension: "jpeg"
           )
 
-          assert_no_difference -> { Upload.jobs.size } do
+          assert_no_difference -> { UploadCritical.jobs.size } do
             assert_difference -> { FindCritical.jobs.size }, +1 do
               Process.new.perform(image.to_h)
             end
@@ -143,11 +167,11 @@ module ImageCrawler
             original_extension: "unknown"
           )
 
-          assert_difference -> { Upload.jobs.size }, +1 do
+          assert_difference -> { UploadCritical.jobs.size }, +1 do
             Process.new.perform(image.to_h)
           end
 
-          queued = Image.new(Upload.jobs.last["args"].first)
+          queued = Image.new(UploadCritical.jobs.last["args"].first)
           assert_equal "png", queued.processed_extension
           assert_equal File.size(queued.processed_path), queued.bytesize
           assert_equal Digest::MD5.file(queued.processed_path).hexdigest, queued.fingerprint

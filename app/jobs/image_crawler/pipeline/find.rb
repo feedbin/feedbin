@@ -145,7 +145,7 @@ module ImageCrawler
           return true
         end
 
-        Process.perform_async(@image.to_h)
+        process_class.perform_async(@image.to_h)
         Sidekiq.logger.info @image.trace(message: "download valid", metadata: {image_url: @image.final_url})
         true
       end
@@ -207,7 +207,7 @@ module ImageCrawler
           @image.original_extension   = download.file_extension
           @image.original_fingerprint = Digest::MD5.file(@image.download_path).hexdigest
 
-          Process.perform_async(@image.to_h)
+          process_class.perform_async(@image.to_h)
           Sidekiq.logger.info @image.trace(message: "download valid", metadata: {image_url: @image.final_url})
         else
           download.delete!
@@ -236,6 +236,12 @@ module ImageCrawler
 
       def reuse_rules
         @reuse_rules ||= ReuseRules.new(@image)
+      end
+
+      # Live images run ahead of a backfill from here on. Both classes
+      # are host-local, because the downloaded file is on this disk.
+      def process_class
+        @image.critical? ? ProcessCritical : Process
       end
     end
   end

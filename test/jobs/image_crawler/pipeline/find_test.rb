@@ -58,6 +58,21 @@ module ImageCrawler
         end
       end
 
+      # A backfill image goes to the plain process queue, behind live work.
+      def test_should_enqueue_plain_process_for_a_non_critical_image
+        url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
+        stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [url], provider: 0, provider_id: 1, critical: false)
+
+        assert_difference -> { Process.jobs.size }, +1 do
+          assert_no_difference -> { ProcessCritical.jobs.size } do
+            Find.new.perform(image.to_h)
+          end
+        end
+        assert_equal false, Process.jobs.first["args"][0]["critical"]
+      end
+
       def test_should_enqueue_recognized_image
         url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
         image_url = "http://example.com/image.jpg"
@@ -67,11 +82,11 @@ module ImageCrawler
 
         image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
 
-        assert_difference -> { Process.jobs.size }, +1 do
+        assert_difference -> { ProcessCritical.jobs.size }, +1 do
           Find.new.perform(image.to_h)
         end
 
-        image = Image.new(Process.jobs.first["args"][0])
+        image = Image.new(ProcessCritical.jobs.first["args"][0])
 
         assert image.download_path
         assert_equal "https://www.youtube.com/watch?v=id", image.entry_url
@@ -97,7 +112,7 @@ module ImageCrawler
 
         Find.new.perform(image.to_h)
 
-        payload = Image.new(Process.jobs.first["args"][0])
+        payload = Image.new(ProcessCritical.jobs.first["args"][0])
         assert_equal Digest::MD5.hexdigest(body), payload.original_fingerprint
       end
 
@@ -168,7 +183,7 @@ module ImageCrawler
 
           image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
 
-          assert_difference -> { Process.jobs.size }, +1 do
+          assert_difference -> { ProcessCritical.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -207,7 +222,7 @@ module ImageCrawler
 
           refute_requested :get, og_url
           assert_requested :get, fresh_url
-          assert_equal 1, Process.jobs.size
+          assert_equal 1, ProcessCritical.jobs.size
         end
       end
 
@@ -236,7 +251,7 @@ module ImageCrawler
 
           refute_requested :get, reused_url
           assert_requested :get, fresh_url
-          assert_equal 1, Process.jobs.size
+          assert_equal 1, ProcessCritical.jobs.size
         end
       end
 
@@ -262,7 +277,7 @@ module ImageCrawler
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_difference -> { Process.jobs.size }, +1 do
+          assert_difference -> { ProcessCritical.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -298,7 +313,7 @@ module ImageCrawler
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_no_difference -> { Process.jobs.size } do
+          assert_no_difference -> { ProcessCritical.jobs.size } do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -329,7 +344,7 @@ module ImageCrawler
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_difference -> { Process.jobs.size }, +1 do
+          assert_difference -> { ProcessCritical.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -361,7 +376,7 @@ module ImageCrawler
             provider: ::Image.providers[:entry_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_no_difference -> { Process.jobs.size } do
+          assert_no_difference -> { ProcessCritical.jobs.size } do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -434,7 +449,7 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_no_difference -> { Process.jobs.size } do
+          assert_no_difference -> { ProcessCritical.jobs.size } do
             Find.new.perform(image.to_h)
           end
           assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
@@ -471,7 +486,7 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_no_difference -> { Process.jobs.size } do
+          assert_no_difference -> { ProcessCritical.jobs.size } do
             Find.new.perform(image.to_h)
           end
 
@@ -495,11 +510,11 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_difference -> { Process.jobs.size }, +1 do
+          assert_difference -> { ProcessCritical.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
 
-          queued = Process.jobs.last["args"].first
+          queued = ProcessCritical.jobs.last["args"].first
           assert_equal "\"fresh\"", queued["etag"]
           assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", queued["last_modified"]
         end
@@ -537,7 +552,7 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_no_difference -> { Process.jobs.size } do
+          assert_no_difference -> { ProcessCritical.jobs.size } do
             Find.new.perform(image.to_h)
           end
 

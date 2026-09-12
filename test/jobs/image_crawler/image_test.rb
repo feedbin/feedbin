@@ -334,5 +334,20 @@ module ImageCrawler
       refute_equal favicon.storage_path, touch.storage_path
       refute_equal favicon.provider, touch.provider
     end
+
+    # Live images take the critical queues; a backfill opts out. Absent from
+    # the payload (an older deploy) reads as not critical, which is the plain
+    # queue that every stage used before the flag existed.
+    test "new_with_attributes is critical unless told otherwise" do
+      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
+      assert image.critical?
+      assert_equal true, image.to_h[:critical]
+
+      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1, critical: false)
+      refute image.critical?
+
+      refute Image.new("id" => "a").critical?
+    end
+
   end
 end

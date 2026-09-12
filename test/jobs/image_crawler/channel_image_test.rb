@@ -144,5 +144,18 @@ module ImageCrawler
 
       assert_equal before.to_f, feed.reload.updated_at.to_f
     end
+
+    # The harvest schedules one channel at a time and is live; the backfill
+    # schedules millions and must not push live images down the queues.
+    test "schedule is critical by default and the backfill opts out" do
+      record = channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}})
+
+      ChannelImage.schedule(record)
+      assert_equal true, Pipeline::Find.jobs.last["args"].first["critical"]
+
+      ChannelImage.schedule(record, critical: false)
+      assert_equal false, Pipeline::Find.jobs.last["args"].first["critical"]
+    end
+
   end
 end

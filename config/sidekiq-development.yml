@@ -3,6 +3,7 @@
 :queues:
   - [crawl,                                  1]
   - [crawl_<%= `hostname`.strip %>,          1]
+  - [crawl_critical_<%= `hostname`.strip %>, 2]
   - [crawl_images,                           2]
   - [crawl_critical,                         3]
   - [default,                                1]
@@ -13,5 +14,6 @@
   - [parse_<%= `hostname`.strip %>,          1]
   - [parse_critical_<%= `hostname`.strip %>, 2]
   - [process_<%= `hostname`.strip %>,        2]
+  - [process_critical_<%= `hostname`.strip %>, 3]
   - [utility,                                1]
   - [utility_critical,                       2]

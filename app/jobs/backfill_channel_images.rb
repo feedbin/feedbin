@@ -67,7 +67,7 @@ class BackfillChannelImages
     scheduled = 0
 
     channels.each do |channel|
-      if ImageCrawler::ChannelImage.schedule(channel)
+      if ImageCrawler::ChannelImage.schedule(channel, critical: false)
         scheduled += 1
       else
         logger.info "BackfillChannelImages: no thumbnail embed_id=#{channel.id} channel_id=#{channel.provider_id}"
