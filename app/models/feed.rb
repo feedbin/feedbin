@@ -13,14 +13,17 @@ class Feed < ApplicationRecord
   has_many :taggings
   has_many :tags, through: :taggings
 
-  has_one :favicon, foreign_key: :host, primary_key: :host
+  has_one :favicon, foreign_key: :host, primary_key: :host # favicons fallback: remove with the favicons table
   has_one :newsletter_sender
   has_one :icon_image_record, -> { provider_feed_icon }, class_name: "Image", foreign_key: :provider_id
+  # The host's favicon row, shared by every feed on the host. Keyed by host
+  # the way channel_image_record is keyed by channel_id.
+  has_one :favicon_image_record, -> { provider_website_favicon }, class_name: "Image", foreign_key: :provider_id, primary_key: :host
 
-  # Everything FaviconComponent (via #icon_url and #favicon) can read when
+  # Everything FaviconComponent (via #icon_url and #site_favicon) can read when
   # rendering this feed's icon. Preload these wherever feeds render in a list,
   # or the icon lookups become a query per feed.
-  ICON_PRELOADS = [:favicon, :icon_image_record, :channel_image_record].freeze
+  ICON_PRELOADS = [:favicon, :favicon_image_record, :icon_image_record, :channel_image_record].freeze
 
   before_create :set_host
   after_create :refresh_favicon
@@ -112,6 +115,12 @@ class Feed < ApplicationRecord
     Image.unified_url(icon_image_record&.storage_path) ||
       Image.unified_url(channel_image_record&.storage_path) ||
       (icon && RemoteFile.signed_url(icon))
+  end
+
+  # The favicon to render for this host, or nil. The images row outranks
+  # the legacy row; the legacy half goes with the favicons table.
+  def site_favicon
+    favicon_image_record || favicon # favicons fallback: remove with the favicons table
   end
 
   def self.create_from_parsed_feed(parsed_feed)

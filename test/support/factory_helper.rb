@@ -134,4 +134,22 @@ module FactoryHelper
       placeholder_color: "aabbcc"
     }.merge(overrides))
   end
+
+  # A website_favicon row for a host, in the icon family's shape: png at the
+  # favicon preset's variant, content-addressed, no feed. Every NOT NULL
+  # column is filled so tests spell only what they are about.
+  def create_favicon_row(host, **overrides)
+    create_image_row(**{
+      provider: :website_favicon,
+      provider_id: host,
+      kind: :site_icon,
+      feed_id: nil,
+      url: "http://#{host}/favicon.ico",
+      variant: "32x32",
+      storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "32x32", "png"),
+      width: 32,
+      height: 32,
+      bytesize: 1_000
+    }.merge(overrides))
+  end
 end

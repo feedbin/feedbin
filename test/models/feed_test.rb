@@ -191,4 +191,39 @@ end
     assert_equal "round", feed.icon_options["https://yt3.ggpht.com/avatar.jpg"]
     assert_match "/files/icons/", feed.icon_url
   end
+
+  # The images row outranks the legacy row, and a host with neither renders
+  # nothing. favicons fallback: the legacy half goes with the favicons table.
+  test "site_favicon prefers the images row and falls back to the favicons row" do
+    feed = create_feeds(users(:ben)).first
+    assert_nil Feed.find(feed.id).site_favicon
+
+    legacy = Favicon.create!(host: feed.host, url: "http://example.com/legacy.png")
+    assert_equal legacy, Feed.find(feed.id).site_favicon
+
+    row = create_favicon_row(feed.host)
+    assert_equal row, Feed.find(feed.id).site_favicon
+  end
+
+  # Preload these wherever feeds render in a list, or the icon lookups
+  # become a query per feed.
+  test "ICON_PRELOADS preloads the favicon row" do
+    feed = create_feeds(users(:ben)).first
+    create_favicon_row(feed.host)
+    feeds = Feed.where(id: feed.id).includes(*Feed::ICON_PRELOADS).to_a
+
+    statements = capture_sql { feeds.each(&:site_favicon) }
+
+    assert_empty statements.select { it.match?(/FROM "images"|FROM "favicons"/i) }
+    assert_not_nil feeds.first.favicon_image_record
+  end
+
+  test "a feed with no host has no favicon row" do
+    feed = create_feeds(users(:ben)).first
+    create_favicon_row(feed.host)
+    feed.update_column(:host, nil)
+
+    assert_nil Feed.find(feed.id).favicon_image_record
+    assert_nil Feed.find(feed.id).site_favicon
+  end
 end
