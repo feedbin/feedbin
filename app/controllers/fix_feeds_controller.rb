@@ -6,7 +6,7 @@ class FixFeedsController < ApplicationController
     @subscriptions = @user
       .subscriptions
       .fix_suggestion_present
-      .includes(feed: [:discovered_feeds])
+      .includes(feed: Feed::ICON_PRELOADS + [:discovered_feeds])
       .sort_by { _1.title.to_s }
       .reject {_1.feed.discovered_feeds.empty?}
 
