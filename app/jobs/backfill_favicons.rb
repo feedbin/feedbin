@@ -60,7 +60,8 @@ class BackfillFavicons
   # twice in flight writes one row and orphans nothing.
   def update(batch)
     rows = self.class.batch_scope(batch).select(:id, :host, :url).order(:id).to_a
-    copied = rows.count { Copy.new(it).call }
+    client = Image.unified_client
+    copied = rows.count { Copy.new(it, client).call }
     logger.info "BackfillFavicons: batch=#{batch} scanned=#{rows.size} copied=#{copied} skipped=#{rows.size - copied}"
   end
 
@@ -76,8 +77,12 @@ class BackfillFavicons
     # at the first host that was not copied.
     STORE_ERRORS = [Excon::Error, Fog::Errors::Error].freeze
 
-    def initialize(favicon)
+    # client is built once per batch, outside the per-host rescue: a client
+    # that cannot be built is a configuration error, and that must abort the
+    # batch.
+    def initialize(favicon, client)
       @favicon = favicon
+      @client = client
     end
 
     def call
@@ -91,7 +96,7 @@ class BackfillFavicons
 
       image = build(path)
       File.open(path) do |file|
-        Image.unified_client.put_object(image.unified_bucket, image.storage_path, file, image.unified_storage_options)
+        @client.put_object(image.unified_bucket, image.storage_path, file, image.unified_storage_options)
       end
       image.create_image
       true
@@ -113,8 +118,10 @@ class BackfillFavicons
     # The object URL the writer recorded, fetched over HTTP: the objects
     # were uploaded public-read, and a key derived from data["favicon_hash"]
     # is not reliable (older rows shard on four characters, newer on three).
+    # block_ssrf: the URL comes from a database row, and the objects live on
+    # public S3 addresses, so the guard costs nothing.
     def download
-      Feedkit::Request.download(@favicon.url).persist!
+      Feedkit::Request.download(@favicon.url, block_ssrf: true).persist!
     rescue Feedkit::Error => exception
       log("download failed exception=#{exception.inspect}")
       nil
