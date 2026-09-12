@@ -58,7 +58,7 @@ module Admin
             div class: "grow" do
               render App::FeedComponent do |feed|
                 feed.icon do
-                  favicon_with_record(@feed.favicon, host: @feed.host, generated: true)
+                  favicon_with_record(@feed.site_favicon, host: @feed.host, generated: true)
                 end
                 feed.title do
                   link_to(@feed.site_url, target: :blank, class: "!text-600") do

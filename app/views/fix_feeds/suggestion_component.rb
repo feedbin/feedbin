@@ -20,7 +20,7 @@ module FixFeeds
       div class: "mb-4 grow" do
         render App::FeedComponent do |feed|
           feed.icon do
-            favicon_with_record(@source.favicon, host: @source.host, generated: true)
+            favicon_with_record(@source.site_favicon, host: @source.host, generated: true)
           end
           feed.title do
             link_to(@source.site_url, target: :blank, class: "!text-600") do

@@ -116,18 +116,21 @@ module ApplicationHelper
   end
 
   def favicon_with_host(host, generated: false)
-    record = Favicon.find_by(host: host)
+    host = host.to_s.downcase
+    record = Image.provider_website_favicon.find_by(provider_id: host) ||
+      Favicon.find_by(host: host) # favicons fallback: remove with the favicons table
     favicon_with_record(record, host: host, generated: generated)
   end
 
+  # record is an images row or, during the cutover, a favicons row: both
+  # answer public_url, and the host comes from the caller.
   def favicon_with_record(record, host:, generated: false)
-    if record && record.url.present?
-      favicon_template(record.cdn_url)
+    if (url = record&.public_url)
+      favicon_template(url)
     elsif generated
       favicon_placeholder_template(host)
     else
-      favicon_url = favicon_service_url(host)
-      favicon_template(favicon_url)
+      favicon_template(favicon_service_url(host))
     end
   end
 

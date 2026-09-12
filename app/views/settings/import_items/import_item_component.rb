@@ -17,7 +17,7 @@ module Settings
                 div class: "pt-4" do
                   render App::FeedComponent do |feed|
                     feed.icon do
-                      favicon_with_record(@import_item.favicon, host: @import_item.host, generated: true)
+                      favicon_with_record(@import_item.site_favicon, host: @import_item.host, generated: true)
                     end
                     feed.title do
                       link_to @import_item.title || "Untitled", @import_item.details[:html_url], target: "_blank", class: "!text-600"
