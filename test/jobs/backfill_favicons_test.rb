@@ -104,6 +104,20 @@ class BackfillFaviconsTest < ActiveSupport::TestCase
     assert_equal ["html.example.com"], BackfillFavicons.pending.pluck(:host)
   end
 
+  # A storage failure is not a per-host failure: the batch must fail
+  # visibly so Sidekiq retries it, and the host must stay pending so the
+  # retry copies it.
+  test "a storage error aborts the batch instead of skipping every host" do
+    favicon = legacy("store.example.com")
+    stub_legacy_png(favicon)
+    stub_unified_put.to_return(status: 403)
+
+    assert_raises(Excon::Error, Fog::Errors::Error) { perform_batches_for(favicon) }
+
+    assert_nil Image.provider_website_favicon.find_by(provider_id: "store.example.com")
+    assert_equal ["store.example.com"], BackfillFavicons.pending.pluck(:host)
+  end
+
   # Content-addressed: identical legacy bytes on two hosts store one object.
   test "two hosts with byte-identical legacy PNGs share one object" do
     a = legacy("a.example.com")

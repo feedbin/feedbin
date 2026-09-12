@@ -66,8 +66,16 @@ class BackfillFavicons
 
   # One legacy favicon into the unified store. Returns true when a row was
   # written. Never raises for one host: a raise abandons the rest of the
-  # batch, and a host that cannot be copied simply stays pending.
+  # batch, and a host that cannot be copied simply stays pending. A storage
+  # error is the exception, see STORE_ERRORS.
   class Copy
+    # Storage errors are batch-level, not per-host: a missing bucket, bad
+    # credentials, or an outage would otherwise turn a whole batch into
+    # "skipped" lines that Sidekiq marks complete. Re-raised so Sidekiq
+    # retries the batch; a copied host leaves pending, so the retry resumes
+    # at the first host that was not copied.
+    STORE_ERRORS = [Excon::Error, Fog::Errors::Error].freeze
+
     def initialize(favicon)
       @favicon = favicon
     end
@@ -87,6 +95,8 @@ class BackfillFavicons
       end
       image.create_image
       true
+    rescue *STORE_ERRORS
+      raise
     rescue => exception
       log("copy failed exception=#{exception.inspect}")
       false
