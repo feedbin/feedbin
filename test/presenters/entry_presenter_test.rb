@@ -60,4 +60,24 @@ class EntryPresenterTest < ActionView::TestCase
 
     assert_nil presenter_for(entry).media_image
   end
+
+  # A micropost author is a person, like the tweet branch above it in
+  # profile_image -- both frame round, never the feed's icon_format.
+  test "profile_image frames a micropost author's avatar round" do
+    entry = @feed.entries.create!(
+      title: nil,
+      url: "https://micro.blog/someone/1",
+      content: "<p>hi</p>",
+      public_id: SecureRandom.hex,
+      entry_id: SecureRandom.hex,
+      published: Time.now,
+      data: {"author" => {"name" => "Someone", "url" => "https://micro.blog/someone",
+        "avatar" => "https://micro.blog/someone/avatar.jpg", "_microblog" => {"username" => "someone"}}}
+    )
+
+    output = presenter_for(entry).profile_image
+
+    assert_includes output, "favicon-wrap icon-round"
+    refute_includes output, "twitter-profile-image"
+  end
 end
