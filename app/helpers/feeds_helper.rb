@@ -3,12 +3,12 @@ module FeedsHelper
   # the feed when one changes, so the key digests the favicon records. Both
   # collections arrive includes(*Feed::ICON_PRELOADS), so this costs no query.
   def sidebar_feeds_cache_key(feeds)
-    [feeds, feeds.map(&:title), feeds.map(&:site_favicon), "v8"]
+    [feeds, feeds.map(&:title), feeds.map(&:site_favicon), "v9"]
   end
 
   # titles come from subscriptions, so a rename does not touch the feed's key
   def sidebar_tags_cache_key(tags)
     feeds = tags.flat_map(&:user_feeds)
-    [tags, tags.map(&:user_feeds), feeds.map(&:title), feeds.map(&:site_favicon), "v14"]
+    [tags, tags.map(&:user_feeds), feeds.map(&:title), feeds.map(&:site_favicon), "v15"]
   end
 end

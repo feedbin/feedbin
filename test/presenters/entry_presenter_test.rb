@@ -26,7 +26,7 @@ class EntryPresenterTest < ActionView::TestCase
     entry = entry_with({})
     create_image_row(
       provider: :entry_icon, provider_id: entry.id.to_s, feed_id: @feed.id,
-      storage_path: "abc/cover.jpg"
+      storage_path: "abc/cover.jpg", kind: :cover_art
     )
 
     with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do

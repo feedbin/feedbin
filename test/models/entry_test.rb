@@ -247,7 +247,7 @@ class EntryTest < ActiveSupport::TestCase
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
       Image.create!(
         provider: :entry_icon, provider_id: entry.id.to_s, feed_id: feed.id,
-        url: "http://example.com/cover.jpg", variant: "200x200",
+        url: "http://example.com/cover.jpg", variant: "200x200", kind: :cover_art,
         image_fingerprint: SecureRandom.hex(16),
         original_fingerprint: SecureRandom.hex(16),
         storage_path: path,
@@ -350,11 +350,43 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil entry.rebase_url(nil)
   end
 
+  # One association, two kinds: a podcast episode's art and a micropost
+  # author's avatar both live on entry_icon, and each reader sees only its
+  # own kind, so neither view can render the other's picture.
+  test "itunes_image and author_avatar_record split the entry_icon row by kind" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      art = create_entry(feeds(:daring_fireball))
+      art_row = create_image_row(provider: :entry_icon, provider_id: art.id.to_s, feed_id: art.feed_id, kind: :cover_art, variant: "200x200", url: "http://example.com/art.jpg")
+      avatar = create_entry(feeds(:daring_fireball))
+      avatar_row = create_image_row(provider: :entry_icon, provider_id: avatar.id.to_s, feed_id: avatar.feed_id, kind: :avatar, variant: "200x200", url: "http://example.com/me.png")
+
+      assert_equal "https://images.example.com/#{art_row.storage_path}", Entry.find(art.id).itunes_image
+      assert_nil Entry.find(art.id).author_avatar_record
+      assert_nil Entry.find(avatar.id).itunes_image
+      assert_equal avatar_row, Entry.find(avatar.id).author_avatar_record
+    end
+  end
+
+  test "with_list_associations preloads the entry icon row" do
+    entry = create_entry(feeds(:daring_fireball))
+    create_image_row(provider: :entry_icon, provider_id: entry.id.to_s, feed_id: entry.feed_id, kind: :avatar, variant: "200x200")
+    entries = Entry.where(id: entry.id).with_list_associations.to_a
+
+    statements = capture_sql { entries.each(&:author_avatar_record) }
+
+    assert_empty statements.select { it.match?(/FROM "images"/i) }
+    assert_not_nil entries.first.author_avatar_record
+  end
+
   private
 
   # FactoryHelper's factory, keyed to an entry. It seeds a legacy url so the
-  # read-path tests can prove the row's legacy pointer is ignored.
-  def create_image_row(entry, provider: :entry_preview, url: "http://example.com/image.jpg")
+  # read-path tests can prove the row's legacy pointer is ignored. Entry is
+  # optional so callers that already pass provider_id/feed_id (entry_icon
+  # rows keyed to two different entries in one test) fall through to the
+  # plain factory instead.
+  def create_image_row(entry = nil, provider: :entry_preview, url: "http://example.com/image.jpg", **overrides)
+    return super(provider: provider, url: url, **overrides) if entry.nil?
     super(
       provider: provider,
       provider_id: entry.id,
@@ -363,7 +395,8 @@ class EntryTest < ActiveSupport::TestCase
       data: {
         "legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg",
         "final_url" => "http://example.com/image-final.jpg"
-      }
+      },
+      **overrides
     )
   end
 end

@@ -118,14 +118,15 @@ class EntriesListTest < ActionController::TestCase
   end
 
   # Budget: one merged entry-owned query (owned_image_records), the entry
-  # channel avatars, the feed's own icon row, and the feed's favicon row.
+  # channel avatars, the feed's own icon row, the feed's favicon row, and
+  # icon_image_record (T2 of the avatar cutover).
   test "the entry-owned image rows load in one query" do
     ids = 3.times.map { create_entry(@feed).id }
 
     statements = capture_sql { Entry.where(id: ids).with_list_associations.to_a }
 
     images = statements.select { it.match?(/FROM "images"/i) }
-    assert_equal 4, images.count,
+    assert_equal 5, images.count,
       "expected owned + channel + feed icon + feed favicon, got #{images.count}:\n#{images.join("\n")}"
   end
 

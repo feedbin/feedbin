@@ -13,12 +13,20 @@ class EntriesHelperTest < ActiveSupport::TestCase
     key = EntriesHelper.entries_cache_key(@entry, {})
 
     assert_equal @entry, key.first
-    assert_equal "v14", key.last
-    assert_equal 6, key.size
+    assert_equal "v15", key.last
+    assert_equal 7, key.size
   end
 
   test "api_entries_cache_key carries the content-diff flag, the entry, and its own version" do
     assert_equal [true, @entry, "v2"], EntriesHelper.api_entries_cache_key(@entry, true)
     assert_equal [false, @entry, "v2"], EntriesHelper.api_entries_cache_key(@entry, false)
+  end
+
+  test "the entries key digests the entry icon row" do
+    entry = create_entry(feeds(:daring_fireball))
+    before = EntriesHelper.entries_cache_key(Entry.find(entry.id))
+    create_image_row(provider: :entry_icon, provider_id: entry.id.to_s, feed_id: entry.feed_id, kind: :avatar, variant: "200x200")
+
+    assert_not_equal before, EntriesHelper.entries_cache_key(Entry.find(entry.id))
   end
 end

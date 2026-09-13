@@ -60,9 +60,10 @@ class Entry < ApplicationRecord
    }
 
   # Everything entries/_entry touches beyond the entry itself. Attaching
-  # less makes a cache-miss render cost a query per row.
+  # less makes a cache-miss render cost a query per row. icon_image_record
+  # is the micropost author's avatar (and a podcast episode's art).
   scope :with_list_associations, -> {
-    includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :channel_image_record)
+    includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :icon_image_record, :channel_image_record)
   }
 
   # The same associations plus a narrow column select; separate because
@@ -188,8 +189,19 @@ class Entry < ApplicationRecord
     processed_image ? true : false
   end
 
+  # The episode's own art. The entry_icon row is shared with the micropost
+  # avatar, so the kind decides which reader sees it.
   def itunes_image
-    Image.unified_url(icon_image_record&.storage_path)
+    record = icon_image_record
+    return nil unless record&.kind_cover_art?
+    Image.unified_url(record.storage_path)
+  end
+
+  # The micropost author's avatar row, written by
+  # ImageCrawler::MicropostAvatar, or nil.
+  def author_avatar_record
+    record = icon_image_record
+    record if record&.kind_avatar?
   end
 
   def content_diff
