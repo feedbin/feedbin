@@ -12,7 +12,7 @@
 class BackfillFavicons
   include Sidekiq::Worker
   include SidekiqHelper
-  sidekiq_options queue: :utility
+  sidekiq_options queue: :backfill
 
   # Rows with no website_favicon row for their lower-cased host. A LEFT
   # JOIN anti-join, not NOT IN: NOT IN never becomes an anti-join in
