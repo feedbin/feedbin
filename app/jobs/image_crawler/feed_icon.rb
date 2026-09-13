@@ -37,11 +37,14 @@ module ImageCrawler
       return false if url.nil?
 
       url = feed.feed_relative_url(url)
+      # The legacy object second: Find tries candidates in order, so a dead
+      # source still lands as a copy of what the proxy cached.
+      candidates = [url, RemoteFile.legacy_object_url(url)].compact
       image = Image.new_with_attributes(
         id: "#{feed.id}-#{Digest::SHA1.hexdigest(url)}#{SUFFIX}",
         kind: ::Image.kinds[kind],
         preset_name: "feed_icon",
-        image_urls: [url],
+        image_urls: candidates,
         provider: ::Image.providers[:feed_icon],
         provider_id: feed.id,
         critical: critical

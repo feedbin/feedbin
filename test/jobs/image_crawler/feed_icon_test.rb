@@ -75,6 +75,18 @@ module ImageCrawler
       end
     end
 
+    # A dead icon url still lands as a row copied from the legacy object the
+    # proxy cached, because Find tries the candidates in order.
+    test "passes the legacy object as the second candidate when the proxy cached it" do
+      url = "http://example.com/icon.png"
+      RemoteFile.create!(fingerprint: RemoteFile.fingerprint(url), original_url: url, storage_url: "https://icons.example.net/abc/icon.png")
+      @feed.update!(options: {"json_feed" => {"icon" => url}})
+
+      FeedIcon.schedule(@feed)
+
+      assert_equal [url, "https://icons.example.net/abc/icon.png"], find_args["image_urls"]
+    end
+
     test "makes a relative url absolute against the feed" do
       # feed_url is attr_readonly, so it cannot be changed via update!; go
       # around ActiveRecord's instance-level readonly check with update_all.
