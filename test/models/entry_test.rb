@@ -334,6 +334,22 @@ class EntryTest < ActiveSupport::TestCase
     assert loaded.has_attribute?(:data)
   end
 
+  # Every shape an entry can hand us for an avatar, resolved against the
+  # entry's own url. A plain relative path is the one that used to break:
+  # the heuristic parser read "avatar.png" as a host.
+  test "rebase_url resolves every relative shape against the entry url" do
+    entry = create_entry(feeds(:daring_fireball))
+    entry.update!(url: "https://example.com/blog/post/1")
+
+    assert_equal "https://example.com/avatar.png", entry.rebase_url("/avatar.png")
+    assert_equal "https://example.com/blog/post/avatar.png", entry.rebase_url("avatar.png")
+    assert_equal "https://example.com/blog/avatar.png", entry.rebase_url("../avatar.png")
+    assert_equal "https://cdn.example.net/avatar.png", entry.rebase_url("//cdn.example.net/avatar.png")
+    assert_equal "https://cdn.example.net/avatar.png", entry.rebase_url("https://cdn.example.net/avatar.png")
+    assert_equal "https://example.com/avatar.png", entry.rebase_url("  /avatar.png ")
+    assert_nil entry.rebase_url(nil)
+  end
+
   private
 
   # FactoryHelper's factory, keyed to an entry. It seeds a legacy url so the

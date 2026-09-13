@@ -135,8 +135,11 @@ class Entry < ApplicationRecord
     return original_url.strip if original_url.strip.downcase.start_with?("http")
     return nil if fully_qualified_url.nil?
 
+    # The base may lack a scheme, so it gets the heuristic parser. The
+    # relative part must not: heuristic_parse reads a plain "avatar.png" as
+    # a host and the join then yields http://avatar.png.
     base = Addressable::URI.heuristic_parse(fully_qualified_url)
-    original_url = Addressable::URI.heuristic_parse(original_url)
+    original_url = Addressable::URI.parse(original_url.strip)
     Addressable::URI.join(base, original_url).to_s
   rescue Addressable::URI::InvalidURIError
     Rails.logger.error("Invalid uri original_url=#{original_url} fully_qualified_url=#{fully_qualified_url}")
