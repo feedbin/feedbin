@@ -9,7 +9,6 @@ class Api::V2::FaviconsControllerTest < ApiControllerTestCase
   # Retired with the base64 column: the route answers, the body is empty.
   test "index is an empty array" do
     login_as @user
-    @feeds.each { Favicon.create!(host: it.host, url: "http://example.com/#{it.host}.png") }
 
     get :index, format: :json
 

@@ -21,21 +21,17 @@ class Api::V2::IconsControllerTest < ApiControllerTestCase
     end
   end
 
-  # favicons fallback: a host with no images row still serves its legacy url,
-  # and a host with neither is omitted, as today.
-  test "falls back to the favicons row for a host with no images row" do
+  test "omits a host with no images row" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      first, second, third = @feeds
+      first, second = @feeds
       row = create_favicon_row(first.host)
-      Favicon.create!(host: second.host, url: "http://legacy.example.com/#{second.host}.png")
       login_as @user
 
       get :index, format: :json
 
       icons = parse_json.index_by { it["host"] }
       assert_equal "https://images.example.com/#{row.storage_path}", icons.fetch(first.host)["url"]
-      assert_equal "https://favicons.example.com/#{second.host}.png", icons.fetch(second.host)["url"]
-      assert_nil icons[third.host]
+      assert_nil icons[second.host]
     end
   end
 end
