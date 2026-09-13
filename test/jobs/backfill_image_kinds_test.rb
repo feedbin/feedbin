@@ -94,6 +94,17 @@ class BackfillImageKindsTest < ActiveSupport::TestCase
     assert_empty BackfillImageKinds.jobs
   end
 
+  # feed_icon rows carry their kind (avatar or site_icon) from the call
+  # site, not from the preset, so the backfill must leave them alone rather
+  # than treat the preset as unmapped.
+  test "leaves self-labeled feed_icon rows alone" do
+    feed_icon = create_image_row(provider: :entry_preview, provider_id: SecureRandom.hex(4), data: {"preset" => "feed_icon"}, kind: :avatar)
+
+    perform_batches_for(feed_icon)
+
+    assert_equal "avatar", feed_icon.reload.kind
+  end
+
   # Nothing since the recreate should be unclassifiable. If a row is, the
   # batch must say so rather than leave the default in place silently.
   test "raises on a preset outside the map" do

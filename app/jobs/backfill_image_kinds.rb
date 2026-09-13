@@ -26,6 +26,11 @@ class BackfillImageKinds
     "touch_icon"     => :site_icon
   }.freeze
 
+  # Presets whose rows carry their kind from the call site, so there is
+  # nothing to map and nothing to relabel. feed_icon writes avatar or
+  # site_icon per source.
+  SELF_LABELED = %w[feed_icon].freeze
+
   def perform(batch = nil, schedule = false)
     if schedule
       build
@@ -53,7 +58,7 @@ class BackfillImageKinds
 
     # Stop rather than leave the default in place quietly: a row this map
     # cannot classify is a row the recreate should not have produced.
-    unknown = scope.where(preset.not_in(PRESET_KINDS.keys).or(preset.eq(nil))).distinct.pluck(preset)
+    unknown = scope.where(preset.not_in(PRESET_KINDS.keys + SELF_LABELED).or(preset.eq(nil))).distinct.pluck(preset)
     raise "BackfillImageKinds: unmapped presets #{unknown.inspect} in batch #{batch} (ids #{ids.first}..#{ids.last})" if unknown.any?
 
     # update_all, not update: updated_at is a view cache key and must move
