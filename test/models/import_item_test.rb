@@ -15,12 +15,8 @@ class ImportItemTest < ActiveSupport::TestCase
     assert_equal "example.com", @item.reload.host
   end
 
-  # favicons fallback: the legacy half goes with the favicons table.
-  test "site_favicon prefers the images row and falls back to the favicons row" do
+  test "site_favicon is the host's images row" do
     assert_nil ImportItem.find(@item.id).site_favicon
-
-    legacy = Favicon.create!(host: "example.com", url: "http://example.com/legacy.png")
-    assert_equal legacy, ImportItem.find(@item.id).site_favicon
 
     row = create_favicon_row("example.com")
     assert_equal row, ImportItem.find(@item.id).site_favicon

@@ -192,17 +192,17 @@ end
     assert_match "/files/icons/", feed.icon_url
   end
 
-  # The images row outranks the legacy row, and a host with neither renders
-  # nothing. favicons fallback: the legacy half goes with the favicons table.
-  test "site_favicon prefers the images row and falls back to the favicons row" do
+  # The host's images row, or nothing: the legacy favicons row is gone.
+  test "site_favicon is the host's images row" do
     feed = create_feeds(users(:ben)).first
     assert_nil Feed.find(feed.id).site_favicon
 
-    legacy = Favicon.create!(host: feed.host, url: "http://example.com/legacy.png")
-    assert_equal legacy, Feed.find(feed.id).site_favicon
-
     row = create_favicon_row(feed.host)
     assert_equal row, Feed.find(feed.id).site_favicon
+  end
+
+  test "ICON_PRELOADS names exactly the three image associations" do
+    assert_equal [:favicon_image_record, :icon_image_record, :channel_image_record], Feed::ICON_PRELOADS
   end
 
   # Preload these wherever feeds render in a list, or the icon lookups

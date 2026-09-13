@@ -9,13 +9,13 @@ module Settings
         @failed_items = @import
           .import_items
           .failed
-          .includes(:discovered_feeds, :favicon, :favicon_image_record)
+          .includes(:discovered_feeds, :favicon_image_record)
           .sort_by { _1.title.to_s }
 
         @fixable_items = @import
           .import_items
           .fixable
-          .includes(:discovered_feeds, :favicon, :favicon_image_record)
+          .includes(:discovered_feeds, :favicon_image_record)
           .sort_by { _1.title.to_s }
       end
 

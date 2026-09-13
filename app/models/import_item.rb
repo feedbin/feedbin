@@ -4,7 +4,6 @@ class ImportItem < ApplicationRecord
   enum :status, [:pending, :complete, :failed, :fixable]
   store_accessor :error, :class, :message, prefix: true
   has_many :discovered_feeds, foreign_key: :site_url, primary_key: :site_url
-  has_one :favicon, foreign_key: :host, primary_key: :host # favicons fallback: remove with the favicons table
   has_one :favicon_image_record, -> { provider_website_favicon }, class_name: "Image", foreign_key: :provider_id, primary_key: :host
 
   after_commit :import_feed, on: :create
@@ -32,7 +31,7 @@ class ImportItem < ApplicationRecord
 
   # The favicon to render for this host, or nil. See Feed#site_favicon.
   def site_favicon
-    favicon_image_record || favicon # favicons fallback: remove with the favicons table
+    favicon_image_record
   end
 
   def set_site_url
