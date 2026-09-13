@@ -151,5 +151,6 @@ class Subscription < ApplicationRecord
   def refresh_favicon
     FaviconCrawler::Finder.perform_async(feed.host)
     ImageCrawler::ItunesFeedImage.perform_async(feed_id)
+    ImageCrawler::FeedIcon.perform_async(feed_id)
   end
 end

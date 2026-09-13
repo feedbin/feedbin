@@ -251,6 +251,17 @@ end
     assert_not Feed.find(feed.id).micropost?
   end
 
+  # Feed create is one of the two live triggers; the other is subscribe.
+  # There is no crawl-time trigger, the same limit podcast art has.
+  test "creating a feed enqueues the feed icon crawler beside the podcast one" do
+    Sidekiq::Worker.clear_all
+
+    feed = Feed.create!(feed_url: "http://icons.example.com/feed.json")
+
+    assert_equal [feed.id], ImageCrawler::FeedIcon.jobs.map { it["args"].first }
+    assert_equal [feed.id], ImageCrawler::ItunesFeedImage.jobs.map { it["args"].first }
+  end
+
   # The host's images row, or nothing: the legacy favicons row is gone.
   test "site_favicon is the host's images row" do
     feed = create_feeds(users(:ben)).first

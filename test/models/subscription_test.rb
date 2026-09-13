@@ -1,6 +1,17 @@
 require "test_helper"
 
 class SubscriptionTest < ActiveSupport::TestCase
+  test "subscribing enqueues the feed icon crawler beside the podcast one" do
+    feed = create_feeds(users(:ben)).first
+    user = users(:new)
+    Sidekiq::Worker.clear_all
+
+    user.subscriptions.create!(feed: feed)
+
+    assert_equal [feed.id], ImageCrawler::FeedIcon.jobs.map { it["args"].first }
+    assert_equal [feed.id], ImageCrawler::ItunesFeedImage.jobs.map { it["args"].first }
+  end
+
   test "should enqueue FaviconCrawler::Finder" do
     Sidekiq::Worker.clear_all
     user = users(:ben)
