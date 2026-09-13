@@ -113,6 +113,28 @@ module FeedCrawler
       assert_includes enqueued_feed_ids, stale.id
     end
 
+    # Schedule jobs that queue up during a deploy run together once the
+    # workers return. Each one must see the refresh the first one started,
+    # or the whole crawl set is pushed once per job.
+    test "a second run that starts mid-refresh enqueues nothing" do
+      original = Sidekiq::Client.method(:push_bulk)
+      reentered = false
+      nested = ->(payload) {
+        unless reentered
+          reentered = true
+          Schedule.new.perform
+        end
+        original.call(payload)
+      }
+
+      Sidekiq::Client.stub(:push_bulk, nested) do
+        Schedule.new.perform
+      end
+
+      assert reentered
+      assert_equal Feed.count, Downloader.jobs.size
+    end
+
     private
 
     def standalone_feed(name, requested_at:)
