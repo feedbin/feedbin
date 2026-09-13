@@ -107,6 +107,18 @@ module ImageCrawler
         legacy_store: false,
         job_class: ChannelImage
       },
+      feed_icon: {
+        width: 200,
+        height: 200,
+        minimum_size: nil,
+        crop: :limit_png,
+        format: "png",
+        validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
+        job_class: FeedIcon
+      },
       icon: {
         width: 400,
         height: 400,
