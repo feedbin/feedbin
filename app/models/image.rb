@@ -73,11 +73,7 @@ class Image < ApplicationRecord
   def self.favicons_for_entries(entries)
     hosts = Array(entries).filter_map { it.hostname&.downcase if it.feed&.pages? }.uniq
     return {} if hosts.empty?
-    found = provider_website_favicon.where(provider_id: hosts).index_by(&:provider_id)
-    # favicons fallback: remove with the favicons table
-    missing = hosts - found.keys
-    found.merge!(Favicon.where(host: missing).index_by(&:host)) if missing.any?
-    found
+    provider_website_favicon.where(provider_id: hosts).index_by(&:provider_id)
   end
 
   before_save :fingerprint_url
@@ -189,9 +185,7 @@ class Image < ApplicationRecord
   end
 
   # The public URL of the stored object, or nil until UNIFIED_IMAGE_HOST is
-  # set. The icon family's readers call this on whatever record resolved and
-  # never the class method, so a Favicon row, which answers the same name,
-  # can stand in during the favicons cutover.
+  # set. The icon family's readers call this on the record they resolved.
   def public_url
     self.class.unified_url(storage_path)
   end
