@@ -1,0 +1,146 @@
+module ImageCrawler
+  # A micropost entry's author avatar, as an entry_icon row keyed by the
+  # entry. Runs per feed, once per crawl with new posts: it groups the
+  # feed's row-less entries by avatar url, attaches the groups whose url the
+  # table already holds (no request), and downloads once per unknown url.
+  # The callback attaches the rest of that url's group, so a feed pass
+  # costs one request per distinct avatar.
+  class MicropostAvatar
+    include Sidekiq::Worker
+    sidekiq_options retry: false
+
+    SUFFIX = "-avatar".freeze
+    PRESET = "micropost_avatar".freeze
+    VARIANT = "200x200".freeze
+
+    # id is a feed id when scheduling and "<entry public_id>-avatar" when the
+    # pipeline calls back with the landed row.
+    def perform(id, image = nil)
+      if image
+        receive(image)
+      else
+        self.class.schedule(Feed.find(id))
+      end
+    rescue ActiveRecord::RecordNotFound
+    end
+
+    # Returns [attached, scheduled]. critical: a live crawl runs on the
+    # critical queues; the backfill passes false.
+    def self.schedule(feed, critical: true)
+      return [0, 0] unless feed.micropost?
+
+      # The feed's own icon on the same pass, once: a request per crawl
+      # would be too many, so only a feed with no row asks.
+      FeedIcon.schedule(feed, critical: critical) if feed.icon_image_record.nil?
+
+      entries = pending_entries(feed).to_a
+      groups = avatar_groups(feed, entries)
+      attached = 0
+      scheduled = 0
+
+      groups.each do |url, group|
+        if (existing = existing_row(url))
+          group.each { |entry| attach(entry, url, existing) }
+          attached += group.size
+        else
+          enqueue(group.first, url, critical)
+          scheduled += 1
+        end
+      end
+
+      Sidekiq.logger.info "MicropostAvatar: feed=#{feed.id} scanned=#{entries.size} urls=#{groups.size} attached=#{attached} scheduled=#{scheduled}"
+      [attached, scheduled]
+    end
+
+    # The feed's entries with no entry_icon row: a LEFT JOIN anti-join on
+    # the cast entry id (provider_id is text), never NOT IN, which Postgres
+    # cannot turn into an anti-join. After the first pass this is the new
+    # entries. Arel.sql carries only the type keyword. Ordered by id: the
+    # feed_id index carries no sort, so an unordered scan can hand back
+    # entries newest-first, and avatar_groups' "first" entry (the one that
+    # pays for the download) would otherwise vary run to run.
+    def self.pending_entries(feed)
+      entries = Entry.arel_table
+      images = ::Image.arel_table
+      entry_id_text = Arel::Nodes::NamedFunction.new("CAST", [entries[:id].as(Arel.sql("text"))])
+      join = entries.join(images, Arel::Nodes::OuterJoin).on(
+        images[:provider].eq(::Image.providers[:entry_icon]).and(images[:provider_id].eq(entry_id_text))
+      ).join_sources
+
+      feed.entries.joins(join).where(images[:id].eq(nil)).select(:id, :feed_id, :url, :data, :title, :public_id).order(:id)
+    end
+
+    # Entries by absolute avatar url, Micropost#author_avatar's rule. Built
+    # from the row's data directly rather than Entry#micropost, which loads
+    # the entry's link image row: a query per entry this pass does not need.
+    def self.avatar_groups(feed, entries)
+      entries.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |entry, groups|
+        post = Micropost.new(entry.data, entry.title, feed: feed)
+        next unless post.valid?
+
+        url = entry.rebase_url(post.author_avatar)
+        groups[url] << entry if url.present?
+      end
+    end
+
+    # The newest row already holding this url's picture at the avatar
+    # variant: an earlier post's row, or a copy of the proxy's cache. One
+    # indexed read on url_fingerprint; the preset comes out of data through
+    # Arel, nothing is interpolated.
+    def self.existing_row(url)
+      ::Image.where(url_fingerprint: ::Image.url_fingerprint_for(url, VARIANT))
+        .where(::Image.data_projection("preset").in([PRESET, "icon"]))
+        .order(id: :desc)
+        .first
+    end
+
+    # A DB-only attach to an object the store already holds, the shape
+    # Dedupe uses. kind is this row's own.
+    def self.attach(entry, url, existing)
+      ::Image.attach!(
+        provider: :entry_icon,
+        provider_id: entry.id,
+        kind: :avatar,
+        feed_id: entry.feed_id,
+        url: url,
+        variant: existing.variant,
+        image_fingerprint: existing.image_fingerprint,
+        original_fingerprint: existing.original_fingerprint,
+        storage_path: existing.storage_path,
+        width: existing.width,
+        height: existing.height,
+        bytesize: existing.bytesize,
+        placeholder_color: existing.placeholder_color,
+        data: {"preset" => PRESET, "final_url" => existing.final_url.presence || url}
+      )
+    end
+
+    # The proxy's cached object second: Find tries candidates in order, so a
+    # dead source still lands as a copy of what was served before.
+    def self.enqueue(entry, url, critical)
+      image = Image.new_with_attributes(
+        id: "#{entry.public_id}#{SUFFIX}",
+        kind: ::Image.kinds[:avatar],
+        preset_name: PRESET,
+        image_urls: [url, RemoteFile.legacy_object_url(url)].compact,
+        provider: ::Image.providers[:entry_icon],
+        provider_id: entry.id,
+        feed_id: entry.feed_id,
+        critical: critical
+      )
+      Pipeline::Find.perform_async(image.to_h)
+    end
+
+    # Upload attached the first entry's row; attach every sibling that
+    # shares its url. No touch: the entries cache key digests the row.
+    def receive(image)
+      image.fetch("storage_path")
+      row = ::Image.provider_entry_icon.find_by(provider_id: image.fetch("provider_id").to_s)
+      return if row.nil? || row.feed_id.nil?
+
+      feed = Feed.find(row.feed_id)
+      siblings = self.class.avatar_groups(feed, self.class.pending_entries(feed).to_a)[row.url]
+      siblings&.each { |entry| self.class.attach(entry, row.url, row) }
+    end
+  end
+end
