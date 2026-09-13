@@ -4,7 +4,7 @@ module EntriesHelper
   # come from something already loaded (Image.favicons_for_entries map,
   # with_list_associations) or the key is an N+1 per render.
   def self.entries_cache_key(entry, favicons = {})
-    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v13"]
+    [entry, entry.feed, entry_favicon(entry, favicons), entry.preview_image_record, entry.channel_image_record, "v14"]
   end
 
   # The extended API fragment carries the same image urls as the list, so it
