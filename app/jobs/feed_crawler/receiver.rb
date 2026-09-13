@@ -11,22 +11,32 @@ module FeedCrawler
       # bypassed.
       data = data.deep_stringify_keys
       feed = Feed.find(data["feed"]["id"])
+      created = 0
       if data["entries"].present?
-        receive_entries(data["entries"], feed)
+        created = receive_entries(data["entries"], feed)
       end
       feed.update(data["feed"].except("feed_url", :feed_url))
+
+      # Once per crawl with new posts, never per entry: the job dedupes the
+      # feed's avatar urls in one pass. The marker is the parser's micropost
+      # verdict for this very parse.
+      if created > 0 && data["feed"]["custom_icon_format"] == "round"
+        ImageCrawler::MicropostAvatar.perform_async(feed.id)
+      end
     end
 
+    # Returns the number of entries created.
     def receive_entries(items, feed)
       public_ids = items.map { |entry| entry["public_id"] }
       entries = Entry.where(public_id: public_ids).index_by(&:public_id)
+      created = 0
       items.each do |item|
         entry = entries[item["public_id"]]
         update = item.delete("update")
         if entry
           EntryUpdate.create!(item, entry)
-        else
-          create_entry(item, feed)
+        elsif create_entry(item, feed)
+          created += 1
         end
       rescue ActiveRecord::RecordNotUnique
         # Ignore
@@ -41,15 +51,19 @@ module FeedCrawler
           Sidekiq.logger.info "Entry Error: feed=#{feed.id} exception=#{exception.inspect}"
         end
       end
+      created
     end
 
+    # Returns whether an entry was created.
     def create_entry(item, feed)
       if alternate_exists?(item)
         Librato.increment("entry.alternate_exists")
+        false
       else
         feed.entries.create!(item)
         Librato.increment("entry.create")
         Sidekiq.logger.info "Creating entry=#{item["public_id"]}"
+        true
       end
     end
 

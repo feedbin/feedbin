@@ -262,6 +262,23 @@ end
     assert_equal [feed.id], ImageCrawler::ItunesFeedImage.jobs.map { it["args"].first }
   end
 
+  # The subscribe path creates the feed and its entries in one call, so the
+  # receiver never runs for them; the same job runs from here.
+  test "create_from_parsed_feed enqueues the micropost avatar crawler for a micropost feed" do
+    Sidekiq::Worker.clear_all
+    parsed = Struct.new(:entries, :feed_hash) do
+      def to_feed = feed_hash
+    end
+    untitled = Struct.new(:title, :entry_hash) do
+      def to_entry = entry_hash
+    end
+    entry = untitled.new(nil, {public_id: SecureRandom.hex, entry_id: SecureRandom.hex, url: "https://micro.example/1", content: "<p>hi</p>", published: Time.now})
+    feed = Feed.create_from_parsed_feed(parsed.new([entry], {feed_url: "https://micro.example/feed.json", title: "Micro"}))
+
+    assert_equal "round", feed.custom_icon_format
+    assert_equal [feed.id], ImageCrawler::MicropostAvatar.jobs.map { it["args"].first }
+  end
+
   # The host's images row, or nothing: the legacy favicons row is gone.
   test "site_favicon is the host's images row" do
     feed = create_feeds(users(:ben)).first

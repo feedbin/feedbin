@@ -160,6 +160,30 @@ module FeedCrawler
       end
     end
 
+    # Once per crawl with new posts, never per entry: the job dedupes the
+    # feed's avatar urls in one pass. The marker is the parser's micropost
+    # verdict for this very parse.
+    test "enqueues the micropost avatar crawler once when a micropost crawl creates entries" do
+      Sidekiq::Worker.clear_all
+      params = {"feed" => {"id" => @feed.id, "custom_icon_format" => "round"}, "entries" => [build_entry, build_entry]}
+
+      Receiver.new.perform(params)
+
+      assert_equal [@feed.id], ImageCrawler::MicropostAvatar.jobs.map { it["args"].first }
+    end
+
+    test "does not enqueue the micropost avatar crawler for a titled feed or a crawl with no new entries" do
+      Sidekiq::Worker.clear_all
+      Receiver.new.perform({"feed" => {"id" => @feed.id, "custom_icon_format" => nil}, "entries" => [build_entry]})
+      assert_empty ImageCrawler::MicropostAvatar.jobs
+
+      public_id = SecureRandom.hex
+      @feed.entries.create!(url: "url", public_id: public_id)
+      $redis[:refresher].with { |redis| redis.del(public_id) }
+      Receiver.new.perform({"feed" => {"id" => @feed.id, "custom_icon_format" => "round"}, "entries" => [build_entry(public_id)]})
+      assert_empty ImageCrawler::MicropostAvatar.jobs
+    end
+
     private
 
     def build_entry(public_id = SecureRandom.hex, update = false)
