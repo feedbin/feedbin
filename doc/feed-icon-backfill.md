@@ -65,13 +65,16 @@ BackfillFeedIcons.perform_async(nil, true)
 ```
 
 The schedule job pushes every batch, spread evenly over `BackfillFeedIcons::SPREAD`
-(12 hours by default) so the shared image queues are not hit all at once.
+(1 hour by default) so the shared image queues are not hit all at once.
+The set is small (a few thousand JSON Feed icons plus the micropost feeds
+with an RSS image; article feeds with an RSS banner are filtered out in
+SQL), so an hour spreads a few thousand downloads over about 670 batches.
 To run over a different window, pass the spread in seconds as the third
 argument, read once at schedule time:
 
 ```ruby
-# The same batches over 48 hours instead of 12.
-BackfillFeedIcons.perform_async(nil, true, 48.hours.to_i)
+# The same batches over 6 hours instead of 1.
+BackfillFeedIcons.perform_async(nil, true, 6.hours.to_i)
 ```
 
 ## Watching it

@@ -12,17 +12,17 @@ class BackfillFeedIcons
   include SidekiqHelper
   sidekiq_options queue: :utility
 
-  SPREAD = 12.hours
+  SPREAD = 1.hour
 
   # Feeds with a legacy source in options and no feed_icon row. Podcasts are
   # excluded: ItunesFeedImage owns their row, and the ones without one are
   # its residual.
   #
-  # The set overestimates on purpose. The RSS image counts only for a
-  # micropost feed, and that reads the feed's entries, which is not cheap in
-  # SQL; the job declines those feeds one by one at no download cost.
-  # Scheduling is not completion: check the row counts after the image
-  # queues drain.
+  # The RSS image counts only for a micropost feed (entries, none titled),
+  # which is the same test Feed#micropost? makes, here as two correlated
+  # EXISTS on entries. Without it the set is 300k article feeds carrying a
+  # banner, each declined by the job at two queries apiece. Scheduling is
+  # not completion: check the row counts after the image queues drain.
   #
   # A hand-built LEFT JOIN anti-join, not where.missing and not
   # where.not(provider_id: subquery). NOT IN never becomes an anti-join in
@@ -40,10 +40,16 @@ class BackfillFeedIcons
       images[:provider].eq(Image.providers[:feed_icon]).and(images[:provider_id].eq(feed_id_text))
     ).join_sources
 
+    entries = Entry.arel_table
+    has_entries = entries.project(1).where(entries[:feed_id].eq(feeds[:id])).exists
+    has_titled_entry = entries.project(1).where(
+      entries[:feed_id].eq(feeds[:id]).and(entries[:title].not_eq(nil)).and(entries[:title].not_eq(""))
+    ).exists
+
     options = feeds[:options]
     source = json_text(options, "json_feed", "icon").not_eq(nil)
       .or(json_text(options, "json_feed", "author", "avatar").not_eq(nil))
-      .or(json_text(options, "image", "url").not_eq(nil))
+      .or(json_text(options, "image", "url").not_eq(nil).and(has_entries).and(has_titled_entry.not))
 
     Feed.joins(join)
       .where(images[:id].eq(nil))

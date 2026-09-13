@@ -33,6 +33,13 @@ class BackfillFeedIconsTest < ActiveSupport::TestCase
     icon = feed("icon", {"json_feed" => {"icon" => "http://example.com/icon.png"}})
     avatar = feed("avatar", {"json_feed" => {"author" => {"avatar" => "http://example.com/me.png"}}})
     image = feed("image", {"image" => {"url" => "http://example.com/logo.png"}})
+    create_entry(image).update!(title: nil)
+    # An RSS image on a feed with titled entries is an article feed's
+    # banner: the job would decline it, so the set leaves it out, and so
+    # does a feed with no entries at all.
+    banner = feed("banner", {"image" => {"url" => "http://example.com/banner.png"}})
+    create_entry(banner).update!(title: "An article")
+    empty = feed("empty", {"image" => {"url" => "http://example.com/logo.png"}})
     podcast = feed("podcast", {"itunes_image" => "http://example.com/cover.jpg", "json_feed" => {"icon" => "http://example.com/icon.png"}})
     stored = feed("stored", {"json_feed" => {"icon" => "http://example.com/icon.png"}})
     create_image_row(provider: :feed_icon, provider_id: stored.id.to_s, feed_id: stored.id, kind: :site_icon, variant: "200x200")
@@ -40,7 +47,7 @@ class BackfillFeedIconsTest < ActiveSupport::TestCase
     create_image_row(provider: :embed_icon, provider_id: icon.id.to_s, feed_id: nil, kind: :avatar, variant: "200x200")
     feed("none", {})
 
-    pending = BackfillFeedIcons.pending.where(id: [icon, avatar, image, podcast, stored].map(&:id))
+    pending = BackfillFeedIcons.pending.where(id: [icon, avatar, image, banner, empty, podcast, stored].map(&:id))
 
     assert_equal [icon.id, avatar.id, image.id].sort, pending.pluck(:id).sort
   end
@@ -142,7 +149,7 @@ class BackfillFeedIconsTest < ActiveSupport::TestCase
     assert_includes sql, %("feeds"."id" BETWEEN 1 AND #{SidekiqHelper::BATCH_SIZE})
     assert_includes sql, %("feeds"."options" -> 'json_feed' ->> 'icon' IS NOT NULL)
     assert_includes sql, %("feeds"."options" -> 'json_feed' -> 'author' ->> 'avatar' IS NOT NULL)
-    assert_includes sql, %("feeds"."options" -> 'image' ->> 'url' IS NOT NULL)
+    assert_includes sql, %("feeds"."options" -> 'image' ->> 'url' IS NOT NULL AND EXISTS (SELECT 1 FROM "entries" WHERE "entries"."feed_id" = "feeds"."id") AND NOT (EXISTS (SELECT 1 FROM "entries" WHERE "entries"."feed_id" = "feeds"."id" AND "entries"."title" IS NOT NULL AND "entries"."title" != '')))
     assert_includes sql, %("feeds"."options" ->> 'itunes_image' IS NULL)
     assert_nothing_raised { BackfillFeedIcons.batch_scope(1).order(:id).load }
   end
