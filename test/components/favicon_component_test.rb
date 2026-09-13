@@ -27,20 +27,29 @@ class FaviconComponentTest < ComponentTestCase
     tweet = load_tweet("one")
     @feed.update(options: {twitter_user: tweet["user"]})
     output = render FaviconComponent.new(feed: @feed)
-    favicon_markup = %(<span class="favicon-wrap twitter-profile-image"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/38cdd03c8be8fcc27c7e933b093f0b4a7015c218/68747470733a2f2f7062732e7477696d672e636f6d2f70726f66696c655f696d616765732f3934363434383034353431353235363036342f626d4579337238412e6a7067" /></span>)
+    favicon_markup = %(<span class="favicon-wrap icon-round"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/38cdd03c8be8fcc27c7e933b093f0b4a7015c218/68747470733a2f2f7062732e7477696d672e636f6d2f70726f66696c655f696d616765732f3934363434383034353431353235363036342f626d4579337238412e6a7067" /></span>)
     assert_equal favicon_markup, output.to_s
   end
 
+  # Deploy 1 only: a proxy url with no row keeps today's derivation for its
+  # shape. The branch goes with the proxy path in Deploy 2.
   test "feed icon" do
     @feed.custom_icon = "http://example.com/custom.png"
     output = render FaviconComponent.new(feed: @feed)
-    assert_equal %(<span class="favicon-wrap twitter-profile-image icon-format-round"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/91a28cf86b9cdea1dcc6c7570f922135db424123/687474703a2f2f6578616d706c652e636f6d2f637573746f6d2e706e67" /></span>), output.to_s
+    assert_equal %(<span class="favicon-wrap icon-round"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/91a28cf86b9cdea1dcc6c7570f922135db424123/687474703a2f2f6578616d706c652e636f6d2f637573746f6d2e706e67" /></span>), output.to_s
+  end
+
+  test "a legacy proxy icon honors custom_icon_format square" do
+    @feed.custom_icon = "http://example.com/custom.png"
+    @feed.custom_icon_format = "square"
+    output = render FaviconComponent.new(feed: @feed)
+    assert_includes output.to_s, "favicon-wrap icon-square"
   end
 
   # A playlist feed mixes videos from many channels. The entry knows its own
   # channel (provider_parent_id); when that channel is not the feed's and its
   # avatar row exists, the entry renders that avatar rather than the feed's
-  # icon. Always round: an embed_icon row is a YouTube channel avatar.
+  # icon. Round because the row's kind is avatar, read from the row.
   test "playlist entry renders the avatar of the channel its video belongs to" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?playlist_id=PLcurated")
@@ -51,7 +60,7 @@ class FaviconComponentTest < ComponentTestCase
       output = render FaviconComponent.new(feed: feed, entry: entry)
 
       assert_includes output.to_s, "https://images.example.com/#{path}"
-      assert_includes output.to_s, "icon-format-round"
+      assert_includes output.to_s, "favicon-wrap icon-round"
     end
   end
 
@@ -160,27 +169,45 @@ class FaviconComponentTest < ComponentTestCase
   end
 
   # A new subscription to a channel someone else already harvested finds the
-  # shared row before its own first harvest writes custom_icon. An empty
-  # format suffix is correct here: application.scss styles
-  # .twitter-profile-image round and only .icon-format-square overrides it.
-  test "channel avatar renders round when the feed has no custom_icon yet" do
+  # shared row before its own first harvest; the row's kind says round.
+  test "channel avatar renders round from the row's kind" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       assert_nil feed.custom_icon
 
-      Image.create!(
-        provider: :embed_icon, provider_id: "UCabc",
-        url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
-        image_fingerprint: SecureRandom.hex(16),
-        original_fingerprint: SecureRandom.hex(16),
-        storage_path: Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png"),
-        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
-      )
+      create_image_row(provider: :embed_icon, provider_id: "UCabc", kind: :avatar, feed_id: nil, variant: "200x200")
 
       output = render FaviconComponent.new(feed: Feed.find(feed.id))
 
-      assert_includes output.to_s, "twitter-profile-image"
-      refute_includes output.to_s, "icon-format-square"
+      assert_includes output.to_s, "favicon-wrap icon-round"
+      refute_includes output.to_s, "twitter-profile-image"
+      refute_includes output.to_s, "icon-format-"
+    end
+  end
+
+  test "a feed's own cover art row renders square from the row's kind" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      create_image_row(
+        provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id, kind: :cover_art,
+        url: "http://example.com/show.jpg", variant: "200x200"
+      )
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_includes output.to_s, "favicon-wrap icon-square"
+    end
+  end
+
+  test "a feed's own avatar row renders round from the row's kind" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      create_image_row(
+        provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id, kind: :avatar,
+        url: "http://example.com/me.png", variant: "200x200"
+      )
+
+      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
+
+      assert_includes output.to_s, "favicon-wrap icon-round"
     end
   end
 
@@ -256,7 +283,7 @@ class FaviconComponentTest < ComponentTestCase
 
   def create_embed_icon(channel_id)
     Image.create!(
-      provider: :embed_icon, provider_id: channel_id,
+      provider: :embed_icon, provider_id: channel_id, kind: :avatar,
       url: "https://yt3.ggpht.com/large.jpg", variant: "200x200",
       image_fingerprint: SecureRandom.hex(16),
       original_fingerprint: SecureRandom.hex(16),
