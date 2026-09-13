@@ -54,13 +54,17 @@ class BackfillAvatarCopies
     end
   end
 
-  # push_bulk slices the push itself.
+  # push_bulk slices the push itself. The table's own first batch may be
+  # above 1 (ids do not start at 1 once anything upstream has been
+  # deleted), so a fresh kickoff (from_batch defaulted to 1) starts at
+  # whichever is later: the table's first batch, or the caller's from_batch.
   def build(from_batch)
     last_id = RemoteFile.maximum(:id)
     return unless last_id
 
+    first_batch = ((RemoteFile.minimum(:id) - 1) / BATCH_SIZE) + 1
     last_batch = ((last_id - 1) / BATCH_SIZE) + 1
-    jobs = (from_batch..last_batch).map { |batch| [batch] }
+    jobs = ([first_batch, from_batch].max..last_batch).map { |batch| [batch] }
     Sidekiq::Client.push_bulk("args" => jobs, "class" => self.class)
   end
 
@@ -83,8 +87,12 @@ class BackfillAvatarCopies
     # credentials, or an outage would otherwise turn a whole batch into
     # "skipped" lines that Sidekiq marks complete. Re-raised so Sidekiq
     # retries the batch; a copied row leaves pending, so the retry resumes
-    # at the first row that was not copied.
-    STORE_ERRORS = [Excon::Error, Fog::Errors::Error].freeze
+    # at the first row that was not copied. ActiveRecord::ActiveRecordError
+    # is here for the same reason: a DB error out of create_image (a bad
+    # connection, a full disk) is batch-level too, not a reason to write
+    # this one row's fingerprint into the log as "skipped" alongside 249
+    # rows that copied fine.
+    STORE_ERRORS = [Excon::Error, Fog::Errors::Error, ActiveRecord::ActiveRecordError].freeze
 
     def initialize(remote_file, client)
       @remote_file = remote_file
@@ -149,25 +157,34 @@ class BackfillAvatarCopies
       end
       cropped = cropper.crop!
 
-      ImageCrawler::Image.new_with_attributes(
-        id: "#{fingerprint}-icon",
-        kind: ::Image.kinds[:avatar],
-        preset_name: "icon",
-        image_urls: [],
-        provider: ::Image.providers[:remote_file],
-        provider_id: fingerprint,
-        original_url: @remote_file.original_url,
-        final_url: @remote_file.original_url,
-        storage_url: @remote_file.storage_url,
-        original_fingerprint: Digest::MD5.file(path).hexdigest,
-        fingerprint: cropped.fingerprint,
-        processed_path: cropped.file,
-        processed_extension: cropped.extension,
-        width: cropped.width,
-        height: cropped.height,
-        bytesize: cropped.size,
-        placeholder_color: cropped.placeholder_color
-      )
+      # cropped.file is a tempfile nothing else references yet: call's own
+      # ensure only knows to clean it up once it is on the returned image's
+      # processed_path, so a raise before that assignment finishes must
+      # clean it up here instead, or it leaks.
+      begin
+        ImageCrawler::Image.new_with_attributes(
+          id: "#{fingerprint}-icon",
+          kind: ::Image.kinds[:avatar],
+          preset_name: "icon",
+          image_urls: [],
+          provider: ::Image.providers[:remote_file],
+          provider_id: fingerprint,
+          original_url: @remote_file.original_url,
+          final_url: @remote_file.original_url,
+          storage_url: @remote_file.storage_url,
+          original_fingerprint: Digest::MD5.file(path).hexdigest,
+          fingerprint: cropped.fingerprint,
+          processed_path: cropped.file,
+          processed_extension: cropped.extension,
+          width: cropped.width,
+          height: cropped.height,
+          bytesize: cropped.size,
+          placeholder_color: cropped.placeholder_color
+        )
+      rescue
+        FileUtils.rm_f(cropped.file)
+        raise
+      end
     end
 
     def log(message)

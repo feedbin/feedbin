@@ -57,8 +57,36 @@ class BackfillAvatarCopiesTest < ActiveSupport::TestCase
     assert_equal remote.storage_url, row.data["legacy_storage_url"]
     assert_nil row.feed_id
     assert Image.same_fingerprint?(Image.url_fingerprint_for(row.url, "200x200"), row.url_fingerprint)
-    assert_requested :put, /test-account\.storage\.example\.com/, times: 1
+    assert_requested :put, %r{\Ahttps://test-account\.storage\.example\.com/.*#{Regexp.escape(row.storage_path)}\z}, times: 1
     assert_empty BackfillAvatarCopies.pending.where(id: remote.id)
+  end
+
+  # STORE_ERRORS is batch-level: a storage outage must fail the batch
+  # visibly so Sidekiq retries it, not log this one row as "skipped"
+  # alongside rows that copied fine.
+  test "a storage error aborts the batch instead of skipping the row" do
+    remote = cached("https://pbs.twimg.com/1.jpg")
+    stub_legacy_object(remote.storage_url)
+    stub_request(:put, /test-account\.storage\.example\.com/).to_raise(Excon::Error::Timeout)
+
+    assert_raises(Excon::Error) { perform_batches_for(remote) }
+
+    assert_equal [remote.id], BackfillAvatarCopies.pending.where(id: remote.id).pluck(:id)
+  end
+
+  # A database error out of create_image is the same kind of batch-level
+  # failure as a storage error: the retry must resume at this row, not
+  # skip it as though it were merely a dead legacy object.
+  test "a database error aborts the batch instead of skipping the row" do
+    remote = cached("https://pbs.twimg.com/1.jpg")
+    stub_legacy_object(remote.storage_url)
+    stub_request(:put, /test-account\.storage\.example\.com/)
+
+    ::Image.stub(:attach!, ->(*) { raise ActiveRecord::StatementInvalid, "boom" }) do
+      assert_raises(ActiveRecord::ActiveRecordError) { perform_batches_for(remote) }
+    end
+
+    assert_equal [remote.id], BackfillAvatarCopies.pending.where(id: remote.id).pluck(:id)
   end
 
   test "a dead legacy object stays pending and does not stop the batch" do
@@ -91,7 +119,7 @@ class BackfillAvatarCopiesTest < ActiveSupport::TestCase
     with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       BackfillAvatarCopies.new.perform(nil, true)
       jobs = BackfillAvatarCopies.jobs
-      assert_equal 1, jobs.first["args"].first
+      assert_equal batches_for(first).first, jobs.first["args"].first
       assert_equal batches_for(last).first, jobs.last["args"].first
       assert_includes jobs.map { it["args"].first }, batches_for(first).first
 
