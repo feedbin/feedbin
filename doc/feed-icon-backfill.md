@@ -48,14 +48,12 @@ create re-enqueues `ImageCrawler::FeedIcon` and self-heals it.
 # Trial: the batch that holds the lowest pending feed id, run inline.
 # Batches number feed ids in blocks of SidekiqHelper::BATCH_SIZE, starting
 # at 1.
-puts BackfillFeedIcons.pending.order(:id).limit(1).pluck(:id).first
-```
-
-Take the id the last line printed as `feed_id`, then:
-
-```ruby
+feed_id = BackfillFeedIcons.pending.order(:id).limit(1).pluck(:id).first
 batch = ((feed_id - 1) / SidekiqHelper::BATCH_SIZE) + 1
+puts "first pending feed: #{feed_id}, batch: #{batch}"
+puts "pending feeds in that batch: #{BackfillFeedIcons.batch_scope(batch).count}"
 BackfillFeedIcons.new.perform(batch)
+puts "Find jobs enqueued by the batch: see the BackfillFeedIcons log line above"
 ```
 
 ## Full run
