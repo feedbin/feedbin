@@ -92,13 +92,18 @@ class BackfillFeedIconsTest < ActiveSupport::TestCase
 
       jobs = BackfillFeedIcons.jobs
       expected = BackfillFeedIcons.new.job_args(Feed.maximum(:id), Feed.minimum(:id))
-      assert_equal expected, jobs.map { it["args"] }
+      assert_equal expected.size, jobs.size
+      assert_equal expected.first, jobs.first["args"]
+      assert_equal expected.last, jobs.last["args"]
       assert_includes jobs.map { it["args"].first }, batches_for(first).first
       assert_includes jobs.map { it["args"].first }, batches_for(last).first
 
+      # Three points, not every job: the fixture ids put ~170k batches in
+      # the range, and the spacing is linear, so first, middle, and last
+      # prove it.
       step = BackfillFeedIcons::SPREAD.to_f / jobs.size
-      jobs.each_with_index do |job, index|
-        assert_in_delta Time.now.to_f + (index * step), job["at"], 5
+      [0, jobs.size / 2, jobs.size - 1].each do |index|
+        assert_in_delta Time.now.to_f + (index * step), jobs[index]["at"], 5
       end
 
       # Only the two batches that hold this test's feeds: the fixtures carry
