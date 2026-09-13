@@ -49,8 +49,11 @@ class IframeEmbed::Youtube < IframeEmbed
     video.duration_in_seconds
   end
 
+  # The channel avatar row the channel harvest stores, never the thumbnail
+  # url: the card must not proxy. `channel` memoizes a miss as `false`, not
+  # `nil`, so `&.` alone would raise on FalseClass; `&&` guards both.
   def profile_image
-    channel && channel.data.safe_dig("snippet", "thumbnails", "medium", "url")
+    channel && channel.channel_image&.public_url
   end
 
   def cache_key

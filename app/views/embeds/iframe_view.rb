@@ -61,7 +61,7 @@ module Embeds
         a data: stimulus_item(actions: {click: :swap_iframe}, for: STIMULUS_CONTROLLER), class: "flex items-center gap-3 sm:gap-4 p-3 sm:p-4 grow min-w-0", href: @media.canonical_url, title: "Visit Embed Source" do
           div class: "flex flex-center sm:w-[48px] sm:h-[48px] w-[36px] h-[36px] shrink-0 place-self-start" do
             if @media.profile_image
-              img src: RemoteFile.signed_url(@media.profile_image), class: "responsive !m-0 !max-w-full rounded-full"
+              img src: @media.profile_image, class: "responsive !m-0 !max-w-full rounded-full"
             else
               Icon("icon-embed-source-#{@media.clean_name}", class: "max-w-full h-auto fill-midnight-500")
             end

@@ -23,11 +23,11 @@ module EntriesHelper
 
   # The one render invocation for the entry list, shared by the view and the
   # cache warmer so the warmer cannot warm keys no view reads.
-  def self.entry_collection(entries, favicons)
+  def self.entry_collection(entries, favicons, avatars = {})
     {
       partial: "entries/entry",
       collection: entries,
-      locals: {favicons: favicons},
+      locals: {favicons: favicons, avatars: avatars},
       cached: ->(entry) { entries_cache_key(entry, favicons) }
     }
   end

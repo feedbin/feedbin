@@ -69,4 +69,17 @@ class IframeEmbed::YoutubeTest < ActiveSupport::TestCase
     embed = IframeEmbed::Youtube.new(@url)
     refute embed.chapters
   end
+
+  # The card's profile image is the channel avatar row, which the channel
+  # harvest already stores; the card never proxies.
+  test "profile_image is the channel row's public url" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      channel = Embed.youtube_channel.create!(provider_id: "UCcard", data: {"snippet" => {"thumbnails" => {"medium" => {"url" => "https://yt3.ggpht.com/medium.jpg"}}}})
+      Embed.youtube_video.create!(provider_id: "videocard", parent_id: "UCcard", data: {})
+      row = create_image_row(provider: :embed_icon, provider_id: "UCcard", feed_id: nil, kind: :avatar, variant: "200x200")
+      embed = IframeEmbed::Youtube.new("https://www.youtube.com/watch?v=videocard")
+
+      assert_equal "https://images.example.com/#{row.storage_path}", embed.profile_image
+    end
+  end
 end

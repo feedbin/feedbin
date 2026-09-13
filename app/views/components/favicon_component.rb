@@ -32,8 +32,10 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
+  # Deploy A only: the proxy on a miss, while the copy backfill runs.
   def icon_twitter_user
-    icon_image(RemoteFile.signed_url(@feed.twitter_user.profile_image_uri_https(:original)), format: "round")
+    url = @feed.twitter_user.profile_image_uri_https(:original).to_s
+    icon_image(Image.avatar_url(url) || RemoteFile.signed_url(url), format: "round")
   end
 
   # The avatar row of this video's own channel, for entries whose channel is

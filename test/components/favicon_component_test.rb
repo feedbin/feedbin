@@ -26,9 +26,19 @@ class FaviconComponentTest < ComponentTestCase
   test "twitter user favicon" do
     tweet = load_tweet("one")
     @feed.update(options: {twitter_user: tweet["user"]})
-    output = render FaviconComponent.new(feed: @feed)
-    favicon_markup = %(<span class="favicon-wrap icon-round"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/38cdd03c8be8fcc27c7e933b093f0b4a7015c218/68747470733a2f2f7062732e7477696d672e636f6d2f70726f66696c655f696d616765732f3934363434383034353431353235363036342f626d4579337238412e6a7067" /></span>)
-    assert_equal favicon_markup, output.to_s
+    url = @feed.twitter_user.profile_image_uri_https(:original).to_s
+
+    proxied = render FaviconComponent.new(feed: @feed)
+    assert_includes proxied.to_s, "favicon-wrap icon-round"
+    assert_includes proxied.to_s, "/files/icons/", "Deploy A only: the proxy until the copy lands"
+
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+      output = render FaviconComponent.new(feed: @feed)
+
+      assert_includes output.to_s, "https://images.example.com/#{row.storage_path}"
+      refute_includes output.to_s, "/files/icons/"
+    end
   end
 
   # Deploy 1 only: a proxy url with no row keeps today's derivation for its
