@@ -94,8 +94,7 @@ class FaviconComponent < ApplicationComponent
   def pages_favicon(host)
     return nil if host.blank?
     return @favicons[host] if @favicons
-    Image.provider_website_favicon.find_by(provider_id: host) ||
-      Favicon.find_by(host: host) # favicons fallback: remove with the favicons table
+    Image.provider_website_favicon.find_by(provider_id: host)
   end
 
   def icon_pages_default

@@ -11,12 +11,6 @@ class FaviconComponentTest < ComponentTestCase
     assert_equal %(<span class="favicon-wrap"><span class="favicon-default favicon-mask" data-color-hash-seed="daringfireball.net"><span class="favicon-inner"></span></span></span>), output.to_s
   end
 
-  test "cdn favicon" do
-    favicon = Favicon.create!(url: "http://example.com/favicon.ico", host: @feed.host)
-    output = render FaviconComponent.new(feed: @feed)
-    assert_equal %(<span class="favicon-wrap"><span class="favicon host-daringfireball-net" style="background-image: url(https://favicons.example.com/favicon.ico);"></span></span>), output.to_s
-  end
-
   test "newsletter favicon" do
     @feed.newsletter!
     output = render FaviconComponent.new(feed: @feed)
@@ -27,16 +21,6 @@ class FaviconComponentTest < ComponentTestCase
     @feed.pages!
     output = render FaviconComponent.new(feed: @feed)
     assert_equal %(<span class="favicon-wrap collection-favicon"><svg width="13.0" height="12.0" class="favicon-saved"><use href="#favicon-saved"></use></svg></span>), output.to_s
-  end
-
-  test "pages article favicon" do
-    @feed.pages!
-    entry = create_entry(@feed)
-    entry.update(url: "http://example.com/article")
-    favicon = Favicon.create!(url: "http://example.com/favicon.ico", host: entry.hostname)
-
-    output = render FaviconComponent.new(feed: @feed, entry: entry)
-    assert_equal %(<span class="favicon-wrap"><span class="favicon host-example-com" style="background-image: url(https://favicons.example.com/favicon.ico);"></span></span>), output.to_s
   end
 
   test "twitter user favicon" do
@@ -98,14 +82,16 @@ class FaviconComponentTest < ComponentTestCase
   end
 
   test "playlist entry with no avatar row falls through to the feed's resolution" do
-    feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?playlist_id=PLcurated", host: "www.youtube.com")
-    entry = create_entry(feed)
-    entry.update!(provider: :youtube, provider_id: "video1", provider_parent_id: "UCunharvested")
-    favicon = Favicon.create!(url: "http://example.com/favicon.ico", host: "www.youtube.com")
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?playlist_id=PLcurated", host: "www.youtube.com")
+      entry = create_entry(feed)
+      entry.update!(provider: :youtube, provider_id: "video1", provider_parent_id: "UCunharvested")
+      create_favicon_row("www.youtube.com")
 
-    output = render FaviconComponent.new(feed: feed, entry: entry)
+      output = render FaviconComponent.new(feed: Feed.find(feed.id), entry: entry)
 
-    assert_includes output.to_s, "host-www-youtube-com"
+      assert_includes output.to_s, "host-www-youtube-com"
+    end
   end
 
   test "feed icon from the stored row is served directly, not through the proxy" do
@@ -208,19 +194,6 @@ class FaviconComponentTest < ComponentTestCase
     end
   end
 
-  # favicons fallback: the legacy row is second, never first.
-  test "the images row outranks the favicons row" do
-    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      Favicon.create!(url: "http://example.com/favicon.ico", host: @feed.host)
-      row = create_favicon_row(@feed.host)
-
-      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
-
-      assert_includes output.to_s, "https://images.example.com/#{row.storage_path}"
-      refute_includes output.to_s, "favicons.example.com"
-    end
-  end
-
   # The entry's host is lower-cased before the lookup and the class.
   test "pages article favicon from the images row" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
@@ -266,6 +239,19 @@ class FaviconComponentTest < ComponentTestCase
       assert_includes output.to_s, "favicon-default"
     end
   end
+
+  # No map and no images row: nothing to render but the default. The legacy
+  # favicons row is gone, so this branch cannot fall through to anything.
+  test "pages article with no images row renders the pages default" do
+    @feed.pages!
+    entry = create_entry(@feed)
+    entry.update!(url: "http://nothing.example.com/article")
+
+    output = render FaviconComponent.new(feed: @feed, entry: entry)
+
+    assert_includes output.to_s, "favicon-saved"
+  end
+
   private
 
   def create_embed_icon(channel_id)
