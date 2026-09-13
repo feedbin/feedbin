@@ -4,15 +4,22 @@
 # processed 32x32 PNG per host, and copying it covers dead hosts and hosts
 # that block the pipeline's user agent, which a re-crawl would lose.
 #
-# Fan-out in the SidekiqHelper style: perform(nil, true) pushes one job per
-# SidekiqHelper::BATCH_SIZE favicon ids at once, and the utility workers
-# drain them. No spread: the copy talks only to S3 and the unified store,
-# so third-party rate limits do not apply, and the utility queue's weight
-# keeps live work ahead.
+# Fan-out: perform(nil, true) pushes one job per BATCH_SIZE favicon ids at
+# once, on the backfill queue, and the backfill workers drain them. No
+# spread: the copy talks only to S3 and the unified store, so third-party
+# rate limits do not apply.
+#
+# Each batch copies its hosts one at a time, so throughput is the number of
+# batch jobs running at once and the tail is the length of one batch. 250
+# ids is a few minutes of one thread, against two hours for the
+# SidekiqHelper size, so every thread stays busy until the last minutes.
+# The batch size rides in the job arguments: a job pushed before this size
+# existed carries a bare batch number and keeps the SidekiqHelper meaning.
 class BackfillFavicons
   include Sidekiq::Worker
-  include SidekiqHelper
   sidekiq_options queue: :backfill
+
+  BATCH_SIZE = 250
 
   # Rows with no website_favicon row for their lower-cased host. A LEFT
   # JOIN anti-join, not NOT IN: NOT IN never becomes an anti-join in
@@ -31,38 +38,44 @@ class BackfillFavicons
 
   # A hash condition, not a SQL fragment: the join brings images into the
   # query, and a bare "id" is ambiguous once both tables are in scope.
-  def self.batch_scope(batch)
-    ids = new.build_ids(batch)
-    pending.where(id: ids.first..ids.last)
+  def self.batch_scope(batch, batch_size = SidekiqHelper::BATCH_SIZE)
+    first = ((batch - 1) * batch_size) + 1
+    pending.where(id: first..(first + batch_size - 1))
   end
 
-  def perform(batch = nil, schedule = false)
+  # batch_size nil on a queued job means it predates the argument: those
+  # jobs were numbered in SidekiqHelper batches. A kickoff without one uses
+  # this job's own size.
+  def perform(batch = nil, schedule = false, batch_size = nil)
     raise "UNIFIED_BUCKET_IMAGES must be configured" unless Image.unified_enabled?
 
     if schedule
-      build
+      build(batch_size || BATCH_SIZE)
     else
-      update(batch)
+      update(batch, batch_size || SidekiqHelper::BATCH_SIZE)
     end
   end
 
-  def build
+  # push_bulk slices the push itself. Every job carries its batch size, so
+  # a later kickoff with a different size cannot renumber jobs in flight.
+  def build(batch_size)
     last_id = Favicon.unscoped.maximum(:id)
     return unless last_id
 
-    job_args(last_id, Favicon.unscoped.minimum(:id)).each_slice(100) do |jobs|
-      Sidekiq::Client.push_bulk("args" => jobs, "class" => self.class)
-    end
+    first_batch = ((Favicon.unscoped.minimum(:id) - 1) / batch_size) + 1
+    last_batch = ((last_id - 1) / batch_size) + 1
+    jobs = (first_batch..last_batch).map { |batch| [batch, false, batch_size] }
+    Sidekiq::Client.push_bulk("args" => jobs, "class" => self.class)
   end
 
   # Reruns are safe: a copied host leaves pending, and create_image upserts
   # by (provider, host) onto a content-addressed path, so a host copied
   # twice in flight writes one row and orphans nothing.
-  def update(batch)
-    rows = self.class.batch_scope(batch).select(:id, :host, :url).order(:id).to_a
+  def update(batch, batch_size)
+    rows = self.class.batch_scope(batch, batch_size).select(:id, :host, :url).order(:id).to_a
     client = Image.unified_client
     copied = rows.count { Copy.new(it, client).call }
-    logger.info "BackfillFavicons: batch=#{batch} scanned=#{rows.size} copied=#{copied} skipped=#{rows.size - copied}"
+    logger.info "BackfillFavicons: batch=#{batch} size=#{batch_size} scanned=#{rows.size} copied=#{copied} skipped=#{rows.size - copied}"
   end
 
   # One legacy favicon into the unified store. Returns true when a row was

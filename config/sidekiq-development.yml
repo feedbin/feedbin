@@ -15,5 +15,6 @@
   - [parse_critical_<%= `hostname`.strip %>, 2]
   - [process_<%= `hostname`.strip %>,        2]
   - [process_critical_<%= `hostname`.strip %>, 3]
+  - [backfill,                               1]
   - [utility,                                1]
   - [utility_critical,                       2]

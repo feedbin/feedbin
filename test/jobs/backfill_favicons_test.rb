@@ -161,9 +161,14 @@ class BackfillFaviconsTest < ActiveSupport::TestCase
     end
   end
 
-  # The fan-out: one job per batch of favicon ids, pushed at once, drained
-  # by the utility workers. No delay and no chain.
-  test "schedule pushes one job per batch of favicon ids" do
+  # The batch that holds an id at the job's own size.
+  def small_batches_for(*records)
+    records.map { |record| ((record.id - 1) / BackfillFavicons::BATCH_SIZE) + 1 }.uniq
+  end
+
+  # The fan-out: one job per BATCH_SIZE favicon ids, pushed at once, each
+  # carrying its size. No delay and no chain.
+  test "schedule pushes one job per batch of favicon ids, carrying the batch size" do
     first = legacy("first.example.com")
     last = legacy("last.example.com")
 
@@ -172,10 +177,39 @@ class BackfillFaviconsTest < ActiveSupport::TestCase
     end
 
     jobs = BackfillFavicons.jobs
-    expected = BackfillFavicons.new.job_args(Favicon.unscoped.maximum(:id), Favicon.unscoped.minimum(:id))
-    assert_equal expected, jobs.map { it["args"] }
-    assert_includes jobs.map { it["args"].first }, batches_for(first).first
-    assert_includes jobs.map { it["args"].first }, batches_for(last).first
+    size = BackfillFavicons::BATCH_SIZE
+    first_batch = ((Favicon.unscoped.minimum(:id) - 1) / size) + 1
+    last_batch = ((Favicon.unscoped.maximum(:id) - 1) / size) + 1
+    assert_equal (first_batch..last_batch).map { |batch| [batch, false, size] }, jobs.map { it["args"] }
+    assert_includes jobs.map { it["args"].first }, small_batches_for(first).first
+    assert_includes jobs.map { it["args"].first }, small_batches_for(last).first
+  end
+
+  test "schedule takes an explicit batch size" do
+    legacy("sized.example.com")
+
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+      BackfillFavicons.new.perform(nil, true, 1_000)
+    end
+
+    assert_equal [1_000], BackfillFavicons.jobs.map { it["args"].last }.uniq
+  end
+
+  # A job carrying a size scopes by that size, and a job without one keeps
+  # the SidekiqHelper meaning it was pushed under.
+  test "a job scopes its ids by the batch size it carries" do
+    inside = legacy("sized-inside.example.com")
+    stub_legacy_png(inside)
+    stub_unified_put
+    batch = small_batches_for(inside).first
+
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+      BackfillFavicons.new.perform(batch + 1, false, BackfillFavicons::BATCH_SIZE)
+      assert_not_requested :get, inside.url
+
+      BackfillFavicons.new.perform(batch, false, BackfillFavicons::BATCH_SIZE)
+      assert_requested :get, inside.url
+    end
   end
 
   test "schedule with no rows pushes nothing" do
@@ -201,6 +235,9 @@ class BackfillFaviconsTest < ActiveSupport::TestCase
     assert_includes sql, %("images"."provider" = 6)
     assert_includes sql, %("favicons"."id" BETWEEN 1 AND #{SidekiqHelper::BATCH_SIZE})
     assert_nothing_raised { BackfillFavicons.batch_scope(1).order(:id).load }
+
+    sized = BackfillFavicons.batch_scope(3, 250).order(:id).to_sql
+    assert_includes sized, %("favicons"."id" BETWEEN 501 AND 750)
   end
 
   test "refuses to run without unified storage configured" do
