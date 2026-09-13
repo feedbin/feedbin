@@ -1,6 +1,15 @@
 require "test_helper"
 
 class ImageTest < ActiveSupport::TestCase
+  # The one reader of kind for layout: a person or a channel renders in a
+  # round frame, everything else in a square one.
+  test "icon_format is round for an avatar and square for every other kind" do
+    assert_equal "round", create_image_row(kind: :avatar).icon_format
+    assert_equal "square", create_image_row(kind: :cover_art, provider_id: "2").icon_format
+    assert_equal "square", create_image_row(kind: :site_icon, provider_id: "3").icon_format
+    assert_equal "square", create_image_row(kind: :poster, provider_id: "4").icon_format
+  end
+
   test "url_fingerprint_for strips and hashes url and variant" do
     assert_equal Digest::MD5.hexdigest("542x304|http://example.com/a.jpg"),
       Image.url_fingerprint_for(" http://example.com/a.jpg ", "542x304")

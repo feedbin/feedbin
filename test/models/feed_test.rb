@@ -192,6 +192,65 @@ end
     assert_match "/files/icons/", feed.icon_url
   end
 
+  # The shape comes from the same row icon_url serves, in the same order, so
+  # the url and the frame can never disagree.
+  test "icon_format reads the kind of the feed's own row" do
+    feed = create_feeds(users(:ben)).first
+    create_image_row(
+      provider: :feed_icon, provider_id: feed.id.to_s, feed_id: feed.id, kind: :cover_art,
+      url: "http://example.com/show.jpg", variant: "200x200"
+    )
+
+    assert_equal "square", Feed.find(feed.id).icon_format
+  end
+
+  test "icon_format is round for an avatar row" do
+    feed = create_feeds(users(:ben)).first
+    create_image_row(
+      provider: :feed_icon, provider_id: feed.id.to_s, feed_id: feed.id, kind: :avatar,
+      url: "http://example.com/me.png", variant: "200x200"
+    )
+
+    assert_equal "round", Feed.find(feed.id).icon_format
+  end
+
+  test "icon_format falls back to the channel row and is nil with no row" do
+    feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
+    assert_nil Feed.find(feed.id).icon_format
+
+    create_image_row(provider: :embed_icon, provider_id: "UCabc", kind: :avatar, feed_id: nil, variant: "200x200")
+
+    assert_equal "round", Feed.find(feed.id).icon_format
+  end
+
+  test "icon_format and icon_url resolve the same row when both exist" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
+      own = create_image_row(
+        provider: :feed_icon, provider_id: feed.id.to_s, feed_id: feed.id, kind: :cover_art,
+        url: "http://example.com/show.jpg", variant: "200x200"
+      )
+      create_image_row(provider: :embed_icon, provider_id: "UCabc", kind: :avatar, feed_id: nil, variant: "200x200")
+
+      assert_equal "https://images.example.com/#{own.storage_path}", Feed.find(feed.id).icon_url
+      assert_equal "square", Feed.find(feed.id).icon_format
+    end
+  end
+
+  # The parser's test on the parsed entries, asked of the stored ones: a
+  # micropost feed is one with entries and no titles.
+  test "micropost? is true only when the feed has entries and none has a title" do
+    feed = Feed.create!(feed_url: Faker::Internet.url)
+    assert_not feed.micropost?, "no entries is not a micropost feed"
+
+    untitled = create_entry(feed)
+    untitled.update!(title: nil)
+    assert Feed.find(feed.id).micropost?
+
+    create_entry(feed).update!(title: "A titled post")
+    assert_not Feed.find(feed.id).micropost?
+  end
+
   # The host's images row, or nothing: the legacy favicons row is gone.
   test "site_favicon is the host's images row" do
     feed = create_feeds(users(:ben)).first

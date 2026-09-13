@@ -44,6 +44,13 @@ class Image < ApplicationRecord
     poster:    3,     # stands for the item: lead image, video thumbnail, og:image of a linked page
   }, prefix: true
 
+  # The frame this picture renders in. A person or a channel is round;
+  # a work, a site, or a poster is square. The only reader of kind for
+  # layout, so the shape has one derivation.
+  def icon_format
+    kind_avatar? ? "round" : "square"
+  end
+
   normalizes :url, with: -> url { url.strip }
 
   # The data JSON's schema as real accessors.

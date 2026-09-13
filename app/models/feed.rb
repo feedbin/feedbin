@@ -116,6 +116,20 @@ class Feed < ApplicationRecord
       (icon && RemoteFile.signed_url(icon))
   end
 
+  # The frame for this feed's icon, from the kind of the row icon_url
+  # serves, in the same order. nil when no row exists, which is also when
+  # icon_url has no row to serve.
+  def icon_format
+    (icon_image_record || channel_image_record)&.icon_format
+  end
+
+  # A feed whose entries carry no titles: a stream of posts rather than
+  # articles. The parser tests the same condition on the parsed entries; the
+  # stored ones exist by the time the icon crawler asks.
+  def micropost?
+    entries.exists? && !entries.where.not(title: [nil, ""]).exists?
+  end
+
   # The favicon to render for this host, or nil.
   def site_favicon
     favicon_image_record
