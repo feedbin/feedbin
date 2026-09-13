@@ -296,4 +296,26 @@ end
     assert_nil Feed.find(feed.id).favicon_image_record
     assert_nil Feed.find(feed.id).site_favicon
   end
+
+  # Every shape a feed can hand us for an icon, resolved against the feed's
+  # own url. A plain relative path is the one that used to break: the
+  # heuristic parser read "icon.png" as a host and produced http://icon.png.
+  test "feed_relative_url resolves every relative shape against the feed url" do
+    feed = Feed.new(feed_url: "https://example.com/blog/feed/index.json")
+
+    assert_equal "https://example.com/icon.png", feed.feed_relative_url("/icon.png")
+    assert_equal "https://example.com/blog/feed/icon.png", feed.feed_relative_url("icon.png")
+    assert_equal "https://example.com/blog/icon.png", feed.feed_relative_url("../icon.png")
+    assert_equal "https://cdn.example.net/icon.png", feed.feed_relative_url("//cdn.example.net/icon.png")
+    assert_equal "https://cdn.example.net/icon.png", feed.feed_relative_url("https://cdn.example.net/icon.png")
+    assert_equal "https://example.com/icon.png", feed.feed_relative_url("  /icon.png ")
+  end
+
+  # The root still goes through the heuristic parser: a feed url stored
+  # without a scheme resolves as before.
+  test "feed_relative_url keeps a scheme-less root working" do
+    feed = Feed.new(feed_url: "example.com/feed.xml")
+
+    assert_equal "http://example.com/icon.png", feed.feed_relative_url("/icon.png")
+  end
 end

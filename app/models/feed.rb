@@ -267,8 +267,11 @@ class Feed < ApplicationRecord
     return relative.strip if relative.strip.downcase.start_with?("http")
     return nil if root.blank?
 
+    # The root may be stored without a scheme, so it gets the heuristic
+    # parser. The relative part must not: heuristic_parse reads a plain
+    # "icon.png" as a host and the join then yields http://icon.png.
     root = Addressable::URI.heuristic_parse(root)
-    relative = Addressable::URI.heuristic_parse(relative)
+    relative = Addressable::URI.parse(relative.strip)
     Addressable::URI.join(root, relative)
   rescue Addressable::URI::InvalidURIError
     Rails.logger.error("Invalid uri feed=#{id} root=#{root} relative=#{relative}")
