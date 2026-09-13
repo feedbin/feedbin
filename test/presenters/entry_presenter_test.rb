@@ -61,10 +61,8 @@ class EntryPresenterTest < ActionView::TestCase
     assert_nil presenter_for(entry).media_image
   end
 
-  # A micropost author is a person, like the tweet branch above it in
-  # profile_image -- both frame round, never the feed's icon_format.
-  test "profile_image frames a micropost author's avatar round" do
-    entry = @feed.entries.create!(
+  def micropost_entry(avatar: "https://micro.blog/someone/avatar.jpg")
+    @feed.entries.create!(
       title: nil,
       url: "https://micro.blog/someone/1",
       content: "<p>hi</p>",
@@ -72,12 +70,37 @@ class EntryPresenterTest < ActionView::TestCase
       entry_id: SecureRandom.hex,
       published: Time.now,
       data: {"author" => {"name" => "Someone", "url" => "https://micro.blog/someone",
-        "avatar" => "https://micro.blog/someone/avatar.jpg", "_microblog" => {"username" => "someone"}}}
+        "avatar" => avatar, "_microblog" => {"username" => "someone"}}}
     )
+  end
 
-    output = presenter_for(entry).profile_image
+  # A micropost author is a person, like the tweet branch above it in
+  # profile_image -- both frame round, never the feed's icon_format. The
+  # row is the source; it is on our CDN and must not go through the proxy.
+  test "profile_image renders a micropost author's avatar row round" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      entry = micropost_entry
+      row = create_image_row(provider: :entry_icon, provider_id: entry.id.to_s, feed_id: entry.feed_id, kind: :avatar, variant: "200x200")
+
+      output = presenter_for(Entry.find(entry.id)).profile_image
+
+      assert_includes output, "favicon-wrap icon-round"
+      assert_includes output, "https://images.example.com/#{row.storage_path}"
+      refute_includes output, "/files/icons/"
+    end
+  end
+
+  # Deploy A only: the proxy while the copy runs. Goes with the proxy.
+  test "profile_image falls back to the proxy for a micropost with no row" do
+    output = presenter_for(micropost_entry).profile_image
 
     assert_includes output, "favicon-wrap icon-round"
-    refute_includes output, "twitter-profile-image"
+    assert_includes output, "/files/icons/"
+  end
+
+  test "profile_image renders the feed's icon for a micropost with no avatar at all" do
+    output = presenter_for(micropost_entry(avatar: nil)).profile_image
+
+    refute_includes output, "/files/icons/"
   end
 end

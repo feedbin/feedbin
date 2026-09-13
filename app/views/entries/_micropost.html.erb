@@ -9,10 +9,13 @@
               signing nil produces a route with no :url segment and raises while
               the second argument is still being computed. EntryPresenter guards
               this the same way. %>
-          <% avatar = micropost.micropost.author_avatar %>
+          <%# The author's row first. Deploy A only: the proxy while the copy
+              backfill runs; the second half goes with the proxy. %>
+          <% avatar = micropost.author_avatar_record&.public_url ||
+               (micropost.micropost.author_avatar.presence && RemoteFile.signed_url(micropost.micropost.author_avatar)) %>
           <% default_avatar = image_url("favicon-profile-default.png") %>
           <%= link_to micropost.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
-            <%= image_tag_with_fallback(default_avatar, avatar.present? ? RemoteFile.signed_url(avatar) : default_avatar, size: "47x47", alt: "") %>
+            <%= image_tag_with_fallback(default_avatar, avatar || default_avatar, size: "47x47", alt: "") %>
           <% end %>
         </div>
         <div class="grow flex gap-4 space-between items-last-baseline">

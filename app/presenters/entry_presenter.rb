@@ -481,15 +481,21 @@ class EntryPresenter < BasePresenter
         fallback = @template.image_url("favicon-profile-default.png")
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
-    elsif entry.micropost? && entry.micropost.author_avatar
+    elsif entry.micropost? && (avatar = micropost_avatar_url)
       @template.content_tag :span, "", class: "favicon-wrap icon-round" do
         fallback = @template.image_url("favicon-profile-default.png")
-        url = RemoteFile.signed_url(entry.micropost.author_avatar)
-        @template.image_tag_with_fallback(fallback, url, alt: "")
+        @template.image_tag_with_fallback(fallback, avatar, alt: "")
       end
     else
       favicon(entry.feed, entry)
     end
+  end
+
+  # The author's row first, preloaded with the entry. Deploy A only: the
+  # proxy while the copy backfill runs; the second half goes with the proxy.
+  def micropost_avatar_url
+    entry.author_avatar_record&.public_url ||
+      (entry.micropost.author_avatar.presence && RemoteFile.signed_url(entry.micropost.author_avatar))
   end
 
   def summary
