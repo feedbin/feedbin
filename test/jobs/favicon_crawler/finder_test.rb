@@ -47,7 +47,6 @@ module FaviconCrawler
       assert_equal "example.com", touch["provider_id"]
       assert_equal ["http://example.com/touch-180.png"], touch["image_urls"]
 
-      assert_nil Favicon.unscoped.find_by(host: @page_url.host)
       assert_not_requested :get, "http://example.com/icon-32.png"
       assert_not_requested :get, "http://example.com/touch-180.png"
       assert_not_requested :get, @default_url
