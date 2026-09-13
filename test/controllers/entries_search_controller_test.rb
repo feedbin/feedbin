@@ -19,30 +19,43 @@ class EntriesSearchControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:page_query).total_entries
   end
 
-  # The entry list template reaches for the feed's favicon; the search
-  # paths must preload it like every other caller.
+  # The entry list template reaches for the feed's favicon; the search path
+  # builds @entries off the search result, not entries_list, so it needs its
+  # own preload of the images row. Compared across two distinct-feed sizes
+  # rather than a fixed number, spread across feeds so a shared Feed
+  # instance's association cache cannot hide a missing preload.
   test "search results preload the favicon the shared template renders" do
     login_as @user
     token = "faviconpreloadtoken"
-    # One feed per entry: a shared Feed instance's association cache would
-    # hide the missing preload.
-    feeds = 5.times.map { |index|
-      feed = Feed.create!(feed_url: "http://preload#{index}.example.com/feed.xml", host: "preload#{index}.example.com", title: "Feed #{index}")
+
+    few_feeds = 2.times.map { |index|
+      feed = Feed.create!(feed_url: "http://faviconfew#{index}.example.com/feed.xml", host: "faviconfew#{index}.example.com", title: "Favicon Few #{index}")
       @user.subscriptions.create!(feed: feed)
       feed
     }
-    entries = feeds.map { create_entry(it).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    few_entries = few_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    few_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
     Search.client { it.refresh }
 
-    statements = capture_sql do
-      get :search, params: {query: token}, xhr: true
-    end
+    with_few_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
+
+    many_feeds = 6.times.map { |index|
+      feed = Feed.create!(feed_url: "http://faviconmany#{index}.example.com/feed.xml", host: "faviconmany#{index}.example.com", title: "Favicon Many #{index}")
+      @user.subscriptions.create!(feed: feed)
+      feed
+    }
+    many_entries = many_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
+    many_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
+    Search.client { it.refresh }
+
+    with_many_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
 
     assert_response :success
-    assert_operator assigns(:entries).to_a.size, :>=, 5
-    favicons = statements.select { it.match?(/FROM "favicons"/i) }
-    assert_operator favicons.count, :<=, 1, "one favicon query per result: #{favicons.count}"
+    assert_operator assigns(:entries).to_a.size, :>=, 8
+    pattern = /FROM "images"/i
+    few = with_few_feeds.count { it.match?(pattern) }
+    many = with_many_feeds.count { it.match?(pattern) }
+    assert_equal few, many, "the favicon lookup scales with the number of distinct feeds: #{few} then #{many}"
   end
 
   # The search path builds @entries off the search result, not
