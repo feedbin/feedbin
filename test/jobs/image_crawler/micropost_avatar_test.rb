@@ -151,6 +151,51 @@ module ImageCrawler
       assert_empty Pipeline::Find.jobs
     end
 
+    # Find writes whichever candidate landed as the row's url. When the
+    # legacy object won, the row must still answer to the avatar url the
+    # entries carry, or every later lookup misses and downloads again.
+    test "receive re-keys a row that landed on the legacy object to the asked url" do
+      first = post("https://micro.example/a.png")
+      second = post("https://micro.example/a.png")
+      landed = create_image_row(
+        provider: :entry_icon, provider_id: first.id.to_s, feed_id: @feed.id, kind: :avatar,
+        url: "https://icons.example.net/abc/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://icons.example.net/abc/a.png"}
+      )
+      before = landed.updated_at
+
+      MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s})
+
+      landed.reload
+      assert_equal "https://micro.example/a.png", landed.url
+      # url_fingerprint is a uuid column: it reads back dashed, while
+      # url_fingerprint_for computes bare hex, so same_fingerprint? is the
+      # comparison that actually holds (see Image's own note on this).
+      assert ::Image.same_fingerprint?(::Image.url_fingerprint_for("https://micro.example/a.png", "200x200"), landed.url_fingerprint)
+      assert_equal before, landed.updated_at
+      assert_equal landed.storage_path, avatar_row_for(second).storage_path
+      # existing_row returns the newest row sharing this fingerprint, and
+      # attaching the sibling above created one; it carries the same
+      # storage_path/image_fingerprint as the re-keyed row, which is what
+      # a later lookup by the asked url actually needs.
+      found = MicropostAvatar.existing_row("https://micro.example/a.png")
+      assert_equal landed.storage_path, found.storage_path
+      assert_equal landed.image_fingerprint, found.image_fingerprint
+    end
+
+    test "attaches to an earlier post's own row for the same url" do
+      earlier = post("https://micro.example/a.png")
+      row = create_image_row(
+        provider: :entry_icon, provider_id: earlier.id.to_s, feed_id: @feed.id, kind: :avatar,
+        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://micro.example/a.png"}
+      )
+      later = post("https://micro.example/a.png")
+
+      assert_equal [1, 0], MicropostAvatar.schedule(@feed)
+
+      assert_empty Pipeline::Find.jobs
+      assert_equal row.storage_path, avatar_row_for(later).storage_path
+    end
+
     test "receive raises on a payload without storage_path" do
       first = post("https://micro.example/a.png")
 

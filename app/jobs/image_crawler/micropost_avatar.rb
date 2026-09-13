@@ -86,7 +86,8 @@ module ImageCrawler
     # The newest row already holding this url's picture at the avatar
     # variant: an earlier post's row, or a copy of the proxy's cache. One
     # indexed read on url_fingerprint; the preset comes out of data through
-    # Arel, nothing is interpolated.
+    # Arel, nothing is interpolated. icon rows exist once the copy backfill
+    # runs; until then only micropost_avatar rows match.
     def self.existing_row(url)
       ::Image.where(url_fingerprint: ::Image.url_fingerprint_for(url, VARIANT))
         .where(::Image.data_projection("preset").in([PRESET, "icon"]))
@@ -139,8 +140,25 @@ module ImageCrawler
       return if row.nil? || row.feed_id.nil?
 
       feed = Feed.find(row.feed_id)
-      siblings = self.class.avatar_groups(feed, self.class.pending_entries(feed).to_a)[row.url]
-      siblings&.each { |entry| self.class.attach(entry, row.url, row) }
+      entry = feed.entries.select(:id, :feed_id, :url, :data, :title, :public_id).find_by(id: row.provider_id)
+      return if entry.nil?
+
+      post = Micropost.new(entry.data, entry.title, feed: feed)
+      asked = post.valid? ? entry.rebase_url(post.author_avatar) : nil
+      return if asked.blank?
+
+      # Find tries the avatar url first and the legacy object second; when
+      # the legacy object wins, the row lands keyed on that url, not the
+      # avatar url every entry and later lookup asks for. Re-key it here so
+      # avatar_groups and existing_row find it. update_columns: the touch
+      # rule is that images.updated_at moves only when the stored bytes
+      # move, and re-keying the url does not.
+      if row.url != asked
+        row.update_columns(url: asked, url_fingerprint: ::Image.url_fingerprint_for(asked, row.variant))
+      end
+
+      siblings = self.class.avatar_groups(feed, self.class.pending_entries(feed).to_a).fetch(asked, [])
+      siblings.each { |sibling| self.class.attach(sibling, asked, row) }
     end
   end
 end
