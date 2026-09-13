@@ -126,6 +126,13 @@ class Feed < ApplicationRecord
   # A feed whose entries carry no titles: a stream of posts rather than
   # articles. The parser tests the same condition on the parsed entries; the
   # stored ones exist by the time the icon crawler asks.
+  #
+  # Feed's own after_create enqueues ImageCrawler::FeedIcon before
+  # create_from_parsed_feed has stored the feed's entries, so a worker that
+  # wins that race sees no entries and this returns false even for a
+  # micropost feed. Subscription's after_create enqueues the same crawler
+  # again, and by then the entries are stored, so that later run is what
+  # recovers the right answer.
   def micropost?
     entries.exists? && !entries.where.not(title: [nil, ""]).exists?
   end
