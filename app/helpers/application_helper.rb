@@ -117,8 +117,7 @@ module ApplicationHelper
 
   def favicon_with_host(host, generated: false)
     host = host.to_s.downcase
-    record = Image.provider_website_favicon.find_by(provider_id: host) ||
-      Favicon.find_by(host: host) # favicons fallback: remove with the favicons table
+    record = Image.provider_website_favicon.find_by(provider_id: host)
     favicon_with_record(record, host: host, generated: generated)
   end
 
