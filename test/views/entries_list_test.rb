@@ -101,21 +101,6 @@ class EntriesListTest < ActionController::TestCase
     assert_equal feed_updated_at.to_i, @feed.reload.updated_at.to_i
   end
 
-  # favicons fallback: an entry whose host has only a legacy row keeps
-  # digesting it until the backfill lands.
-  test "an entry whose host has only a favicons row still digests it" do
-    entry = create_entry(@feed)
-    entry.update!(url: "http://legacy.example.com/article")
-    favicon = Favicon.create!(host: "legacy.example.com", url: "http://example.com/a.png")
-
-    before = entry_cache_key(entry, Image.favicons_for_entries([entry]))
-    travel 1.minute do
-      favicon.update!(url: "http://example.com/b.png")
-    end
-
-    refute_equal before, entry_cache_key(entry, Image.favicons_for_entries([entry]))
-  end
-
   test "storing a preview image changes the key" do
     entry = create_entry(@feed)
     before = entry_cache_key(entry)

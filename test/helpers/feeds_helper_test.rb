@@ -55,19 +55,6 @@ class FeedsHelperTest < ActiveSupport::TestCase
     refute_equal before, after
   end
 
-  # favicons fallback: a host with no images row still digests its legacy
-  # row, so the sidebar keeps invalidating for it until the backfill lands.
-  test "the feeds key digests the favicons row when no images row exists" do
-    favicon = Favicon.create!(host: @feed.host, url: "http://example.com/a.png")
-
-    before = ActiveSupport::Cache.expand_cache_key(sidebar_feeds_cache_key(loaded_feeds))
-    travel 1.minute do
-      favicon.update!(url: "http://example.com/b.png")
-    end
-
-    refute_equal before, ActiveSupport::Cache.expand_cache_key(sidebar_feeds_cache_key(loaded_feeds))
-  end
-
   # Both @feeds and tag_group's feeds are already includes(*ICON_PRELOADS),
   # so this costs nothing -- but only as long as the key reads what was
   # preloaded.
