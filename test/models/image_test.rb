@@ -1,6 +1,40 @@
 require "test_helper"
 
 class ImageTest < ActiveSupport::TestCase
+  # A row copied from the proxy's cache, keyed by the MD5 of its url, the
+  # legacy remote_files key. Tweet avatars and embed profile images resolve
+  # here: legacy data with no crawler.
+  test "avatar_url resolves a copied row by the url's fingerprint" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      url = "https://pbs.twimg.com/profile_images/1/me.jpg"
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+
+      assert_equal "https://images.example.com/#{row.storage_path}", Image.avatar_url(url)
+      assert_nil Image.avatar_url("https://pbs.twimg.com/profile_images/2/other.jpg")
+      assert_nil Image.avatar_url(nil)
+    end
+  end
+
+  # The entry list resolves the page's tweet avatars in one query and hands
+  # the map down as a local, keyed by url. A url with no row is absent.
+  test "avatars_for_entries maps the page's tweet avatar urls in one query" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      feed = feeds(:daring_fireball)
+      tweet = create_entry(feed)
+      tweet.update!(data: {"tweet" => load_tweet("one")})
+      url = tweet.tweet_avatar_urls.first
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+      plain = create_entry(feed)
+
+      map = nil
+      statements = capture_sql { map = Image.avatars_for_entries([tweet, plain]) }
+
+      assert_equal "https://images.example.com/#{row.storage_path}", map[url]
+      assert_equal 1, statements.count { it.match?(/FROM "images"/i) }
+      assert_empty Image.avatars_for_entries([plain])
+    end
+  end
+
   # The one reader of kind for layout: a person or a channel renders in a
   # round frame, everything else in a square one.
   test "icon_format is round for an avatar and square for every other kind" do

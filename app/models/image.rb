@@ -83,6 +83,28 @@ class Image < ApplicationRecord
     provider_website_favicon.where(provider_id: hosts).index_by(&:provider_id)
   end
 
+  # A row copied from the proxy's cache, keyed by the MD5 of its url, the
+  # legacy remote_files key. Tweet avatars and embed profile images: legacy
+  # data with no crawler, resolved by url. A caller rendering one entry uses
+  # this; the entry list uses avatars_for_entries.
+  def self.avatar_url(url)
+    return nil if url.blank?
+    provider_remote_file.find_by(provider_id: RemoteFile.fingerprint(url.to_s))&.public_url
+  end
+
+  # The page's tweet avatars in one query, keyed by url. A url with no row
+  # is absent, so the reader's fallback runs on a miss.
+  def self.avatars_for_entries(entries)
+    urls = Array(entries).flat_map(&:tweet_avatar_urls).uniq
+    return {} if urls.empty?
+
+    by_fingerprint = provider_remote_file.where(provider_id: urls.map { RemoteFile.fingerprint(it) }).index_by(&:provider_id)
+    urls.each_with_object({}) do |url, map|
+      row = by_fingerprint[RemoteFile.fingerprint(url)]
+      map[url] = row.public_url if row&.public_url
+    end
+  end
+
   before_save :fingerprint_url
 
   # Identity is (url, variant): one URL rendered at two sizes is two stored

@@ -328,6 +328,17 @@ class Entry < ApplicationRecord
       end
   end
 
+  # Every avatar the list can render for a tweet entry: the author, the
+  # retweeter, and a quoted author, at the original size the readers ask
+  # for. Empty for anything but a tweet.
+  def tweet_avatar_urls
+    return [] unless tweet?
+
+    users = [tweet.main_tweet.user, tweet.user]
+    users << tweet.main_tweet.quoted_status.user if tweet.main_tweet.quoted_status?
+    users.filter_map { it.profile_image_uri_https(:original)&.to_s if it.profile_image_uri? }.uniq
+  end
+
   def json_feed
     data&.respond_to?(:dig) && data&.safe_dig("json_feed")
   end

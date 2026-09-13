@@ -378,6 +378,20 @@ class EntryTest < ActiveSupport::TestCase
     assert_not_nil entries.first.author_avatar_record
   end
 
+  # Every avatar the list can render for a tweet: the author, the retweeter,
+  # and a quoted author, at the original size the readers request.
+  test "tweet_avatar_urls lists the tweet's people and is empty otherwise" do
+    entry = create_entry(feeds(:daring_fireball))
+    assert_equal [], entry.tweet_avatar_urls
+
+    entry.update!(data: {"tweet" => load_tweet("one")})
+    urls = Entry.find(entry.id).tweet_avatar_urls
+
+    assert_not_empty urls
+    assert urls.all? { it.start_with?("https://") }
+    assert_equal urls.uniq, urls
+  end
+
   private
 
   # FactoryHelper's factory, keyed to an entry. It seeds a legacy url so the

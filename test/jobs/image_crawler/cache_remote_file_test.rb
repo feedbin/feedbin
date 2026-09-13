@@ -27,26 +27,24 @@ module ImageCrawler
       assert_equal ::Image.providers[:remote_file], args["provider"]
     end
 
-    test "creates a remote file" do
-      assert_difference "RemoteFile.count", 1 do
-        CacheRemoteFile.new.perform(@url, @image)
+    # The row is written by Upload; nothing enters the legacy store any more.
+    test "writes no remote file on callback" do
+      assert_no_difference "RemoteFile.count" do
+        CacheRemoteFile.new.perform(@url, @image.merge("storage_path" => "abc/abc123.png"))
       end
-
-      remote_file = RemoteFile.find_by(fingerprint: "bc5431c75680852f26ff34e4688af32b")
-      assert_equal @image["original_url"], remote_file.original_url
-      assert_equal @image["processed_url"], remote_file.storage_url
-      assert_equal @image["width"], remote_file.width
-      assert_equal @image["height"], remote_file.height
     end
 
-    test "is idempotent when the fingerprint already exists" do
-      CacheRemoteFile.new.perform(@url, @image)
+    test "the icon preset is png, unified, content addressed, and keeps its callback" do
+      preset = Image.new(preset_name: "icon").preset
 
-      assert_no_difference "RemoteFile.count" do
-        assert_nothing_raised do
-          CacheRemoteFile.new.perform(@url, @image)
-        end
-      end
+      assert_equal 200, preset.width
+      assert_equal 200, preset.height
+      assert_equal :limit_png, preset.crop
+      assert_equal "png", preset.format
+      assert preset.unified
+      assert preset.content_addressed
+      assert_not preset.legacy_store
+      assert_equal CacheRemoteFile, preset.job_class
     end
   end
 end

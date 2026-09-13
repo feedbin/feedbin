@@ -131,14 +131,19 @@ module ImageCrawler
         legacy_store: false,
         job_class: MicropostAvatar
       },
+      # The copy backfill's target for the proxy's cached avatars, keyed by
+      # url fingerprint on the remote_file provider. Once legacy-only; now
+      # unified, and its callback writes nothing.
       icon: {
-        width: 400,
-        height: 400,
+        width: 200,
+        height: 200,
         minimum_size: nil,
-        crop: :limit_crop,
-        bucket: RemoteFile::BUCKET,
-        region: RemoteFile::REGION,
+        crop: :limit_png,
+        format: "png",
         validate: false,
+        unified: true,
+        content_addressed: true,
+        legacy_store: false,
         job_class: CacheRemoteFile
       },
       favicon: {
