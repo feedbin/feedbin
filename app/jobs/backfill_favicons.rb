@@ -50,7 +50,7 @@ class BackfillFavicons
     last_id = Favicon.unscoped.maximum(:id)
     return unless last_id
 
-    job_args(last_id, Favicon.unscoped.minimum(:id)).each_slice(10_000) do |jobs|
+    job_args(last_id, Favicon.unscoped.minimum(:id)).each_slice(100) do |jobs|
       Sidekiq::Client.push_bulk("args" => jobs, "class" => self.class)
     end
   end
