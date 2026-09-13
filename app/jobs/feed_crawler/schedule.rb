@@ -6,6 +6,8 @@ module FeedCrawler
 
     COUNT_KEY = "feed_refresher_scheduler:count".freeze
     LAST_REFRESH_KEY = "feed_refresher_scheduler:last_refresh".freeze
+    LOCK_KEY = "feed_refresher_scheduler:lock".freeze
+    LOCK_TTL = 15.minutes
 
     def perform
       queues = [Downloader, Receiver]
@@ -19,7 +21,22 @@ module FeedCrawler
         return
       end
 
-      refresh_feeds
+      # The guards above only read. Jobs that queue up during a deploy start
+      # together once the workers return, and each one passes both guards
+      # until the first push lands. The lock is one atomic check-and-set, so
+      # exactly one of them refreshes; the rest skip. It marks a refresh in
+      # progress, so it is released at the end; the last-refresh guard owns
+      # the cool-down, and the TTL only bounds a run that dies mid-way.
+      unless RedisLock.acquire(LOCK_KEY, LOCK_TTL.to_i)
+        Sidekiq.logger.info "skipping, another crawl schedule holds the lock"
+        return
+      end
+
+      begin
+        refresh_feeds
+      ensure
+        Sidekiq.redis { _1.del(LOCK_KEY) }
+      end
     end
 
     def refresh_feeds
