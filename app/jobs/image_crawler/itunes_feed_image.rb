@@ -33,9 +33,11 @@ module ImageCrawler
       end
     end
 
+    # Row-backed: the row is the read path and its kind is the shape. The
+    # touch moves the cached views, because new artwork can land under the
+    # same path.
     def receive
       @image.fetch("storage_path")
-      @feed.update(custom_icon_format: "square")
       @feed.touch
     end
   end

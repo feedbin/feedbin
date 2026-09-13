@@ -97,13 +97,6 @@ class HarvestEmbeds
         # keyed by the channel, so a playlist entry from a channel nobody
         # subscribes to directly resolves through the same row.
         ImageCrawler::ChannelImage.schedule(channel)
-
-        # where: one channel can own several feed rows (http/https, www
-        # variants). custom_icon keeps the small default thumbnail -- it is
-        # only the fallback until the images row lands.
-        Feed.where(channel_id: channel.provider_id).find_each do |feed|
-          feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
-        end
       end
 
       Entry.provider_youtube.where(provider_id: ids).each do |entry|

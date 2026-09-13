@@ -46,7 +46,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
 
     assert_equal("channel_id", @entry.reload.provider_parent_id)
     assert_equal(9743, @entry.reload.embed_duration)
-    assert_equal("image_url", @feed.reload.custom_icon)
+    assert_nil @feed.reload.custom_icon, "the channel row is the icon; nothing is copied out of the embed"
   end
 
   test "should survive a youtube response with no items" do
@@ -212,24 +212,6 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal ["https://yt3.ggpht.com/avatar.jpg", "image_url"], args["image_urls"]
     assert_equal "channel_avatar", args["preset_name"]
     assert_equal "channel_id", args["provider_id"]
-  end
-
-  # The old lookup reconstructed one exact url string, so a feed subscribed
-  # through any other spelling of the same channel never got its icon.
-  test "updates every feed for the channel, not just the canonical url" do
-    other = Feed.create!(feed_url: "https://youtube.com/feeds/videos.xml?channel_id=channel_id")
-
-    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
-    @entry.provider_youtube!
-    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") }
-    stub_youtube_api
-
-    HarvestEmbeds.new.perform(nil, true)
-    job = HarvestEmbeds::Download.jobs.shift
-    HarvestEmbeds::Download.new.perform(*job["args"])
-
-    assert_equal "image_url", @feed.reload.custom_icon
-    assert_equal "image_url", other.reload.custom_icon
   end
 
   # The channels half of the API can come back empty while the videos half

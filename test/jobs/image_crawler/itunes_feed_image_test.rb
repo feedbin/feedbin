@@ -48,12 +48,11 @@ module ImageCrawler
       assert_nil @feed.reload.custom_icon
     end
 
-    # Row-backed: the feed_icon row is the read path. custom_icon stays
-    # whatever it was (an inert legacy value, or nil), custom_icon_format is
-    # the shape marker the icon component reads, and the touch busts the
+    # Row-backed: the feed_icon row is the read path and its kind is the
+    # shape. The callback's only feed write is the touch, which busts the
     # cached views because new artwork can land under the same path.
-    test "writes the format and touches the feed, never custom_icon" do
-      @feed.update!(custom_icon: "https://old.example.com/abc/show.jpg", updated_at: 1.year.ago)
+    test "touches the feed and writes neither custom_icon nor custom_icon_format" do
+      @feed.update!(custom_icon: "https://old.example.com/abc/show.jpg", custom_icon_format: nil, updated_at: 1.year.ago)
       before = @feed.reload.updated_at
 
       ItunesFeedImage.new.perform(@feed.id, {
@@ -63,7 +62,7 @@ module ImageCrawler
 
       @feed.reload
       assert_equal "https://old.example.com/abc/show.jpg", @feed.custom_icon
-      assert_equal "square", @feed.custom_icon_format
+      assert_nil @feed.custom_icon_format
       assert_operator @feed.updated_at, :>, before
     end
   end
