@@ -104,8 +104,8 @@ class FaviconComponent < ApplicationComponent
   end
 
   # The host comes from the feed or the entry, never from the record: an
-  # images row is keyed by host in provider_id and a favicons row in host,
-  # and the class must not care which record it got.
+  # images row is keyed by host in provider_id, and the class must not care
+  # which record it got.
   def icon_favicon(url, host)
     span class: "favicon-wrap" do
       span class: "favicon #{host_class(host)}", style: "background-image: url(#{url});"

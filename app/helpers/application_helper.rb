@@ -121,8 +121,8 @@ module ApplicationHelper
     favicon_with_record(record, host: host, generated: generated)
   end
 
-  # record is an images row or, during the cutover, a favicons row: both
-  # answer public_url, and the host comes from the caller.
+  # record is an images row, which answers public_url; the host comes from
+  # the caller.
   def favicon_with_record(record, host:, generated: false)
     if (url = record&.public_url)
       favicon_template(url)
