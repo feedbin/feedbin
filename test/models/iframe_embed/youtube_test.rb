@@ -82,4 +82,14 @@ class IframeEmbed::YoutubeTest < ActiveSupport::TestCase
       assert_equal "https://images.example.com/#{row.storage_path}", embed.profile_image
     end
   end
+
+  # Deploy A only: a channel with no avatar row yet still shows the card's
+  # picture, through the proxy, rather than losing it.
+  test "profile_image falls back to the proxy thumbnail when the channel has no row" do
+    Embed.youtube_channel.create!(provider_id: "UCnothumb", data: {"snippet" => {"thumbnails" => {"medium" => {"url" => "https://yt3.ggpht.com/medium.jpg"}}}})
+    Embed.youtube_video.create!(provider_id: "videonothumb", parent_id: "UCnothumb", data: {})
+    embed = IframeEmbed::Youtube.new("https://www.youtube.com/watch?v=videonothumb")
+
+    assert_includes embed.profile_image, "/files/icons/"
+  end
 end
