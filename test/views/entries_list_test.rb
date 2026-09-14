@@ -127,7 +127,7 @@ class EntriesListTest < ActionController::TestCase
 
     images = statements.select { it.match?(/FROM "images"/i) }
     assert_equal 5, images.count,
-      "expected owned + channel + feed icon + feed favicon, got #{images.count}:\n#{images.join("\n")}"
+      "expected owned + channel + feed icon + feed favicon + icon_image_record, got #{images.count}:\n#{images.join("\n")}"
   end
 
   # The avatar-landing touch goes to feeds of that channel; a playlist feed

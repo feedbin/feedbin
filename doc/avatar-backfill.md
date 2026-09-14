@@ -37,11 +37,16 @@ all at once.
 puts "remote_files rows: #{RemoteFile.count}"
 puts "remote_files rows with no images row (the copy's set): #{BackfillAvatarCopies.pending.count}"
 puts "micropost feeds with an entry lacking a row (the pass's set): #{BackfillMicropostAvatars.pending.count}"
+puts "unlabeled podcast art rows (must be 0): #{Image.provider_entry_icon.where(Image.data_projection("preset").eq("podcast")).where.not(kind: :cover_art).count}"
+puts "YouTube channels with no avatar row: #{Embed.youtube_channel.where.missing(:channel_image).count}"
 ```
 
 These are the two jobs' starting sets. Expect `remote_files rows` near
 2,394,516 and the copy's pending count close to it; the pass's pending
 count is unrelated to the copy's and does not need to match either one.
+`Entry#itunes_image` now reads the row's kind, so an unlabeled podcast art
+row would drop an episode's own art. Those YouTube channels show the
+proxied thumbnail on their card until `BackfillChannelImages` covers them.
 
 ## Trial
 
@@ -51,9 +56,10 @@ The batch that holds the lowest pending remote file id, run inline:
 remote_id = BackfillAvatarCopies.pending.order(:id).limit(1).pluck(:id).first
 batch = ((remote_id - 1) / BackfillAvatarCopies::BATCH_SIZE) + 1
 puts "first pending remote file: #{remote_id}, batch: #{batch}"
-puts "rows in that batch: #{BackfillAvatarCopies.batch_scope(batch).count}"
+before = BackfillAvatarCopies.batch_scope(batch).count
+puts "rows in that batch: #{before}"
 BackfillAvatarCopies.new.perform(batch)
-puts "copied in that batch (rows now present): #{BackfillAvatarCopies::BATCH_SIZE - BackfillAvatarCopies.batch_scope(batch).count}"
+puts "copied in that batch (rows now present): #{before - BackfillAvatarCopies.batch_scope(batch).count}"
 ```
 
 A dead source is expected and is not a failure: `Copy#call` logs it and
@@ -75,9 +81,10 @@ To continue after an interruption, resume from the batch number on the
 last `BackfillAvatarCopies: batch=` log line before the stop:
 
 ```ruby
-# from_batch: the batch number from the last "BackfillAvatarCopies: batch=N"
-# log line before the interruption.
-from_batch = 4821
+# The lowest remaining pending id's batch: reruns are safe (a copied row
+# leaves pending), so resuming one batch behind the last log line costs
+# nothing and needs no number copied by hand from the log.
+from_batch = ((BackfillAvatarCopies.pending.minimum(:id) - 1) / BackfillAvatarCopies::BATCH_SIZE) + 1
 puts "resuming the copy from batch: #{from_batch}"
 BackfillAvatarCopies.perform_async(nil, true, from_batch)
 ```
@@ -139,6 +146,11 @@ puts "MicropostAvatar retries (must be 0): #{Sidekiq::RetrySet.new.count { it.kl
 a nonzero count means something upstream re-enqueued through a retrying
 path and is worth investigating on its own.
 
+`BackfillMicropostAvatars.pending` is prefiltered by the parser's own
+marker for a micropost feed, so a zero there does not mean every micropost
+feed's entries are covered — an unmarked feed is picked up on its own the
+next time it crawls with new posts.
+
 ## The gate before Deploy B
 
 Both pending counts — `BackfillAvatarCopies.pending.count` and
@@ -158,6 +170,21 @@ And confirm in the browser: the sidebar, an entry list with microposts, an
 entry list with stored tweets, a micropost entry view, and a YouTube embed
 card show no `/files/icons/` url except the accepted residual above, and
 `image.unified_error` is flat.
+
+Fragments cached during Deploy A for tweet entries, Twitter feed icons, and
+embed cards can still carry a `/files/icons/` url even once both pending
+counts read 0: their cache keys do not digest the copied rows, only the
+row-backed sources, so a fragment written before a row landed keeps
+rendering the proxy until something else invalidates it. That is expected
+and is not part of the residual above. Deploy B must bump `entries_helper`'s
+cache key from `"v15"` to `"v16"` and both of `feeds_helper`'s version
+strings when it removes the proxy, so every cached fragment is forced to
+re-render against the rows.
+
+**Deploy B deletion list** — dead once the proxy retires: `CacheRemoteFile.schedule`
+(no callers), `Pipeline::Find#attempt_legacy` and `DownloadCache.copy` (no
+preset reaches them), and the `RemoteFile.signed_url` fallbacks marked
+`# Deploy A only`.
 
 ## Residual avatars
 
