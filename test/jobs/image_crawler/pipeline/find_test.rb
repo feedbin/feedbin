@@ -2,31 +2,11 @@ require "test_helper"
 module ImageCrawler
   module Pipeline
     class FindTest < ActiveSupport::TestCase
+      # attempt_legacy and DownloadCache.copy have no preset left that reaches
+      # them since the icon preset went unified; they are deleted with the
+      # legacy icon bucket in the avatar cutover's Deploy B.
       def setup
         flush_redis
-      end
-
-      # attempt_legacy, and with it the redis download cache and its
-      # copy_object shortcut, is reached only by a preset that is neither
-      # content_addressed nor unified. Since the S3 backfill icon is the only
-      # one left, so it carries this coverage.
-      def test_should_copy_image
-        image_url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
-        original_url = "https://www.youtube.com/watch?v=id"
-
-        stub_request_file("image.jpeg", image_url, headers: {content_type: "image/jpeg"})
-        stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
-
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:avatar], preset_name: "icon", image_urls: [original_url], provider: 0, provider_id: 1)
-        Sidekiq::Testing.inline! do
-          Find.perform_async(image.to_h)
-        end
-
-        image_two = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:avatar], preset_name: "icon", image_urls: [original_url], provider: 0, provider_id: 1)
-        Find.new.perform(image_two.to_h)
-
-        assert_equal(image_url, CacheRemoteFile.jobs.first["args"][1]["original_url"])
-        assert_equal("https:/#{image_two.image_name}jpg", CacheRemoteFile.jobs.first["args"][1]["processed_url"])
       end
 
       def test_should_process_an_image
