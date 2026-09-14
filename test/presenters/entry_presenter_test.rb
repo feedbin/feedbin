@@ -104,6 +104,21 @@ class EntryPresenterTest < ActionView::TestCase
     refute_includes output, "/files/icons/"
   end
 
+  # A copied remote_file row for the same url serves a micropost whose own
+  # row has not landed, and the replies dialog, whose OpenStruct has no row.
+  test "profile_image resolves a micropost avatar by url when the entry has no row" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      entry = micropost_entry
+      url = entry.micropost.author_avatar
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+
+      output = presenter_for(Entry.find(entry.id)).profile_image
+
+      assert_includes output, "https://images.example.com/#{row.storage_path}"
+      refute_includes output, "/files/icons/"
+    end
+  end
+
   def tweet_entry
     @feed.entries.create!(
       title: nil, url: "https://twitter.com/someone/status/1", content: "<p>hi</p>",

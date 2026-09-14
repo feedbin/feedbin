@@ -491,11 +491,15 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  # The author's row first, preloaded with the entry. Deploy A only: the
-  # proxy while the copy backfill runs; the second half goes with the proxy.
+  # The author's row first, preloaded with the entry. Then a copied
+  # remote_file row for the same url, for the replies dialog's OpenStruct
+  # (no row of its own) and an entry whose own row has not landed yet.
+  # Deploy A only: the proxy on a miss, while the copy backfill runs; the
+  # second half goes with the proxy.
   def micropost_avatar_url
     entry.author_avatar_record&.public_url ||
-      (entry.micropost.author_avatar.presence && RemoteFile.signed_url(entry.micropost.author_avatar))
+      (url = entry.micropost.author_avatar.presence) &&
+        (Image.avatar_url(url) || RemoteFile.signed_url(url))
   end
 
   def summary
