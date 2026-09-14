@@ -89,6 +89,32 @@ class BackfillAvatarCopiesTest < ActiveSupport::TestCase
     assert_equal [remote.id], BackfillAvatarCopies.pending.where(id: remote.id).pluck(:id)
   end
 
+  # ROW_ERRORS is per-row: a data error must not poison the rows after it,
+  # the way a storage or database error does. The row that raised stays
+  # pending; the next row in the same batch still copies.
+  test "a row error is skipped instead of aborting the batch" do
+    first = cached("https://pbs.twimg.com/1.jpg")
+    second = cached("https://pbs.twimg.com/2.jpg")
+    stub_legacy_object(first.storage_url)
+    stub_legacy_object(second.storage_url)
+    stub_request(:put, /test-account\.storage\.example\.com/)
+
+    original_attach = ::Image.method(:attach!)
+    calls = 0
+    attach_stub = lambda { |attributes|
+      calls += 1
+      raise ActiveRecord::NotNullViolation, "boom" if calls == 1
+      original_attach.call(attributes)
+    }
+
+    ::Image.stub(:attach!, attach_stub) do
+      assert_nothing_raised { perform_batches_for(first, second) }
+    end
+
+    assert_equal [first.id], BackfillAvatarCopies.pending.where(id: [first.id, second.id]).pluck(:id)
+    assert Image.provider_remote_file.exists?(provider_id: second.fingerprint.to_s.delete("-"))
+  end
+
   test "a dead legacy object stays pending and does not stop the batch" do
     dead = cached("https://pbs.twimg.com/dead.jpg")
     live = cached("https://pbs.twimg.com/live.jpg")

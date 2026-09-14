@@ -133,11 +133,15 @@ module ImageCrawler
     end
 
     # Upload attached the first entry's row; attach every sibling that
-    # shares its url. No touch: the entries cache key digests the row.
+    # shares its url. Re-keys the row to the avatar url when Find landed it
+    # under the legacy object url instead. No touch: the entries cache key
+    # digests the row.
     def receive(image)
       image.fetch("storage_path")
       row = ::Image.provider_entry_icon.find_by(provider_id: image.fetch("provider_id").to_s)
       return if row.nil? || row.feed_id.nil?
+      # The entry_icon slot is shared with podcast art; only an avatar continues.
+      return unless row.kind_avatar?
 
       feed = Feed.find(row.feed_id)
       entry = feed.entries.select(:id, :feed_id, :url, :data, :title, :public_id).find_by(id: row.provider_id)

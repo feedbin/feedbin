@@ -196,6 +196,23 @@ module ImageCrawler
       assert_equal row.storage_path, avatar_row_for(later).storage_path
     end
 
+    # The entry_icon slot is shared with podcast art; a row landed there for
+    # some other reason must not be treated as this entry's avatar.
+    test "receive skips a row that is not an avatar" do
+      first = post("https://micro.example/a.png")
+      second = post("https://micro.example/a.png")
+      landed = create_image_row(
+        provider: :entry_icon, provider_id: first.id.to_s, feed_id: @feed.id, kind: :cover_art,
+        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://micro.example/a.png"}
+      )
+
+      assert_nothing_raised do
+        MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s})
+      end
+
+      assert_nil avatar_row_for(second)
+    end
+
     test "receive raises on a payload without storage_path" do
       first = post("https://micro.example/a.png")
 

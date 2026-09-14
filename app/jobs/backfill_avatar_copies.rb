@@ -94,6 +94,12 @@ class BackfillAvatarCopies
     # rows that copied fine.
     STORE_ERRORS = [Excon::Error, Fog::Errors::Error, ActiveRecord::ActiveRecordError].freeze
 
+    # A data error belongs to one row, not the batch: an invalid attribute,
+    # a fingerprint collision that survives attach!'s own retry, or a
+    # not-null violation from a malformed source row. Log it and skip;
+    # the row stays pending and shows up in the residual count.
+    ROW_ERRORS = [ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique, ActiveRecord::NotNullViolation].freeze
+
     def initialize(remote_file, client)
       @remote_file = remote_file
       @client = client
@@ -116,6 +122,9 @@ class BackfillAvatarCopies
       end
       image.create_image
       true
+    rescue *ROW_ERRORS => exception
+      log("row error exception=#{exception.inspect}")
+      false
     rescue *STORE_ERRORS
       raise
     rescue => exception
