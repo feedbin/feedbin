@@ -32,14 +32,7 @@ module ImageCrawler
         kind: @image.kind,
         feed_id: @image.feed_id,
         url: @original_url,
-        variant: record.variant,
-        image_fingerprint: record.image_fingerprint,
-        original_fingerprint: record.original_fingerprint,
-        storage_path: record.storage_path,
-        width: record.width,
-        height: record.height,
-        bytesize: record.bytesize,
-        placeholder_color: record.placeholder_color,
+        **::Image.stored_object_attributes(record),
         data: {
           "preset"    => @image.preset_name,
           "final_url" => final_url

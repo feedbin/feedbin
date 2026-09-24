@@ -99,6 +99,20 @@ module ImageCrawler
       end
     end
 
+    # An attached row is a source for the next post with the same avatar,
+    # even once the row it was copied from is gone.
+    test "an attached row is found by the next lookup for its url" do
+      source = create_image_row(
+        provider: :remote_file, provider_id: RemoteFile.fingerprint("https://micro.example/a.png"), feed_id: nil, kind: :avatar,
+        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "icon", "final_url" => "https://micro.example/a.png"}
+      )
+      attached = post("https://micro.example/a.png")
+      MicropostAvatar.schedule(@feed)
+      source.destroy!
+
+      assert_equal avatar_row_for(attached), MicropostAvatar.existing_row("https://micro.example/a.png")
+    end
+
     test "a row from another preset or variant is not reused" do
       create_image_row(provider: :entry_preview, provider_id: "9", kind: :poster, url: "https://micro.example/a.png", variant: "542x304", data: {"preset" => "primary"})
       post("https://micro.example/a.png")
@@ -246,10 +260,9 @@ module ImageCrawler
       assert ::Image.same_fingerprint?(::Image.url_fingerprint_for("https://micro.example/a.png", "200x200"), landed.url_fingerprint)
       assert_equal before, landed.updated_at
       assert_equal landed.storage_path, avatar_row_for(second).storage_path
-      # existing_row returns the newest row sharing this fingerprint, and
-      # attaching the sibling above created one; it carries the same
-      # storage_path/image_fingerprint as the re-keyed row, which is what
-      # a later lookup by the asked url actually needs.
+      # existing_row returns any row sharing this fingerprint: the re-keyed
+      # row or the sibling attached to it. Both carry the storage_path and
+      # image_fingerprint a later lookup by the asked url actually needs.
       found = MicropostAvatar.existing_row("https://micro.example/a.png")
       assert_equal landed.storage_path, found.storage_path
       assert_equal landed.image_fingerprint, found.image_fingerprint

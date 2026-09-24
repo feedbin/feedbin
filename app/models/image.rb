@@ -105,6 +105,13 @@ class Image < ApplicationRecord
     end
   end
 
+  # The columns a row takes from a row that already stores its picture:
+  # attaching is a database write that shares the stored object. Dedupe
+  # and MicropostAvatar attach this way.
+  def self.stored_object_attributes(record)
+    %i[variant image_fingerprint original_fingerprint storage_path width height bytesize placeholder_color].index_with { record.public_send(it) }
+  end
+
   before_save :fingerprint_url
 
   # Identity is (url, variant): one URL rendered at two sizes is two stored

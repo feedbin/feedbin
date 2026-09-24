@@ -10,7 +10,9 @@ module ImageCrawler
 
     SUFFIX = "-avatar".freeze
     PRESET = "micropost_avatar".freeze
-    VARIANT = "200x200".freeze
+    # Rows that can already hold an avatar's picture: an earlier post's, or
+    # BackfillAvatarCopies' copy of the proxy's cache.
+    SOURCE_PRESETS = [PRESET, "icon"].freeze
 
     # id is a feed id when scheduling and "<entry public_id>-avatar" when the
     # pipeline calls back with the landed row. entry_ids limits a pass to
@@ -45,7 +47,7 @@ module ImageCrawler
 
       groups.each do |url, group|
         if (existing = existing_row(url))
-          group.each { |entry| attach(entry, url, existing) }
+          attach(group, url, existing)
           attached += group.size
         else
           enqueue(feed, group, url, critical)
@@ -102,37 +104,29 @@ module ImageCrawler
       avatar.presence if avatar.is_a?(String)
     end
 
-    # The newest row already holding this url's picture at the avatar
-    # variant: an earlier post's row, or a copy of the proxy's cache. One
-    # indexed read on url_fingerprint; the preset comes out of data through
-    # Arel, nothing is interpolated. icon rows exist once the copy backfill
-    # runs; until then only micropost_avatar rows match.
+    # A row already holding this url's picture at a source preset's
+    # variant. Any one will do: take, not the newest, which would read and
+    # sort the row of every entry ever attached to the url. One indexed read
+    # on url_fingerprint; the preset comes out of data through Arel, nothing
+    # is interpolated. icon rows exist once the copy backfill runs.
     def self.existing_row(url)
-      ::Image.where(url_fingerprint: ::Image.url_fingerprint_for(url, VARIANT))
-        .where(::Image.data_projection("preset").in([PRESET, "icon"]))
-        .order(id: :desc)
-        .first
+      fingerprints = SOURCE_PRESETS.map { ::Image.url_fingerprint_for(url, Image.new(preset_name: it).variant) }.uniq
+      ::Image.where(url_fingerprint: fingerprints).where(::Image.data_projection("preset").in(SOURCE_PRESETS)).take
     end
 
-    # A DB-only attach to an object the store already holds, the shape
-    # Dedupe uses. kind is this row's own.
-    def self.attach(entry, url, existing)
-      ::Image.attach!(
-        provider: :entry_icon,
-        provider_id: entry.id,
-        kind: :avatar,
-        feed_id: entry.feed_id,
+    # A database-only attach of every entry to an object the store already
+    # holds, in one statement. kind is these rows' own. upsert_all skips
+    # callbacks, so url_fingerprint is computed here.
+    def self.attach(entries, url, existing)
+      shared = ::Image.stored_object_attributes(existing).merge(
+        provider: ::Image.providers[:entry_icon],
+        kind: ::Image.kinds[:avatar],
         url: url,
-        variant: existing.variant,
-        image_fingerprint: existing.image_fingerprint,
-        original_fingerprint: existing.original_fingerprint,
-        storage_path: existing.storage_path,
-        width: existing.width,
-        height: existing.height,
-        bytesize: existing.bytesize,
-        placeholder_color: existing.placeholder_color,
+        url_fingerprint: ::Image.url_fingerprint_for(url, existing.variant),
         data: {"preset" => PRESET, "final_url" => existing.final_url.presence || url}
       )
+      rows = entries.map { shared.merge(provider_id: it.id.to_s, feed_id: it.feed_id) }
+      ::Image.upsert_all(rows, unique_by: %i[provider provider_id]) if rows.any?
     end
 
     # One download for the group, landing on its first entry. Find tries
@@ -180,7 +174,7 @@ module ImageCrawler
         row.update_columns(url: url, url_fingerprint: ::Image.url_fingerprint_for(url, row.variant))
       end
 
-      Entry.where(id: context["entry_ids"]).select(:id, :feed_id).each { |sibling| self.class.attach(sibling, url, row) }
+      self.class.attach(Entry.where(id: context["entry_ids"]).select(:id, :feed_id).to_a, url, row)
     end
   end
 end
