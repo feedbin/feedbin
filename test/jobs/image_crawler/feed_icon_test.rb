@@ -38,6 +38,17 @@ module ImageCrawler
       assert_equal true, args["critical"]
     end
 
+    # micro.blog's feed.json puts the author's avatar in "icon": for a feed
+    # of posts the icon is a person, not a site, and renders round.
+    test "a micropost json feed icon is a round avatar" do
+      create_entry(@feed).update!(title: nil)
+      @feed.update!(options: {"json_feed" => {"icon" => "http://example.com/icon.png"}})
+
+      FeedIcon.schedule(@feed)
+
+      assert_equal ::Image.kinds[:avatar], find_args["kind"]
+    end
+
     test "a json feed author avatar is a round avatar, ranked after the icon" do
       @feed.update!(options: {"json_feed" => {"author" => {"avatar" => "http://example.com/me.png"}}})
       FeedIcon.schedule(@feed)

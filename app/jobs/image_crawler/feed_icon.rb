@@ -60,9 +60,11 @@ module ImageCrawler
       true
     end
 
-    # Today's ranking, unchanged. The RSS image counts only for a micropost
-    # feed, where it is the author's picture; for an article feed it is a
-    # banner as often as a logo, and it stays ignored.
+    # The legacy ranking's url order. The RSS image counts only for a
+    # micropost feed, where it is the author's picture; for an article feed
+    # it is a banner as often as a logo, and it stays ignored. A micropost
+    # feed's JSON Feed icon is the author's picture too (micro.blog puts the
+    # avatar there), so it is an avatar; any other feed's is its site icon.
     def self.source_for(feed)
       options = feed.options || {}
 
@@ -70,7 +72,7 @@ module ImageCrawler
         return [url, :avatar]
       end
       if (url = options.safe_dig("json_feed", "icon").presence)
-        return [url, :site_icon]
+        return [url, feed.micropost? ? :avatar : :site_icon]
       end
       if (url = options.safe_dig("json_feed", "author", "avatar").presence)
         return [url, :avatar]
