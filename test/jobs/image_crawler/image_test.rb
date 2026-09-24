@@ -65,6 +65,23 @@ module ImageCrawler
       end
     end
 
+    # A caller's context rides the payload through Find, Process and Upload
+    # (each a JSON round trip) to its callback, which needs it to finish.
+    test "send_to_feedbin hands the callback the caller's context" do
+      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+        image = Image.new_with_attributes(
+          id: "a", kind: ::Image.kinds[:avatar], preset_name: "micropost_avatar", image_urls: [],
+          provider: ::Image.providers[:entry_icon], provider_id: 1,
+          original_fingerprint: "abc", original_url: "http://example.com/a.png",
+          context: {"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}
+        )
+        Image.new(JSON.parse(image.to_h.to_json)).send_to_feedbin
+
+        _, payload = MicropostAvatar.jobs.last["args"]
+        assert_equal({"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}, payload["context"])
+      end
+    end
+
     test "send_to_feedbin keeps the legacy payload shape when not unified" do
       image = Image.new_with_attributes(
         id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],

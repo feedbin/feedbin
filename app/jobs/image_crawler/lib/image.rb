@@ -3,6 +3,7 @@ module ImageCrawler
     ATTRIBUTES = %i[
       bytesize
       camo
+      context
       critical
       download_path
       entry_url
@@ -240,6 +241,9 @@ module ImageCrawler
         payload["storage_path"] = storage_path
         payload["provider_id"]  = provider_id.to_s
       end
+      # Whatever the caller needs to finish once the row lands, carried
+      # untouched through every stage.
+      payload["context"] = context if context
       preset.job_class.perform_async(id, payload)
     end
 
