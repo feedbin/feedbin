@@ -337,17 +337,26 @@ class EntryTest < ActiveSupport::TestCase
   # Every shape an entry can hand us for an avatar, resolved against the
   # entry's own url. A plain relative path is the one that used to break:
   # the heuristic parser read "avatar.png" as a host.
-  test "rebase_url resolves every relative shape against the entry url" do
+  test "rebase_url with strict: reads every relative shape as a path" do
     entry = create_entry(feeds(:daring_fireball))
     entry.update!(url: "https://example.com/blog/post/1")
 
-    assert_equal "https://example.com/avatar.png", entry.rebase_url("/avatar.png")
-    assert_equal "https://example.com/blog/post/avatar.png", entry.rebase_url("avatar.png")
-    assert_equal "https://example.com/blog/avatar.png", entry.rebase_url("../avatar.png")
-    assert_equal "https://cdn.example.net/avatar.png", entry.rebase_url("//cdn.example.net/avatar.png")
-    assert_equal "https://cdn.example.net/avatar.png", entry.rebase_url("https://cdn.example.net/avatar.png")
-    assert_equal "https://example.com/avatar.png", entry.rebase_url("  /avatar.png ")
-    assert_nil entry.rebase_url(nil)
+    assert_equal "https://example.com/avatar.png", entry.rebase_url("/avatar.png", strict: true)
+    assert_equal "https://example.com/blog/post/avatar.png", entry.rebase_url("avatar.png", strict: true)
+    assert_equal "https://example.com/blog/avatar.png", entry.rebase_url("../avatar.png", strict: true)
+    assert_equal "https://cdn.example.net/avatar.png", entry.rebase_url("//cdn.example.net/avatar.png", strict: true)
+    assert_equal "https://cdn.example.net/avatar.png", entry.rebase_url("https://cdn.example.net/avatar.png", strict: true)
+    assert_equal "https://example.com/avatar.png", entry.rebase_url("  /avatar.png ", strict: true)
+    assert_nil entry.rebase_url(nil, strict: true)
+  end
+
+  # Enclosures, chapters and content images go through the default reading,
+  # where a url without a scheme is a host.
+  test "rebase_url reads a scheme-less host as a host" do
+    entry = create_entry(feeds(:daring_fireball))
+    entry.update!(url: "https://example.com/blog/post/1")
+
+    assert_equal "http://media.example.org/episode.mp3", entry.rebase_url("media.example.org/episode.mp3")
   end
 
   # One association, two kinds: a podcast episode's art and a micropost

@@ -33,13 +33,20 @@ module ImageCrawler
     def self.schedule(feed, critical: true)
       return false if feed.options&.safe_dig("itunes_image").present?
 
-      url, kind = source_for(feed)
-      return false if url.nil?
+      source, kind = source_for(feed)
+      return false if source.nil?
 
-      url = feed.feed_relative_url(url)
-      # The legacy object second: Find tries candidates in order, so a dead
-      # source still lands as a copy of what the proxy cached.
-      candidates = [url, RemoteFile.legacy_object_url(url)].compact
+      # A bare "icon.png" is a path to a browser and a host to the heuristic
+      # parser, and "cdn.example.com/icon.png" is the reverse. Find tries
+      # candidates in order, so both readings go in, the strict one first.
+      readings = [feed.feed_relative_url(source, strict: true), feed.feed_relative_url(source)].compact_blank.uniq
+      return false if readings.empty?
+
+      url = readings.first
+      # Deploy A only: the object the proxy cached goes last, so a dead source
+      # still lands as a copy of what was served before. The proxy was handed
+      # the heuristic reading, so the lookup uses it. Goes with remote_files.
+      candidates = [*readings, RemoteFile.legacy_object_url(readings.last)].compact
       image = Image.new_with_attributes(
         id: "#{feed.id}-#{Digest::SHA1.hexdigest(url)}#{SUFFIX}",
         kind: ::Image.kinds[kind],

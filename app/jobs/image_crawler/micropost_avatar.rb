@@ -43,7 +43,7 @@ module ImageCrawler
           group.each { |entry| attach(entry, url, existing) }
           attached += group.size
         else
-          enqueue(group.first, url, critical)
+          enqueue(feed, group.first, url, critical)
           scheduled += 1
         end
       end
@@ -78,7 +78,7 @@ module ImageCrawler
         post = Micropost.new(entry.data, entry.title, feed: feed)
         next unless post.valid?
 
-        url = entry.rebase_url(post.author_avatar)
+        url = entry.rebase_url(post.author_avatar, strict: true)
         groups[url] << entry if url.present?
       end
     end
@@ -116,14 +116,18 @@ module ImageCrawler
       )
     end
 
-    # The proxy's cached object second: Find tries candidates in order, so a
-    # dead source still lands as a copy of what was served before.
-    def self.enqueue(entry, url, critical)
+    # Find tries candidates in order: the strict reading of the avatar url,
+    # then the heuristic one (see FeedIcon.schedule), then the object the
+    # proxy cached, so a dead source still lands as a copy of what was served
+    # before. Deploy A only: the legacy object goes with remote_files. The
+    # proxy was handed the url exactly as the entry carries it.
+    def self.enqueue(feed, entry, url, critical)
+      raw = Micropost.new(entry.data, entry.title, feed: feed).author_avatar
       image = Image.new_with_attributes(
         id: "#{entry.public_id}#{SUFFIX}",
         kind: ::Image.kinds[:avatar],
         preset_name: PRESET,
-        image_urls: [url, RemoteFile.legacy_object_url(url)].compact,
+        image_urls: [url, entry.rebase_url(raw), RemoteFile.legacy_object_url(raw)].compact_blank.uniq,
         provider: ::Image.providers[:entry_icon],
         provider_id: entry.id,
         feed_id: entry.feed_id,
@@ -148,7 +152,7 @@ module ImageCrawler
       return if entry.nil?
 
       post = Micropost.new(entry.data, entry.title, feed: feed)
-      asked = post.valid? ? entry.rebase_url(post.author_avatar) : nil
+      asked = post.valid? ? entry.rebase_url(post.author_avatar, strict: true) : nil
       return if asked.blank?
 
       # Find tries the avatar url first and the legacy object second; when

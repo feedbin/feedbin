@@ -317,15 +317,24 @@ end
   # Every shape a feed can hand us for an icon, resolved against the feed's
   # own url. A plain relative path is the one that used to break: the
   # heuristic parser read "icon.png" as a host and produced http://icon.png.
-  test "feed_relative_url resolves every relative shape against the feed url" do
+  test "feed_relative_url with strict: reads every relative shape as a path" do
     feed = Feed.new(feed_url: "https://example.com/blog/feed/index.json")
 
-    assert_equal "https://example.com/icon.png", feed.feed_relative_url("/icon.png")
-    assert_equal "https://example.com/blog/feed/icon.png", feed.feed_relative_url("icon.png")
-    assert_equal "https://example.com/blog/icon.png", feed.feed_relative_url("../icon.png")
-    assert_equal "https://cdn.example.net/icon.png", feed.feed_relative_url("//cdn.example.net/icon.png")
-    assert_equal "https://cdn.example.net/icon.png", feed.feed_relative_url("https://cdn.example.net/icon.png")
-    assert_equal "https://example.com/icon.png", feed.feed_relative_url("  /icon.png ")
+    assert_equal "https://example.com/icon.png", feed.feed_relative_url("/icon.png", strict: true)
+    assert_equal "https://example.com/blog/feed/icon.png", feed.feed_relative_url("icon.png", strict: true)
+    assert_equal "https://example.com/blog/icon.png", feed.feed_relative_url("../icon.png", strict: true)
+    assert_equal "https://cdn.example.net/icon.png", feed.feed_relative_url("//cdn.example.net/icon.png", strict: true)
+    assert_equal "https://cdn.example.net/icon.png", feed.feed_relative_url("https://cdn.example.net/icon.png", strict: true)
+    assert_equal "https://example.com/icon.png", feed.feed_relative_url("  /icon.png ", strict: true)
+  end
+
+  # feedkit stores a feed's <link> as the feed wrote it, and a link without
+  # a scheme is a host. The site url, the host a new feed stores, and the
+  # entry links resolved against the site url all read it that way.
+  test "site_url reads a scheme-less link as a host" do
+    feed = Feed.new(feed_url: "https://feeds.feedburner.com/example", site_url: "www.example.com")
+
+    assert_equal "http://www.example.com", feed.site_url
   end
 
   # The root still goes through the heuristic parser: a feed url stored

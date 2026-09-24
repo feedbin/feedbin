@@ -254,9 +254,9 @@ class Feed < ApplicationRecord
     feed_relative_url(self[:site_url])
   end
 
-  def feed_relative_url(url)
+  def feed_relative_url(url, strict: false)
     root = crawl_data&.redirected_to || feed_url
-    rebase_url(root, url).to_s
+    rebase_url(root, url, strict:).to_s
   end
 
   def site_relative_url(url)
@@ -264,16 +264,17 @@ class Feed < ApplicationRecord
     rebase_url(root, url).to_s
   end
 
-  def rebase_url(root, relative)
+  # The heuristic parser reads a scheme-less "example.com" as a host, which
+  # is what a stored <link> means. It also reads a bare "icon.png" as a
+  # host; strict: is the asset reading, where anything without a scheme is
+  # a path, the way a browser resolves an img src.
+  def rebase_url(root, relative, strict: false)
     return root if relative.blank? || !relative.respond_to?(:strip)
     return relative.strip if relative.strip.downcase.start_with?("http")
     return nil if root.blank?
 
-    # The root may be stored without a scheme, so it gets the heuristic
-    # parser. The relative part must not: heuristic_parse reads a plain
-    # "icon.png" as a host and the join then yields http://icon.png.
     root = Addressable::URI.heuristic_parse(root)
-    relative = Addressable::URI.parse(relative.strip)
+    relative = strict ? Addressable::URI.parse(relative.strip) : Addressable::URI.heuristic_parse(relative)
     Addressable::URI.join(root, relative)
   rescue Addressable::URI::InvalidURIError
     Rails.logger.error("Invalid uri feed=#{id} root=#{root} relative=#{relative}")

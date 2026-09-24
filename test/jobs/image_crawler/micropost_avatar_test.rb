@@ -99,8 +99,18 @@ module ImageCrawler
       relative = post("avatar.png", url: "https://micro.example/posts/1")
 
       assert_equal [0, 1], MicropostAvatar.schedule(@feed)
-      assert_equal ["https://micro.example/posts/avatar.png"], find_args.last["image_urls"]
+      assert_equal "https://micro.example/posts/avatar.png", find_args.last["image_urls"].first
       assert_equal "#{relative.public_id}-avatar", find_args.last["id"]
+    end
+
+    # A scheme-less host is a path to a browser and a host to the heuristic
+    # parser: both readings go in, the strict one first.
+    test "offers both readings of a scheme-less avatar url" do
+      post("avatars.example.net/a.png", url: "https://micro.example/posts/1")
+
+      MicropostAvatar.schedule(@feed)
+
+      assert_equal ["https://micro.example/posts/avatars.example.net/a.png", "http://avatars.example.net/a.png"], find_args.last["image_urls"]
     end
 
     test "passes the proxy's cached object as the second candidate" do

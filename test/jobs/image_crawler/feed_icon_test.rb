@@ -87,6 +87,21 @@ module ImageCrawler
       assert_equal [url, "https://icons.example.net/abc/icon.png"], find_args["image_urls"]
     end
 
+    # "cdn.example.net/icon.png" is a path to a browser and a host to the
+    # heuristic parser. Both readings go in, the strict one first, and the
+    # proxy's object is found under the url the proxy signed: the heuristic
+    # reading, which is what the legacy feed icon handed it.
+    test "offers both readings of a scheme-less icon url, then the proxy's object" do
+      Feed.where(id: @feed.id).update_all(feed_url: "http://example.com/feed/index.json")
+      signed = "http://cdn.example.net/icon.png"
+      RemoteFile.create!(fingerprint: RemoteFile.fingerprint(signed), original_url: signed, storage_url: "https://icons.example.net/abc/icon.png")
+      @feed.reload.update!(options: {"json_feed" => {"icon" => "cdn.example.net/icon.png"}})
+
+      FeedIcon.schedule(@feed)
+
+      assert_equal ["http://example.com/feed/cdn.example.net/icon.png", signed, "https://icons.example.net/abc/icon.png"], find_args["image_urls"]
+    end
+
     test "makes a relative url absolute against the feed" do
       # feed_url is attr_readonly, so it cannot be changed via update!; go
       # around ActiveRecord's instance-level readonly check with update_all.
