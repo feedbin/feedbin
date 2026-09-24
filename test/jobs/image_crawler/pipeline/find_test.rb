@@ -2,11 +2,28 @@ require "test_helper"
 module ImageCrawler
   module Pipeline
     class FindTest < ActiveSupport::TestCase
-      # attempt_legacy and DownloadCache.copy have no preset left that reaches
-      # them since the icon preset went unified; they are deleted with the
-      # legacy icon bucket in the avatar cutover's Deploy B.
       def setup
         flush_redis
+      end
+
+      def unified(&)
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test", &)
+      end
+
+      # Every preset writes to the unified store, and production does not
+      # boot without one, so with no store configured there is nowhere to
+      # write: the job skips rather than download for nothing.
+      def test_skips_without_a_unified_store
+        url = "http://example.com/image.jpg"
+        stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [url], provider: 0, provider_id: 1)
+
+        with_env("UNIFIED_BUCKET_IMAGES" => nil) do
+          Find.new.perform(image.to_h)
+        end
+
+        refute_requested :get, url
+        assert_empty ProcessCritical.jobs
       end
 
       def test_should_process_an_image
@@ -40,93 +57,103 @@ module ImageCrawler
 
       # A backfill image goes to the plain process queue, behind live work.
       def test_should_enqueue_plain_process_for_a_non_critical_image
-        url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
-        stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+        unified do
+          url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
+          stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
 
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [url], provider: 0, provider_id: 1, critical: false)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [url], provider: 0, provider_id: 1, critical: false)
 
-        assert_difference -> { Process.jobs.size }, +1 do
-          assert_no_difference -> { ProcessCritical.jobs.size } do
-            Find.new.perform(image.to_h)
+          assert_difference -> { Process.jobs.size }, +1 do
+            assert_no_difference -> { ProcessCritical.jobs.size } do
+              Find.new.perform(image.to_h)
+            end
           end
+          assert_equal false, Process.jobs.first["args"][0]["critical"]
         end
-        assert_equal false, Process.jobs.first["args"][0]["critical"]
       end
 
       def test_should_enqueue_recognized_image
-        url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
-        image_url = "http://example.com/image.jpg"
+        unified do
+          url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
+          image_url = "http://example.com/image.jpg"
 
-        stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
-        id = SecureRandom.hex
+          stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+          id = SecureRandom.hex
 
-        image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
+          image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
 
-        assert_difference -> { ProcessCritical.jobs.size }, +1 do
-          Find.new.perform(image.to_h)
+          assert_difference -> { ProcessCritical.jobs.size }, +1 do
+            Find.new.perform(image.to_h)
+          end
+
+          image = Image.new(ProcessCritical.jobs.first["args"][0])
+
+          assert image.download_path
+          assert_equal "https://www.youtube.com/watch?v=id", image.entry_url
+          assert_equal "https://i.ytimg.com/vi/id/maxresdefault.jpg", image.final_url
+          assert_equal id, image.id
+          assert_equal ["http://example.com/image.jpg"], image.image_urls
+          assert_equal "https://www.youtube.com/watch?v=id", image.original_url
+          assert_equal "primary", image.preset_name
+
+          assert_requested :get, url
+          refute_requested :get, image_url
         end
-
-        image = Image.new(ProcessCritical.jobs.first["args"][0])
-
-        assert image.download_path
-        assert_equal "https://www.youtube.com/watch?v=id", image.entry_url
-        assert_equal "https://i.ytimg.com/vi/id/maxresdefault.jpg", image.final_url
-        assert_equal id, image.id
-        assert_equal ["http://example.com/image.jpg"], image.image_urls
-        assert_equal "https://www.youtube.com/watch?v=id", image.original_url
-        assert_equal "primary", image.preset_name
-
-        assert_requested :get, url
-        refute_requested :get, image_url
       end
 
       # Every row records the provenance of the bytes it came from --
       # images.original_fingerprint is NOT NULL -- so the ordinary download
       # path must fingerprint the original file, not just the icon path.
       def test_should_fingerprint_the_original_bytes_on_the_entry_path
-        url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
-        body = ("lorem " * 3_500)
+        unified do
+          url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
+          body = ("lorem " * 3_500)
 
-        stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: body)
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
+          stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: body)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
 
-        Find.new.perform(image.to_h)
+          Find.new.perform(image.to_h)
 
-        payload = Image.new(ProcessCritical.jobs.first["args"][0])
-        assert_equal Digest::MD5.hexdigest(body), payload.original_fingerprint
+          payload = Image.new(ProcessCritical.jobs.first["args"][0])
+          assert_equal Digest::MD5.hexdigest(body), payload.original_fingerprint
+        end
       end
 
       def test_should_try_all_urls
-        urls = [
-          "http://example.com/image_1.jpg",
-          "http://example.com/image_2.jpg",
-          "http://example.com/image_3.jpg"
-        ]
+        unified do
+          urls = [
+            "http://example.com/image_1.jpg",
+            "http://example.com/image_2.jpg",
+            "http://example.com/image_3.jpg"
+          ]
 
-        urls.each do |url|
-          stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+          urls.each do |url|
+            stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+          end
+
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: urls, provider: 0, provider_id: 1)
+          Sidekiq::Testing.inline! do
+            Find.perform_async(image.to_h)
+          end
+
+          assert_requested :get, urls[0]
+          assert_requested :get, urls[1]
+          assert_requested :get, urls[2]
         end
-
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: urls, provider: 0, provider_id: 1)
-        Sidekiq::Testing.inline! do
-          Find.perform_async(image.to_h)
-        end
-
-        assert_requested :get, urls[0]
-        assert_requested :get, urls[1]
-        assert_requested :get, urls[2]
       end
 
       def test_should_use_camo
-        image_url = "http://example.com/image.jpg"
-        camo_url = RemoteFile.camo_url(image_url)
+        unified do
+          image_url = "http://example.com/image.jpg"
+          camo_url = RemoteFile.camo_url(image_url)
 
-        stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
+          stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
 
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, camo: true)
-        Find.new.perform(image.to_h)
+          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, camo: true)
+          Find.new.perform(image.to_h)
 
-        assert_requested :get, camo_url
+          assert_requested :get, camo_url
+        end
       end
 
       def test_should_attach_existing_unified_image_without_downloading

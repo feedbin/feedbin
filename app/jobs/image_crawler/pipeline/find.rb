@@ -10,6 +10,13 @@ module ImageCrawler
 
         Sidekiq.logger.info @image.trace(message: "starting")
 
+        # Every preset writes only to the unified store, and production does
+        # not boot without one, so with no store there is nowhere to write.
+        unless @image.unified?
+          Sidekiq.logger.info @image.trace(message: "no unified store, skipping")
+          return
+        end
+
         timer = Timer.new(45)
         count = 0
 
@@ -34,10 +41,8 @@ module ImageCrawler
 
           if @image.content_addressed?
             break if attempt_icon(original_url)
-          elsif @image.unified?
-            break if attempt_unified(original_url)
           else
-            break if attempt_legacy(original_url)
+            break if attempt_unified(original_url)
           end
         end
       rescue => exception
@@ -64,28 +69,6 @@ module ImageCrawler
           download_image(original_url, download_cache)
         else
           Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {original_url: original_url})
-          false
-        end
-      end
-
-      def attempt_legacy(original_url)
-        download_cache = DownloadCache.copy(original_url, @image)
-
-        if download_cache.copied?
-          image             = download_cache.cached_image
-          image.storage_url = download_cache.storage_url
-          image.id          = @image.id
-          image.provider    = @image.provider
-          image.provider_id = @image.provider_id
-
-          image.send_to_feedbin
-
-          Sidekiq.logger.info @image.trace(message: "copied existing image", metadata: {image_url: @image.final_url, storage_url: @image.storage_url})
-          true
-        elsif download_cache.download?
-          download_image(original_url, download_cache)
-        else
-          Sidekiq.logger.info @image.trace(message: "skipping image", metadata: {image_url: @image.final_url})
           false
         end
       end

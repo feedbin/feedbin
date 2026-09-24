@@ -337,7 +337,6 @@ module ImageCrawler
       assert_equal "png", preset.format
       assert preset.unified
       assert preset.content_addressed
-      assert_not preset.legacy_store
       assert_equal MicropostAvatar, preset.job_class
     end
 

@@ -171,7 +171,6 @@ module ImageCrawler
         build.call("http://a.example.com/favicon.ico").storage_path
       assert_equal build.call("http://a.example.com/favicon.ico").storage_path,
         build.call("http://b.example.com/favicon.ico").storage_path
-      assert_not build.call("http://a.example.com/favicon.ico").legacy_store?
     end
 
     # A pre-migration Process (whose payload lacks original_fingerprint) can
@@ -198,7 +197,6 @@ module ImageCrawler
       )
 
       assert_not image.content_addressed?
-      assert_not image.legacy_store?
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "jpg"), image.storage_path
     end
 
@@ -251,8 +249,6 @@ module ImageCrawler
       show = build.call("podcast_feed", :feed_icon, "http://example.com/show.jpg")
 
       assert episode.content_addressed?
-      assert_not episode.legacy_store?, "episode art is unified only since the S3 backfill"
-      assert_not show.legacy_store?, "show art is unified only since the show-art re-crawl"
       assert_equal "200x200", episode.variant
       assert_equal "jpg", episode.preset.format
       assert_equal :fill_crop, episode.preset.crop
@@ -291,7 +287,6 @@ module ImageCrawler
       )
 
       assert image.content_addressed?
-      refute image.legacy_store?, "there is no legacy object for this tenant"
       assert_equal "200x200", image.variant
       assert_equal "png", image.preset.format
       assert_equal :limit_png, image.preset.crop

@@ -47,7 +47,6 @@ module ImageCrawler
         format: "jpg",
         validate: true,
         unified: true,
-        legacy_store: false,
         job_class: EntryImage
       },
       twitter: {
@@ -58,7 +57,6 @@ module ImageCrawler
         format: "jpg",
         validate: true,
         unified: true,
-        legacy_store: false,
         job_class: TwitterLinkImage
       },
       youtube: {
@@ -69,7 +67,6 @@ module ImageCrawler
         format: "jpg",
         validate: true,
         unified: true,
-        legacy_store: false,
         job_class: EntryImage
       },
       podcast: {
@@ -81,7 +78,6 @@ module ImageCrawler
         validate: true,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: ItunesImage
       },
       podcast_feed: {
@@ -93,7 +89,6 @@ module ImageCrawler
         validate: true,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: ItunesFeedImage
       },
       channel_avatar: {
@@ -105,7 +100,6 @@ module ImageCrawler
         validate: false,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: ChannelImage
       },
       feed_icon: {
@@ -117,7 +111,6 @@ module ImageCrawler
         validate: false,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: FeedIcon
       },
       micropost_avatar: {
@@ -129,12 +122,11 @@ module ImageCrawler
         validate: false,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: MicropostAvatar
       },
-      # The copy backfill's target for the proxy's cached avatars, keyed by
-      # url fingerprint on the remote_file provider. Once legacy-only; now
-      # unified, and its callback writes nothing.
+      # BackfillAvatarCopies' recipe for the proxy's cached avatars, keyed by
+      # url fingerprint on the remote_file provider. Nothing crawls with it,
+      # so there is no callback.
       icon: {
         width: 200,
         height: 200,
@@ -143,9 +135,7 @@ module ImageCrawler
         format: "png",
         validate: false,
         unified: true,
-        content_addressed: true,
-        legacy_store: false,
-        job_class: CacheRemoteFile
+        content_addressed: true
       },
       favicon: {
         width: 32,
@@ -156,7 +146,6 @@ module ImageCrawler
         validate: false,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: nil
       },
       touch_icon: {
@@ -168,7 +157,6 @@ module ImageCrawler
         validate: false,
         unified: true,
         content_addressed: true,
-        legacy_store: false,
         job_class: nil
       }
     }
@@ -222,7 +210,7 @@ module ImageCrawler
       preset.validate || false
     end
 
-    def send_to_feedbin(include_unified: true)
+    def send_to_feedbin
       # A preset with no callback job stores the row and stops. The icon
       # presets ship before their tenants do; each tenant adds its job_class
       # when it lands.
@@ -237,7 +225,7 @@ module ImageCrawler
         "height"            => height,
         "placeholder_color" => placeholder_color
       }
-      if unified? && include_unified
+      if unified?
         payload["storage_path"] = storage_path
         payload["provider_id"]  = provider_id.to_s
       end
@@ -306,14 +294,6 @@ module ImageCrawler
       unified? && !content_addressed?
     end
 
-    # Whether the legacy object is written alongside the unified one. Every
-    # unified preset writes unified only since the S3 backfill and the show
-    # art re-crawl; icon writes legacy only (not unified?), into its own
-    # bucket.
-    def legacy_store?
-      preset.legacy_store != false
-    end
-
     # Identity pairs variant with the url (entry presets) or
     # original_fingerprint (content-addressed presets), plus the format as
     # extension. All three must match to share an object: podcast and
@@ -333,21 +313,6 @@ module ImageCrawler
       }
     end
 
-    def image_name
-      path = File.join(id[0..2], "#{id}.#{processed_extension}")
-      if preset.directory
-        path = File.join(preset.directory, path)
-      end
-      path
-    end
-
-    # Only a preset that still writes a legacy object names a bucket, and
-    # only icon does: it writes RemoteFile's. Every other preset is unified
-    # only, so nothing reaches this without a preset bucket.
-    def bucket
-      preset.bucket
-    end
-
     def trace(message:, metadata: {})
       defaults = {
         public_id: id,
@@ -355,15 +320,6 @@ module ImageCrawler
       }.merge(metadata)
 
       Sidekiq.logger.info "Image trace: #{message} #{defaults.map { |k, v| "#{k}=#{v}" }.join(" ")}"
-    end
-
-    def storage_options
-      {
-        "Cache-Control" => "max-age=315360000, public",
-        "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
-        "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY",
-        "x-amz-acl" => "public-read"
-      }
     end
 
   end

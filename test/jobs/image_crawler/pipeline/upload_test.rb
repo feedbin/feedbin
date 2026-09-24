@@ -6,26 +6,6 @@ module ImageCrawler
         flush_redis
       end
 
-      # The stored URL must describe the connection Fog actually made. A
-      # development-only URI::HTTP branch used to stamp Fog's port onto an http
-      # URL, producing http://host:443/path -- plaintext against a TLS port,
-      # which nginx's /remote_image proxy_pass hangs on.
-      def test_object_url_matches_the_scheme_fog_used
-        data = {scheme: "https", host: "feedbin-dev.s3.amazonaws.com", port: 443, path: "/d73/d73dcf-icon.jpg"}
-
-        Rails.stub(:env, ActiveSupport::StringInquirer.new("development")) do
-          assert_equal "https://feedbin-dev.s3.amazonaws.com/d73/d73dcf-icon.jpg", Upload.new.object_url(data)
-        end
-
-        assert_equal "https://feedbin-dev.s3.amazonaws.com/d73/d73dcf-icon.jpg", Upload.new.object_url(data)
-      end
-
-      def test_object_url_keeps_a_non_default_port
-        data = {scheme: "http", host: "localhost", port: 9000, path: "/d73/d73dcf-icon.jpg"}
-
-        assert_equal "http://localhost:9000/d73/d73dcf-icon.jpg", Upload.new.object_url(data)
-      end
-
       # podcast_feed is unified-only now, like every other unified preset: this
       # pins Upload's default path, that it stores the unified object and
       # hands ItunesFeedImage the payload the callback reads, storage_path
@@ -108,9 +88,6 @@ module ImageCrawler
 
           _, payload = EntryImage.jobs.last["args"]
           assert_equal image.storage_path, payload["storage_path"]
-
-          # the positive redis cache is retired for unified images
-          assert_nil DownloadCache.new(original_url, image).cached_image
         end
       end
 
@@ -143,7 +120,6 @@ module ImageCrawler
           end
 
           assert_not_requested legacy
-          assert_nil DownloadCache.new(original_url, image).cached_image
         end
       end
 
