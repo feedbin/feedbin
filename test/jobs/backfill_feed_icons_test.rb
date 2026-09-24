@@ -52,12 +52,14 @@ class BackfillFeedIconsTest < ActiveSupport::TestCase
     assert_equal [icon.id, avatar.id, image.id].sort, pending.pluck(:id).sort
   end
 
+  # An empty icon passes the SQL's null test, so the feed reaches the job,
+  # which declines it: source_for reads a blank value as no source.
   test "a batch schedules its pending feeds off the critical queues and declines the rest" do
     icon = feed("icon", {"json_feed" => {"icon" => "http://example.com/icon.png"}})
-    banner = feed("banner", {"image" => {"url" => "http://example.com/banner.png"}})
-    create_entry(banner).update!(title: "An article")
+    blank = feed("blank", {"json_feed" => {"icon" => ""}})
+    assert_includes BackfillFeedIcons.pending.pluck(:id), blank.id
 
-    perform_batches_for(icon, banner)
+    perform_batches_for(icon, blank)
 
     assert_equal [icon.id], scheduled_feed_ids
     assert_equal [false], ImageCrawler::Pipeline::Find.jobs.map { it["args"].first["critical"] }
