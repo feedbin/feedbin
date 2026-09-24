@@ -10,10 +10,13 @@ or the JSON Feed author avatar) and no `feed_icon` row yet. It does not
 touch podcasts: `ItunesFeedImage` owns their `feed_icon` row, and a feed
 with `itunes_image` set is declined. The RSS `<image>` counts only for a
 micropost feed, since for an article feed it is as often a banner as a
-logo; `BackfillFeedIcons.pending` overestimates on purpose because that
-check reads the feed's entries, which is not cheap in SQL, so the job
-declines those feeds one by one at no download cost instead of filtering
-them out up front. Declines are expected and are not a failure.
+logo; `BackfillFeedIcons.pending` filters those feeds out in SQL with the
+same test `Feed#micropost?` makes. The job still declines a feed whose
+source is blank, so a few declines are expected and are not a failure.
+
+After the deploy a feed's row is refreshed only when a crawl changes one
+of those urls (a Mastodon account's new avatar, say), and on a new feed or
+a new subscription. A dead source is not asked for again on every crawl.
 
 ## Pre-deploy checks
 
@@ -49,11 +52,15 @@ create re-enqueues `ImageCrawler::FeedIcon` and self-heals it.
 # Batches number feed ids in blocks of SidekiqHelper::BATCH_SIZE, starting
 # at 1.
 feed_id = BackfillFeedIcons.pending.order(:id).limit(1).pluck(:id).first
-batch = ((feed_id - 1) / SidekiqHelper::BATCH_SIZE) + 1
-puts "first pending feed: #{feed_id}, batch: #{batch}"
-puts "pending feeds in that batch: #{BackfillFeedIcons.batch_scope(batch).count}"
-BackfillFeedIcons.new.perform(batch)
-puts "Find jobs enqueued by the batch: see the BackfillFeedIcons log line above"
+if feed_id.nil?
+  puts "nothing pending"
+else
+  batch = ((feed_id - 1) / SidekiqHelper::BATCH_SIZE) + 1
+  puts "first pending feed: #{feed_id}, batch: #{batch}"
+  puts "pending feeds in that batch: #{BackfillFeedIcons.batch_scope(batch).count}"
+  BackfillFeedIcons.new.perform(batch)
+  puts "Find jobs enqueued by the batch: see the BackfillFeedIcons log line above"
+end
 ```
 
 ## Full run
@@ -84,18 +91,17 @@ BackfillFeedIcons: batch=... scanned=... scheduled=... declined=...
 ```
 
 Scheduled counts are not successful downloads; `scheduled` only means a
-`Pipeline::Find` job was pushed. Check row counts and the retry queue,
-ideally twice a day apart so the trend is visible:
+`Pipeline::Find` job was pushed. Check row counts and the batches waiting
+to retry, ideally twice a day apart so the trend is visible:
 
 ```ruby
 puts "pending: #{BackfillFeedIcons.pending.count}"
 puts "feed_icon rows: #{Image.provider_feed_icon.count}"
-puts "FeedIcon retries (must be 0): #{Sidekiq::RetrySet.new.count { it.klass == "ImageCrawler::FeedIcon" }}"
+puts "backfill batches waiting to retry: #{Sidekiq::RetrySet.new.count { it.klass == "BackfillFeedIcons" }}"
 ```
 
-`FeedIcon` sets `retry: false`, so that count should always read 0; a
-nonzero count means something upstream re-enqueued through a retrying
-path and is worth investigating on its own.
+A batch in the retry set failed as a whole (the pending query, or storage
+configuration) and is worth a look before it retries again.
 
 When the run has mostly drained, list what is left:
 

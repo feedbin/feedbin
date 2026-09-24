@@ -3,7 +3,9 @@
 Deploy the `micropost_avatar` and `icon` image presets, `ImageCrawler::MicropostAvatar`,
 `BackfillAvatarCopies`, and `BackfillMicropostAvatars` together (Deploy A of
 the avatar images cutover), then run these production Rails console
-commands in order: the copy first, then the micropost pass.
+commands in order: the copy first, then the micropost pass. From the
+deploy on, each crawl's new micropost entries get their avatar rows from
+the live pass; the two backfills cover what was stored before.
 
 `BackfillAvatarCopies` copies every avatar the icon proxy already cached in
 `remote_files` into an `images` row on the `remote_file` provider, keyed by
@@ -18,10 +20,10 @@ ids, with no spread — about 9,600 batches for 2.4 million rows. The wall
 clock is batches ÷ the number of Sidekiq threads working the `backfill`
 queue, so watch the batch log rather than expect a fixed ETA.
 
-`BackfillMicropostAvatars` runs second, after the copy's queue has
-drained, and walks every micropost feed with an entry lacking an
-`entry_icon` row, re-running `ImageCrawler::MicropostAvatar.schedule` for
-it off the critical queues. Because the copy already ran, most avatar urls
+`BackfillMicropostAvatars` runs second, after the copy has finished, and
+walks every micropost feed with an untitled entry lacking an `entry_icon`
+row, running `ImageCrawler::MicropostAvatar.schedule` for it off the
+critical queues. Because the copy already ran, most avatar urls
 now resolve to a `remote_file` row the crawler can attach with no request;
 only an avatar the copy missed — a legacy object the proxy never cached,
 or one genuinely new since the copy started — costs a download. It fans
@@ -31,22 +33,32 @@ feed ids on the `utility` queue, with `at` timestamps spread over
 that remain share the crawl queues' rate limits with live crawling, not
 all at once.
 
-## Pre-deploy checks
+## Before deploying
+
+These run on the code that is live now:
 
 ```ruby
-puts "remote_files rows: #{RemoteFile.count}"
-puts "remote_files rows with no images row (the copy's set): #{BackfillAvatarCopies.pending.count}"
-puts "micropost feeds with an entry lacking a row (the pass's set): #{BackfillMicropostAvatars.pending.count}"
 puts "unlabeled podcast art rows (must be 0): #{Image.provider_entry_icon.where(Image.data_projection("preset").eq("podcast")).where.not(kind: :cover_art).count}"
 puts "YouTube channels with no avatar row: #{Embed.youtube_channel.where.missing(:channel_image).count}"
 ```
 
-These are the two jobs' starting sets. Expect `remote_files rows` near
-2,394,516 and the copy's pending count close to it; the pass's pending
-count is unrelated to the copy's and does not need to match either one.
-`Entry#itunes_image` now reads the row's kind, so an unlabeled podcast art
-row would drop an episode's own art. Those YouTube channels show the
-proxied thumbnail on their card until `BackfillChannelImages` covers them.
+`Entry#itunes_image` reads the row's kind from the moment of the deploy,
+so an unlabeled podcast art row would drop an episode's own art: do not
+deploy until the first count reads 0. The YouTube channels show the
+thumbnail the proxy cached (or its copy) on their card until
+`BackfillChannelImages` covers them.
+
+## After deploying: the starting sets
+
+```ruby
+puts "remote_files rows: #{RemoteFile.count}"
+puts "remote_files rows with no images row (the copy's set): #{BackfillAvatarCopies.pending.count}"
+puts "micropost feeds with an untitled entry lacking a row (the pass's set): #{BackfillMicropostAvatars.pending.count}"
+```
+
+Expect `remote_files rows` near 2,394,516 and the copy's pending count
+close to it; the pass's pending count is unrelated to the copy's and does
+not need to match either one.
 
 ## Trial
 
@@ -54,12 +66,16 @@ The batch that holds the lowest pending remote file id, run inline:
 
 ```ruby
 remote_id = BackfillAvatarCopies.pending.order(:id).limit(1).pluck(:id).first
-batch = ((remote_id - 1) / BackfillAvatarCopies::BATCH_SIZE) + 1
-puts "first pending remote file: #{remote_id}, batch: #{batch}"
-before = BackfillAvatarCopies.batch_scope(batch).count
-puts "rows in that batch: #{before}"
-BackfillAvatarCopies.new.perform(batch)
-puts "copied in that batch (rows now present): #{before - BackfillAvatarCopies.batch_scope(batch).count}"
+if remote_id.nil?
+  puts "nothing pending"
+else
+  batch = ((remote_id - 1) / BackfillAvatarCopies::BATCH_SIZE) + 1
+  puts "first pending remote file: #{remote_id}, batch: #{batch}"
+  before = BackfillAvatarCopies.batch_scope(batch).count
+  puts "rows in that batch: #{before}"
+  BackfillAvatarCopies.new.perform(batch)
+  puts "copied in that batch (rows now present): #{before - BackfillAvatarCopies.batch_scope(batch).count}"
+end
 ```
 
 A dead source is expected and is not a failure: `Copy#call` logs it and
@@ -77,17 +93,12 @@ BackfillAvatarCopies.perform_async(nil, true)
 through its last, all onto the `backfill` queue at once — no spread, since
 the copy talks to storage, not a third party.
 
-To continue after an interruption, resume from the batch number on the
-last `BackfillAvatarCopies: batch=` log line before the stop:
-
-```ruby
-# The lowest remaining pending id's batch: reruns are safe (a copied row
-# leaves pending), so resuming one batch behind the last log line costs
-# nothing and needs no number copied by hand from the log.
-from_batch = ((BackfillAvatarCopies.pending.minimum(:id) - 1) / BackfillAvatarCopies::BATCH_SIZE) + 1
-puts "resuming the copy from batch: #{from_batch}"
-BackfillAvatarCopies.perform_async(nil, true, from_batch)
-```
+Queued batches survive a restart, so an interruption needs nothing. To
+start over after clearing the queue, run the kickoff again: a copied row
+leaves pending, so a batch whose rows are all copied costs one query, and
+rows that failed are tried again. Never kick off again while batches are
+still queued, running or waiting to retry (see Watching it): they would
+run twice.
 
 ## Watching it
 
@@ -100,32 +111,38 @@ BackfillAvatarCopies: batch=... scanned=... copied=... skipped=...
 Skipped rows are not a failure: a dead legacy object or an undecodable
 image stays pending forever and cannot be copied. `Copy::STORE_ERRORS`
 re-raises a storage or database error instead of logging it as skipped, so
-Sidekiq retries the whole batch — if the queue depth below is not
-draining, check the retry set for this class before assuming every row is
-simply dead. Check row counts and the queue depth, ideally twice a day
-apart so the trend is visible:
+Sidekiq retries the whole batch; such a batch leaves the queue and waits in
+the retry set. Check row counts and the batches still to run, ideally twice
+a day apart so the trend is visible:
 
 ```ruby
 puts "copy pending: #{BackfillAvatarCopies.pending.count}"
 puts "remote_file rows: #{Image.provider_remote_file.count}"
-puts "backfill queue depth: #{Sidekiq::Queue.new("backfill").size}"
+puts "copy batches queued: #{Sidekiq::Queue.new("backfill").count { it.klass == "BackfillAvatarCopies" }}"
+puts "copy batches waiting to retry: #{Sidekiq::RetrySet.new.count { it.klass == "BackfillAvatarCopies" }}"
+puts "copy batches running: #{Sidekiq::WorkSet.new.count { |_process, _thread, work| work.job.klass == "BackfillAvatarCopies" }}"
 ```
 
 ## The micropost pass
 
-Run this only once the copy's queue is empty (`backfill queue depth: 0`
-above): most of the pass's downloads are avoided only because the rows the
-copy wrote are already there to attach.
+Run this only once the copy has finished: all three batch counts above
+read 0. A batch waiting to retry holds rows not yet copied, and most of the
+pass's downloads are avoided only because the rows the copy wrote are
+already there to attach.
 
 A trial batch, in the same shape as the copy's:
 
 ```ruby
 feed_id = BackfillMicropostAvatars.pending.order(:id).limit(1).pluck(:id).first
-batch = ((feed_id - 1) / SidekiqHelper::BATCH_SIZE) + 1
-puts "first pending feed: #{feed_id}, batch: #{batch}"
-puts "pending feeds in that batch: #{BackfillMicropostAvatars.batch_scope(batch).count}"
-BackfillMicropostAvatars.new.perform(batch)
-puts "attached and scheduled: see the BackfillMicropostAvatars log line above"
+if feed_id.nil?
+  puts "nothing pending"
+else
+  batch = ((feed_id - 1) / SidekiqHelper::BATCH_SIZE) + 1
+  puts "first pending feed: #{feed_id}, batch: #{batch}"
+  puts "pending feeds in that batch: #{BackfillMicropostAvatars.batch_scope(batch).count}"
+  BackfillMicropostAvatars.new.perform(batch)
+  puts "attached and scheduled: see the BackfillMicropostAvatars log line above"
+end
 ```
 
 The full run:
@@ -139,17 +156,19 @@ Watching it:
 ```ruby
 puts "pass pending: #{BackfillMicropostAvatars.pending.count}"
 puts "entry_icon avatar rows: #{Image.provider_entry_icon.where(kind: :avatar).count}"
-puts "MicropostAvatar retries (must be 0): #{Sidekiq::RetrySet.new.count { it.klass == "ImageCrawler::MicropostAvatar" }}"
+puts "pass batches waiting to retry: #{Sidekiq::RetrySet.new.count { it.klass == "BackfillMicropostAvatars" }}"
 ```
 
-`MicropostAvatar` sets `retry: false`, so that count should always read 0;
-a nonzero count means something upstream re-enqueued through a retrying
-path and is worth investigating on its own.
+A feed that raises is logged (`BackfillMicropostAvatars: feed failed
+feed_id=...`), stays pending, and the rest of its batch goes on, so a batch
+in the retry set failed as a whole and is worth a look.
 
-`BackfillMicropostAvatars.pending` is prefiltered by the parser's own
-marker for a micropost feed, so a zero there does not mean every micropost
-feed's entries are covered — an unmarked feed is picked up on its own the
-next time it crawls with new posts.
+The pass's pending count does not reach 0: an untitled entry that is not a
+micropost, has no avatar, belongs to a podcast episode, or whose avatar
+never lands keeps its feed pending. It is also prefiltered by the parser's
+marker for a micropost feed, so a micropost feed without the marker is not
+covered here; its new posts are, from its next crawl, but its older
+entries are not.
 
 ## The gate before Deploy B
 
@@ -177,21 +196,31 @@ counts read 0: their cache keys do not digest the copied rows, only the
 row-backed sources, so a fragment written before a row landed keeps
 rendering the proxy until something else invalidates it. That is expected
 and is not part of the residual above. Deploy B must bump `entries_helper`'s
-cache key from `"v15"` to `"v16"` and both of `feeds_helper`'s version
-strings when it removes the proxy, so every cached fragment is forced to
-re-render against the rows.
+cache key from `"v15"` to `"v16"`, both of `feeds_helper`'s version strings,
+and the embed card's (`embeds/_iframe.html.erb`) from `"v6"` to `"v7"` when
+it removes the proxy, so every cached fragment is forced to re-render
+against the rows.
 
-**Deploy B deletion list** — dead once the proxy retires: `CacheRemoteFile.schedule`
-(no callers), `Pipeline::Find#attempt_legacy` and `DownloadCache.copy` (no
-preset reaches them), and the `RemoteFile.signed_url` fallbacks marked
-`# Deploy A only`.
+**Deploy B changes**, once the proxy retires:
+
+- `Image.avatar_url` serves a miss through camo instead of
+  `RemoteFile.signed_url`, so an avatar no row holds still renders while its
+  source lives: a new replier in the micro.blog replies dialog, or a post
+  whose row has not landed.
+- `Feed#icon_url`'s `RemoteFile.signed_url(icon)` fallback and
+  `FaviconComponent#legacy_icon_format` go with the feed icon cutover's
+  Deploy 2.
+- The legacy object candidates in `ImageCrawler::FeedIcon.schedule` and
+  `ImageCrawler::MicropostAvatar.enqueue`, and `RemoteFile.legacy_object_url`,
+  go with `remote_files`.
+- Every other line marked `# Deploy A only`.
 
 ## Residual avatars
 
-A residual left after Deploy B is not broken, it degrades: a micropost
-with no row renders the feed's icon in the list and the default avatar in
-the view; a tweet with no row renders the default avatar; an embed card
-renders the source's own icon. Reruns of either job are safe: a copied or
+A residual left after Deploy B is not broken, it degrades: an avatar that
+no row holds renders through camo while its source lives, and the default
+avatar once it is gone; an embed card with no thumbnail at all renders the
+source's own icon. Reruns of either job are safe: a copied or
 attached row leaves `pending`, and both `Image.attach!` and the copy's
 `create_image` upsert onto a content-addressed path, so scheduling either
 backfill twice while it is in flight does not create duplicate rows.
