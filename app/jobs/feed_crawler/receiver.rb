@@ -11,11 +11,20 @@ module FeedCrawler
       # bypassed.
       data = data.deep_stringify_keys
       feed = Feed.find(data["feed"]["id"])
+      icon_urls = ImageCrawler::FeedIcon.source_urls(feed)
       created = 0
       if data["entries"].present?
         created = receive_entries(data["entries"], feed)
       end
       feed.update(data["feed"].except("feed_url", :feed_url))
+
+      # The stored feed_icon row outranks options, so a new icon url (a
+      # Mastodon account's new avatar) is fetched only if the crawl that
+      # brings it asks. An unchanged url, or one that never landed, is not
+      # asked for again.
+      if ImageCrawler::FeedIcon.source_urls(feed) != icon_urls
+        ImageCrawler::FeedIcon.perform_async(feed.id)
+      end
 
       # Once per crawl with new posts, never per entry: the job dedupes the
       # feed's avatar urls in one pass. The marker is the parser's micropost

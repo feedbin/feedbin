@@ -31,16 +31,15 @@ module ImageCrawler
       assert_empty Pipeline::Find.jobs
     end
 
-    test "schedules the feed's own icon once, only without a row" do
+    # The feed icon has its own triggers (create, subscribe, a crawl that
+    # changes its url, the backfill), so a dead icon is not asked for again
+    # on every crawl with new posts.
+    test "does not schedule the feed's own icon" do
       post("https://micro.example/a.png")
       @feed.update!(options: {"image" => {"url" => "https://micro.example/logo.png"}})
 
       MicropostAvatar.schedule(@feed)
-      assert_equal 1, find_args.count { it["preset_name"] == "feed_icon" }
 
-      create_image_row(provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id, kind: :avatar, variant: "200x200")
-      Sidekiq::Worker.clear_all
-      MicropostAvatar.schedule(Feed.find(@feed.id))
       assert_equal 0, find_args.count { it["preset_name"] == "feed_icon" }
     end
 

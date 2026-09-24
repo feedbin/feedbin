@@ -29,10 +29,6 @@ module ImageCrawler
     def self.schedule(feed, critical: true)
       return [0, 0] unless feed.micropost?
 
-      # The feed's own icon on the same pass, once: a request per crawl
-      # would be too many, so only a feed with no row asks.
-      FeedIcon.schedule(feed, critical: critical) if feed.icon_image_record.nil?
-
       entries = pending_entries(feed).to_a
       groups = avatar_groups(feed, entries)
       attached = 0

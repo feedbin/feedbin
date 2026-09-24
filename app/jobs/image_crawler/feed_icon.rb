@@ -60,6 +60,13 @@ module ImageCrawler
       true
     end
 
+    # Every url source_for can pick, as the feed stores them, with no query
+    # and no ranking. The receiver compares them across a crawl.
+    def self.source_urls(feed)
+      options = feed.options || {}
+      [options.safe_dig("image", "url"), options.safe_dig("json_feed", "icon"), options.safe_dig("json_feed", "author", "avatar")]
+    end
+
     # The legacy ranking's url order. The RSS image counts only for a
     # micropost feed, where it is the author's picture; for an article feed
     # it is a banner as often as a logo, and it stays ignored. A micropost

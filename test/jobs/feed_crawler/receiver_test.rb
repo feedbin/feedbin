@@ -184,6 +184,20 @@ module FeedCrawler
       assert_empty ImageCrawler::MicropostAvatar.jobs
     end
 
+    # The stored feed_icon row outranks options, so a new icon url (a
+    # Mastodon account's new avatar) is only fetched if the crawl that
+    # brings it asks. An unchanged url is not asked for again.
+    test "schedules the feed icon only when a crawl changes the feed's icon url" do
+      @feed.update!(options: {"image" => {"url" => "http://example.com/old.png"}})
+      Sidekiq::Worker.clear_all
+
+      Receiver.new.perform({"feed" => {"id" => @feed.id, "options" => {"image" => {"url" => "http://example.com/old.png"}}}})
+      assert_empty ImageCrawler::FeedIcon.jobs
+
+      Receiver.new.perform({"feed" => {"id" => @feed.id, "options" => {"image" => {"url" => "http://example.com/new.png"}}}})
+      assert_equal [@feed.id], ImageCrawler::FeedIcon.jobs.map { it["args"].first }
+    end
+
     private
 
     def build_entry(public_id = SecureRandom.hex, update = false)
