@@ -8,8 +8,9 @@
 # ids at once, on the backfill queue. No spread: the copy talks only to the
 # legacy bucket and the unified store, so third-party rate limits do not
 # apply. 2.4 million rows is about 9,600 batches; the wall clock is that
-# count divided by the queue's thread count. from_batch lets a second
-# kickoff continue where the first stopped.
+# count divided by the queue's thread count. Queued batches survive a
+# restart; a second kickoff after the queue is cleared starts over, and a
+# batch whose rows are all copied costs one query.
 #
 # Each batch copies its rows one at a time, so throughput is the number of
 # batch jobs running at once and the tail is the length of one batch. 250
@@ -40,27 +41,25 @@ class BackfillAvatarCopies
     pending.where(id: first..(first + BATCH_SIZE - 1))
   end
 
-  def perform(batch = nil, schedule = false, from_batch = 1)
+  def perform(batch = nil, schedule = false)
     raise "UNIFIED_BUCKET_IMAGES must be configured" unless Image.unified_enabled?
 
     if schedule
-      build(from_batch)
+      build
     else
       update(batch)
     end
   end
 
   # push_bulk slices the push itself. The table's own first batch may be
-  # above 1 (ids do not start at 1 once anything upstream has been
-  # deleted), so a fresh kickoff (from_batch defaulted to 1) starts at
-  # whichever is later: the table's first batch, or the caller's from_batch.
-  def build(from_batch)
+  # above 1: ids do not start at 1 once anything upstream has been deleted.
+  def build
     last_id = RemoteFile.maximum(:id)
     return unless last_id
 
     first_batch = ((RemoteFile.minimum(:id) - 1) / BATCH_SIZE) + 1
     last_batch = ((last_id - 1) / BATCH_SIZE) + 1
-    jobs = ([first_batch, from_batch].max..last_batch).map { |batch| [batch] }
+    jobs = (first_batch..last_batch).map { |batch| [batch] }
     Sidekiq::Client.push_bulk("args" => jobs, "class" => self.class)
   end
 
@@ -148,48 +147,41 @@ class BackfillAvatarCopies
       nil
     end
 
-    # Re-encoded to the icon preset's 200px png, the same processing a live
-    # crawl would do, so the row is exactly what a crawler would have
-    # written: a later crawl of the same url short-circuits on its
-    # fingerprint. original_fingerprint is the legacy object's bytes; url
-    # is the original url, so a micropost crawler's lookup by
-    # url_fingerprint finds this row.
+    # Re-encoded with the icon preset's recipe, as Pipeline::Process would.
+    # url is the original url, so Image.avatar_row finds this row by the url
+    # a micropost or a tweet carries. original_fingerprint is the legacy
+    # object's bytes, not the source's, and crawlers look rows up by their
+    # own provider, so a later crawl of the same source downloads anyway
+    # and stores its own object.
     def build(path)
-      cropper = ImageCrawler::Processor::Cropper.new(path, crop: :limit_png, extension: ImageFormat.detect(path), width: 200, height: 200)
+      image = ImageCrawler::Image.new_with_attributes(
+        id: "#{fingerprint}-icon",
+        kind: ::Image.kinds[:avatar],
+        preset_name: "icon",
+        image_urls: [],
+        provider: ::Image.providers[:remote_file],
+        provider_id: fingerprint,
+        original_url: @remote_file.original_url,
+        final_url: @remote_file.original_url,
+        storage_url: @remote_file.storage_url,
+        original_fingerprint: Digest::MD5.file(path).hexdigest
+      )
+      preset = image.preset
+      cropper = ImageCrawler::Processor::Cropper.new(path, crop: preset.crop, extension: ImageFormat.detect(path), width: preset.width, height: preset.height)
       unless cropper.valid?(false)
         log("undecodable")
         return nil
       end
-      cropped = cropper.crop!
 
-      # cropped.file is a tempfile nothing else references yet: call's own
-      # ensure only knows to clean it up once it is on the returned image's
-      # processed_path, so a raise before that assignment finishes must
-      # clean it up here instead, or it leaks.
-      begin
-        ImageCrawler::Image.new_with_attributes(
-          id: "#{fingerprint}-icon",
-          kind: ::Image.kinds[:avatar],
-          preset_name: "icon",
-          image_urls: [],
-          provider: ::Image.providers[:remote_file],
-          provider_id: fingerprint,
-          original_url: @remote_file.original_url,
-          final_url: @remote_file.original_url,
-          storage_url: @remote_file.storage_url,
-          original_fingerprint: Digest::MD5.file(path).hexdigest,
-          fingerprint: cropped.fingerprint,
-          processed_path: cropped.file,
-          processed_extension: cropped.extension,
-          width: cropped.width,
-          height: cropped.height,
-          bytesize: cropped.size,
-          placeholder_color: cropped.placeholder_color
-        )
-      rescue
-        FileUtils.rm_f(cropped.file)
-        raise
-      end
+      cropped = cropper.crop!
+      image.processed_path = cropped.file
+      image.processed_extension = cropped.extension
+      image.fingerprint = cropped.fingerprint
+      image.width = cropped.width
+      image.height = cropped.height
+      image.bytesize = cropped.size
+      image.placeholder_color = cropped.placeholder_color
+      image
     end
 
     def log(message)

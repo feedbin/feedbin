@@ -61,6 +61,23 @@ class BackfillAvatarCopiesTest < ActiveSupport::TestCase
     assert_empty BackfillAvatarCopies.pending.where(id: remote.id)
   end
 
+  # The copy crops with the icon preset's recipe, so changing the preset
+  # changes the copies and the variant they are recorded under together.
+  test "copies with the icon preset's recipe" do
+    remote = cached("https://pbs.twimg.com/1.jpg")
+    stub_legacy_object(remote.storage_url)
+    stub_request(:put, /test-account\.storage\.example\.com/)
+    presets = ImageCrawler::Image::PRESETS.merge(icon: ImageCrawler::Image::PRESETS[:icon].merge(width: 16, height: 16))
+
+    swap_const(ImageCrawler::Image, :PRESETS, presets) do
+      perform_batches_for(remote)
+    end
+
+    row = Image.provider_remote_file.find_by!(provider_id: remote.fingerprint.to_s.delete("-"))
+    assert_equal "16x16", row.variant
+    assert_operator row.width, :<=, 16
+  end
+
   # STORE_ERRORS is batch-level: a storage outage must fail the batch
   # visibly so Sidekiq retries it, not log this one row as "skipped"
   # alongside rows that copied fine.
@@ -138,7 +155,7 @@ class BackfillAvatarCopiesTest < ActiveSupport::TestCase
     assert_equal 1, Image.provider_remote_file.where(provider_id: remote.fingerprint.to_s.delete("-")).count
   end
 
-  test "schedule pushes one job per batch from a starting batch" do
+  test "schedule pushes one job per batch" do
     first = cached("https://pbs.twimg.com/first.jpg")
     last = cached("https://pbs.twimg.com/last.jpg")
 
@@ -147,11 +164,6 @@ class BackfillAvatarCopiesTest < ActiveSupport::TestCase
       jobs = BackfillAvatarCopies.jobs
       assert_equal batches_for(first).first, jobs.first["args"].first
       assert_equal batches_for(last).first, jobs.last["args"].first
-      assert_includes jobs.map { it["args"].first }, batches_for(first).first
-
-      Sidekiq::Worker.clear_all
-      BackfillAvatarCopies.new.perform(nil, true, batches_for(last).first)
-      assert_equal [batches_for(last).first], BackfillAvatarCopies.jobs.map { it["args"].first }
     end
   end
 
