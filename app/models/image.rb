@@ -105,6 +105,23 @@ class Image < ApplicationRecord
     end
   end
 
+  # A LEFT JOIN from table to its images rows for provider, keyed by key: a
+  # text node, because provider_id is text (see as_text). A caller keeps
+  # the rows with no match by testing arel_table[:id] for NULL, an
+  # anti-join. Not NOT IN, which Postgres never plans as an anti-join, and
+  # not where.missing, which compares text to bigint. The join rides
+  # index_images_on_provider_and_provider_id.
+  def self.outer_join(table, provider:, key:)
+    table.join(arel_table, Arel::Nodes::OuterJoin).on(
+      arel_table[:provider].eq(providers.fetch(provider)).and(arel_table[:provider_id].eq(key))
+    )
+  end
+
+  # CAST(node AS text). Arel.sql carries only the type keyword, never a value.
+  def self.as_text(node)
+    Arel::Nodes::NamedFunction.new("CAST", [node.as(Arel.sql("text"))])
+  end
+
   # The columns a row takes from a row that already stores its picture:
   # attaching is a database write that shares the stored object. Dedupe
   # and MicropostAvatar attach this way.

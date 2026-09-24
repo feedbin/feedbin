@@ -24,21 +24,11 @@ class BackfillFeedIcons
   # banner, each declined by the job at two queries apiece. Scheduling is
   # not completion: check the row counts after the image queues drain.
   #
-  # A hand-built LEFT JOIN anti-join, not where.missing and not
-  # where.not(provider_id: subquery). NOT IN never becomes an anti-join in
-  # Postgres, so it hashes every feed_icon provider_id per query and rescans
-  # images per row once that hash outgrows work_mem. where.missing builds
-  # the right join but compares images.provider_id (text) to feeds.id
-  # (bigint), which Postgres refuses; the cast below is the fix, and the
-  # join still rides index_images_on_provider_and_provider_id. Arel.sql
-  # carries only the type keyword "text", never a value.
+  # An anti-join on the cast feed id (Image.outer_join).
   def self.pending
     feeds = Feed.arel_table
     images = Image.arel_table
-    feed_id_text = Arel::Nodes::NamedFunction.new("CAST", [feeds[:id].as(Arel.sql("text"))])
-    join = feeds.join(images, Arel::Nodes::OuterJoin).on(
-      images[:provider].eq(Image.providers[:feed_icon]).and(images[:provider_id].eq(feed_id_text))
-    ).join_sources
+    join = Image.outer_join(feeds, provider: :feed_icon, key: Image.as_text(feeds[:id])).join_sources
 
     entries = Entry.arel_table
     has_entries = entries.project(1).where(entries[:feed_id].eq(feeds[:id])).exists

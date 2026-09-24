@@ -20,19 +20,15 @@ class BackfillAvatarCopies
 
   BATCH_SIZE = 250
 
-  # Rows with no remote_file row for their fingerprint. A LEFT JOIN
-  # anti-join, not NOT IN: NOT IN never becomes an anti-join in Postgres.
-  # The fingerprint column is uuid and reads back dashed; provider_id is the
-  # bare hex the rows carry, so the join strips the dashes. Arel.sql carries
-  # only the type keyword.
+  # Rows with no remote_file row for their fingerprint, an anti-join
+  # (Image.outer_join). The fingerprint column is uuid and reads back
+  # dashed; provider_id is the bare hex the rows carry, so the join strips
+  # the dashes.
   def self.pending
     remote = RemoteFile.arel_table
     images = Image.arel_table
-    as_text = Arel::Nodes::NamedFunction.new("CAST", [remote[:fingerprint].as(Arel.sql("text"))])
-    bare = Arel::Nodes::NamedFunction.new("replace", [as_text, Arel::Nodes.build_quoted("-"), Arel::Nodes.build_quoted("")])
-    join = remote.join(images, Arel::Nodes::OuterJoin).on(
-      images[:provider].eq(Image.providers[:remote_file]).and(images[:provider_id].eq(bare))
-    ).join_sources
+    bare = Arel::Nodes::NamedFunction.new("replace", [Image.as_text(remote[:fingerprint]), Arel::Nodes.build_quoted("-"), Arel::Nodes.build_quoted("")])
+    join = Image.outer_join(remote, provider: :remote_file, key: bare).join_sources
 
     RemoteFile.joins(join).where(images[:id].eq(nil))
   end

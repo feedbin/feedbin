@@ -59,23 +59,17 @@ module ImageCrawler
       [attached, scheduled]
     end
 
-    # The feed's untitled entries with no entry_icon row: a LEFT JOIN
-    # anti-join on the cast entry id (provider_id is text), never NOT IN,
-    # which Postgres cannot turn into an anti-join. A titled entry is never
-    # a micropost, so it is not loaded. Arel.sql carries only the type
-    # keyword. Ordered by id: the feed_id index carries no sort, so an
-    # unordered scan can hand back entries newest-first, and avatar_groups'
-    # "first" entry (the one that pays for the download) would otherwise
-    # vary run to run.
+    # The feed's untitled entries with no entry_icon row, an anti-join on
+    # the cast entry id (Image.outer_join). A titled entry is never a
+    # micropost, so it is not loaded. Ordered by id: the feed_id index
+    # carries no sort, so an unordered scan can hand back entries
+    # newest-first, and avatar_groups' "first" entry (the one that pays for
+    # the download) would otherwise vary run to run.
     def self.pending_entries(feed)
       entries = Entry.arel_table
-      images = ::Image.arel_table
-      entry_id_text = Arel::Nodes::NamedFunction.new("CAST", [entries[:id].as(Arel.sql("text"))])
-      join = entries.join(images, Arel::Nodes::OuterJoin).on(
-        images[:provider].eq(::Image.providers[:entry_icon]).and(images[:provider_id].eq(entry_id_text))
-      ).join_sources
+      join = ::Image.outer_join(entries, provider: :entry_icon, key: ::Image.as_text(entries[:id])).join_sources
 
-      feed.entries.where(title: [nil, ""]).joins(join).where(images[:id].eq(nil)).select(:id, :feed_id, :url, :data, :title, :public_id).order(:id)
+      feed.entries.where(title: [nil, ""]).joins(join).where(::Image.arel_table[:id].eq(nil)).select(:id, :feed_id, :url, :data, :title, :public_id).order(:id)
     end
 
     # Entries by absolute avatar url.

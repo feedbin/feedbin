@@ -35,7 +35,26 @@ class BackfillMicropostAvatarsTest < ActiveSupport::TestCase
 
     pending = BackfillMicropostAvatars.pending.where(id: [todo, done, unmarked, titled].map(&:id))
 
-    assert_equal [todo.id, titled.id].sort, pending.pluck(:id).sort, "the marker is the prefilter; the job's own gate declines the titled feed"
+    assert_equal [todo.id], pending.pluck(:id), "the marker is the prefilter, and a titled entry never gets an avatar row, so it keeps no feed pending"
+  end
+
+  # One feed's error must not strand the feeds after it in the batch, or
+  # send the whole batch back through Sidekiq's retries.
+  test "a feed that raises is logged and the batch goes on" do
+    bad = micropost_feed("bad")
+    good = micropost_feed("good")
+    passes = []
+    schedule = ->(feed, **) {
+      passes << feed.id
+      raise "boom" if feed.id == bad.id
+      [0, 1]
+    }
+
+    ImageCrawler::MicropostAvatar.stub(:schedule, schedule) do
+      assert_nothing_raised { perform_batches_for(bad, good) }
+    end
+
+    assert_equal [bad.id, good.id], passes
   end
 
   test "a batch schedules each pending feed off the critical queues" do
@@ -69,7 +88,7 @@ class BackfillMicropostAvatarsTest < ActiveSupport::TestCase
     sql = BackfillMicropostAvatars.batch_scope(1).order(:id).to_sql
 
     assert_includes sql, %("feeds"."settings" ->> 'custom_icon_format' = 'round')
-    assert_includes sql, %(EXISTS (SELECT 1 FROM "entries" LEFT OUTER JOIN "images" ON "images"."provider" = 0 AND "images"."provider_id" = CAST("entries"."id" AS text) WHERE "entries"."feed_id" = "feeds"."id" AND "images"."id" IS NULL))
+    assert_includes sql, %(EXISTS (SELECT 1 FROM "entries" LEFT OUTER JOIN "images" ON "images"."provider" = 0 AND "images"."provider_id" = CAST("entries"."id" AS text) WHERE "entries"."feed_id" = "feeds"."id" AND ("entries"."title" IS NULL OR "entries"."title" = '') AND "images"."id" IS NULL))
     assert_includes sql, %("feeds"."id" BETWEEN 1 AND #{SidekiqHelper::BATCH_SIZE})
     refute_includes sql, "NOT IN"
     assert_nothing_raised { BackfillMicropostAvatars.batch_scope(1).order(:id).load }
