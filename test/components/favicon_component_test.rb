@@ -41,8 +41,8 @@ class FaviconComponentTest < ComponentTestCase
     end
   end
 
-  # Deploy 1 only: a proxy url with no row keeps today's derivation for its
-  # shape. The branch goes with the proxy path in Deploy 2.
+  # Deploy A only: a proxy url with no row keeps the legacy derivation for
+  # its shape. The branch goes with the proxy.
   test "feed icon" do
     @feed.custom_icon = "http://example.com/custom.png"
     output = render FaviconComponent.new(feed: @feed)
