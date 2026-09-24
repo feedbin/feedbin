@@ -12,12 +12,11 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
-  # The preview image and the tweet/micropost link preview are both keyed by
-  # this entry's id, so one association fetches the pair in one query;
-  # preview_image_record/link_image_record read from it. entry_icon rows stay
-  # out -- no list reads them.
-  has_many :owned_image_records, -> { entry_images }, class_name: "Image", foreign_key: :provider_id
-  has_one :icon_image_record, -> { provider_entry_icon }, class_name: "Image", foreign_key: :provider_id
+  # Every row keyed by this entry's id -- the preview image, the
+  # tweet/micropost link preview, and the entry_icon row -- in one query;
+  # preview_image_record, link_image_record and icon_image_record read from
+  # it.
+  has_many :owned_image_records, -> { entry_owned }, class_name: "Image", foreign_key: :provider_id
   # The avatar of this video's own channel -- a playlist feed mixes videos
   # from many channels, keyed by provider_parent_id (UC-form).
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
@@ -60,10 +59,9 @@ class Entry < ApplicationRecord
    }
 
   # Everything entries/_entry touches beyond the entry itself. Attaching
-  # less makes a cache-miss render cost a query per row. icon_image_record
-  # is the micropost author's avatar (and a podcast episode's art).
+  # less makes a cache-miss render cost a query per row.
   scope :with_list_associations, -> {
-    includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :icon_image_record, :channel_image_record)
+    includes(feed: Feed::ICON_PRELOADS).preload(:owned_image_records, :channel_image_record)
   }
 
   # The same associations plus a narrow column select; separate because
@@ -182,6 +180,11 @@ class Entry < ApplicationRecord
 
   def link_image_record
     owned_image_records.detect(&:provider_entry_link_preview?)
+  end
+
+  # The micropost author's avatar or a podcast episode's art.
+  def icon_image_record
+    owned_image_records.detect(&:provider_entry_icon?)
   end
 
   def processed_image?

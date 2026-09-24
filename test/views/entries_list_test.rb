@@ -117,17 +117,17 @@ class EntriesListTest < ActionController::TestCase
     refute_equal before, entry_cache_key(Entry.find(entry.id))
   end
 
-  # Budget: one merged entry-owned query (owned_image_records), the entry
-  # channel avatars, the feed's own icon row, the feed's favicon row, and
-  # icon_image_record (T2 of the avatar cutover).
+  # Budget: one merged entry-owned query (owned_image_records, which carries
+  # the preview, the link preview and the entry_icon row), the entry channel
+  # avatars, the feed's own icon row, and the feed's favicon row.
   test "the entry-owned image rows load in one query" do
     ids = 3.times.map { create_entry(@feed).id }
 
     statements = capture_sql { Entry.where(id: ids).with_list_associations.to_a }
 
     images = statements.select { it.match?(/FROM "images"/i) }
-    assert_equal 5, images.count,
-      "expected owned + channel + feed icon + feed favicon + icon_image_record, got #{images.count}:\n#{images.join("\n")}"
+    assert_equal 4, images.count,
+      "expected owned + channel + feed icon + feed favicon, got #{images.count}:\n#{images.join("\n")}"
   end
 
   # The avatar-landing touch goes to feeds of that channel; a playlist feed

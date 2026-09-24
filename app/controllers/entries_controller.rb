@@ -254,10 +254,11 @@ class EntriesController < ApplicationController
   def entries_by_id(entry_ids)
     # The full-content render reaches the images rows too: a tweet through
     # Entry#tweet (preview_image_record), a podcast through
-    # EntryPresenter#media_image (icon_image_record). The preload endpoint
-    # renders a client-sized batch of these at once.
+    # EntryPresenter#media_image (icon_image_record), both read from
+    # owned_image_records. The preload endpoint renders a client-sized batch
+    # of these at once.
     entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS)
-      .preload(:owned_image_records, :icon_image_record)
+      .preload(:owned_image_records)
     subscriptions = @user.subscriptions.pluck(:feed_id)
     @title = entries.present? ? "#{entries.first.title} - Feedbin" : "Feedbin"
     entries.each_with_object({}) do |entry, hash|
