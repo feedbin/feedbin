@@ -1,10 +1,9 @@
 module ImageCrawler
   # A micropost entry's author avatar, as an entry_icon row keyed by the
-  # entry. Runs per feed, once per crawl with new posts: it groups the
-  # feed's row-less entries by avatar url, attaches the groups whose url the
-  # table already holds (no request), and downloads once per unknown url.
-  # The callback attaches the rest of that url's group, so a feed pass
-  # costs one request per distinct avatar.
+  # entry. Runs per feed: it groups row-less micropost entries by avatar
+  # url, attaches the groups whose url the table already holds (no request),
+  # and downloads once per unknown url. The callback attaches the rest of
+  # that url's group, so a pass costs one request per distinct avatar.
   class MicropostAvatar
     include Sidekiq::Worker
     sidekiq_options retry: false
@@ -14,22 +13,32 @@ module ImageCrawler
     VARIANT = "200x200".freeze
 
     # id is a feed id when scheduling and "<entry public_id>-avatar" when the
-    # pipeline calls back with the landed row.
-    def perform(id, image = nil)
+    # pipeline calls back with the landed row. entry_ids limits a pass to
+    # those entries; without it the pass covers the whole feed.
+    def perform(id, image = nil, entry_ids = nil)
       if image
         receive(image)
       else
-        self.class.schedule(Feed.find(id))
+        self.class.schedule(Feed.find(id), entry_ids:)
       end
     rescue ActiveRecord::RecordNotFound
     end
 
+    # The pass for the entries a crawl or a subscribe just created, when any
+    # is a micropost. The entries decide, one by one, as the readers do;
+    # nothing depends on the parser's feed marker. Limited to these entries,
+    # so an older entry whose avatar never landed is not fetched again.
+    def self.for_new_entries(feed, entries)
+      ids = entries.filter_map { it.id if Micropost.new(it.data, it.title, feed: feed).valid? }
+      perform_async(feed.id, nil, ids) if ids.any?
+    end
+
     # Returns [attached, scheduled]. critical: a live crawl runs on the
     # critical queues; the backfill passes false.
-    def self.schedule(feed, critical: true)
-      return [0, 0] unless feed.micropost?
-
-      entries = pending_entries(feed).to_a
+    def self.schedule(feed, entry_ids: nil, critical: true)
+      entries = pending_entries(feed)
+      entries = entries.where(id: entry_ids) if entry_ids
+      entries = entries.to_a
       groups = avatar_groups(feed, entries)
       attached = 0
       scheduled = 0
@@ -48,13 +57,14 @@ module ImageCrawler
       [attached, scheduled]
     end
 
-    # The feed's entries with no entry_icon row: a LEFT JOIN anti-join on
-    # the cast entry id (provider_id is text), never NOT IN, which Postgres
-    # cannot turn into an anti-join. After the first pass this is the new
-    # entries. Arel.sql carries only the type keyword. Ordered by id: the
-    # feed_id index carries no sort, so an unordered scan can hand back
-    # entries newest-first, and avatar_groups' "first" entry (the one that
-    # pays for the download) would otherwise vary run to run.
+    # The feed's untitled entries with no entry_icon row: a LEFT JOIN
+    # anti-join on the cast entry id (provider_id is text), never NOT IN,
+    # which Postgres cannot turn into an anti-join. A titled entry is never
+    # a micropost, so it is not loaded. Arel.sql carries only the type
+    # keyword. Ordered by id: the feed_id index carries no sort, so an
+    # unordered scan can hand back entries newest-first, and avatar_groups'
+    # "first" entry (the one that pays for the download) would otherwise
+    # vary run to run.
     def self.pending_entries(feed)
       entries = Entry.arel_table
       images = ::Image.arel_table
@@ -63,7 +73,7 @@ module ImageCrawler
         images[:provider].eq(::Image.providers[:entry_icon]).and(images[:provider_id].eq(entry_id_text))
       ).join_sources
 
-      feed.entries.joins(join).where(images[:id].eq(nil)).select(:id, :feed_id, :url, :data, :title, :public_id).order(:id)
+      feed.entries.where(title: [nil, ""]).joins(join).where(images[:id].eq(nil)).select(:id, :feed_id, :url, :data, :title, :public_id).order(:id)
     end
 
     # Entries by absolute avatar url, Micropost#author_avatar's rule. Built

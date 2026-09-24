@@ -12,7 +12,7 @@ module FeedCrawler
       data = data.deep_stringify_keys
       feed = Feed.find(data["feed"]["id"])
       icon_urls = ImageCrawler::FeedIcon.source_urls(feed)
-      created = 0
+      created = []
       if data["entries"].present?
         created = receive_entries(data["entries"], feed)
       end
@@ -26,26 +26,23 @@ module FeedCrawler
         ImageCrawler::FeedIcon.perform_async(feed.id)
       end
 
-      # Once per crawl with new posts, never per entry: the job dedupes the
-      # feed's avatar urls in one pass. The marker is the parser's micropost
-      # verdict for this very parse.
-      if created > 0 && data["feed"]["custom_icon_format"] == "round"
-        ImageCrawler::MicropostAvatar.perform_async(feed.id)
-      end
+      # After the update: an RSS micropost's author comes from the feed's
+      # options, which this crawl just stored.
+      ImageCrawler::MicropostAvatar.for_new_entries(feed, created)
     end
 
-    # Returns the number of entries created.
+    # Returns the entries created.
     def receive_entries(items, feed)
       public_ids = items.map { |entry| entry["public_id"] }
       entries = Entry.where(public_id: public_ids).index_by(&:public_id)
-      created = 0
+      created = []
       items.each do |item|
         entry = entries[item["public_id"]]
         update = item.delete("update")
         if entry
           EntryUpdate.create!(item, entry)
-        elsif create_entry(item, feed)
-          created += 1
+        elsif (new_entry = create_entry(item, feed))
+          created << new_entry
         end
       rescue ActiveRecord::RecordNotUnique
         # Ignore
@@ -63,16 +60,16 @@ module FeedCrawler
       created
     end
 
-    # Returns whether an entry was created.
+    # Returns the entry created, or nil.
     def create_entry(item, feed)
       if alternate_exists?(item)
         Librato.increment("entry.alternate_exists")
-        false
+        nil
       else
-        feed.entries.create!(item)
+        entry = feed.entries.create!(item)
         Librato.increment("entry.create")
         Sidekiq.logger.info "Creating entry=#{item["public_id"]}"
-        true
+        entry
       end
     end
 

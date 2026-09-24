@@ -160,27 +160,30 @@ module FeedCrawler
       end
     end
 
-    # Once per crawl with new posts, never per entry: the job dedupes the
-    # feed's avatar urls in one pass. The marker is the parser's micropost
-    # verdict for this very parse.
-    test "enqueues the micropost avatar crawler once when a micropost crawl creates entries" do
+    # Once per crawl with new posts, never per entry: the pass dedupes their
+    # avatar urls. The new entries themselves decide, not the parser's feed
+    # marker, and the pass covers only them.
+    test "starts the avatar pass for the micropost entries a crawl creates" do
       Sidekiq::Worker.clear_all
-      params = {"feed" => {"id" => @feed.id, "custom_icon_format" => "round"}, "entries" => [build_entry, build_entry]}
+      params = {"feed" => {"id" => @feed.id}, "entries" => [build_micropost, build_micropost, build_entry]}
 
       Receiver.new.perform(params)
 
-      assert_equal [@feed.id], ImageCrawler::MicropostAvatar.jobs.map { it["args"].first }
+      microposts = Entry.where(public_id: params["entries"].first(2).map { it["public_id"] }).pluck(:id)
+      job = ImageCrawler::MicropostAvatar.jobs.sole
+      assert_equal @feed.id, job["args"][0]
+      assert_equal microposts.sort, job["args"][2].sort
     end
 
-    test "does not enqueue the micropost avatar crawler for a titled feed or a crawl with no new entries" do
+    test "does not start the avatar pass for titled entries or a crawl with no new entries" do
       Sidekiq::Worker.clear_all
-      Receiver.new.perform({"feed" => {"id" => @feed.id, "custom_icon_format" => nil}, "entries" => [build_entry]})
+      Receiver.new.perform({"feed" => {"id" => @feed.id}, "entries" => [build_entry]})
       assert_empty ImageCrawler::MicropostAvatar.jobs
 
-      public_id = SecureRandom.hex
-      @feed.entries.create!(url: "url", public_id: public_id)
-      $redis[:refresher].with { |redis| redis.del(public_id) }
-      Receiver.new.perform({"feed" => {"id" => @feed.id, "custom_icon_format" => "round"}, "entries" => [build_entry(public_id)]})
+      micropost = build_micropost
+      @feed.entries.create!(url: "url", public_id: micropost["public_id"])
+      $redis[:refresher].with { |redis| redis.del(micropost["public_id"]) }
+      Receiver.new.perform({"feed" => {"id" => @feed.id}, "entries" => [micropost]})
       assert_empty ImageCrawler::MicropostAvatar.jobs
     end
 
@@ -214,6 +217,12 @@ module FeedCrawler
         "update" => update,
         "data" => data
       }
+    end
+
+    def build_micropost
+      entry = build_entry
+      entry["data"]["author"] = {"name" => "Someone", "avatar" => "https://micro.example/a.png", "_microblog" => {"username" => "someone"}}
+      entry.merge("title" => nil)
     end
 
     def update_params

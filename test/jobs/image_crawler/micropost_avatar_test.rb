@@ -130,6 +130,25 @@ module ImageCrawler
       assert_equal false, find_args.last["critical"]
     end
 
+    # The receiver's pass covers only the posts its crawl created, so an
+    # older entry whose avatar never landed is not fetched again.
+    test "perform with entry ids limits the pass to those entries" do
+      post("https://micro.example/old.png")
+      newer = post("https://micro.example/new.png")
+
+      MicropostAvatar.new.perform(@feed.id, nil, [newer.id])
+
+      assert_equal ["https://micro.example/new.png"], find_args.map { it["image_urls"].first }
+    end
+
+    # Each entry decides for itself, the way the readers decide.
+    test "a micropost entry is crawled whatever the feed's other entries are" do
+      create_entry(@feed)
+      post("https://micro.example/a.png")
+
+      assert_equal [0, 1], MicropostAvatar.schedule(@feed)
+    end
+
     test "perform with a feed id schedules, and an unknown id does nothing" do
       post("https://micro.example/a.png")
 

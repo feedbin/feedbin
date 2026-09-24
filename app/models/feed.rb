@@ -145,16 +145,17 @@ class Feed < ApplicationRecord
   def self.create_from_parsed_feed(parsed_feed)
     record = parsed_feed.to_feed
     create_with(record).create_or_find_by!(feed_url: record[:feed_url]).tap do |new_feed|
-      parsed_feed.entries.each do |parsed_entry|
+      entries = parsed_feed.entries.map do |parsed_entry|
         entry_hash = parsed_entry.to_entry
         new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
       end
-      # for micropost feeds. The receiver never runs for these entries, so
-      # the avatar pass starts here.
+      # for micropost feeds
       if parsed_feed.entries.filter_map(&:title).blank?
         new_feed.update!(custom_icon_format: "round")
-        ImageCrawler::MicropostAvatar.perform_async(new_feed.id)
       end
+      # The receiver never runs for these entries, so the avatar pass starts
+      # here.
+      ImageCrawler::MicropostAvatar.for_new_entries(new_feed, entries)
     end
   end
 

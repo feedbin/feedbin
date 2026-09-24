@@ -272,11 +272,12 @@ end
     untitled = Struct.new(:title, :entry_hash) do
       def to_entry = entry_hash
     end
-    entry = untitled.new(nil, {public_id: SecureRandom.hex, entry_id: SecureRandom.hex, url: "https://micro.example/1", content: "<p>hi</p>", published: Time.now})
+    author = {"author" => {"name" => "Someone", "avatar" => "https://micro.example/a.png", "_microblog" => {"username" => "someone"}}}
+    entry = untitled.new(nil, {public_id: SecureRandom.hex, entry_id: SecureRandom.hex, url: "https://micro.example/1", content: "<p>hi</p>", published: Time.now, data: author})
     feed = Feed.create_from_parsed_feed(parsed.new([entry], {feed_url: "https://micro.example/feed.json", title: "Micro"}))
 
     assert_equal "round", feed.custom_icon_format
-    assert_equal [feed.id], ImageCrawler::MicropostAvatar.jobs.map { it["args"].first }
+    assert_equal [feed.id, nil, feed.entries.pluck(:id)], ImageCrawler::MicropostAvatar.jobs.sole["args"]
   end
 
   # The host's images row, or nothing: the legacy favicons row is gone.
