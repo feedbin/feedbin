@@ -10,9 +10,6 @@ module ImageCrawler
 
     SUFFIX = "-avatar".freeze
     PRESET = "micropost_avatar".freeze
-    # Rows that can already hold an avatar's picture: an earlier post's, or
-    # BackfillAvatarCopies' copy of the proxy's cache.
-    SOURCE_PRESETS = [PRESET, "icon"].freeze
 
     # id is a feed id when scheduling and "<entry public_id>-avatar" when the
     # pipeline calls back with the landed row. entry_ids limits a pass to
@@ -46,7 +43,9 @@ module ImageCrawler
       scheduled = 0
 
       groups.each do |url, group|
-        if (existing = existing_row(url))
+        # An earlier post's row, or a copy of the proxy's cache once the copy
+        # backfill runs.
+        if (existing = ::Image.avatar_row(url))
           attach(group, url, existing)
           attached += group.size
         else
@@ -96,16 +95,6 @@ module ImageCrawler
 
       avatar = post.author_avatar
       avatar.presence if avatar.is_a?(String)
-    end
-
-    # A row already holding this url's picture at a source preset's
-    # variant. Any one will do: take, not the newest, which would read and
-    # sort the row of every entry ever attached to the url. One indexed read
-    # on url_fingerprint; the preset comes out of data through Arel, nothing
-    # is interpolated. icon rows exist once the copy backfill runs.
-    def self.existing_row(url)
-      fingerprints = SOURCE_PRESETS.map { ::Image.url_fingerprint_for(url, Image.new(preset_name: it).variant) }.uniq
-      ::Image.where(url_fingerprint: fingerprints).where(::Image.data_projection("preset").in(SOURCE_PRESETS)).take
     end
 
     # A database-only attach of every entry to an object the store already
@@ -161,9 +150,10 @@ module ImageCrawler
       return unless row&.kind_avatar?
 
       # Find lands the row on whichever candidate answered. Key it on the
-      # asked url, the one every entry and later lookup uses, so existing_row
-      # finds it. update_columns: the touch rule is that images.updated_at
-      # moves only when the stored bytes move, and re-keying the url does not.
+      # asked url, the one every entry and later lookup uses, so
+      # Image.avatar_row finds it. update_columns: the touch rule is that
+      # images.updated_at moves only when the stored bytes move, and
+      # re-keying the url does not.
       if row.url != url
         row.update_columns(url: url, url_fingerprint: ::Image.url_fingerprint_for(url, row.variant))
       end

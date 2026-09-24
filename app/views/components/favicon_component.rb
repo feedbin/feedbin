@@ -32,10 +32,8 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
-  # Deploy A only: the proxy on a miss, while the copy backfill runs.
   def icon_twitter_user
-    url = @feed.twitter_user.profile_image_uri_https(:original).to_s
-    icon_image(Image.avatar_url(url) || RemoteFile.signed_url(url), format: "round")
+    icon_image(Image.avatar_url(@feed.twitter_user.profile_image_uri_https(:original).to_s), format: "round")
   end
 
   # The avatar row of this video's own channel, for entries whose channel is
@@ -62,9 +60,9 @@ class FaviconComponent < ApplicationComponent
     end
   end
 
-  # Deploy 1 only: a proxy url with no row has no kind to read, so the
-  # shape comes from today's derivation over the feed's options. Round is
-  # the frame an unset format rendered in before. Goes with the proxy path.
+  # Deploy A only: a proxy url with no row has no kind to read, so the
+  # shape comes from the legacy derivation over the feed's options. Round
+  # is the frame an unset format rendered in before. Goes with the proxy.
   def legacy_icon_format
     @feed.custom_icon_format || @feed.default_icon_format || "round"
   end

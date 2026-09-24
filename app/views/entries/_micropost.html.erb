@@ -5,17 +5,11 @@
         <div class="profile-image-wrap">
           <%# An author with no avatar is an ordinary micropost: Micropost#valid?
               asks only for a name and a username. The fallback below is for an
-              image that fails to load, so it cannot cover a missing one --
-              signing nil produces a route with no :url segment and raises while
-              the second argument is still being computed. EntryPresenter guards
-              this the same way. %>
-          <%# The author's row first, then a copied remote_file row for the
-              same url (the replies dialog's OpenStruct has no row of its
-              own). Deploy A only: the proxy on a miss, while the copy
-              backfill runs; the second half goes with the proxy. %>
-          <% avatar = micropost.author_avatar_record&.public_url ||
-               (url = micropost.micropost.author_avatar.presence) &&
-                 (Image.avatar_url(url) || RemoteFile.signed_url(url)) %>
+              image that fails to load, so it cannot cover a missing one: the
+              resolver returns nil for no avatar, and the default stands in. The
+              same resolver as the entry list, for an entry here or a reply's
+              OpenStruct in the replies dialog. %>
+          <% avatar = present(micropost, nil, EntryPresenter).micropost_avatar_url %>
           <% default_avatar = image_url("favicon-profile-default.png") %>
           <%= link_to micropost.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
             <%= image_tag_with_fallback(default_avatar, avatar || default_avatar, size: "47x47", alt: "") %>

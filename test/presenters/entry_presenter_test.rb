@@ -110,7 +110,7 @@ class EntryPresenterTest < ActionView::TestCase
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       entry = micropost_entry
       url = entry.micropost.author_avatar
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
 
       output = presenter_for(Entry.find(entry.id)).profile_image
 
@@ -128,26 +128,23 @@ class EntryPresenterTest < ActionView::TestCase
   end
 
   # Tweets are the exception: no crawler, only rows copied from the proxy's
-  # cache, resolved by url. The list hands the page's map down; one entry
-  # on its own resolves directly.
-  test "profile_image renders a tweet author's copied row from the map or by lookup" do
+  # cache, resolved by url inside the cached list fragment.
+  test "profile_image renders a tweet author's copied row" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       entry = tweet_entry
-      url = entry.tweet_avatar_urls.first
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+      url = entry.tweet.main_tweet.user.profile_image_uri_https(:original).to_s
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
 
-      with_map = EntryPresenter.new(entry, {avatars: {url => row.public_url}}, view).profile_image
-      assert_includes with_map, "https://images.example.com/#{row.storage_path}"
-      refute_includes with_map, "/files/icons/"
+      output = presenter_for(entry).profile_image
 
-      alone = presenter_for(entry).profile_image
-      assert_includes alone, "https://images.example.com/#{row.storage_path}"
+      assert_includes output, "https://images.example.com/#{row.storage_path}"
+      refute_includes output, "/files/icons/"
     end
   end
 
   # Deploy A only: the proxy for a tweet avatar that has no row yet.
   test "profile_image falls back to the proxy for a tweet with no row" do
-    output = EntryPresenter.new(tweet_entry, {avatars: {}}, view).profile_image
+    output = presenter_for(tweet_entry).profile_image
 
     assert_includes output, "/files/icons/"
   end

@@ -83,6 +83,20 @@ class IframeEmbed::YoutubeTest < ActiveSupport::TestCase
     end
   end
 
+  # A channel with no avatar row yet shows the thumbnail the proxy cached for
+  # the old card, which the copy backfill stored in a row of its own.
+  test "profile_image uses the copied thumbnail when the channel has no row" do
+    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
+      thumbnail = "https://yt3.ggpht.com/medium.jpg"
+      Embed.youtube_channel.create!(provider_id: "UCcopied", data: {"snippet" => {"thumbnails" => {"medium" => {"url" => thumbnail}}}})
+      Embed.youtube_video.create!(provider_id: "videocopied", parent_id: "UCcopied", data: {})
+      copy = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(thumbnail), feed_id: nil, kind: :avatar, url: thumbnail, variant: "200x200", data: {"preset" => "icon"})
+      embed = IframeEmbed::Youtube.new("https://www.youtube.com/watch?v=videocopied")
+
+      assert_equal "https://images.example.com/#{copy.storage_path}", embed.profile_image
+    end
+  end
+
   # Deploy A only: a channel with no avatar row yet still shows the card's
   # picture, through the proxy, rather than losing it.
   test "profile_image falls back to the proxy thumbnail when the channel has no row" do

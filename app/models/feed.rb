@@ -109,7 +109,9 @@ class Feed < ApplicationRecord
   # The renderable URL: images row from our CDN, else the legacy url through
   # the signing proxy. The feed's own row outranks the shared channel row.
   # icon/icon_options/default_icon_format still answer the separate question
-  # "which source won and what shape is it".
+  # "which source won and what shape is it". Deploy A only: the proxy
+  # fallback, signed here rather than through Image.avatar_url, which would
+  # cost the sidebar a query per feed that has no row.
   def icon_url
     Image.unified_url(icon_image_record&.storage_path) ||
       Image.unified_url(channel_image_record&.storage_path) ||

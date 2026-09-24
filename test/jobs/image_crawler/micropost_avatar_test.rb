@@ -110,7 +110,7 @@ module ImageCrawler
       MicropostAvatar.schedule(@feed)
       source.destroy!
 
-      assert_equal avatar_row_for(attached), MicropostAvatar.existing_row("https://micro.example/a.png")
+      assert_equal avatar_row_for(attached), ::Image.avatar_row("https://micro.example/a.png")
     end
 
     test "a row from another preset or variant is not reused" do
@@ -260,10 +260,10 @@ module ImageCrawler
       assert ::Image.same_fingerprint?(::Image.url_fingerprint_for("https://micro.example/a.png", "200x200"), landed.url_fingerprint)
       assert_equal before, landed.updated_at
       assert_equal landed.storage_path, avatar_row_for(second).storage_path
-      # existing_row returns any row sharing this fingerprint: the re-keyed
+      # avatar_row returns any row sharing this fingerprint: the re-keyed
       # row or the sibling attached to it. Both carry the storage_path and
       # image_fingerprint a later lookup by the asked url actually needs.
-      found = MicropostAvatar.existing_row("https://micro.example/a.png")
+      found = ::Image.avatar_row("https://micro.example/a.png")
       assert_equal landed.storage_path, found.storage_path
       assert_equal landed.image_fingerprint, found.image_fingerprint
     end
@@ -319,7 +319,7 @@ module ImageCrawler
 
       assert_equal "https://micro.example/old.png", landed.reload.url
       assert_equal "https://micro.example/old.png", avatar_row_for(second).url
-      assert_nil MicropostAvatar.existing_row("https://micro.example/new.png")
+      assert_nil ::Image.avatar_row("https://micro.example/new.png")
     end
 
     test "receive raises on a payload without storage_path" do

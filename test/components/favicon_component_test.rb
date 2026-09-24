@@ -33,7 +33,7 @@ class FaviconComponentTest < ComponentTestCase
     assert_includes proxied.to_s, "/files/icons/", "Deploy A only: the proxy until the copy lands"
 
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200")
+      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
       output = render FaviconComponent.new(feed: @feed)
 
       assert_includes output.to_s, "https://images.example.com/#{row.storage_path}"

@@ -16,11 +16,10 @@ class CacheEntryViews
     entry_ids = dequeue_ids(SET_NAME)
     entries = Entry.where(id: entry_ids).with_list_associations.to_a
     favicons = Image.favicons_for_entries(entries)
-    avatars = Image.avatars_for_entries(entries)
 
     # The same invocation the entry list renders with, or this warms keys
     # nothing ever looks up.
-    ApplicationController.render(EntriesHelper.entry_collection(entries, favicons, avatars).merge(format: :html))
+    ApplicationController.render(EntriesHelper.entry_collection(entries, favicons).merge(format: :html))
     ApplicationController.render({
       layout: nil,
       template: "api/v2/entries/index",

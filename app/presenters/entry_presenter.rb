@@ -491,15 +491,11 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  # The author's row first, preloaded with the entry. Then a copied
-  # remote_file row for the same url, for the replies dialog's OpenStruct
-  # (no row of its own) and an entry whose own row has not landed yet.
-  # Deploy A only: the proxy on a miss, while the copy backfill runs; the
-  # second half goes with the proxy.
+  # The author's row first, preloaded with the entry; then whatever
+  # Image.avatar_url resolves for the author's avatar url. The replies
+  # dialog renders this too, for an OpenStruct with no row of its own.
   def micropost_avatar_url
-    entry.author_avatar_record&.public_url ||
-      (url = entry.micropost.author_avatar.presence) &&
-        (Image.avatar_url(url) || RemoteFile.signed_url(url))
+    entry.author_avatar_record&.public_url || Image.avatar_url(entry.micropost.author_avatar.presence)
   end
 
   def summary
@@ -677,7 +673,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_retweeted_image
     if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https(:original)
-      avatar_url(entry.tweet.user.profile_image_uri_https(:original).to_s)
+      Image.avatar_url(entry.tweet.user.profile_image_uri_https(:original).to_s)
     else
       @template.image_url("favicon-profile-default.png")
     end
@@ -694,19 +690,10 @@ class EntryPresenter < BasePresenter
   # Sizes: normal, bigger
   def tweet_profile_image_uri(tweet, size = :original)
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
-      avatar_url(tweet.user.profile_image_uri_https(size).to_s)
+      Image.avatar_url(tweet.user.profile_image_uri_https(size).to_s)
     else
       @template.image_url("favicon-profile-default.png")
     end
-  end
-
-  # A copied row by url: the list's map when one was handed down, else one
-  # lookup for a caller rendering a single entry. Deploy A only: the proxy
-  # on a miss, while the copy backfill runs; goes with the proxy.
-  def avatar_url(url)
-    map = @locals && @locals[:avatars]
-    resolved = map ? map[url] : Image.avatar_url(url)
-    resolved || RemoteFile.signed_url(url)
   end
 
   def youtube_embed(url, tag = :iframe)
