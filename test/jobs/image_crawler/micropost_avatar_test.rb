@@ -16,6 +16,19 @@ module ImageCrawler
       ).tap { Sidekiq::Worker.clear_all }
     end
 
+    # An RSS micropost carries no author of its own: Micropost takes the
+    # name, username and avatar from the feed's <image>.
+    def rss_post
+      @feed.entries.create!(
+        title: nil, url: "https://micro.example/#{SecureRandom.hex(4)}", content: "<p>hi</p>", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: Time.now,
+        data: {"id" => SecureRandom.hex(4)}
+      ).tap { Sidekiq::Worker.clear_all }
+    end
+
+    def rss_avatar(url)
+      @feed.update!(options: {"image" => {"url" => url, "title" => "Someone", "link" => "https://mastodon.example/@someone"}})
+    end
+
     def avatar_row_for(entry)
       ::Image.provider_entry_icon.find_by(provider_id: entry.id.to_s)
     end
@@ -157,10 +170,19 @@ module ImageCrawler
       assert_nothing_raised { MicropostAvatar.new.perform(0) }
     end
 
+    test "the Find carries the asked url and the rest of the group" do
+      post("https://micro.example/a.png")
+      second = post("https://micro.example/a.png")
+
+      MicropostAvatar.schedule(@feed)
+
+      assert_equal({"url" => "https://micro.example/a.png", "entry_ids" => [second.id]}, find_args.sole["context"])
+    end
+
     # The callback lands the first entry's row through Upload; the job then
-    # attaches every sibling that shares the url, so a feed pass costs one
-    # download per distinct avatar.
-    test "receive attaches the siblings that share the landed row's url" do
+    # attaches the rest of the group the payload names, so a feed pass costs
+    # one download per distinct avatar.
+    test "receive attaches the siblings the payload names" do
       first = post("https://micro.example/a.png")
       second = post("https://micro.example/a.png")
       third = post("https://micro.example/a.png")
@@ -169,7 +191,8 @@ module ImageCrawler
         url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://micro.example/a.png"}
       )
 
-      MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s})
+      MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s,
+        "context" => {"url" => "https://micro.example/a.png", "entry_ids" => [second.id, third.id]}})
 
       [second, third].each do |entry|
         row = avatar_row_for(entry)
@@ -191,7 +214,8 @@ module ImageCrawler
       )
       before = landed.updated_at
 
-      MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s})
+      MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s,
+        "context" => {"url" => "https://micro.example/a.png", "entry_ids" => [second.id]}})
 
       landed.reload
       assert_equal "https://micro.example/a.png", landed.url
@@ -235,10 +259,33 @@ module ImageCrawler
       )
 
       assert_nothing_raised do
-        MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s})
+        MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s,
+          "context" => {"url" => "https://micro.example/a.png", "entry_ids" => [second.id]}})
       end
 
       assert_nil avatar_row_for(second)
+    end
+
+    # An RSS micropost's avatar is the feed's image url, which a crawl can
+    # change while the download waits in the queue. The landed row answers to
+    # the url the pass asked for, so the next posts fetch the new avatar
+    # instead of attaching the old picture under the new url.
+    test "receive keys the landed row on the url the pass asked for" do
+      rss_avatar("https://micro.example/old.png")
+      first = rss_post
+      second = rss_post
+      landed = create_image_row(
+        provider: :entry_icon, provider_id: first.id.to_s, feed_id: @feed.id, kind: :avatar,
+        url: "https://micro.example/old.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://micro.example/old.png"}
+      )
+      rss_avatar("https://micro.example/new.png")
+
+      MicropostAvatar.new.perform("#{first.public_id}-avatar", {"storage_path" => landed.storage_path, "provider_id" => first.id.to_s,
+        "context" => {"url" => "https://micro.example/old.png", "entry_ids" => [second.id]}})
+
+      assert_equal "https://micro.example/old.png", landed.reload.url
+      assert_equal "https://micro.example/old.png", avatar_row_for(second).url
+      assert_nil MicropostAvatar.existing_row("https://micro.example/new.png")
     end
 
     test "receive raises on a payload without storage_path" do

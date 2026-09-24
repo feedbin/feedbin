@@ -48,7 +48,7 @@ module ImageCrawler
           group.each { |entry| attach(entry, url, existing) }
           attached += group.size
         else
-          enqueue(feed, group.first, url, critical)
+          enqueue(feed, group, url, critical)
           scheduled += 1
         end
       end
@@ -122,12 +122,15 @@ module ImageCrawler
       )
     end
 
-    # Find tries candidates in order: the strict reading of the avatar url,
-    # then the heuristic one (see FeedIcon.schedule), then the object the
-    # proxy cached, so a dead source still lands as a copy of what was served
+    # One download for the group, landing on its first entry. Find tries
+    # candidates in order: the strict reading of the avatar url, then the
+    # heuristic one (see FeedIcon.schedule), then the object the proxy
+    # cached, so a dead source still lands as a copy of what was served
     # before. Deploy A only: the legacy object goes with remote_files. The
-    # proxy was handed the url exactly as the entry carries it.
-    def self.enqueue(feed, entry, url, critical)
+    # proxy was handed the url exactly as the entry carries it. The context
+    # tells the callback which url it asked for and who else waits on it.
+    def self.enqueue(feed, group, url, critical)
+      entry = group.first
       raw = Micropost.new(entry.data, entry.title, feed: feed).author_avatar
       image = Image.new_with_attributes(
         id: "#{entry.public_id}#{SUFFIX}",
@@ -137,42 +140,34 @@ module ImageCrawler
         provider: ::Image.providers[:entry_icon],
         provider_id: entry.id,
         feed_id: entry.feed_id,
-        critical: critical
+        critical: critical,
+        context: {"url" => url, "entry_ids" => group.drop(1).map(&:id)}
       )
       Pipeline::Find.perform_async(image.to_h)
     end
 
-    # Upload attached the first entry's row; attach every sibling that
-    # shares its url. Re-keys the row to the avatar url when Find landed it
-    # under the legacy object url instead. No touch: the entries cache key
+    # Upload attached the group's first entry; attach the rest, which the
+    # context names, under the url the pass asked for. Nothing is recomputed
+    # from the feed: an RSS micropost's avatar is the feed's image url, which
+    # can change while the download waits. No touch: the entries cache key
     # digests the row.
     def receive(image)
       image.fetch("storage_path")
+      context = image["context"] or return
+      url = context.fetch("url")
       row = ::Image.provider_entry_icon.find_by(provider_id: image.fetch("provider_id").to_s)
-      return if row.nil? || row.feed_id.nil?
       # The entry_icon slot is shared with podcast art; only an avatar continues.
-      return unless row.kind_avatar?
+      return unless row&.kind_avatar?
 
-      feed = Feed.find(row.feed_id)
-      entry = feed.entries.select(:id, :feed_id, :url, :data, :title, :public_id).find_by(id: row.provider_id)
-      return if entry.nil?
-
-      post = Micropost.new(entry.data, entry.title, feed: feed)
-      asked = post.valid? ? entry.rebase_url(post.author_avatar, strict: true) : nil
-      return if asked.blank?
-
-      # Find tries the avatar url first and the legacy object second; when
-      # the legacy object wins, the row lands keyed on that url, not the
-      # avatar url every entry and later lookup asks for. Re-key it here so
-      # avatar_groups and existing_row find it. update_columns: the touch
-      # rule is that images.updated_at moves only when the stored bytes
-      # move, and re-keying the url does not.
-      if row.url != asked
-        row.update_columns(url: asked, url_fingerprint: ::Image.url_fingerprint_for(asked, row.variant))
+      # Find lands the row on whichever candidate answered. Key it on the
+      # asked url, the one every entry and later lookup uses, so existing_row
+      # finds it. update_columns: the touch rule is that images.updated_at
+      # moves only when the stored bytes move, and re-keying the url does not.
+      if row.url != url
+        row.update_columns(url: url, url_fingerprint: ::Image.url_fingerprint_for(url, row.variant))
       end
 
-      siblings = self.class.avatar_groups(feed, self.class.pending_entries(feed).to_a).fetch(asked, [])
-      siblings.each { |sibling| self.class.attach(sibling, asked, row) }
+      Entry.where(id: context["entry_ids"]).select(:id, :feed_id).each { |sibling| self.class.attach(sibling, url, row) }
     end
   end
 end
