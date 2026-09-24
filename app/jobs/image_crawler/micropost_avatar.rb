@@ -29,7 +29,7 @@ module ImageCrawler
     # nothing depends on the parser's feed marker. Limited to these entries,
     # so an older entry whose avatar never landed is not fetched again.
     def self.for_new_entries(feed, entries)
-      ids = entries.filter_map { it.id if Micropost.new(it.data, it.title, feed: feed).valid? }
+      ids = entries.filter_map { it.id if author_avatar(feed, it) }
       perform_async(feed.id, nil, ids) if ids.any?
     end
 
@@ -76,17 +76,30 @@ module ImageCrawler
       feed.entries.where(title: [nil, ""]).joins(join).where(images[:id].eq(nil)).select(:id, :feed_id, :url, :data, :title, :public_id).order(:id)
     end
 
-    # Entries by absolute avatar url, Micropost#author_avatar's rule. Built
-    # from the row's data directly rather than Entry#micropost, which loads
-    # the entry's link image row: a query per entry this pass does not need.
+    # Entries by absolute avatar url.
     def self.avatar_groups(feed, entries)
       entries.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |entry, groups|
-        post = Micropost.new(entry.data, entry.title, feed: feed)
-        next unless post.valid?
-
-        url = entry.rebase_url(post.author_avatar, strict: true)
+        avatar = author_avatar(feed, entry)
+        url = avatar && entry.rebase_url(avatar, strict: true)
         groups[url] << entry if url.present?
       end
+    end
+
+    # The author's avatar as the entry carries it, Micropost#author_avatar's
+    # rule, or nil: not a micropost, no avatar (the readers treat an empty
+    # one as none), a value that is not a url, or an episode, whose
+    # entry_icon slot belongs to its podcast art as the feed_icon slot does
+    # in FeedIcon. Built from the row's data directly rather than
+    # Entry#micropost, which loads the entry's link image row: a query per
+    # entry this pass does not need.
+    def self.author_avatar(feed, entry)
+      return nil if entry.data.is_a?(Hash) && entry.data["itunes_image"].present?
+
+      post = Micropost.new(entry.data, entry.title, feed: feed)
+      return nil unless post.valid?
+
+      avatar = post.author_avatar
+      avatar.presence if avatar.is_a?(String)
     end
 
     # The newest row already holding this url's picture at the avatar
@@ -131,7 +144,7 @@ module ImageCrawler
     # tells the callback which url it asked for and who else waits on it.
     def self.enqueue(feed, group, url, critical)
       entry = group.first
-      raw = Micropost.new(entry.data, entry.title, feed: feed).author_avatar
+      raw = author_avatar(feed, entry)
       image = Image.new_with_attributes(
         id: "#{entry.public_id}#{SUFFIX}",
         kind: ::Image.kinds[:avatar],

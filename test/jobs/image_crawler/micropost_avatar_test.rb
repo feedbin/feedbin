@@ -115,6 +115,27 @@ module ImageCrawler
       assert_equal "#{relative.public_id}-avatar", find_args.last["id"]
     end
 
+    # Podcast art owns an episode's entry_icon slot, as it owns the feed's
+    # feed_icon slot in FeedIcon, so an untitled episode gets no avatar row
+    # for ItunesImage to overwrite or to find in its way.
+    test "leaves an episode's entry to its podcast art" do
+      episode = post("https://micro.example/a.png")
+      episode.update!(data: episode.data.merge("itunes_image" => "https://micro.example/cover.jpg"))
+
+      assert_equal [0, 0], MicropostAvatar.schedule(@feed)
+      assert_empty Pipeline::Find.jobs
+    end
+
+    # The readers treat an empty avatar as none, so the pass does too, and a
+    # value that is not a string is not a url.
+    test "an empty or non-string avatar schedules nothing" do
+      post("")
+      post({"url" => "https://micro.example/a.png"})
+
+      assert_equal [0, 0], MicropostAvatar.schedule(@feed)
+      assert_empty Pipeline::Find.jobs
+    end
+
     # A scheme-less host is a path to a browser and a host to the heuristic
     # parser: both readings go in, the strict one first.
     test "offers both readings of a scheme-less avatar url" do
