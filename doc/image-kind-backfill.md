@@ -68,9 +68,10 @@ To rerun after an interruption or a failed batch, schedule again. Reruns
 are safe: a row already at its mapped kind is skipped, so a repeated batch
 costs a scan and nothing else. To rerun one failed batch, take the batch
 number from its error and call `BackfillImageKinds.perform_async(batch)`.
-`feed_icon` is self-labeled (`BackfillImageKinds::SELF_LABELED`): its rows
-already carry `avatar` or `site_icon` from the call site, so a rerun skips
-them rather than treating the preset as unmapped.
+`feed_icon`, `micropost_avatar` and `icon` are self-labeled
+(`BackfillImageKinds::SELF_LABELED`): their rows already carry their kind
+from the call site, so a rerun skips them rather than treating the preset
+as unmapped.
 
 ## Done
 

@@ -13,8 +13,6 @@ class BackfillImageKinds
   include SidekiqHelper
   sidekiq_options queue: :utility
 
-  # icon is absent on purpose: that preset writes remote_files, never an
-  # images row.
   PRESET_KINDS = {
     "primary"        => :poster,
     "youtube"        => :poster,
@@ -28,8 +26,9 @@ class BackfillImageKinds
 
   # Presets whose rows carry their kind from the call site, so there is
   # nothing to map and nothing to relabel. feed_icon writes avatar or
-  # site_icon per source.
-  SELF_LABELED = %w[feed_icon].freeze
+  # site_icon per source; micropost_avatar and icon (the copy of the
+  # proxy's cache) write avatar.
+  SELF_LABELED = %w[feed_icon micropost_avatar icon].freeze
 
   def perform(batch = nil, schedule = false)
     if schedule

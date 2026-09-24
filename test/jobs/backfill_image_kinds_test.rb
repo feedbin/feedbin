@@ -105,6 +105,18 @@ class BackfillImageKindsTest < ActiveSupport::TestCase
     assert_equal "avatar", feed_icon.reload.kind
   end
 
+  # The avatar crawler and the copy backfill write their rows with the kind
+  # set at the call site too, so a rerun after they run must accept them.
+  test "leaves self-labeled micropost_avatar and icon rows alone" do
+    micropost_avatar = create_image_row(provider: :entry_icon, provider_id: SecureRandom.hex(4), data: {"preset" => "micropost_avatar"}, kind: :avatar)
+    copy = create_image_row(provider: :remote_file, provider_id: SecureRandom.hex(16), data: {"preset" => "icon"}, kind: :avatar)
+
+    perform_batches_for(micropost_avatar, copy)
+
+    assert_equal "avatar", micropost_avatar.reload.kind
+    assert_equal "avatar", copy.reload.kind
+  end
+
   # Nothing since the recreate should be unclassifiable. If a row is, the
   # batch must say so rather than leave the default in place silently.
   test "raises on a preset outside the map" do
