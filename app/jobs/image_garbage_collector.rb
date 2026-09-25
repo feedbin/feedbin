@@ -1,4 +1,4 @@
-# Removes images-table usage rows for deleted entries and hands the unified
+# Removes images-table usage rows for deleted entries and hands the stored
 # objects they referenced to the deferred sweep.
 class ImageGarbageCollector
   include Sidekiq::Worker

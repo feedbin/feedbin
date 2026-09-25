@@ -4,7 +4,7 @@ module ImageCrawler
     class CropperTest < ActiveSupport::TestCase
       def test_should_get_image_size
         file = copy_support_file("image.jpeg")
-        image = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+        image = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
         assert_equal(image.source.width, 640)
         assert_equal(image.source.height, 828)
         assert_equal(542, image.proposed_size.width)
@@ -13,7 +13,7 @@ module ImageCrawler
 
       def test_should_get_face_location
         file = copy_support_file("image.jpeg")
-        image = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+        image = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
         assert_equal(462, image.average_face_position("y", File.new(file)))
       end
 
@@ -26,7 +26,7 @@ module ImageCrawler
           "face row without an axis" => '[{"face":{"size":10}}]'
         }.each do |description, output|
           file = copy_support_file("image.jpeg")
-          cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+          cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
 
           Open3.stub(:capture3, [output, "", OpenStruct.new(success?: true)]) do
             assert_nil(cropper.average_face_position("x", File.new(file)), description)
@@ -36,7 +36,7 @@ module ImageCrawler
 
       def test_should_crop
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
         image = cropper.crop!
         assert_equal(542, image.width)
         assert_equal(304, image.height)
@@ -44,19 +44,9 @@ module ImageCrawler
         FileUtils.rm image.file
       end
 
-      def test_should_crop
-        file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "jpeg", width: 400, height: 400)
-        image = cropper.crop!
-        assert_equal(309, image.width)
-        assert_equal(400, image.height)
-        assert image.file.include?(".jpg")
-        FileUtils.rm image.file
-      end
-
       def test_should_return_same_size_image
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 640, height: 828)
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 640, height: 828)
         image = cropper.crop!
         assert_equal(640, image.width)
         assert_equal(828, image.height)
@@ -66,45 +56,16 @@ module ImageCrawler
 
       def test_should_validate_conditionally
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 6000, height: 6000)
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 6000, height: 6000)
         refute cropper.valid?(true)
         assert cropper.valid?(false)
-      end
-
-      def test_should_return_png
-        file = copy_support_file("image.png")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "png", width: 400, height: 400)
-        image = cropper.crop!
-        assert image.file.end_with?(".png")
-        FileUtils.rm image.file
-      end
-
-      def test_should_return_jpg
-        file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "png", width: 400, height: 400)
-        image = cropper.crop!
-        assert image.file.end_with?(".jpg")
-        FileUtils.rm image.file
-      end
-
-      def test_should_return_original
-        file = copy_support_file("image.png")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "png", width: 6000, height: 6000)
-        image = cropper.crop!
-
-        original_fingerprint = Digest::SHA1.hexdigest(File.read(file))
-        cropped_fingerprint = Digest::SHA1.hexdigest(File.read(image.file))
-
-        assert_equal(original_fingerprint, cropped_fingerprint)
-
-        FileUtils.rm image.file
       end
 
       def test_should_reject_content_that_is_not_an_image
         file = File.join(Dir.tmpdir, SecureRandom.hex)
         File.binwrite(file, "%!PS-Adobe-3.0\n/Times findfont")
 
-        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
 
         assert_not cropper.valid?(true)
         assert_raises ImageFormat::Unsupported do
@@ -120,7 +81,7 @@ module ImageCrawler
       # actually took effect rather than that they were merely passed.
       def test_should_apply_the_mozjpeg_savings
         file = copy_support_file("image.jpeg")
-        tuned = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 542, height: 304).crop!
+        tuned = Processor::Cropper.new(file, crop: :fill_crop, width: 542, height: 304).crop!
 
         plain = ImageProcessing::Vips
           .source(Vips::Image.new_from_file(copy_support_file("image.jpeg")))
@@ -137,7 +98,7 @@ module ImageCrawler
 
       def test_should_crop_to_a_single_jpg
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :fill_crop, extension: "jpeg", width: 542, height: 304)
+        cropper = Processor::Cropper.new(file, crop: :fill_crop, width: 542, height: 304)
         cropped = cropper.crop!
 
         assert_equal(542, cropped.width)
@@ -151,7 +112,7 @@ module ImageCrawler
 
       def test_should_crop_to_a_single_jpg_with_smart_crop
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
+        cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
         cropped = cropper.crop!
 
         assert_equal(:jpeg, ImageFormat.detect(cropped.file))
@@ -163,7 +124,7 @@ module ImageCrawler
 
       def test_should_render_an_icon_as_png_from_the_best_layer
         file = copy_support_file("favicon.ico")
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 32, height: 32)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 32, height: 32)
 
         assert cropper.valid?(false)
         image = cropper.crop!
@@ -181,7 +142,7 @@ module ImageCrawler
         file = copy_support_file("favicon.ico")
         layer_width = IconLayer.best(file).width
 
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 200, height: 200)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 200, height: 200)
         image = cropper.crop!
 
         assert_operator layer_width, :<, 200, "fixture must be smaller than the target for this to prove anything"
@@ -196,7 +157,7 @@ module ImageCrawler
         file = File.join(Dir.tmpdir, "#{SecureRandom.hex}.svg")
         File.write(file, %(<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#0867e2"/></svg>))
 
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "svg", width: 32, height: 32)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 32, height: 32)
         assert cropper.valid?(false)
         image = cropper.crop!
 
@@ -209,19 +170,19 @@ module ImageCrawler
 
       def test_should_be_invalid_when_no_icon_layer_is_usable
         file = copy_support_file("favicon-blank.ico")
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 32, height: 32)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 32, height: 32)
 
         assert_not cropper.valid?(false)
       end
 
       def test_should_scale_down_to_png_without_selecting_a_layer
         file = copy_support_file("image.png")
-        cropper = Processor::Cropper.new(file, crop: :limit_png, extension: "png", width: 200, height: 200)
+        cropper = Processor::Cropper.new(file, crop: :limit_png, width: 200, height: 200)
         image = cropper.crop!
 
         assert_equal(200, image.width)
         assert_equal(117, image.height)
-        assert_equal("png", image.extension)
+        assert image.file.end_with?(".png")
         assert_equal(:png, ImageFormat.detect(image.file))
         FileUtils.rm image.file
       end
@@ -231,7 +192,7 @@ module ImageCrawler
       # larger than the 88x88 default thumbnail stays 88x88.
       def test_should_not_upscale_a_small_source
         file = write_solid_png(88, 88, [200, 100, 50])
-        cropper = Processor::Cropper.new(file, crop: :limit_png, extension: "png", width: 200, height: 200)
+        cropper = Processor::Cropper.new(file, crop: :limit_png, width: 200, height: 200)
         image = cropper.crop!
 
         assert_equal(88, image.width)
@@ -246,9 +207,9 @@ module ImageCrawler
       def test_should_accept_a_white_source_that_icon_crop_rejects
         file = write_solid_png(300, 300, [255, 255, 255])
 
-        refute Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 200, height: 200).valid?(false)
+        refute Processor::Cropper.new(file, crop: :icon_crop, width: 200, height: 200).valid?(false)
 
-        cropper = Processor::Cropper.new(file, crop: :limit_png, extension: "png", width: 200, height: 200)
+        cropper = Processor::Cropper.new(file, crop: :limit_png, width: 200, height: 200)
         assert cropper.valid?(false)
 
         image = cropper.crop!
@@ -267,8 +228,8 @@ module ImageCrawler
         icon_file  = copy_support_file("image.png")
         limit_file = copy_support_file("image.png")
 
-        icon  = Processor::Cropper.new(icon_file, crop: :icon_crop, extension: "png", width: 200, height: 200).crop!
-        limit = Processor::Cropper.new(limit_file, crop: :limit_png, extension: "png", width: 200, height: 200).crop!
+        icon  = Processor::Cropper.new(icon_file, crop: :icon_crop, width: 200, height: 200).crop!
+        limit = Processor::Cropper.new(limit_file, crop: :limit_png, width: 200, height: 200).crop!
 
         assert_equal icon.fingerprint, limit.fingerprint
         FileUtils.rm icon.file
@@ -279,12 +240,12 @@ module ImageCrawler
       # alone rather than upscaling.
       def test_icon_crop_should_not_upscale_a_small_source
         file = write_solid_png(180, 180, [40, 90, 200])
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 200, height: 200)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 200, height: 200)
         image = cropper.crop!
 
         assert_equal(180, image.width)
         assert_equal(180, image.height)
-        assert_equal("png", image.extension)
+        assert image.file.end_with?(".png")
         FileUtils.rm image.file
       ensure
         FileUtils.rm_f file

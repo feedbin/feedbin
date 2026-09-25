@@ -11,15 +11,8 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
       .to_return(status: 200, body: "<DeleteResult/>", headers: {content_type: "application/xml"})
   end
 
-  # Rows sharing a url_fingerprint also share their legacy object, so the
-  # default legacy url is keyed by url, not by provider_id.
-  def seed_row(provider_id:, url: @url, legacy_storage_url: nil, provider: :entry_preview)
-    create_image_row(
-      provider: provider,
-      provider_id: provider_id,
-      url: url,
-      data: {"legacy_storage_url" => legacy_storage_url || "https://bucket.s3.amazonaws.com/abc/#{Digest::MD5.hexdigest(url)}.jpg"}
-    )
+  def seed_row(provider_id:, url: @url, provider: :entry_preview)
+    create_image_row(provider: provider, provider_id: provider_id, url: url)
   end
 
   def seed_icon_row(storage_path)

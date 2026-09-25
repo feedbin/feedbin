@@ -9,16 +9,13 @@ module FaviconCrawler
     # At most one crawl per host per hour, whatever the number of subscribe
     # events. A Redis key rather than a row timestamp: images.updated_at is
     # a content version that moves only when the bytes move, so it cannot
-    # say when a host was last checked, and the favicons row is no longer
-    # written.
+    # say when a host was last checked.
     GATE = 1.hour
 
     # force skips the gate: the manual refresh in settings passes true. The
     # pipeline still decides on bytes, so force never re-uploads an
-    # unchanged icon. critical false keeps a caller's pipeline stages off
-    # the critical queues; nothing passes it today, it exists so a future
-    # sweep cannot land on the critical queues by omission.
-    def perform(host, force = false, critical = true)
+    # unchanged icon.
+    def perform(host, force = false)
       @host = host.to_s.downcase
       return if @host.blank?
 
@@ -27,8 +24,8 @@ module FaviconCrawler
         return
       end
 
-      schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls, critical)
-      schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls, critical)
+      schedule_icon("favicon", ::Image.providers[:website_favicon], all_favicon_urls)
+      schedule_icon("touch_icon", ::Image.providers[:website_touch_icon], touch_icon_urls)
       Librato.increment("favicon.crawl")
     end
 
@@ -39,7 +36,7 @@ module FaviconCrawler
     # (Pipeline::Find#unchanged? keys on the row's original_fingerprint).
     # The pipeline walks the candidates in order and decides on bytes; the
     # crawler downloads nothing itself.
-    def schedule_icon(preset_name, provider, urls, critical)
+    def schedule_icon(preset_name, provider, urls)
       # .uniq(&:to_s): the list mixes Addressable::URI and URI::HTTP --
       # equal by string, distinct classes, invisible to a bare .uniq.
       urls = urls.uniq(&:to_s)
@@ -52,8 +49,7 @@ module FaviconCrawler
         preset_name: preset_name,
         image_urls: urls.map(&:to_s),
         provider: provider,
-        provider_id: @host,
-        critical: critical
+        provider_id: @host
       )
       ImageCrawler::Pipeline::Find.perform_async(image.to_h)
     end

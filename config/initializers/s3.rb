@@ -8,7 +8,7 @@ STORAGE = {}.tap do |hash|
   hash[:path_style]            = ENV["AWS_S3_PATH_STYLE"] if ENV["AWS_S3_PATH_STYLE"]
 end
 
-STORAGE_UNIFIED = {}.tap do |hash|
+STORAGE_IMAGES = {}.tap do |hash|
   hash[:provider]              = "AWS"
   hash[:aws_access_key_id]     = ENV["UNIFIED_ACCESS_KEY_ID"]
   hash[:aws_secret_access_key] = ENV["UNIFIED_SECRET_ACCESS_KEY"]
@@ -21,5 +21,5 @@ end
 # Models are not autoloaded during initializer evaluation, so the check runs
 # once the app is up. A failure here stops the process, which is the point.
 Rails.application.config.after_initialize do
-  Image.check_unified_config!
+  Image.check_storage_config!
 end

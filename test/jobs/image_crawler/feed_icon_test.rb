@@ -35,7 +35,6 @@ module ImageCrawler
       assert_equal ::Image.providers[:feed_icon], args["provider"]
       assert_equal @feed.id, args["provider_id"]
       assert_equal ["http://example.com/icon.png"], args["image_urls"]
-      assert_equal true, args["critical"]
     end
 
     # micro.blog's feed.json puts the author's avatar in "icon": for a feed
@@ -130,31 +129,20 @@ module ImageCrawler
       settings = @feed.reload.settings.dup
       before = @feed.updated_at
 
-      FeedIcon.new.perform(@feed.id, {"processed_url" => nil, "storage_path" => "abc/abc123.png"})
+      FeedIcon.new.perform(@feed.id, {"storage_path" => "abc/abc123.png", "provider_id" => @feed.id.to_s})
 
       @feed.reload
       assert_operator @feed.updated_at, :>, before
       assert_equal settings, @feed.settings
     end
 
-    # The preset is unified only. A payload without storage_path is a
-    # regression, and it must raise rather than touch the feed for nothing.
-    test "receive raises on a payload without storage_path" do
-      @feed.update!(updated_at: 1.year.ago)
-      before = @feed.reload.updated_at
-
-      assert_raises(KeyError) { FeedIcon.new.perform(@feed.id, {"processed_url" => "https://cdn.example.com/icon.png"}) }
-      assert_equal before, @feed.reload.updated_at
-    end
-
-    test "the feed_icon preset is png, unified, content addressed, and calls back here" do
+    test "the feed_icon preset is png, content addressed, and calls back here" do
       preset = Image.new(preset_name: "feed_icon").preset
 
       assert_equal 200, preset.width
       assert_equal 200, preset.height
       assert_equal :limit_png, preset.crop
       assert_equal "png", preset.format
-      assert preset.unified
       assert preset.content_addressed
       assert_equal FeedIcon, preset.job_class
     end

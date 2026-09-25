@@ -29,7 +29,7 @@ module ImageCrawler
       # -- same reason ImageCrawler::Download fetches through Feedkit.
       urls = parse_meta_urls(Feedkit::Request.download(parsed_url, block_ssrf: true).body)
     rescue Feedkit::Error => exception
-      Sidekiq.logger.info "PageImages: exception=#{exception.inspect} url=#{@url}"
+      Sidekiq.logger.info "MetaImages: exception=#{exception.inspect} url=#{@url}"
       urls
     ensure
       cache.save({checked: true, urls: urls})

@@ -22,32 +22,26 @@ module ImageCrawler
       # against, so the only knob is dropping metadata.
       PNG_SAVER = {keep: :none}.freeze
 
-      attr_reader :path
+      # Crops that encode their own output as png. The rest return geometry,
+      # which crop! encodes as jpg.
+      PNG_CROPS = %i[limit_png icon_crop]
 
-      def initialize(file, crop:, extension:, width:, height:)
-        @file      = file
-        @crop      = crop
-        @extension = extension
-        @width     = width
-        @height    = height
+      Size = Data.define(:width, :height)
+
+      def initialize(file, crop:, width:, height:)
+        @file   = file
+        @crop   = crop
+        @width  = width
+        @height = height
       end
 
-      # Crops that own their output format: limit_crop picks png or jpg from
-      # the source's alpha and may keep the original untouched; the png crops
-      # are always png. Everything else is encoded as jpg.
-      SELF_ENCODING_CROPS = %i[limit_crop limit_png icon_crop]
-
       def crop!
-        return send(@crop) if SELF_ENCODING_CROPS.include?(@crop)
-        Processed.from_pipeline(save_as(geometry, "jpg", JPG_SAVER))
+        return send(@crop) if PNG_CROPS.include?(@crop)
+        Processed.from_pipeline(save_as(send(@crop), "jpg", JPG_SAVER))
       end
 
       def source
         @source ||= Vips::Image.new_from_file(ImageFormat.checked!(@file))
-      end
-
-      def size
-        File.size(@file)
       end
 
       def valid?(validate)
@@ -58,10 +52,6 @@ module ImageCrawler
         false
       end
 
-      def geometry
-        @geometry ||= send(@crop)
-      end
-
       def save_as(pipeline, format, saver)
         pipeline.convert(format).saver(**saver)
       end
@@ -70,24 +60,6 @@ module ImageCrawler
         ImageProcessing::Vips
           .source(source)
           .resize_to_fill(width, height)
-      end
-
-      def limit_crop
-        extension = source.has_alpha? ? "png" : "jpg"
-        image = ImageProcessing::Vips
-          .source(source)
-          .resize_to_limit(@width, @height)
-          .convert(extension)
-          .saver(keep: :none, quality: 80)
-
-        result = Processed.from_pipeline(image)
-
-        # if the original is smaller than the resized, just use that one
-        if result.size > size && source.width <= @width && source.height <= @height && ["png", "jpg"].include?(@extension)
-          File.unlink(result.file)
-          return Processed.from_file(@file, @extension)
-        end
-        result
       end
 
       # Layer choice happens before any resizing. Memoized including the nil
@@ -130,17 +102,17 @@ module ImageCrawler
 
         if proposed_size.width > @width
           axis = "x"
-          contraint = @width
+          constraint = @width
           max = proposed_size.width - @width
         else
           axis = "y"
-          contraint = @height
+          constraint = @height
           max = proposed_size.height - @height
         end
 
         if PIGO_INSTALLED && center = average_face_position(axis, save_as(image, "jpg", JPG_SAVER).call)
           point = {"x" => 0, "y" => 0}
-          point[axis] = (center.to_f - contraint.to_f / 2.0).floor
+          point[axis] = (center.to_f - constraint.to_f / 2.0).floor
 
           if point[axis] < 0
             point[axis] = 0
@@ -169,7 +141,7 @@ module ImageCrawler
             proposed_height = @height.to_f
             proposed_width = proposed_height * width_proportion
           end
-          OpenStruct.new({width: proposed_width.to_i, height: proposed_height.to_i})
+          Size.new(width: proposed_width.to_i, height: proposed_height.to_i)
         end
       end
 
@@ -181,11 +153,7 @@ module ImageCrawler
         }
         command = "%<pigo>s -in %<image>s -out empty -cf %<cascade>s -scale 1.2 -json -"
         out, _, status = Open3.capture3(command % params)
-        begin
-          File.unlink(file)
-        rescue
-          Errno::ENOENT
-        end
+        FileUtils.rm_f(file.path)
 
         faces = if status.success?
           JSON.load(out)

@@ -16,8 +16,7 @@ module ImageCrawler
       end
 
       @entry = Entry.find_by_public_id!(public_id)
-      @image = image
-      if @image
+      if image
         receive
       elsif !@entry.processed_image?
         schedule
@@ -79,12 +78,9 @@ module ImageCrawler
       entry_host == feed_host
     end
 
-    # Row-backed only: Upload or Dedupe created the images row before this
-    # callback. The touch busts cached entry views; metadata is not
-    # duplicated onto the entry. fetch: a payload without storage_path is a
-    # regression to the legacy path, which no longer exists.
+    # Upload or Dedupe wrote the images row before this callback. The touch
+    # moves the entry's own cache keys, the API fragment's among them.
     def receive
-      @image.fetch("storage_path")
       @entry.touch
     end
 

@@ -73,7 +73,6 @@ module ImageCrawler
       assert_equal ::Image.providers[:entry_icon], a["provider"]
       assert_equal first.id, a["provider_id"]
       assert_equal @feed.id, a["feed_id"]
-      assert_equal true, a["critical"]
       assert_nil avatar_row_for(second), "the sibling waits for the callback"
     end
 
@@ -315,20 +314,13 @@ module ImageCrawler
       assert_nil ::Image.avatar_row("https://micro.example/new.png")
     end
 
-    test "receive raises on a payload without storage_path" do
-      first = post("https://micro.example/a.png")
-
-      assert_raises(KeyError) { MicropostAvatar.new.perform("#{first.public_id}-avatar", {"provider_id" => first.id.to_s}) }
-    end
-
-    test "the micropost_avatar preset is png, unified, content addressed, and calls back here" do
+    test "the micropost_avatar preset is png, content addressed, and calls back here" do
       preset = Image.new(preset_name: "micropost_avatar").preset
 
       assert_equal 200, preset.width
       assert_equal 200, preset.height
       assert_equal :limit_png, preset.crop
       assert_equal "png", preset.format
-      assert preset.unified
       assert preset.content_addressed
       assert_equal MicropostAvatar, preset.job_class
     end

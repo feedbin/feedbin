@@ -4,33 +4,32 @@ module ImageCrawler
       include Sidekiq::Worker
       include SidekiqHelper
 
-      sidekiq_options queue: local_queue("crawl"), retry: false
+      # Host-local: the processed file is on this disk.
+      sidekiq_options queue: local_queue("crawl_critical"), retry: false
 
       def perform(image_hash)
         @image = Image.new(image_hash)
 
         begin
-          upload_unified
+          store
           @image.create_image
-          Librato.increment("image.unified_upload")
+          Librato.increment("image.upload")
         rescue => exception
-          # Nothing to fall back to: the unified store is the only one, so a
-          # callback here would hand the receiver a row nobody wrote. Drop
-          # the image instead and let the next crawl retry it.
-          Librato.increment("image.unified_error")
-          Sidekiq.logger.info "Upload: unified write failed id=#{@image.id} exception=#{exception.inspect}"
+          # No row, so no callback: the receiver would have nothing to read.
+          Librato.increment("image.upload_error")
+          Sidekiq.logger.info "Upload: write failed id=#{@image.id} exception=#{exception.inspect}"
           return
         end
 
-        @image.send_to_feedbin
+        @image.enqueue_callback
         Sidekiq.logger.info "Upload: id=#{@image.id} original_url=#{@image.original_url} storage_path=#{@image.storage_path} width=#{@image.width} height=#{@image.height}"
       ensure
-        File.unlink(@image.processed_path)
+        FileUtils.rm_f(@image.processed_path)
       end
 
-      def upload_unified
+      def store
         File.open(@image.processed_path) do |file|
-          ::Image.unified_client.put_object(@image.unified_bucket, @image.storage_path, file, @image.unified_storage_options)
+          ::Image.storage_client.put_object(::Image.bucket, @image.storage_path, file, @image.storage_options)
         end
       end
     end

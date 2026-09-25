@@ -147,9 +147,9 @@ class TweetTest < ActiveSupport::TestCase
     end
   end
 
-  # The unified pipeline stops writing twitter_link_image_processed once the
-  # image lives on a row; the gate must accept the row too, or previews for
-  # every newly crawled entry silently stop rendering.
+  # The pipeline stores the image on a row, not in
+  # twitter_link_image_processed; the gate must accept the row too, or
+  # previews for every newly crawled entry silently stop rendering.
   test "link_preview? accepts a stored link image row in place of the legacy data key" do
     fake_url = OpenStruct.new(expanded_url: URI.parse("https://example.com/p"), indices: [0, 10])
     tweet = make_tweet(link_image: Object.new)

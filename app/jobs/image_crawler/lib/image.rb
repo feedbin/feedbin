@@ -3,168 +3,78 @@ module ImageCrawler
     ATTRIBUTES = %i[
       bytesize
       context
-      critical
       download_path
       entry_url
       etag
       feed_id
       final_url
+      fingerprint
       height
-      width
       id
       image_urls
       kind
       last_modified
       meta_image_urls
-      original_extension
       original_fingerprint
       original_url
       page_url
       placeholder_color
       preset_name
-      processed_extension
       processed_path
-      storage_url
       provider
       provider_id
-      fingerprint
+      width
     ]
 
-
-    attr_accessor *ATTRIBUTES
+    attr_accessor(*ATTRIBUTES)
 
     CONTENT_TYPES = {
       "png" => "image/png",
       "jpg" => "image/jpeg"
     }.freeze
+
+    # A rendering recipe. A content_addressed preset keys its stored object
+    # on the original bytes instead of the url (see storage_path). job_class
+    # is the callback that runs once the row lands; a preset without one
+    # stores the row and stops.
+    Preset = Data.define(:width, :height, :crop, :format, :minimum_size, :validate, :content_addressed, :job_class) do
+      def initialize(width:, height:, crop:, format:, minimum_size: nil, validate: false, content_addressed: false, job_class: nil)
+        super
+      end
+
+      # Identity pairs variant with the url (entry presets) or
+      # original_fingerprint (content-addressed presets), plus the format as
+      # extension. All three must match to share an object: podcast and
+      # touch_icon both render 200x200 and only the format separates them.
+      def variant
+        "#{width}x#{height}"
+      end
+    end
+
     PRESETS = {
-      primary: {
-        width: 542,
-        height: 304,
-        minimum_size: 20_000,
-        crop: :smart_crop,
-        format: "jpg",
-        validate: true,
-        unified: true,
-        job_class: EntryImage
-      },
-      twitter: {
-        width: 542,
-        height: 304,
-        minimum_size: 10_000,
-        crop: :smart_crop,
-        format: "jpg",
-        validate: true,
-        unified: true,
-        job_class: TwitterLinkImage
-      },
-      youtube: {
-        width: 542,
-        height: 304,
-        minimum_size: nil,
-        crop: :fill_crop,
-        format: "jpg",
-        validate: true,
-        unified: true,
-        job_class: EntryImage
-      },
-      podcast: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :fill_crop,
-        format: "jpg",
-        validate: true,
-        unified: true,
-        content_addressed: true,
-        job_class: ItunesImage
-      },
-      podcast_feed: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :fill_crop,
-        format: "jpg",
-        validate: true,
-        unified: true,
-        content_addressed: true,
-        job_class: ItunesFeedImage
-      },
-      channel_avatar: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :limit_png,
-        format: "png",
-        validate: false,
-        unified: true,
-        content_addressed: true,
-        job_class: ChannelImage
-      },
-      feed_icon: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :limit_png,
-        format: "png",
-        validate: false,
-        unified: true,
-        content_addressed: true,
-        job_class: FeedIcon
-      },
-      micropost_avatar: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :limit_png,
-        format: "png",
-        validate: false,
-        unified: true,
-        content_addressed: true,
-        job_class: MicropostAvatar
-      },
-      favicon: {
-        width: 32,
-        height: 32,
-        minimum_size: nil,
-        crop: :icon_crop,
-        format: "png",
-        validate: false,
-        unified: true,
-        content_addressed: true,
-        job_class: nil
-      },
-      touch_icon: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :icon_crop,
-        format: "png",
-        validate: false,
-        unified: true,
-        content_addressed: true,
-        job_class: nil
-      }
-    }
+      primary:          Preset.new(width: 542, height: 304, crop: :smart_crop, format: "jpg", minimum_size: 20_000, validate: true, job_class: EntryImage),
+      twitter:          Preset.new(width: 542, height: 304, crop: :smart_crop, format: "jpg", minimum_size: 10_000, validate: true, job_class: TwitterLinkImage),
+      youtube:          Preset.new(width: 542, height: 304, crop: :fill_crop,  format: "jpg", validate: true, job_class: EntryImage),
+      podcast:          Preset.new(width: 200, height: 200, crop: :fill_crop,  format: "jpg", validate: true, content_addressed: true),
+      podcast_feed:     Preset.new(width: 200, height: 200, crop: :fill_crop,  format: "jpg", validate: true, content_addressed: true, job_class: ItunesFeedImage),
+      channel_avatar:   Preset.new(width: 200, height: 200, crop: :limit_png,  format: "png", content_addressed: true, job_class: ChannelImage),
+      feed_icon:        Preset.new(width: 200, height: 200, crop: :limit_png,  format: "png", content_addressed: true, job_class: FeedIcon),
+      micropost_avatar: Preset.new(width: 200, height: 200, crop: :limit_png,  format: "png", content_addressed: true, job_class: MicropostAvatar),
+      favicon:          Preset.new(width: 32,  height: 32,  crop: :icon_crop,  format: "png", content_addressed: true),
+      touch_icon:       Preset.new(width: 200, height: 200, crop: :icon_crop,  format: "png", content_addressed: true)
+    }.freeze
 
     # kind is required alongside preset_name because they answer different
     # questions: the preset is the rendering recipe, kind is what the
     # picture is, which only the caller knows. Passed as ::Image.kinds[...]
     # like provider, so the payload carries the enum value.
-    #
-    # critical defaults to true: a live image runs on the critical queues,
-    # ahead of a backfill. Only a backfill passes false, so forgetting the
-    # flag at a new call site cannot demote live work.
-    def self.new_with_attributes(id:, kind:, preset_name:, image_urls:, provider:, provider_id:, critical: true, **other)
-      arguments = Hash[binding.local_variables.map{ [it, binding.local_variable_get(it)]}]
-      arguments.delete(:arguments)
-      other = arguments.delete(:other)
-      new(other.merge(arguments))
+    def self.new_with_attributes(id:, kind:, preset_name:, image_urls:, provider:, provider_id:, **other)
+      new(other.merge(id:, kind:, preset_name:, image_urls:, provider:, provider_id:))
     end
 
     # Ignores attributes it does not recognize: pipeline jobs are retry: false
-    # and run on host-local queues, so payloads written by a newer deploy must
-    # not crash a not-yet-deployed consumer (and vice versa).
+    # and run on host-local queues, so a payload written by one deploy must
+    # not crash the code of the next.
     def initialize(data = {})
       data.each do |name, value|
         if ATTRIBUTES.include?(name.to_sym)
@@ -174,49 +84,27 @@ module ImageCrawler
     end
 
     def to_h
-      {}.tap do |hash|
-        ATTRIBUTES.each do |attribute|
-          hash[attribute] = self.send(attribute)
-        end
-      end
+      ATTRIBUTES.index_with { public_send(it) }
     end
 
     def preset
-      OpenStruct.new(PRESETS[preset_name.to_sym])
-    end
-
-    # Which queue the next stage takes. A payload from before the flag
-    # carries no key and reads as not critical: the plain queue, which is
-    # where every stage ran before, so a deploy in either direction is safe.
-    def critical?
-      critical == true
+      PRESETS.fetch(preset_name.to_sym)
     end
 
     def validate?
-      preset.validate || false
+      preset.validate
     end
 
-    def send_to_feedbin
-      # A preset with no callback job stores the row and stops. The icon
-      # presets ship before their tenants do; each tenant adds its job_class
-      # when it lands.
+    # The row is written by now, so the callback needs only to know which
+    # one: storage_path and provider_id. The caller's context rides through
+    # every stage untouched and comes back here.
+    def enqueue_callback
       return if preset.job_class.nil?
 
-      # storage_path is the receivers' row-backed gate; provider_id is their
-      # entity key. Other row metadata stays on the row.
       payload = {
-        "original_url"      => final_url,
-        "processed_url"     => storage_url,
-        "width"             => width,
-        "height"            => height,
-        "placeholder_color" => placeholder_color
+        "storage_path" => storage_path,
+        "provider_id"  => provider_id.to_s
       }
-      if unified?
-        payload["storage_path"] = storage_path
-        payload["provider_id"]  = provider_id.to_s
-      end
-      # Whatever the caller needs to finish once the row lands, carried
-      # untouched through every stage.
       payload["context"] = context if context
       preset.job_class.perform_async(id, payload)
     end
@@ -237,11 +125,10 @@ module ImageCrawler
         bytesize: bytesize,
         placeholder_color: placeholder_color,
         data: {
-          "legacy_storage_url" => storage_url,
-          "preset"             => preset_name,
-          "final_url"          => final_url,
-          "etag"               => etag,
-          "last_modified"      => last_modified
+          "preset"        => preset_name,
+          "final_url"     => final_url,
+          "etag"          => etag,
+          "last_modified" => last_modified
         }.compact
       )
 
@@ -255,10 +142,8 @@ module ImageCrawler
       record
     end
 
-    def unified?
-      preset.unified == true && ::Image.unified_enabled?
-    end
-
+    # Hashing a blank fingerprint would put every such image at one shared
+    # path, so a content-addressed preset without one raises instead.
     def storage_path
       if content_addressed?
         raise ArgumentError, "content-addressed preset #{preset_name} has no original_fingerprint" if original_fingerprint.blank?
@@ -268,31 +153,19 @@ module ImageCrawler
       end
     end
 
-    # The icon family: storage identity comes from the original bytes rather
-    # than the URL, and the pipeline always downloads before deciding anything.
+    # The icon family, podcast art and avatars: storage identity comes from
+    # the original bytes rather than the URL, and the pipeline always
+    # downloads before deciding anything. The rest are keyed by url, which
+    # is what makes Dedupe and ReuseRules meaningful for them.
     def content_addressed?
-      preset.content_addressed == true
+      preset.content_addressed
     end
 
-    # Identity from the url -- what makes the reuse rules meaningful; they
-    # mean nothing for an icon keyed by its own bytes and shared on purpose.
-    def url_addressed?
-      unified? && !content_addressed?
-    end
-
-    # Identity pairs variant with the url (entry presets) or
-    # original_fingerprint (content-addressed presets), plus the format as
-    # extension. All three must match to share an object: podcast and
-    # touch_icon both render 200x200 and only the format separates them.
     def variant
-      "#{preset.width}x#{preset.height}"
+      preset.variant
     end
 
-    def unified_bucket
-      ::Image.unified_bucket
-    end
-
-    def unified_storage_options
+    def storage_options
       {
         "Content-Type"  => CONTENT_TYPES.fetch(preset.format),
         "Cache-Control" => "max-age=315360000, public, immutable"
@@ -300,13 +173,8 @@ module ImageCrawler
     end
 
     def trace(message:, metadata: {})
-      defaults = {
-        public_id: id,
-        preset: preset_name,
-      }.merge(metadata)
-
-      Sidekiq.logger.info "Image trace: #{message} #{defaults.map { |k, v| "#{k}=#{v}" }.join(" ")}"
+      fields = {public_id: id, preset: preset_name}.merge(metadata)
+      Sidekiq.logger.info "Image trace: #{message} #{fields.map { |key, value| "#{key}=#{value}" }.join(" ")}"
     end
-
   end
 end

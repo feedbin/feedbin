@@ -4,68 +4,55 @@ module ImageCrawler
       include Sidekiq::Worker
       include SidekiqHelper
 
-      sidekiq_options queue: local_queue("process"), retry: false
+      # Host-local: the downloaded file is on this disk.
+      sidekiq_options queue: local_queue("process_critical"), retry: false
+
+      # The attributes that describe the request rather than a candidate: what
+      # Find needs to try the rest of the urls.
+      REQUEST_ATTRIBUTES = %i[id kind preset_name image_urls provider provider_id feed_id page_url meta_image_urls context]
 
       def perform(image_hash)
         @image = Image.new(image_hash)
         Sidekiq.logger.info "Process: public_id=#{@image.id} final_url=#{@image.final_url}"
 
         processor = Processor::Cropper.new(@image.download_path,
-          crop:      @image.preset.crop,
-          extension: @image.original_extension,
-          width:     @image.preset.width,
-          height:    @image.preset.height
+          crop:   @image.preset.crop,
+          width:  @image.preset.width,
+          height: @image.preset.height
         )
 
         if processor.valid?(@image.validate?)
           cropped = processor.crop!
 
-          @image.processed_path      = cropped.file
-          @image.bytesize            = cropped.size
-          @image.fingerprint         = cropped.fingerprint
-          @image.width               = cropped.width
-          @image.height              = cropped.height
-          @image.placeholder_color   = cropped.placeholder_color
-          @image.processed_extension = cropped.extension
+          @image.processed_path    = cropped.file
+          @image.bytesize          = cropped.size
+          @image.fingerprint       = cropped.fingerprint
+          @image.width             = cropped.width
+          @image.height            = cropped.height
+          @image.placeholder_color = cropped.placeholder_color
 
           if reuse_rejected?
             Librato.increment("image.reuse_rejected")
             Sidekiq.logger.info "Process: rejecting reused fingerprint public_id=#{@image.id} original_url=#{@image.original_url}"
-            File.unlink(@image.processed_path) rescue Errno::ENOENT
+            FileUtils.rm_f(@image.processed_path)
             requeue_remaining
           else
-            upload_class.perform_async(@image.to_h)
+            Upload.perform_async(@image.to_h)
           end
         else
           requeue_remaining
         end
       ensure
-        File.unlink(@image.download_path) rescue Errno::ENOENT
+        FileUtils.rm_f(@image.download_path)
       end
 
       def requeue_remaining
         return if @image.image_urls.empty?
-        image = Image.new_with_attributes(
-          id: @image.id,
-          kind: @image.kind,
-          preset_name: @image.preset_name,
-          image_urls: @image.image_urls,
-          provider: @image.provider,
-          provider_id: @image.provider_id,
-          feed_id: @image.feed_id,
-          page_url: @image.page_url,
-          meta_image_urls: @image.meta_image_urls,
-          critical: @image.critical?
-        )
-        (image.critical? ? FindCritical : Find).perform_async(image.to_h)
-      end
-
-      def upload_class
-        @image.critical? ? UploadCritical : Upload
+        FindCritical.perform_async(@image.to_h.slice(*REQUEST_ATTRIBUTES))
       end
 
       def reuse_rejected?
-        return false unless @image.url_addressed?
+        return false if @image.content_addressed?
         ReuseRules.new(@image).fingerprint_used_in_feed?(@image.fingerprint)
       end
     end

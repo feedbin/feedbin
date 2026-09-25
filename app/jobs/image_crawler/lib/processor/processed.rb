@@ -1,29 +1,30 @@
 module ImageCrawler
   module Processor
     class Processed
-
-      attr_reader :file, :extension
+      attr_reader :file
 
       def self.from_pipeline(pipeline)
-        extension = pipeline.options[:format]
-        path = persisted_path(extension)
+        path = File.join(Dir.tmpdir, ["image_processed_", SecureRandom.hex, ".#{pipeline.options[:format]}"].join)
         pipeline.call(destination: path)
-        new(path, extension)
+        new(path)
       end
 
-      def self.from_file(file, extension)
-        destination = persisted_path(extension)
-        FileUtils.cp file, destination
-        new(destination, extension)
+      # The mean colour as six hex digits.
+      def self.average_color(image)
+        average(image).first(3).map { "%02x" % it }.join
       end
 
-      def self.persisted_path(extension)
-        File.join(Dir.tmpdir, ["image_processed_", SecureRandom.hex, ".#{extension}"].join)
+      # The mean of each band: the image shrunk to one pixel.
+      def self.average(image)
+        ImageProcessing::Vips
+          .source(image)
+          .resize_to_fill(1, 1, sharpen: false)
+          .call(save: false)
+          .getpoint(0, 0)
       end
 
-      def initialize(file, extension)
+      def initialize(file)
         @file = file
-        @extension = extension
       end
 
       def source
@@ -47,17 +48,7 @@ module ImageCrawler
       end
 
       def placeholder_color
-        hex = nil
-        file = ImageProcessing::Vips
-          .source(source)
-          .resize_to_fill(1, 1, sharpen: false)
-          .custom { |image|
-            image.tap do |data|
-              hex = data.getpoint(0, 0).map { |value| "%02x" % value }.first(3).join
-            end
-          }.call
-        file.unlink
-        hex
+        self.class.average_color(source)
       end
     end
   end

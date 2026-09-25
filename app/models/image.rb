@@ -54,7 +54,7 @@ class Image < ApplicationRecord
   normalizes :url, with: -> url { url.strip }
 
   # The data JSON's schema as real accessors.
-  store_accessor :data, :legacy_storage_url, :final_url, :etag, :last_modified, :preset
+  store_accessor :data, :final_url, :etag, :last_modified, :preset
 
   # One data key as a SQL projection, for plucks that skip instantiating
   # rows. Restricted to store_accessor's registry so a renamed key fails
@@ -88,7 +88,7 @@ class Image < ApplicationRecord
   # ever attached to the url. One indexed read on url_fingerprint; the
   # preset comes out of data through Arel, nothing is interpolated.
   def self.avatar_row(url)
-    variant = ImageCrawler::Image.new(preset_name: "micropost_avatar").variant
+    variant = ImageCrawler::Image::PRESETS.fetch(:micropost_avatar).variant
     where(url_fingerprint: url_fingerprint_for(url, variant)).where(data_projection("preset").eq("micropost_avatar")).take
   end
 
@@ -147,7 +147,7 @@ class Image < ApplicationRecord
     path_for(Digest::MD5.hexdigest("#{variant}|#{original_fingerprint.to_s.delete("-")}"), extension)
   end
 
-  # A storage key: the unified object name and the public URL path, sharded
+  # A storage key: the object name and the public URL path, sharded
   # on the first three characters.
   def self.path_for(fingerprint, extension)
     "#{fingerprint[0..2]}/#{fingerprint}.#{extension}"
@@ -165,9 +165,9 @@ class Image < ApplicationRecord
     normalize_fingerprint(one) == normalize_fingerprint(other)
   end
 
-  # The public URL for a stored object. Nil until UNIFIED_IMAGE_HOST is set,
-  # which keeps the read path on the legacy fallback.
-  def self.unified_url(storage_path)
+  # The public URL for a stored object, or nil when UNIFIED_IMAGE_HOST is
+  # not set (development and test; production does not boot without it).
+  def self.public_url_for(storage_path)
     return nil if storage_path.blank?
     host = ENV["UNIFIED_IMAGE_HOST"]
     return nil if host.blank?
@@ -184,28 +184,28 @@ class Image < ApplicationRecord
 
   # One definition for the write-side switch: the pipeline writes and the
   # sweep deletes iff the bucket is configured, and they must flip together.
-  def self.unified_bucket
+  def self.bucket
     ENV["UNIFIED_BUCKET_IMAGES"]
   end
 
-  def self.unified_enabled?
-    unified_bucket.present?
+  def self.storage_configured?
+    bucket.present?
   end
 
-  # Production has no image path but the unified store once the legacy read
-  # fallback is gone, so a boot without either switch fails here rather than
-  # blank every image on the host. Arguments exist so a test can drive it.
-  def self.check_unified_config!(env: Rails.env, vars: ENV)
+  # Every image renders from this store, so a production boot without
+  # either setting fails here rather than blank every image on the host.
+  # Arguments exist so a test can drive it.
+  def self.check_storage_config!(env: Rails.env, vars: ENV)
     return unless env.production?
 
     %w[UNIFIED_BUCKET_IMAGES UNIFIED_IMAGE_HOST].each do |name|
-      raise "#{name} must be set in production: the unified store is the only image path" if vars[name].blank?
+      raise "#{name} must be set in production: the image store is the only image path" if vars[name].blank?
     end
     nil
   end
 
-  def self.unified_client
-    Fog::Storage.new(STORAGE_UNIFIED)
+  def self.storage_client
+    Fog::Storage.new(STORAGE_IMAGES)
   end
 
   # Upsert keyed by (provider, provider_id). One retry: the second pass
@@ -233,10 +233,9 @@ class Image < ApplicationRecord
     end
   end
 
-  # The public URL of the stored object, or nil until UNIFIED_IMAGE_HOST is
-  # set. The icon family's readers call this on the record they resolved.
+  # The public URL of the stored object; see public_url_for.
   def public_url
-    self.class.unified_url(storage_path)
+    self.class.public_url_for(storage_path)
   end
 
   private

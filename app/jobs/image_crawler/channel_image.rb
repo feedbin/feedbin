@@ -6,8 +6,8 @@ module ImageCrawler
     SUFFIX = "-channel".freeze
 
     # Largest first. The channels API returns default (88x88), medium
-    # (240x240) and high (800x800); the avatar is hotlinked from default
-    # today, which is soft in every slot bigger than a favicon.
+    # (240x240) and high (800x800); default is soft in every slot bigger
+    # than a favicon.
     THUMBNAIL_SIZES = %w[high medium default].freeze
 
     # Scoped to the channel: one row serves the channel's own feed and every
@@ -37,12 +37,9 @@ module ImageCrawler
     # channel has one feed, occasionally a few url spellings. Only reached
     # when the bytes changed (unchanged? returns before Process otherwise).
     def perform(id, image)
-      return if image["storage_path"].blank?
-
       # Never fall through to a nil query: channel_id is null for every
       # non-YouTube feed, and touching all of those is the fan-out this
-      # design avoids. Blank payload = pre-provider_id deploy; skip, the
-      # next harvest self-heals.
+      # design avoids.
       channel_id = image["provider_id"]
       return if channel_id.blank?
 

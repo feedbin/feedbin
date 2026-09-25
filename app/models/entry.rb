@@ -153,7 +153,7 @@ class Entry < ApplicationRecord
   # it. An entry without a row renders no image.
   def processed_image
     if record = preview_image_record
-      Image.unified_url(record.storage_path)
+      Image.public_url_for(record.storage_path)
     end
   end
 
@@ -196,7 +196,7 @@ class Entry < ApplicationRecord
   def itunes_image
     record = icon_image_record
     return nil unless record&.kind_cover_art?
-    Image.unified_url(record.storage_path)
+    Image.public_url_for(record.storage_path)
   end
 
   # The micropost author's avatar row, written by
@@ -343,7 +343,7 @@ class Entry < ApplicationRecord
 
   def link_image
     if record = link_image_record
-      Image.unified_url(record.storage_path)
+      Image.public_url_for(record.storage_path)
     end
   end
 

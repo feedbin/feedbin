@@ -114,7 +114,7 @@ class FaviconComponentTest < ComponentTestCase
 
       assert_includes output.to_s, "https://images.example.com/#{path}"
       refute_includes output.to_s, "/files/icons/",
-        "a unified url is already on our own CDN and must not be wrapped in the signing proxy"
+        "a stored image url is already on our own CDN and must not be wrapped in the signing proxy"
     end
   end
 
@@ -201,7 +201,7 @@ class FaviconComponentTest < ComponentTestCase
     end
   end
 
-  test "favicon from the images row renders the unified url with the host class" do
+  test "favicon from the images row renders the public url with the host class" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       row = create_favicon_row(@feed.host)
 
@@ -247,7 +247,7 @@ class FaviconComponentTest < ComponentTestCase
     end
   end
 
-  test "an images row with no unified host renders the generated favicon" do
+  test "an images row with no image host renders the generated favicon" do
     with_env("UNIFIED_IMAGE_HOST" => nil) do
       create_favicon_row(@feed.host)
 

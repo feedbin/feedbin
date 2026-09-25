@@ -7,8 +7,6 @@ module ImageCrawler
       @original_url = "http://example.com/image.jpg"
       @image = Image.new_with_attributes(
         id: SecureRandom.hex,
-        kind: ::Image.kinds[:poster],
-
         kind: ::Image.kinds[:poster], preset_name: "primary",
         image_urls: [],
         provider: ::Image.providers[:entry_preview],
@@ -17,7 +15,7 @@ module ImageCrawler
       )
     end
 
-    def seed_row(provider_id: 1, data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg", "final_url" => "http://example.com/image-final.jpg"})
+    def seed_row(provider_id: 1, data: {"final_url" => "http://example.com/image-final.jpg"})
       create_image_row(provider_id: provider_id, url: @original_url, data: data)
     end
 
@@ -43,13 +41,11 @@ module ImageCrawler
         assert_equal row.original_fingerprint, attached.original_fingerprint
         assert_equal 12_345, attached.bytesize
         assert_equal ::Image.kinds.key(@image.kind), attached.kind, "the attached row carries its own kind, not the shared object's"
-        assert_nil attached.data["legacy_storage_url"]
+        assert_equal "http://example.com/image-final.jpg", attached.final_url
 
         _, payload = EntryImage.jobs.last["args"]
         assert_equal row.storage_path, payload["storage_path"]
         assert_equal "2", payload["provider_id"]
-        assert_equal "http://example.com/image-final.jpg", payload["original_url"]
-        assert_nil payload["processed_url"]
       end
     end
   end

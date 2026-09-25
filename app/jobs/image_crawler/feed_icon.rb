@@ -13,9 +13,8 @@ module ImageCrawler
     def perform(feed_id, image = nil)
       feed_id = feed_id.to_s.split("-").first
       @feed = Feed.find(feed_id)
-      @image = image
 
-      if @image
+      if image
         receive
       else
         self.class.schedule(@feed)
@@ -59,11 +58,12 @@ module ImageCrawler
       [options.safe_dig("image", "url"), options.safe_dig("json_feed", "icon"), options.safe_dig("json_feed", "author", "avatar")]
     end
 
-    # The legacy ranking's url order. The RSS image counts only for a
-    # micropost feed, where it is the author's picture; for an article feed
-    # it is a banner as often as a logo, and it stays ignored. A micropost
-    # feed's JSON Feed icon is the author's picture too (micro.blog puts the
-    # avatar there), so it is an avatar; any other feed's is its site icon.
+    # The feed's icon url and what kind of picture it is, or nil. The RSS
+    # image counts only for a micropost feed, where it is the author's
+    # picture; for an article feed it is a banner as often as a logo, and it
+    # stays ignored. A micropost feed's JSON Feed icon is the author's
+    # picture too (micro.blog puts the avatar there), so it is an avatar;
+    # any other feed's is its site icon.
     def self.source_for(feed)
       options = feed.options || {}
 
@@ -80,10 +80,9 @@ module ImageCrawler
       nil
     end
 
-    # Row-backed: the row is the read path. The touch moves the cached
-    # sidebar and entry keys, because new bytes can land under the same path.
+    # The row is the read path. The touch moves the cached sidebar and entry
+    # keys, because new bytes can land under the same path.
     def receive
-      @image.fetch("storage_path")
       @feed.touch
     end
   end

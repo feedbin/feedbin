@@ -1,5 +1,5 @@
 module ImageCrawler
-  # Attaches an entry to an already-stored unified image so the same
+  # Attaches an entry to an already-stored image so the same
   # original_url is never downloaded or processed twice. Attaching is purely
   # a database operation: the new row shares the stored object with the rows
   # that already reference it. SweepStoredImages refcounts by storage_path,
@@ -35,25 +35,13 @@ module ImageCrawler
         **::Image.stored_object_attributes(record),
         data: {
           "preset"    => @image.preset_name,
-          "final_url" => final_url
+          "final_url" => record.final_url.presence || @original_url
         }
       )
 
-      @image.original_url      = @original_url
-      @image.final_url         = final_url
-      @image.width             = record.width
-      @image.height            = record.height
-      @image.bytesize          = record.bytesize
-      @image.placeholder_color = record.placeholder_color
-      @image.fingerprint       = record.image_fingerprint
-      @image.send_to_feedbin
+      @image.original_url = @original_url
+      @image.enqueue_callback
       true
-    end
-
-    private
-
-    def final_url
-      record.final_url.presence || @original_url
     end
   end
 end

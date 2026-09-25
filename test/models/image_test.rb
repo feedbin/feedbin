@@ -262,36 +262,34 @@ class ImageTest < ActiveSupport::TestCase
       Image.storage_path_for("https://example.com/other.png", "542x304")
   end
 
-  # After the legacy read removal the unified store is the only image path,
-  # so a production boot without its two switches must fail here rather
-  # than blank every image on the host.
-  test "check_unified_config! raises in production when the bucket is blank" do
+  # Every image renders from the image store, so a production boot
+  # without its two settings must fail here rather than blank every image
+  # on the host.
+  test "check_storage_config! raises in production when the bucket is blank" do
     production = ActiveSupport::StringInquirer.new("production")
     error = assert_raises(RuntimeError) do
-      Image.check_unified_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "", "UNIFIED_IMAGE_HOST" => "https://images.example.com"})
+      Image.check_storage_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "", "UNIFIED_IMAGE_HOST" => "https://images.example.com"})
     end
     assert_match(/UNIFIED_BUCKET_IMAGES/, error.message)
   end
 
-  test "check_unified_config! raises in production when the host is blank" do
+  test "check_storage_config! raises in production when the host is blank" do
     production = ActiveSupport::StringInquirer.new("production")
     error = assert_raises(RuntimeError) do
-      Image.check_unified_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "images", "UNIFIED_IMAGE_HOST" => nil})
+      Image.check_storage_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "images", "UNIFIED_IMAGE_HOST" => nil})
     end
     assert_match(/UNIFIED_IMAGE_HOST/, error.message)
   end
 
-  test "check_unified_config! passes in production with both set, and never checks elsewhere" do
+  test "check_storage_config! passes in production with both set, and never checks elsewhere" do
     production = ActiveSupport::StringInquirer.new("production")
     development = ActiveSupport::StringInquirer.new("development")
-    assert_nil Image.check_unified_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "images", "UNIFIED_IMAGE_HOST" => "https://images.example.com"})
-    assert_nil Image.check_unified_config!(env: development, vars: {})
+    assert_nil Image.check_storage_config!(env: production, vars: {"UNIFIED_BUCKET_IMAGES" => "images", "UNIFIED_IMAGE_HOST" => "https://images.example.com"})
+    assert_nil Image.check_storage_config!(env: development, vars: {})
   end
 
-  # The icon family's readers call public_url on whatever record resolved
-  # (an images row, or a favicons row during the cutover) and never inspect
-  # its class. Nil until UNIFIED_IMAGE_HOST is set, like unified_url.
-  test "public_url is the unified url of the storage path" do
+  # Nil until UNIFIED_IMAGE_HOST is set, like public_url_for.
+  test "public_url joins the image host and the storage path" do
     row = create_image_row
 
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do

@@ -28,8 +28,8 @@ class MicropostTest < ActiveSupport::TestCase
     assert_not micropost.valid?
   end
 
-  # The unified pipeline stops writing twitter_link_image_processed once the
-  # image lives on a row; the gate must accept the row too.
+  # The pipeline stores the image on a row, not in
+  # twitter_link_image_processed; the gate must accept the row too.
   test "link_preview? accepts a stored link image row in place of the legacy data key" do
     data = @data.merge(
       "urls" => ["https://example.com/p"],

@@ -6,14 +6,13 @@ module ImageCrawler
         flush_redis
       end
 
-      def unified(&)
+      def with_store(&)
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test", &)
       end
 
-      # Every preset writes to the unified store, and production does not
-      # boot without one, so with no store configured there is nowhere to
-      # write: the job skips rather than download for nothing.
-      def test_skips_without_a_unified_store
+      # With no store configured there is nowhere to write, so the job skips
+      # rather than download for nothing.
+      def test_skips_without_a_store
         url = "http://example.com/image.jpg"
         stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
         image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [url], provider: 0, provider_id: 1)
@@ -23,7 +22,7 @@ module ImageCrawler
         end
 
         refute_requested :get, url
-        assert_empty ProcessCritical.jobs
+        assert_empty Process.jobs
       end
 
       def test_should_process_an_image
@@ -55,25 +54,8 @@ module ImageCrawler
         end
       end
 
-      # A backfill image goes to the plain process queue, behind live work.
-      def test_should_enqueue_plain_process_for_a_non_critical_image
-        unified do
-          url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
-          stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
-
-          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [url], provider: 0, provider_id: 1, critical: false)
-
-          assert_difference -> { Process.jobs.size }, +1 do
-            assert_no_difference -> { ProcessCritical.jobs.size } do
-              Find.new.perform(image.to_h)
-            end
-          end
-          assert_equal false, Process.jobs.first["args"][0]["critical"]
-        end
-      end
-
       def test_should_enqueue_recognized_image
-        unified do
+        with_store do
           url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
           image_url = "http://example.com/image.jpg"
 
@@ -82,11 +64,11 @@ module ImageCrawler
 
           image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, entry_url: "https://www.youtube.com/watch?v=id")
 
-          assert_difference -> { ProcessCritical.jobs.size }, +1 do
+          assert_difference -> { Process.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
 
-          image = Image.new(ProcessCritical.jobs.first["args"][0])
+          image = Image.new(Process.jobs.first["args"][0])
 
           assert image.download_path
           assert_equal "https://www.youtube.com/watch?v=id", image.entry_url
@@ -105,7 +87,7 @@ module ImageCrawler
       # images.original_fingerprint is NOT NULL -- so the ordinary download
       # path must fingerprint the original file, not just the icon path.
       def test_should_fingerprint_the_original_bytes_on_the_entry_path
-        unified do
+        with_store do
           url = "https://i.ytimg.com/vi/id/maxresdefault.jpg"
           body = ("lorem " * 3_500)
 
@@ -114,13 +96,13 @@ module ImageCrawler
 
           Find.new.perform(image.to_h)
 
-          payload = Image.new(ProcessCritical.jobs.first["args"][0])
+          payload = Image.new(Process.jobs.first["args"][0])
           assert_equal Digest::MD5.hexdigest(body), payload.original_fingerprint
         end
       end
 
       def test_should_try_all_urls
-        unified do
+        with_store do
           urls = [
             "http://example.com/image_1.jpg",
             "http://example.com/image_2.jpg",
@@ -142,7 +124,7 @@ module ImageCrawler
         end
       end
 
-      def test_should_attach_existing_unified_image_without_downloading
+      def test_should_attach_existing_image_without_downloading
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/image.jpg"
           ::Image.create!(
@@ -155,8 +137,7 @@ module ImageCrawler
             original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for(original_url, "542x304"),
             width: 542, height: 304, bytesize: 12_345,
-            placeholder_color: "aabbcc",
-            data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
+            placeholder_color: "aabbcc"
           )
 
           # No storage stubs: a dedupe hit issues no storage API requests.
@@ -169,14 +150,14 @@ module ImageCrawler
         end
       end
 
-      def test_should_download_unified_image_on_dedupe_miss
+      def test_should_download_image_on_dedupe_miss
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/image.jpg"
           stub_request_file("image.jpeg", original_url, headers: {content_type: "image/jpeg"})
 
           image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [original_url], provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9)
 
-          assert_difference -> { ProcessCritical.jobs.size }, +1 do
+          assert_difference -> { Process.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -199,10 +180,9 @@ module ImageCrawler
           ::Image.create!(
             provider: :entry_preview, provider_id: "1", feed_id: 9,
             url: og_url, variant: "542x304", image_fingerprint: SecureRandom.hex(16),
- original_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for(og_url, "542x304"),
-            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
-            data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
+            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
           )
 
           image = Image.new_with_attributes(
@@ -215,7 +195,7 @@ module ImageCrawler
 
           refute_requested :get, og_url
           assert_requested :get, fresh_url
-          assert_equal 1, ProcessCritical.jobs.size
+          assert_equal 1, Process.jobs.size
         end
       end
 
@@ -227,10 +207,9 @@ module ImageCrawler
           ::Image.create!(
             provider: :entry_preview, provider_id: "1", feed_id: 9,
             url: reused_url, variant: "542x304", image_fingerprint: SecureRandom.hex(16),
- original_fingerprint: SecureRandom.hex(16),
+            original_fingerprint: SecureRandom.hex(16),
             storage_path: ::Image.storage_path_for(reused_url, "542x304"),
-            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
-            data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/abcdef.jpg"}
+            width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
           )
           stub_request_file("image.jpeg", fresh_url, headers: {content_type: "image/jpeg"})
 
@@ -244,7 +223,7 @@ module ImageCrawler
 
           refute_requested :get, reused_url
           assert_requested :get, fresh_url
-          assert_equal 1, ProcessCritical.jobs.size
+          assert_equal 1, Process.jobs.size
         end
       end
 
@@ -270,7 +249,7 @@ module ImageCrawler
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_difference -> { ProcessCritical.jobs.size }, +1 do
+          assert_difference -> { Process.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -306,7 +285,7 @@ module ImageCrawler
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_no_difference -> { ProcessCritical.jobs.size } do
+          assert_no_difference -> { Process.jobs.size } do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -337,7 +316,7 @@ module ImageCrawler
             provider: ::Image.providers[:feed_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_difference -> { ProcessCritical.jobs.size }, +1 do
+          assert_difference -> { Process.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -369,7 +348,7 @@ module ImageCrawler
             provider: ::Image.providers[:entry_icon], provider_id: 5, feed_id: 9
           )
 
-          assert_no_difference -> { ProcessCritical.jobs.size } do
+          assert_no_difference -> { Process.jobs.size } do
             Find.new.perform(image.to_h)
           end
           assert_requested :get, original_url
@@ -442,7 +421,7 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_no_difference -> { ProcessCritical.jobs.size } do
+          assert_no_difference -> { Process.jobs.size } do
             Find.new.perform(image.to_h)
           end
           assert_equal expected_updated_at.to_f, row.reload.updated_at.to_f
@@ -479,7 +458,7 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_no_difference -> { ProcessCritical.jobs.size } do
+          assert_no_difference -> { Process.jobs.size } do
             Find.new.perform(image.to_h)
           end
 
@@ -503,11 +482,11 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_difference -> { ProcessCritical.jobs.size }, +1 do
+          assert_difference -> { Process.jobs.size }, +1 do
             Find.new.perform(image.to_h)
           end
 
-          queued = ProcessCritical.jobs.last["args"].first
+          queued = Process.jobs.last["args"].first
           assert_equal "\"fresh\"", queued["etag"]
           assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", queued["last_modified"]
         end
@@ -545,7 +524,7 @@ module ImageCrawler
             provider: ::Image.providers[:website_favicon], provider_id: "example.com"
           )
 
-          assert_no_difference -> { ProcessCritical.jobs.size } do
+          assert_no_difference -> { Process.jobs.size } do
             Find.new.perform(image.to_h)
           end
 

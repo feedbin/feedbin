@@ -5,11 +5,10 @@ module ImageCrawler
 
     def perform(public_id, image = nil, page_url = nil)
       public_id = public_id.split("-").first
-      @entry = Entry.find_by_public_id(public_id)
-      @image = image
+      @entry = Entry.find_by_public_id!(public_id)
       @page_url = page_url
 
-      if @image
+      if image
         receive
       else
         schedule
@@ -32,8 +31,8 @@ module ImageCrawler
       Pipeline::Find.perform_async(image.to_h)
     end
 
+    # The touch moves the entry's own cache keys.
     def receive
-      @image.fetch("storage_path")
       @entry.touch
     end
   end

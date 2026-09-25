@@ -39,7 +39,6 @@ module FaviconCrawler
       assert_equal ::Image.providers[:website_favicon], favicon["provider"]
       assert_equal ::Image.kinds[:site_icon], favicon["kind"]
       assert_equal "example.com", favicon["provider_id"]
-      assert_equal true, favicon["critical"]
       assert_equal ["http://example.com/icon-32.png", "http://example.com/touch-180.png", "http://example.com/favicon.ico"], favicon["image_urls"]
 
       assert_equal ::Image.providers[:website_touch_icon], touch["provider"]
@@ -146,16 +145,8 @@ module FaviconCrawler
       assert_equal ["favicon.crawl", "favicon.gated"], counted
     end
 
-    test "critical false rides into the pipeline payload" do
-      stub_homepage
-
-      Finder.new.perform(@page_url.host, false, false)
-
-      assert_equal false, find_jobs.last["critical"]
-    end
-
-    # The legacy write this rescue once protected is gone. An enqueue
-    # failure is the job's failure: retry: false, logged by Sidekiq.
+    # An enqueue failure is the job's failure: retry: false, logged by
+    # Sidekiq.
     test "an enqueue failure raises" do
       stub_homepage
 

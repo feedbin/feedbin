@@ -182,7 +182,7 @@ class EntryTest < ActiveSupport::TestCase
     assert_same @entry.tweet, @entry.tweet
   end
 
-  test "processed_image tolerates a schemeless unified image host" do
+  test "processed_image tolerates a schemeless image host" do
     entry = create_entry(Feed.first)
     row = create_image_row(entry)
 

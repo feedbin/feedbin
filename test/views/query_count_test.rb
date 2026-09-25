@@ -162,8 +162,7 @@ class ApiEntriesQueryCountTest < ApiControllerTestCase
         image_fingerprint: SecureRandom.hex(16),
         original_fingerprint: SecureRandom.hex(16),
         storage_path: Image.storage_path_for(url, "542x304"),
-        width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
-        data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/#{entry.id}.jpg"}
+        width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
       )
     end
   end
@@ -204,8 +203,7 @@ class ActionResultsQueryCountTest < ActiveSupport::TestCase
       image_fingerprint: SecureRandom.hex(16),
       original_fingerprint: SecureRandom.hex(16),
       storage_path: Image.storage_path_for(url, "542x304"),
-      width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc",
-      data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/#{provider}-#{entry.id}.jpg"}
+      width: 542, height: 304, bytesize: 12_345, placeholder_color: "aabbcc"
     )
   end
 

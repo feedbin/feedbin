@@ -38,17 +38,8 @@ module ImageCrawler
       assert_equal ::Image.kinds[:poster], image.to_h[:kind]
     end
 
-    test "unified? requires an opted-in preset and the unified bucket env" do
-      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
-      refute image.unified?
-
-      icon = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:avatar], preset_name: "micropost_avatar", image_urls: [], provider: ::Image.providers[:entry_icon], provider_id: 1)
-      refute icon.unified?
-
-      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-        assert image.unified?
-        assert icon.unified?
-      end
+    test "preset rejects an unknown name" do
+      assert_raises(KeyError) { Image.new(preset_name: "no_such_preset").preset }
     end
 
     test "storage_path is derived from original_url" do
@@ -56,79 +47,68 @@ module ImageCrawler
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304"), image.storage_path
     end
 
-    test "send_to_feedbin includes unified metadata when unified" do
-      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-        image = Image.new_with_attributes(
-          id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
-          provider: ::Image.providers[:entry_preview], provider_id: 1,
-          original_url: "http://example.com/a.jpg", final_url: "http://example.com/a.jpg",
-          storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
-          width: 542, height: 304, bytesize: 9_999, placeholder_color: "aabbcc"
-        )
-        image.send_to_feedbin
-
-        _, payload = EntryImage.jobs.last["args"]
-        assert_equal image.storage_path, payload["storage_path"]
-        assert_equal "1",                payload["provider_id"]
-      end
-    end
-
-    # A caller's context rides the payload through Find, Process and Upload
-    # (each a JSON round trip) to its callback, which needs it to finish.
-    test "send_to_feedbin hands the callback the caller's context" do
-      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-        image = Image.new_with_attributes(
-          id: "a", kind: ::Image.kinds[:avatar], preset_name: "micropost_avatar", image_urls: [],
-          provider: ::Image.providers[:entry_icon], provider_id: 1,
-          original_fingerprint: "abc", original_url: "http://example.com/a.png",
-          context: {"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}
-        )
-        Image.new(JSON.parse(image.to_h.to_json)).send_to_feedbin
-
-        _, payload = MicropostAvatar.jobs.last["args"]
-        assert_equal({"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}, payload["context"])
-      end
-    end
-
-    test "send_to_feedbin keeps the legacy payload shape when not unified" do
+    test "enqueue_callback names the row the callback reads" do
       image = Image.new_with_attributes(
         id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
         provider: ::Image.providers[:entry_preview], provider_id: 1,
         original_url: "http://example.com/a.jpg", final_url: "http://example.com/a.jpg",
-        storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
-        width: 542, height: 304, placeholder_color: "aabbcc"
+        width: 542, height: 304, bytesize: 9_999, placeholder_color: "aabbcc"
       )
-      image.send_to_feedbin
+      image.enqueue_callback
 
-      _, payload = EntryImage.jobs.last["args"]
-      refute payload.key?("storage_path")
+      id, payload = EntryImage.jobs.last["args"]
+      assert_equal "a", id
+      assert_equal({"storage_path" => image.storage_path, "provider_id" => "1"}, payload)
+    end
+
+    # A caller's context rides the payload through Find, Process and Upload
+    # (each a JSON round trip) to its callback, which needs it to finish.
+    test "enqueue_callback hands the callback the caller's context" do
+      image = Image.new_with_attributes(
+        id: "a", kind: ::Image.kinds[:avatar], preset_name: "micropost_avatar", image_urls: [],
+        provider: ::Image.providers[:entry_icon], provider_id: 1,
+        original_fingerprint: "abc", original_url: "http://example.com/a.png",
+        context: {"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}
+      )
+      Image.new(JSON.parse(image.to_h.to_json)).enqueue_callback
+
+      _, payload = MicropostAvatar.jobs.last["args"]
+      assert_equal({"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}, payload["context"])
+    end
+
+    test "enqueue_callback does nothing for a preset without a callback" do
+      image = Image.new_with_attributes(
+        id: "a", kind: ::Image.kinds[:cover_art], preset_name: "podcast", image_urls: [],
+        provider: ::Image.providers[:entry_icon], provider_id: 1,
+        original_fingerprint: "abc", original_url: "http://example.com/a.jpg"
+      )
+
+      assert_no_difference -> { Sidekiq::Worker.jobs.size } do
+        image.enqueue_callback
+      end
     end
 
     test "create_image records a usage row" do
-      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-        image = Image.new_with_attributes(
-          id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
-          provider: ::Image.providers[:entry_preview], provider_id: 42, feed_id: 7,
-          original_url: "http://example.com/a.jpg", final_url: "http://example.com/a-final.jpg",
-          storage_url: "https://s3.amazonaws.com/bucket/a/abc.jpg",
-          width: 542, height: 304, bytesize: 9_999, placeholder_color: "aabbcc",
-          fingerprint: SecureRandom.hex(16), original_fingerprint: SecureRandom.hex(16),
-          etag: "\"abc123\"", last_modified: "Wed, 21 Oct 2026 07:28:00 GMT"
-        )
+      image = Image.new_with_attributes(
+        id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
+        provider: ::Image.providers[:entry_preview], provider_id: 42, feed_id: 7,
+        original_url: "http://example.com/a.jpg", final_url: "http://example.com/a-final.jpg",
+        width: 542, height: 304, bytesize: 9_999, placeholder_color: "aabbcc",
+        fingerprint: SecureRandom.hex(16), original_fingerprint: SecureRandom.hex(16),
+        etag: "\"abc123\"", last_modified: "Wed, 21 Oct 2026 07:28:00 GMT"
+      )
 
-        record = image.create_image
+      record = image.create_image
 
-        assert_equal "42", record.provider_id
-        assert_equal "poster", record.kind
-        assert_equal 7, record.feed_id
-        assert_equal image.storage_path, record.storage_path
-        assert_equal 9_999, record.bytesize
-        assert_equal "https://s3.amazonaws.com/bucket/a/abc.jpg", record.data["legacy_storage_url"]
-        assert_equal "primary", record.data["preset"]
-        assert_equal "http://example.com/a-final.jpg", record.data["final_url"]
-        assert_equal "\"abc123\"", record.data["etag"]
-        assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", record.data["last_modified"]
-      end
+      assert_equal "42", record.provider_id
+      assert_equal "poster", record.kind
+      assert_equal 7, record.feed_id
+      assert_equal image.storage_path, record.storage_path
+      assert_equal 9_999, record.bytesize
+      assert_equal "primary", record.data["preset"]
+      assert_equal "http://example.com/a-final.jpg", record.data["final_url"]
+      assert_equal "\"abc123\"", record.data["etag"]
+      assert_equal "Wed, 21 Oct 2026 07:28:00 GMT", record.data["last_modified"]
     end
 
     test "storage_path and content type follow the preset format" do
@@ -139,7 +119,7 @@ module ImageCrawler
       )
       assert_equal "jpg", image.preset.format
       assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304", "jpg"), image.storage_path
-      assert_equal "image/jpeg", image.unified_storage_options["Content-Type"]
+      assert_equal "image/jpeg", image.storage_options["Content-Type"]
     end
 
     # variant names the rendering recipe, not the result. A 180x180 touch icon
@@ -156,7 +136,7 @@ module ImageCrawler
         )
         assert_equal variant, image.variant
         assert_equal "png", image.preset.format
-        assert_equal "image/png", image.unified_storage_options["Content-Type"]
+        assert_equal "image/png", image.storage_options["Content-Type"]
         assert_equal :icon_crop, image.preset.crop
       end
     end
@@ -181,11 +161,8 @@ module ImageCrawler
         build.call("http://b.example.com/favicon.ico").storage_path
     end
 
-    # A pre-migration Process (whose payload lacks original_fingerprint) can
-    # hand off to a post-migration Upload on the same host, since Process and
-    # Upload are host-local and retry: false. Silently hashing a blank
-    # fingerprint would collapse every such image onto one shared path instead
-    # of surfacing the mismatch.
+    # Silently hashing a blank fingerprint would collapse every such image
+    # onto one shared path instead of surfacing the bug.
     test "storage_path raises for a content-addressed preset with no original_fingerprint" do
       image = Image.new_with_attributes(
         id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
@@ -209,35 +186,33 @@ module ImageCrawler
     end
 
     test "create_image sweeps the object it replaced, and only when it changed" do
-      with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-        build = ->(fingerprint) {
-          Image.new_with_attributes(
-            id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
-            provider: ::Image.providers[:feed_icon], provider_id: 7,
-            original_url: "http://example.com/favicon.ico",
-            original_fingerprint: fingerprint,
-            fingerprint: SecureRandom.hex(16),
-            width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc"
-          )
-        }
+      build = ->(fingerprint) {
+        Image.new_with_attributes(
+          id: SecureRandom.hex, kind: ::Image.kinds[:site_icon], preset_name: "favicon", image_urls: [],
+          provider: ::Image.providers[:feed_icon], provider_id: 7,
+          original_url: "http://example.com/favicon.ico",
+          original_fingerprint: fingerprint,
+          fingerprint: SecureRandom.hex(16),
+          width: 32, height: 32, bytesize: 500, placeholder_color: "aabbcc"
+        )
+      }
 
-        first = build.call(Digest::MD5.hexdigest("old bytes"))
-        assert_no_difference -> { SweepStoredImages.jobs.size } do
-          first.create_image
-        end
-
-        assert_no_difference -> { SweepStoredImages.jobs.size } do
-          build.call(Digest::MD5.hexdigest("old bytes")).create_image
-        end
-
-        assert_difference -> { SweepStoredImages.jobs.size }, +1 do
-          build.call(Digest::MD5.hexdigest("new bytes")).create_image
-        end
-
-        assert_equal [[first.storage_path]], SweepStoredImages.jobs.last["args"]
-        assert_in_delta (Time.now + ImageGarbageCollector::SWEEP_DELAY).to_f,
-          SweepStoredImages.jobs.last["at"], 5
+      first = build.call(Digest::MD5.hexdigest("old bytes"))
+      assert_no_difference -> { SweepStoredImages.jobs.size } do
+        first.create_image
       end
+
+      assert_no_difference -> { SweepStoredImages.jobs.size } do
+        build.call(Digest::MD5.hexdigest("old bytes")).create_image
+      end
+
+      assert_difference -> { SweepStoredImages.jobs.size }, +1 do
+        build.call(Digest::MD5.hexdigest("new bytes")).create_image
+      end
+
+      assert_equal [[first.storage_path]], SweepStoredImages.jobs.last["args"]
+      assert_in_delta (Time.now + ImageGarbageCollector::SWEEP_DELAY).to_f,
+        SweepStoredImages.jobs.last["at"], 5
     end
 
     # One object per show instead of one per episode: a show and every episode
@@ -283,10 +258,7 @@ module ImageCrawler
       refute_equal podcast.storage_path, touch.storage_path
     end
 
-    # Content-addressed and unified-only. Unlike podcast artwork there is no legacy
-    # object to dual-write: the fallback read path is a third-party ggpht url
-    # rendered through the signing proxy, which costs us no storage.
-    test "channel_avatar is content-addressed, unified-only, and keyed by the bytes" do
+    test "channel_avatar is content-addressed and keyed by the bytes" do
       fingerprint = Digest::MD5.hexdigest("avatar bytes")
       image = Image.new_with_attributes(
         id: "UCabc-channel", kind: ::Image.kinds[:avatar], preset_name: "channel_avatar", image_urls: [],
@@ -356,20 +328,5 @@ module ImageCrawler
       refute_equal favicon.storage_path, touch.storage_path
       refute_equal favicon.provider, touch.provider
     end
-
-    # Live images take the critical queues; a backfill opts out. Absent from
-    # the payload (an older deploy) reads as not critical, which is the plain
-    # queue that every stage used before the flag existed.
-    test "new_with_attributes is critical unless told otherwise" do
-      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
-      assert image.critical?
-      assert_equal true, image.to_h[:critical]
-
-      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1, critical: false)
-      refute image.critical?
-
-      refute Image.new("id" => "a").critical?
-    end
-
   end
 end

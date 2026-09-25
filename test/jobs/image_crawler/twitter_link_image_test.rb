@@ -50,37 +50,21 @@ module ImageCrawler
       assert_equal "http://example.com/linked-page", image.entry_url
     end
 
-    test "raises on a payload without storage_path" do
-      entry = Feed.first.entries.create(content: "content", public_id: SecureRandom.hex, url: "http://example.com/article", data: {})
-      payload = {"original_url" => "http://example.com/image.jpg", "processed_url" => "https://bucket.s3.amazonaws.com/abc/abc.jpg", "width" => 542, "height" => 304, "placeholder_color" => "aabbcc"}
-
-      assert_raises(KeyError) { TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload) }
-      assert_nil entry.reload.data["twitter_link_image_processed"]
+    test "does nothing for a deleted entry" do
+      assert_no_difference -> { Pipeline::Find.jobs.size } do
+        TwitterLinkImage.new.perform("#{SecureRandom.hex}-twitter", nil, @page_url)
+      end
     end
 
-    test "should not duplicate row-backed images onto the entry" do
-      entry = Feed.first.entries.create(
-        content: "content",
-        public_id: SecureRandom.hex,
-        url: "http://example.com/article",
-        data: {}
-      )
+    test "the callback touches the entry and writes nothing onto it" do
+      @entry.update_column(:updated_at, 1.year.ago)
+      before = @entry.reload.updated_at
 
-      payload = {
-        "original_url" => "http://example.com/image.jpg",
-        "processed_url" => "https://bucket.s3.amazonaws.com/abc/abc.jpg",
-        "width" => 542,
-        "height" => 304,
-        "bytesize" => 12_345,
-        "placeholder_color" => "aabbcc",
-        "storage_path" => "abc/abcdef.jpg",
-        "provider" => "entry_link_preview"
-      }
-      TwitterLinkImage.new.perform("#{entry.public_id}-twitter", payload)
+      TwitterLinkImage.new.perform("#{@entry.public_id}-twitter", {"storage_path" => "abc/abcdef.jpg", "provider_id" => @entry.id.to_s})
 
-      entry.reload
-      assert_nil entry.data["link_image"]
-      assert_nil entry.data["twitter_link_image_processed"]
+      @entry.reload
+      assert_operator @entry.updated_at, :>, before
+      assert_equal({}, @entry.data)
     end
   end
 end

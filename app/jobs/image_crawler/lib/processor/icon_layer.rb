@@ -5,15 +5,7 @@ module ImageCrawler
     # of sites ship a large layer that is blank, transparent black, or solid
     # white padding around a smaller real icon. Reject those and take the
     # largest of what is left.
-    #
-    # Once shared with the legacy FaviconCrawler::Image; the pipeline is the only caller now.
     class IconLayer
-      INVALID_COLORS = [
-        -> (color) { color.nil? },
-        -> (color) { color == "00000000" },        # opacity bit matters for black
-        -> (color) { color.start_with?("ffffff") } # ignore opacity bit for white because the result is white
-      ]
-
       # Returns a Vips::Image, or nil when nothing in the source is usable.
       def self.best(path)
         new(path).best
@@ -28,12 +20,19 @@ module ImageCrawler
           .filter_map { load_layer(it) }
           .uniq       { it.size }
           .sort_by    { it.size.first * -1 }
-          .find       { |layer|
-            !INVALID_COLORS.any? { |proc| proc.call(color(layer)) }
-          }
+          .find       { !blank?(it) }
       end
 
       private
+
+      # Blank is every pixel transparent, whatever colour sits under the
+      # alpha, or white at any opacity, which renders as white. Opaque black
+      # stays: plenty of logos are black. sRGB first, so the bands are always
+      # red, green, blue and then alpha when there is one.
+      def blank?(layer)
+        red, green, blue, alpha = Processed.average(layer.colourspace(:srgb))
+        alpha == 0 || [red, green, blue].all?(255)
+      end
 
       def load_layer(page)
         begin
@@ -43,21 +42,6 @@ module ImageCrawler
         end
       rescue Vips::Error
         nil
-      end
-
-      def color(source)
-        hex = nil
-        file = ImageProcessing::Vips
-          .source(source)
-          .resize_to_fill(1, 1, sharpen: false)
-          .custom { |image|
-            image.tap do |data|
-              hex = data.getpoint(0, 0).first(3).map { "%02x" % it }.join
-            end
-          }
-          .call
-        file.unlink
-        hex
       end
     end
   end

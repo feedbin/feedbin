@@ -136,7 +136,6 @@ module ImageCrawler
     # can change while the download waits. No touch: the entries cache key
     # digests the row.
     def receive(image)
-      image.fetch("storage_path")
       context = image["context"] or return
       url = context.fetch("url")
       row = ::Image.provider_entry_icon.find_by(provider_id: image.fetch("provider_id").to_s)

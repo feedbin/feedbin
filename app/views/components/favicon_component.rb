@@ -11,7 +11,7 @@ class FaviconComponent < ApplicationComponent
       icon_newsletter
     elsif @feed.twitter_user?
       icon_twitter_user
-    elsif (channel = entry_channel_record) && (channel_url = Image.unified_url(channel.storage_path))
+    elsif (channel = entry_channel_record) && (channel_url = Image.public_url_for(channel.storage_path))
       icon_image(channel_url, format: channel.icon_format)
     elsif (icon_url = @feed.icon_url)
       icon_image(icon_url, format: @feed.icon_format)

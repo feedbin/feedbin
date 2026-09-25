@@ -99,9 +99,9 @@ module ImageCrawler
       assert_operator feed.reload.updated_at, :>, before
     end
 
-    # A payload written by a deploy predating provider_id must not fall
-    # through to Feed.where(channel_id: nil), which matches every
-    # non-YouTube feed in the table.
+    # A payload without provider_id must not fall through to
+    # Feed.where(channel_id: nil), which matches every non-YouTube feed in
+    # the table.
     test "touches nothing when the payload carries no provider_id" do
       youtube = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
       plain = Feed.create!(feed_url: "http://example.com/feed.xml")
@@ -116,25 +116,5 @@ module ImageCrawler
       assert_equal plain_before.to_f, plain.reload.updated_at.to_f
       assert_equal youtube_before.to_f, youtube.reload.updated_at.to_f
     end
-
-    # storage_path is absent when the unified write failed and Upload degraded to
-    # legacy -- and this preset has no legacy object. Nothing was stored, so
-    # there is nothing to invalidate.
-    test "touches nothing when nothing was stored" do
-      feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
-      feed.update_column(:updated_at, 1.year.ago)
-      before = feed.reload.updated_at
-
-      ChannelImage.new.perform("UCabc-channel", {"processed_url" => "https://cdn.example.com/a.png"})
-
-      assert_equal before.to_f, feed.reload.updated_at.to_f
-    end
-
-    # The harvest schedules one channel at a time and is live.
-    test "schedule is critical" do
-      ChannelImage.schedule(channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}}))
-      assert_equal true, Pipeline::Find.jobs.last["args"].first["critical"]
-    end
-
   end
 end

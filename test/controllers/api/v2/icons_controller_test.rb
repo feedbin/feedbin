@@ -6,7 +6,7 @@ class Api::V2::IconsControllerTest < ApiControllerTestCase
     @feeds = create_feeds(@user)
   end
 
-  test "serves the images row's unified url for each subscribed host" do
+  test "serves the images row's public url for each subscribed host" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       rows = @feeds.map { create_favicon_row(it.host) }
       login_as @user

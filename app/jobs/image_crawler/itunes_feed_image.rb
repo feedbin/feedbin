@@ -6,9 +6,8 @@ module ImageCrawler
     def perform(feed_id, image = nil)
       feed_id = feed_id.to_s.split("-").first
       @feed = Feed.find(feed_id)
-      @image = image
 
-      if @image
+      if image
         receive
       else
         schedule
@@ -33,11 +32,9 @@ module ImageCrawler
       end
     end
 
-    # Row-backed: the row is the read path and its kind is the shape. The
-    # touch moves the cached views, because new artwork can land under the
-    # same path.
+    # The row is the read path and its kind is the shape. The touch moves
+    # the cached views, because new artwork can land under the same path.
     def receive
-      @image.fetch("storage_path")
       @feed.touch
     end
   end

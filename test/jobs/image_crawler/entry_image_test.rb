@@ -83,43 +83,9 @@ module ImageCrawler
       assert_equal(["https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/100/027/057/original/94aa051201c933c6.png", "https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/321/232/707/original/fd91baf5af1de4eb.png", "https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/513/928/252/original/005201b20fde9798.png"], extracted_urls)
     end
 
-    # No callback carries a legacy-only payload since C3. A payload without
-    # storage_path is a regression, and it must raise rather than write the
-    # legacy JSON back onto the entry.
-    test "raises on a payload without storage_path" do
-      image = {"original_url" => "http://example.com/image.jpg", "processed_url" => "http://cdn.example.com/image.jpg", "width" => 542, "height" => 304}
-      assert_raises(KeyError) { EntryImage.new.perform(@entry.public_id, image) }
-      assert_nil @entry.reload.image
-    end
-
-    # Legacy JSON no longer counts as a processed image, so the crawl runs
-    # again and gives the entry a row.
-    test "enqueues Find when only legacy JSON is present" do
-      @entry.update(image: {
-        "original_url" => "http://example.com/image.jpg",
-        "processed_url" => "http://cdn.example.com/image.jpg",
-        "width" => 542,
-        "height" => 304
-      })
-      assert_difference -> { Pipeline::Find.jobs.size }, +1 do
-        EntryImage.new.perform(@entry.public_id)
-      end
-    end
-
-    test "should not duplicate row-backed images onto the entry" do
-      image = {
-        "original_url" => "http://example.com/image.jpg",
-        "processed_url" => "http://cdn.example.com/image.jpg",
-        "width" => 542,
-        "height" => 304,
-        "bytesize" => 12_345,
-        "placeholder_color" => "aabbcc",
-        "storage_path" => "abc/abcdef.jpg",
-        "provider" => "entry_preview"
-      }
-
+    test "the callback touches the entry and writes nothing onto it" do
       original_updated_at = @entry.updated_at
-      EntryImage.new.perform(@entry.public_id, image)
+      EntryImage.new.perform(@entry.public_id, {"storage_path" => "abc/abcdef.jpg", "provider_id" => @entry.id.to_s})
 
       @entry.reload
       assert_nil @entry.image
@@ -137,12 +103,11 @@ module ImageCrawler
         original_fingerprint: SecureRandom.hex(16),
         storage_path: ::Image.storage_path_for("http://example.com/image.jpg", "542x304"),
         width: 542, height: 304, bytesize: 12_345,
-        placeholder_color: "aabbcc",
-        data: {"legacy_storage_url" => "https://bucket.s3.amazonaws.com/abc/legacy.jpg"}
+        placeholder_color: "aabbcc"
       )
 
-      # processed_image? renders the row through the unified host, which
-      # production always sets (Image.check_unified_config!).
+      # processed_image? renders the row through the image host, which
+      # production always sets (Image.check_storage_config!).
       with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
         assert_no_difference -> { Pipeline::Find.jobs.size } do
           EntryImage.new.perform(@entry.public_id)

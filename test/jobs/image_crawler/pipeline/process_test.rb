@@ -14,11 +14,11 @@ module ImageCrawler
 
         image = Image.new_with_attributes(id: id, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: [])
 
-        assert_difference -> { UploadCritical.jobs.size }, +1 do
+        assert_difference -> { Upload.jobs.size }, +1 do
           Process.new.perform(image.to_h)
         end
 
-        image = Image.new(UploadCritical.jobs.first["args"].first)
+        image = Image.new(Upload.jobs.first["args"].first)
 
         assert_equal(id, image.id)
         assert_equal("primary", image.preset_name)
@@ -26,30 +26,6 @@ module ImageCrawler
         assert_equal(url, image.original_url)
         assert_equal(url, image.final_url)
         assert_equal(6, image.placeholder_color.length)
-      end
-
-      # A backfill image stays on the plain queues at every stage: Upload
-      # when the candidate is good, Find when it is not.
-      def test_should_enqueue_plain_upload_and_find_for_a_non_critical_image
-        url = "http://example.com/image.jpg"
-
-        path = copy_support_file("image.jpeg")
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: [], critical: false)
-        assert_difference -> { Upload.jobs.size }, +1 do
-          assert_no_difference -> { UploadCritical.jobs.size } do
-            Process.new.perform(image.to_h)
-          end
-        end
-        assert_equal false, Upload.jobs.first["args"].first["critical"]
-
-        path = Tempfile.new.path
-        image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", provider: 0, provider_id: 1, download_path: path, original_url: url, final_url: url, image_urls: ["http://example.com/image_2.jpg"], critical: false)
-        assert_difference -> { Find.jobs.size }, +1 do
-          assert_no_difference -> { FindCritical.jobs.size } do
-            Process.new.perform(image.to_h)
-          end
-        end
-        assert_equal false, Find.jobs.first["args"].first["critical"]
       end
 
       def test_should_enqueue_find
@@ -69,18 +45,37 @@ module ImageCrawler
         assert_equal(id, image.id)
         assert_equal("primary", image.preset_name)
         assert_equal(all_urls, image.image_urls)
+        assert_nil image.original_url, "what Find learned about the failed candidate stays behind"
       end
 
-      # One encoding per image: both stores get the same jpg, so the bytesize
-      # and fingerprint on the payload describe the file that is actually
-      # uploaded to each.
+      # MicropostAvatar's callback needs its context to attach the rest of
+      # the group, whichever candidate finally lands.
+      def test_should_requeue_with_the_callers_context
+        context = {"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}
+        image = Image.new_with_attributes(
+          id: SecureRandom.hex, kind: ::Image.kinds[:avatar], preset_name: "micropost_avatar",
+          provider: ::Image.providers[:entry_icon], provider_id: 1, feed_id: 9,
+          download_path: Tempfile.new.path, original_url: "http://example.com/a.png",
+          image_urls: ["http://example.com/b.png"], context: context
+        )
+
+        assert_difference -> { FindCritical.jobs.size }, +1 do
+          Process.new.perform(JSON.parse(image.to_h.to_json))
+        end
+
+        requeued = Image.new(FindCritical.jobs.last["args"].first)
+        assert_equal context, requeued.context
+        assert_equal ["http://example.com/b.png"], requeued.image_urls
+        assert_equal 9, requeued.feed_id
+      end
+
+      # The bytesize and fingerprint on the payload describe the file that
+      # is actually uploaded.
       def test_should_produce_a_single_jpg_for_entry_presets
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           download_path = copy_support_file("image.jpeg")
           image = Image.new_with_attributes(
             id: SecureRandom.hex,
-            kind: ::Image.kinds[:poster],
-
             kind: ::Image.kinds[:poster], preset_name: "primary",
             image_urls: [],
             provider: ::Image.providers[:entry_preview],
@@ -88,16 +83,15 @@ module ImageCrawler
             feed_id: 1,
             original_url: "http://example.com/image.jpg",
             final_url: "http://example.com/image.jpg",
-            download_path: download_path,
-            original_extension: "jpeg"
+            download_path: download_path
           )
 
-          assert_difference -> { UploadCritical.jobs.size }, +1 do
+          assert_difference -> { Upload.jobs.size }, +1 do
             Process.new.perform(image.to_h)
           end
 
-          queued = Image.new(UploadCritical.jobs.last["args"].first)
-          assert_equal "jpg", queued.processed_extension
+          queued = Image.new(Upload.jobs.last["args"].first)
+          assert queued.processed_path.end_with?(".jpg")
           assert_equal :jpeg, ImageFormat.detect(queued.processed_path)
           assert_equal File.size(queued.processed_path), queued.bytesize
           assert_equal Digest::MD5.file(queued.processed_path).hexdigest, queued.fingerprint
@@ -111,7 +105,7 @@ module ImageCrawler
       def test_should_reject_repeated_fingerprint_in_feed
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           # Compute the fingerprint this exact source produces.
-          reference = Processor::Cropper.new(copy_support_file("image.jpeg"), crop: :smart_crop, extension: "jpeg", width: 542, height: 304).crop!
+          reference = Processor::Cropper.new(copy_support_file("image.jpeg"), crop: :smart_crop, width: 542, height: 304).crop!
           fingerprint = reference.fingerprint
           File.unlink(reference.file)
 
@@ -132,10 +126,10 @@ module ImageCrawler
             provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 9,
             page_url: "http://example.com/article", meta_image_urls: [original_url],
             original_url: original_url, final_url: original_url,
-            download_path: copy_support_file("image.jpeg"), original_extension: "jpeg"
+            download_path: copy_support_file("image.jpeg")
           )
 
-          assert_no_difference -> { UploadCritical.jobs.size } do
+          assert_no_difference -> { Upload.jobs.size } do
             assert_difference -> { FindCritical.jobs.size }, +1 do
               Process.new.perform(image.to_h)
             end
@@ -154,8 +148,6 @@ module ImageCrawler
           download_path = copy_support_file("favicon.ico")
           image = Image.new_with_attributes(
             id: SecureRandom.hex,
-            kind: ::Image.kinds[:site_icon],
-
             kind: ::Image.kinds[:site_icon], preset_name: "favicon",
             image_urls: [],
             provider: ::Image.providers[:feed_icon],
@@ -163,16 +155,15 @@ module ImageCrawler
             feed_id: 9,
             original_url: "http://example.com/favicon.ico",
             final_url: "http://example.com/favicon.ico",
-            download_path: download_path,
-            original_extension: "unknown"
+            download_path: download_path
           )
 
-          assert_difference -> { UploadCritical.jobs.size }, +1 do
+          assert_difference -> { Upload.jobs.size }, +1 do
             Process.new.perform(image.to_h)
           end
 
-          queued = Image.new(UploadCritical.jobs.last["args"].first)
-          assert_equal "png", queued.processed_extension
+          queued = Image.new(Upload.jobs.last["args"].first)
+          assert queued.processed_path.end_with?(".png")
           assert_equal File.size(queued.processed_path), queued.bytesize
           assert_equal Digest::MD5.file(queued.processed_path).hexdigest, queued.fingerprint
           assert_equal 32, queued.width

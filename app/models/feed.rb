@@ -84,8 +84,8 @@ class Feed < ApplicationRecord
   # outranks the shared channel row. A feed with neither renders its host's
   # favicon.
   def icon_url
-    Image.unified_url(icon_image_record&.storage_path) ||
-      Image.unified_url(channel_image_record&.storage_path)
+    Image.public_url_for(icon_image_record&.storage_path) ||
+      Image.public_url_for(channel_image_record&.storage_path)
   end
 
   # The frame for this feed's icon, from the kind of the row icon_url

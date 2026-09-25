@@ -40,26 +40,15 @@ module ImageCrawler
       end
     end
 
-    # No callback carries a legacy-only payload now that podcast_feed writes
-    # the unified store only. A payload without storage_path is a regression,
-    # and it must raise rather than write a legacy pointer onto the feed.
-    test "raises on a payload without storage_path" do
-      assert_raises(KeyError) { ItunesFeedImage.new.perform(@feed.id, {"processed_url" => "https://cdn.example.com/cover.jpg"}) }
-      assert_nil @feed.reload.settings["custom_icon"]
-    end
-
-    # Row-backed: the feed_icon row is the read path and its kind is the
-    # shape. The callback's only feed write is the touch, which busts the
-    # cached views because new artwork can land under the same path.
+    # The feed_icon row is the read path and its kind is the shape. The
+    # callback's only feed write is the touch, which busts the cached views
+    # because new artwork can land under the same path.
     test "touches the feed and writes nothing else on it" do
       @feed.update!(updated_at: 1.year.ago)
       settings = @feed.reload.settings.dup
       before = @feed.updated_at
 
-      ItunesFeedImage.new.perform(@feed.id, {
-        "processed_url" => nil,
-        "storage_path" => "abc/abc123.jpg"
-      })
+      ItunesFeedImage.new.perform(@feed.id, {"storage_path" => "abc/abc123.jpg", "provider_id" => @feed.id.to_s})
 
       @feed.reload
       assert_equal settings, @feed.settings
