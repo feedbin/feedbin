@@ -1,13 +1,10 @@
 class Embed < ApplicationRecord
   belongs_to :parent, class_name: "Embed", foreign_key: :parent_id, primary_key: :provider_id
 
-  # Exists so BackfillChannelImages can ask for channels with no avatar as a
-  # LEFT JOIN anti-join (where.missing) rather than NOT IN. Postgres cannot
-  # turn NOT IN into an anti-join, so it hashes every embed_icon
-  # provider_id per query and rescans images per row once that hash outgrows
-  # work_mem. The join rides index_images_on_provider_and_provider_id.
-  # Meaningful on youtube_channel rows only: a video's provider_id is a
-  # video id, which no embed_icon row carries.
+  # The channel's avatar row. The join rides
+  # index_images_on_provider_and_provider_id. Meaningful on youtube_channel
+  # rows only: a video's provider_id is a video id, which no embed_icon row
+  # carries.
   # No dependent option on purpose: the row keys on the channel identity,
   # not on this embed, and it outlives any one embed row.
   has_one :channel_image, -> { provider_embed_icon },

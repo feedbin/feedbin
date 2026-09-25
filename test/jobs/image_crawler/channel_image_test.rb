@@ -67,8 +67,8 @@ module ImageCrawler
       end
     end
 
-    # BackfillChannelImages counts scheduled channels off this return value,
-    # so it is part of the contract, not an accident of perform_async.
+    # A channel with no thumbnail declines rather than enqueue an empty
+    # download.
     test "reports whether it enqueued a job" do
       assert_equal true, ChannelImage.schedule(channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}}))
       assert_equal false, ChannelImage.schedule(Embed.youtube_channel.create!(provider_id: "UCnone", data: {}))
@@ -145,16 +145,10 @@ module ImageCrawler
       assert_equal before.to_f, feed.reload.updated_at.to_f
     end
 
-    # The harvest schedules one channel at a time and is live; the backfill
-    # schedules millions and must not push live images down the queues.
-    test "schedule is critical by default and the backfill opts out" do
-      record = channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}})
-
-      ChannelImage.schedule(record)
+    # The harvest schedules one channel at a time and is live.
+    test "schedule is critical" do
+      ChannelImage.schedule(channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}}))
       assert_equal true, Pipeline::Find.jobs.last["args"].first["critical"]
-
-      ChannelImage.schedule(record, critical: false)
-      assert_equal false, Pipeline::Find.jobs.last["args"].first["critical"]
     end
 
   end

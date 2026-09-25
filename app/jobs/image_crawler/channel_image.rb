@@ -15,14 +15,8 @@ module ImageCrawler
     # single feed, and feed_id only feeds ReuseRules, which a
     # content-addressed preset never reaches.
     #
-    # Returns whether a job was enqueued. BackfillChannelImages counts on
-    # that, so it is stated here rather than left to whatever perform_async
-    # happens to return.
-    #
-    # critical: the harvest schedules one channel at a time and is live. The
-    # backfill schedules millions and passes false, so its avatars run on
-    # the plain queues behind live images at every stage.
-    def self.schedule(channel, critical: true)
+    # Returns whether a job was enqueued.
+    def self.schedule(channel)
       urls = THUMBNAIL_SIZES.filter_map { channel.data.safe_dig("snippet", "thumbnails", it, "url").presence }.uniq
       return false if urls.empty?
 
@@ -33,7 +27,6 @@ module ImageCrawler
         image_urls: urls,
         provider: ::Image.providers[:embed_icon],
         provider_id: channel.provider_id,
-        critical: critical,
         camo: (OutsideCamo.pick if OutsideCamo.enabled?)
       )
       Pipeline::Find.perform_async(image.to_h)
