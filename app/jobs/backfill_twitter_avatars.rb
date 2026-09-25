@@ -57,6 +57,65 @@ class BackfillTwitterAvatars
     batch_for(first_id)..batch_for(last_id)
   end
 
+  # What a copy run will cost, from a production console. Writes nothing:
+  # the sample runs Copy#prepare, which downloads and decodes but never
+  # uploads or writes a row. Every value is its own line, because a pasted
+  # console block echoes only its last expression.
+  def self.sizing(sample: 200, out: $stdout)
+    remote = RemoteFile.arel_table
+    host = Arel::Nodes::NamedFunction.new("substring", [remote[:original_url], Arel::Nodes.build_quoted("^[a-z]+://([^/]+)")])
+    pending_count = pending.count
+
+    out.puts "remote_files rows: #{RemoteFile.count}"
+    out.puts "top hosts:"
+    RemoteFile.group(host).order(Arel.star.count.desc).limit(20).count.each do |name, count|
+      out.puts "  #{name || "(no host)"}: #{count}"
+    end
+    out.puts "twitter rows: #{twitter_rows.count}"
+    out.puts "pending rows: #{pending_count}"
+    out.puts "kickoff batches: #{batches&.size || 0}"
+    out.puts "images rows with provider remote_file: #{Image.provider_remote_file.count}"
+
+    results = sample_rows(sample, out)
+    report_sample(results, pending_count, out)
+    nil
+  end
+
+  def self.sample_rows(sample, out)
+    rows = pending.order(Arel.sql("random()")).limit(sample).to_a
+    rows.each.with_index(1).map do |row, index|
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      result = begin
+        Copy.new(row).prepare { |prepared| {ok: true, extension: prepared.extension, bytesize: prepared.bytesize} }
+      rescue Copy::RowError => exception
+        {ok: false, reason: exception.message}
+      end
+      out.puts "  sampled #{index}/#{rows.size}" if (index % 25).zero?
+      result.merge(seconds: Process.clock_gettime(Process::CLOCK_MONOTONIC) - started)
+    end
+  end
+
+  def self.report_sample(results, pending_count, out)
+    out.puts "sample: #{results.size}"
+    return if results.empty?
+
+    copied, failed = results.partition { it[:ok] }
+    out.puts "failed: #{(failed.size * 100.0 / results.size).round(1)}%"
+    failed.group_by { it[:reason] }.each { |reason, group| out.puts "  #{reason}: #{group.size}" }
+    out.puts "formats: #{copied.group_by { it[:extension] }.map { |extension, group| "#{extension}=#{group.size}" }.join(" ")}"
+
+    sizes = copied.map { it[:bytesize] }.sort
+    if sizes.any?
+      mean = sizes.sum / sizes.size.to_f
+      out.puts "bytes mean: #{mean.round} p95: #{sizes[(sizes.size * 0.95).ceil - 1]}"
+      out.puts "estimated total bytes: #{(mean * pending_count).round} (#{ActiveSupport::NumberHelper.number_to_human_size(mean * pending_count)})"
+    end
+
+    seconds = results.sum { it[:seconds] } / results.size
+    out.puts "seconds per row (download + decode, no upload): #{seconds.round(3)}"
+    out.puts "estimated thread-hours: #{(seconds * pending_count / 3600).round(1)}"
+  end
+
   def perform(batch = nil, schedule = false)
     if schedule
       build

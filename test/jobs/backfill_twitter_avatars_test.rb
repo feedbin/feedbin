@@ -189,6 +189,42 @@ class BackfillTwitterAvatarsTest < ActiveSupport::TestCase
     end
   end
 
+  test "sizing reports the rows and a sample and writes nothing" do
+    good = remote_file("https://pbs.twimg.com/profile_images/1/a.jpg")
+    missing = remote_file("https://pbs.twimg.com/profile_images/2/b.jpg")
+    remote_file("https://micro.blog/someone/avatar.jpg")
+    stub_request(:get, good.storage_url).to_return(body: File.binread(support_file("image.jpeg")))
+    stub_request(:get, missing.storage_url).to_return(status: 404)
+    out = StringIO.new
+
+    assert_no_difference "Image.count" do
+      BackfillTwitterAvatars.sizing(sample: 10, out: out)
+    end
+
+    report = out.string
+    assert_includes report, "remote_files rows: 3"
+    assert_includes report, "pbs.twimg.com: 2"
+    assert_includes report, "micro.blog: 1"
+    assert_includes report, "twitter rows: 2"
+    assert_includes report, "pending rows: 2"
+    assert_includes report, "images rows with provider remote_file: 0"
+    assert_includes report, "sample: 2"
+    assert_includes report, "failed: 50.0%"
+    assert_includes report, "download failed (Feedkit::NotFound): 1"
+    assert_includes report, "formats: jpg=1"
+    assert_includes report, "estimated thread-hours:"
+    assert_not_requested :put, /storage\.example\.com/
+  end
+
+  test "sizing with nothing pending reports an empty sample" do
+    out = StringIO.new
+
+    BackfillTwitterAvatars.sizing(sample: 10, out: out)
+
+    assert_includes out.string, "pending rows: 0"
+    assert_includes out.string, "sample: 0"
+  end
+
   private
 
   def stored(&)
