@@ -25,6 +25,18 @@ class TwitterAvatarTest < ActiveSupport::TestCase
     refute TwitterAvatar.signature_valid?(nil, url)
   end
 
+  test "path is relative on the icons path without FILES_HOST" do
+    with_env("FILES_HOST" => nil) do
+      assert_equal "/files/icons/#{TwitterAvatar.sign(URL)}/#{URL.unpack1("H*")}", TwitterAvatar.path(URL)
+    end
+  end
+
+  test "path is on FILES_HOST when it is set" do
+    with_env("FILES_HOST" => "https://files.example.com") do
+      assert_equal "https://files.example.com/files/icons/#{TwitterAvatar.sign(URL)}/#{URL.unpack1("H*")}", TwitterAvatar.path(URL)
+    end
+  end
+
   test "decode returns UTF-8" do
     assert_equal Encoding::UTF_8, TwitterAvatar.decode(URL.unpack1("H*")).encoding
   end

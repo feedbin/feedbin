@@ -22,6 +22,20 @@ class TwitterAvatar
     [hex.to_s].pack("H*").force_encoding(Encoding::UTF_8)
   end
 
+  def self.path(url)
+    url = url.to_s
+    helpers = Rails.application.routes.url_helpers
+    signature = sign(url)
+    hex = url.unpack1("H*")
+
+    if (host = ENV["FILES_HOST"].presence)
+      host = URI(host)
+      helpers.twitter_avatar_url(signature, hex, protocol: host.scheme, host: host.host)
+    else
+      helpers.twitter_avatar_path(signature, hex)
+    end
+  end
+
   def self.resolve(url)
     Image.provider_twitter_avatar.find_by(provider_id: fingerprint(url))&.public_url
   end

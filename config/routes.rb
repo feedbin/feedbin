@@ -392,11 +392,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :remote_files, path: :files, only: [] do
-    collection do
-      get "icons/:signature/:url", action: :icon, as: :icon
-    end
-  end
+  # The icon proxy's path, kept so its signed URLs and the CDN's cache of them
+  # stay valid.
+  get "files/icons/:signature/:url", to: "twitter_avatars#show", as: :twitter_avatar
 
   match "pages",          to: "pages#create",          via: :post
   match "pages",          to: "pages#options",         via: :options
