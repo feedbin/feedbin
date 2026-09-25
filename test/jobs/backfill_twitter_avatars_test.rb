@@ -178,6 +178,23 @@ class BackfillTwitterAvatarsTest < ActiveSupport::TestCase
     end
   end
 
+  # The proxy found a row by the fingerprint of the URL a reader asked for,
+  # so that is the key the copy keeps, even where original_url differs.
+  test "the copy is keyed by the row's fingerprint, not its original_url" do
+    stored do
+      requested = "https://pbs.twimg.com/profile_images/1/a.jpg"
+      row = RemoteFile.create!(fingerprint: RemoteFile.fingerprint(requested), original_url: "https://pbs.twimg.com/profile_images/1/a-final.jpg", storage_url: "https://icons.example.net/#{SecureRandom.hex}.jpg")
+      bytes = File.binread(support_file("image.jpeg"))
+      stub_request(:get, row.storage_url).to_return(body: bytes)
+      stub_request(:put, store_url(Image.content_storage_path_for(Digest::MD5.hexdigest(bytes), "400x400", "jpg")))
+
+      BackfillTwitterAvatars.new.update(BackfillTwitterAvatars.batch_for(row.id))
+
+      assert Image.provider_twitter_avatar.exists?(provider_id: TwitterAvatar.fingerprint(requested))
+      assert_empty BackfillTwitterAvatars.pending
+    end
+  end
+
   test "perform with a batch runs update" do
     stored do
       row = remote_file("https://pbs.twimg.com/profile_images/1/a.jpg")

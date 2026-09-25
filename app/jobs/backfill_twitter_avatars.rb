@@ -184,7 +184,10 @@ class BackfillTwitterAvatars
 
         Image.attach!(
           provider: Image.providers[:twitter_avatar],
-          provider_id: TwitterAvatar.fingerprint(@remote_file.original_url),
+          # The proxy's own key: the fingerprint of the URL readers ask for,
+          # which pending joins on too. original_url is where the bytes
+          # came from and can differ.
+          provider_id: Image.normalize_fingerprint(@remote_file.fingerprint),
           kind: Image.kinds[:avatar],
           feed_id: nil,
           url: @remote_file.original_url,
