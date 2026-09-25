@@ -22,15 +22,6 @@ class RemoteFile < ApplicationRecord
     end
   end
 
-  # The legacy icons bucket's object for a url, or nil. The bucket is
-  # public-read, so a crawler can hand the object to Find as the candidate
-  # after the original: a dead source still lands as a copy of what the
-  # proxy cached. Deploy A only: once the backfills finish, no crawler
-  # needs it.
-  def self.legacy_object_url(url)
-    find_by(fingerprint: fingerprint(url.to_s))&.storage_url
-  end
-
   def self.decode(string)
     string.scan(/../).map { |x| x.hex.chr }.join
   end

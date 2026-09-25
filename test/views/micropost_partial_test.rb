@@ -22,7 +22,7 @@ class MicropostPartialTest < ActionView::TestCase
 
     html = render_micropost(entry)
 
-    assert_includes html, RemoteFile.signed_url("https://micro.blog/someone/avatar.jpg")
+    assert_includes html, RemoteFile.camo_url("https://micro.blog/someone/avatar.jpg")
   end
 
   test "renders a micropost with no timestamp" do

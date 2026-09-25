@@ -40,7 +40,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     url = "http://example.com/image.jpeg"
     signature, encoded_url = RemoteFile.signed_url(url).split("/").last(2)
 
-    # Deploy A: the proxy serves a miss through camo and caches nothing; the copy backfill and the crawlers write the rows now.
+    # The proxy serves a miss through camo and caches nothing: remote_files is frozen as the tweet avatar store.
     assert_no_difference -> { ImageCrawler::Pipeline::Find.jobs.size } do
       get :icon, params: {signature: signature, url: encoded_url}
       assert_response :success
@@ -69,8 +69,8 @@ class RemoteFilesControllerTest < ActionController::TestCase
     assert response.header[RemoteFilesController::SENDFILE_HEADER].start_with?(RemoteFilesController::PROXY_PATH)
   end
 
-  # Deploy A: a miss creates no legacy row and schedules no crawl; the copy
-  # backfill and the avatar crawlers write the rows now.
+  # A miss creates no legacy row and schedules no crawl: remote_files is
+  # frozen as the tweet avatar store.
   test "should create an icon" do
     authorize
     image_url = "http://example.com/image.jpg"

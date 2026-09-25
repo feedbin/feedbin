@@ -2,6 +2,14 @@ require "test_helper"
 
 module ImageCrawler
   class ImageTest < ActiveSupport::TestCase
+    PRESET_KINDS = {
+      "podcast"        => :cover_art,
+      "podcast_feed"   => :cover_art,
+      "channel_avatar" => :avatar,
+      "favicon"        => :site_icon,
+      "touch_icon"     => :site_icon
+    }.freeze
+
     setup do
       flush_redis
     end
@@ -141,7 +149,7 @@ module ImageCrawler
     test "icon presets keep their recipe as the variant and store png" do
       %w[favicon touch_icon].zip(["32x32", "200x200"]).each do |preset_name, variant|
         image = Image.new_with_attributes(
-          id: SecureRandom.hex, kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset_name)), preset_name: preset_name, image_urls: [],
+          id: SecureRandom.hex, kind: ::Image.kinds.fetch(PRESET_KINDS.fetch(preset_name)), preset_name: preset_name, image_urls: [],
           provider: ::Image.providers[:feed_icon], provider_id: 1,
           original_url: "http://example.com/favicon.ico",
           width: 17, height: 17
@@ -239,7 +247,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("cover bytes")
       build = ->(preset, provider, url) {
         Image.new_with_attributes(
-          id: SecureRandom.hex, kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
+          id: SecureRandom.hex, kind: ::Image.kinds.fetch(PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
           provider: ::Image.providers[provider], provider_id: 1,
           original_url: url, original_fingerprint: fingerprint
         )
@@ -300,7 +308,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("avatar bytes")
       build = ->(preset, provider) {
         Image.new_with_attributes(
-          id: "a", kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
+          id: "a", kind: ::Image.kinds.fetch(PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
           provider: ::Image.providers[provider], provider_id: "UCabc",
           original_url: "https://yt3.ggpht.com/avatar.jpg", original_fingerprint: fingerprint
         )
@@ -334,7 +342,7 @@ module ImageCrawler
       fingerprint = Digest::MD5.hexdigest("icon bytes")
       build = ->(preset, provider) {
         Image.new_with_attributes(
-          id: "a", kind: ::Image.kinds.fetch(BackfillImageKinds::PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
+          id: "a", kind: ::Image.kinds.fetch(PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
           provider: ::Image.providers[provider], provider_id: "example.com",
           original_url: "http://example.com/icon.png", original_fingerprint: fingerprint
         )

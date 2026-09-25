@@ -1,9 +1,10 @@
 require "test_helper"
 
 class ImageTest < ActiveSupport::TestCase
-  # Deploy A only: a url no micropost row holds goes to the proxy.
-  test "avatar_url falls back to the proxy on a miss" do
-    assert_includes Image.avatar_url("https://avatars.micro.blog/avatars/2/other.jpg"), "/files/icons/"
+  # A url no micropost row holds goes through camo, never the proxy.
+  test "avatar_url serves a miss through camo" do
+    url = "https://avatars.micro.blog/avatars/2/other.jpg"
+    assert_equal RemoteFile.camo_url(url), Image.avatar_url(url)
     assert_nil Image.avatar_url(nil)
   end
 

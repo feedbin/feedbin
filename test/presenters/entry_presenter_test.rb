@@ -22,7 +22,7 @@ class EntryPresenterTest < ActionView::TestCase
   # values on each side so a regression that returned the show's icon here
   # would visibly fail rather than coincidentally match.
   test "media_image prefers the episode's artwork over the show's" do
-    @feed.update!(custom_icon: "https://show.example.com/icon.jpg")
+    create_image_row(provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id, storage_path: "abc/show.jpg", kind: :cover_art)
     entry = entry_with({})
     create_image_row(
       provider: :entry_icon, provider_id: entry.id.to_s, feed_id: @feed.id,
@@ -48,14 +48,9 @@ class EntryPresenterTest < ActionView::TestCase
     end
   end
 
-  # The legacy custom_icon is inert: a podcast with no row and no episode
-  # art shows no artwork.
-  test "media_image is nil when the show has only a legacy custom_icon" do
-    @feed.update!(
-      options: {"itunes_image" => "http://example.com/show.jpg"},
-      custom_icon: "https://bucket.s3.amazonaws.com/abc/show.jpg",
-      custom_icon_format: "square"
-    )
+  # A podcast with no row and no episode art shows no artwork.
+  test "media_image is nil when the show has no row" do
+    @feed.update!(options: {"itunes_image" => "http://example.com/show.jpg"})
     entry = entry_with({})
 
     assert_nil presenter_for(entry).media_image
@@ -90,12 +85,13 @@ class EntryPresenterTest < ActionView::TestCase
     end
   end
 
-  # Deploy A only: the proxy while the copy runs. Goes with the proxy.
-  test "profile_image falls back to the proxy for a micropost with no row" do
-    output = presenter_for(micropost_entry).profile_image
+  test "profile_image serves a micropost avatar with no row through camo" do
+    entry = micropost_entry
+    output = presenter_for(entry).profile_image
 
     assert_includes output, "favicon-wrap icon-round"
-    assert_includes output, "/files/icons/"
+    assert_includes output, RemoteFile.camo_url(entry.micropost.author_avatar)
+    refute_includes output, "/files/icons/"
   end
 
   test "profile_image renders the feed's icon for a micropost with no avatar at all" do

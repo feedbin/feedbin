@@ -302,7 +302,7 @@ class EntryPresenter < BasePresenter
   end
 
   # The episode's own art, else the show's: the feed_icon row, then the
-  # channel row. Never the legacy custom_icon.
+  # channel row.
   def media_image
     entry.itunes_image || entry.feed.icon_url
   end

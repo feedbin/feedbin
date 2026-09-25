@@ -32,19 +32,13 @@ class FaviconComponentTest < ComponentTestCase
     assert_includes output.to_s, "/files/icons/", "tweet avatars stay on the proxy"
   end
 
-  # Deploy A only: a proxy url with no row keeps the legacy derivation for
-  # its shape. The branch goes with the proxy.
-  test "feed icon" do
-    @feed.custom_icon = "http://example.com/custom.png"
+  # An icon url in the options with no row is never proxied: the feed falls
+  # through to its generated icon.
+  test "an options icon without a row renders the fallback, not the proxy" do
+    @feed.options = {"json_feed" => {"icon" => "http://example.com/custom.png"}}
     output = render FaviconComponent.new(feed: @feed)
-    assert_equal %(<span class="favicon-wrap icon-round"><img alt="" onerror="this.onerror=null;this.src=&#39;http://test.host/assets/favicon-profile-default-65075e4958d19345a99f697e3b7eb70a82851108a33d28f85f70c0a3df02b4c5.png&#39;;" src="/files/icons/91a28cf86b9cdea1dcc6c7570f922135db424123/687474703a2f2f6578616d706c652e636f6d2f637573746f6d2e706e67" /></span>), output.to_s
-  end
-
-  test "a legacy proxy icon honors custom_icon_format square" do
-    @feed.custom_icon = "http://example.com/custom.png"
-    @feed.custom_icon_format = "square"
-    output = render FaviconComponent.new(feed: @feed)
-    assert_includes output.to_s, "favicon-wrap icon-square"
+    refute_includes output.to_s, "/files/icons/"
+    assert_includes output.to_s, "favicon-default"
   end
 
   # A playlist feed mixes videos from many channels. The entry knows its own
@@ -124,12 +118,8 @@ class FaviconComponentTest < ComponentTestCase
     end
   end
 
-  # The branch cannot key on custom_icon: once the legacy store retires, a
-  # row-backed feed has artwork and no custom_icon at all.
-  test "feed icon renders from the row even with no custom_icon" do
+  test "feed icon renders from the row" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      assert_nil @feed.custom_icon
-
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
       Image.create!(
         provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id,
@@ -174,7 +164,6 @@ class FaviconComponentTest < ComponentTestCase
   test "channel avatar renders round from the row's kind" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
-      assert_nil feed.custom_icon
 
       create_image_row(provider: :embed_icon, provider_id: "UCabc", kind: :avatar, feed_id: nil, variant: "200x200")
 

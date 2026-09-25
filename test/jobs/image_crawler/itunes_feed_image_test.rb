@@ -45,15 +45,16 @@ module ImageCrawler
     # and it must raise rather than write a legacy pointer onto the feed.
     test "raises on a payload without storage_path" do
       assert_raises(KeyError) { ItunesFeedImage.new.perform(@feed.id, {"processed_url" => "https://cdn.example.com/cover.jpg"}) }
-      assert_nil @feed.reload.custom_icon
+      assert_nil @feed.reload.settings["custom_icon"]
     end
 
     # Row-backed: the feed_icon row is the read path and its kind is the
     # shape. The callback's only feed write is the touch, which busts the
     # cached views because new artwork can land under the same path.
-    test "touches the feed and writes neither custom_icon nor custom_icon_format" do
-      @feed.update!(custom_icon: "https://old.example.com/abc/show.jpg", custom_icon_format: nil, updated_at: 1.year.ago)
-      before = @feed.reload.updated_at
+    test "touches the feed and writes nothing else on it" do
+      @feed.update!(updated_at: 1.year.ago)
+      settings = @feed.reload.settings.dup
+      before = @feed.updated_at
 
       ItunesFeedImage.new.perform(@feed.id, {
         "processed_url" => nil,
@@ -61,8 +62,7 @@ module ImageCrawler
       })
 
       @feed.reload
-      assert_equal "https://old.example.com/abc/show.jpg", @feed.custom_icon
-      assert_nil @feed.custom_icon_format
+      assert_equal settings, @feed.settings
       assert_operator @feed.updated_at, :>, before
     end
   end

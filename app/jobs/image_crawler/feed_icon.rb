@@ -23,14 +23,11 @@ module ImageCrawler
     rescue ActiveRecord::RecordNotFound
     end
 
-    # Returns whether a job was enqueued; BackfillFeedIcons counts on that.
-    #
-    # critical: a subscribe or a feed create is live and runs on the critical
-    # queues. The backfill passes false, so its icons run behind live images.
+    # Returns whether a job was enqueued.
     #
     # Kind is set here, at the call site, per source: only this job knows
     # which parser field a url came from.
-    def self.schedule(feed, critical: true)
+    def self.schedule(feed)
       return false if feed.options&.safe_dig("itunes_image").present?
 
       source, kind = source_for(feed)
@@ -43,18 +40,13 @@ module ImageCrawler
       return false if readings.empty?
 
       url = readings.first
-      # Deploy A only: the object the proxy cached goes last, so a dead source
-      # still lands as a copy of what was served before. The proxy was handed
-      # the heuristic reading, so the lookup uses it. Goes with remote_files.
-      candidates = [*readings, RemoteFile.legacy_object_url(readings.last)].compact
       image = Image.new_with_attributes(
         id: "#{feed.id}-#{Digest::SHA1.hexdigest(url)}#{SUFFIX}",
         kind: ::Image.kinds[kind],
         preset_name: "feed_icon",
-        image_urls: candidates,
+        image_urls: readings,
         provider: ::Image.providers[:feed_icon],
-        provider_id: feed.id,
-        critical: critical
+        provider_id: feed.id
       )
       Pipeline::Find.perform_async(image.to_h)
       true

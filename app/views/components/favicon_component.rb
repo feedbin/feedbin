@@ -14,7 +14,7 @@ class FaviconComponent < ApplicationComponent
     elsif (channel = entry_channel_record) && (channel_url = Image.unified_url(channel.storage_path))
       icon_image(channel_url, format: channel.icon_format)
     elsif (icon_url = @feed.icon_url)
-      icon_image(icon_url, format: @feed.icon_format || legacy_icon_format)
+      icon_image(icon_url, format: @feed.icon_format)
     elsif @feed.pages? && @entry
       icon_pages
     elsif @feed.pages?
@@ -48,8 +48,7 @@ class FaviconComponent < ApplicationComponent
 
   # One frame for every row-backed icon. format is "round" or "square",
   # read from the row's kind by the caller, never derived from the feed's
-  # options. Takes the url rather than re-asking the feed: the legacy
-  # fallback inside Feed#icon_url signs the url (an HMAC) on every call.
+  # options.
   def icon_image(url, format:)
     span class: "favicon-wrap icon-#{format}" do
       image_tag_with_fallback(
@@ -58,14 +57,6 @@ class FaviconComponent < ApplicationComponent
         alt: ""
       )
     end
-  end
-
-  # Deploy A only: a proxy url with no row has no kind to read, so the
-  # shape comes from the legacy derivation over the feed's options. Round
-  # is the frame an unset format rendered in before. Goes with the proxy
-  # fallback in Feed#icon_url.
-  def legacy_icon_format
-    @feed.custom_icon_format || @feed.default_icon_format || "round"
   end
 
   # A Pages entry keys on its own host, lower-cased, not the feed's.

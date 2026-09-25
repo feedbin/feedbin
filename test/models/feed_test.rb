@@ -1,12 +1,14 @@
 require "test_helper"
 
 class FeedTest < ActiveSupport::TestCase
-  test "icon_url prefers the stored row and does not sign it" do
+  # A url in the feed's options is never rendered: only a row is. A feed
+  # without one renders its host's favicon.
+  test "icon_url is the stored row, never the options url through the proxy" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = create_feeds(users(:ben)).first
-      feed.update!(custom_icon: "https://old.example.com/abc/show.jpg")
+      feed.update!(options: {"json_feed" => {"icon" => "https://old.example.com/icon.png"}})
 
-      assert_match "/files/icons/", feed.icon_url, "the legacy path is proxied through a signed url"
+      assert_nil feed.icon_url
 
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
       Image.create!(
@@ -77,12 +79,11 @@ class FeedTest < ActiveSupport::TestCase
     assert_nil feed.reload.youtube_channel_id
   end
 
-  test "icon_url prefers the channel row over the signed proxy" do
+  test "icon_url falls back to the channel row" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc")
-      feed.update!(custom_icon: "https://yt3.ggpht.com/small.jpg")
 
-      assert_match "/files/icons/", feed.icon_url, "the legacy path is proxied through a signed url"
+      assert_nil feed.icon_url
 
       path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "png")
       Image.create!(
@@ -148,17 +149,10 @@ class FeedTest < ActiveSupport::TestCase
     end
   end
 
-  # A podcast's custom_icon is a legacy show-art pointer; its read path is
-  # the feed_icon row. Without a row the feed renders its fallback icon.
-  test "icon_options ignores a podcast feed's legacy custom_icon" do
+  # A podcast's art renders only from its feed_icon row.
+  test "a podcast feed renders its feed_icon row" do
     feed = create_feeds(users(:ben)).first
-    feed.update!(
-      options: {"itunes_image" => "http://example.com/show.jpg"},
-      custom_icon: "https://bucket.s3.amazonaws.com/abc/show.jpg",
-      custom_icon_format: "square"
-    )
-
-    refute_includes feed.icon_options.keys, "https://bucket.s3.amazonaws.com/abc/show.jpg"
+    feed.update!(options: {"itunes_image" => "http://example.com/show.jpg"})
     assert_nil feed.icon_url
 
     path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
@@ -170,26 +164,6 @@ class FeedTest < ActiveSupport::TestCase
     with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       assert_equal "https://images.example.com/#{path}", Feed.find(feed.id).icon_url
     end
-  end
-
-# A podcast's artwork is square. That used to follow from the legacy
-# custom_icon entry in icon_options; with the entry gone, the format must
-# come from the feed being a podcast, or every show renders as a circle.
-test "default_icon_format is square for a podcast feed" do
-  feed = create_feeds(users(:ben)).first
-  feed.update!(options: {"itunes_image" => "http://example.com/show.jpg"}, custom_icon_format: nil)
-
-  assert_equal "square", feed.default_icon_format
-end
-
-  # A YouTube feed's custom_icon is a publisher thumbnail, not a legacy
-  # object; it still renders round.
-  test "icon_options keeps a non-podcast feed's custom_icon round" do
-    feed = create_feeds(users(:ben)).first
-    feed.update!(custom_icon: "https://yt3.ggpht.com/avatar.jpg")
-
-    assert_equal "round", feed.icon_options["https://yt3.ggpht.com/avatar.jpg"]
-    assert_match "/files/icons/", feed.icon_url
   end
 
   # The shape comes from the same row icon_url serves, in the same order, so
@@ -276,7 +250,7 @@ end
     entry = untitled.new(nil, {public_id: SecureRandom.hex, entry_id: SecureRandom.hex, url: "https://micro.example/1", content: "<p>hi</p>", published: Time.now, data: author})
     feed = Feed.create_from_parsed_feed(parsed.new([entry], {feed_url: "https://micro.example/feed.json", title: "Micro"}))
 
-    assert_equal "round", feed.custom_icon_format
+    assert_nil feed.custom_icon_format, "nothing reads the parser marker, so nothing writes it"
     assert_equal [feed.id, nil, feed.entries.pluck(:id)], ImageCrawler::MicropostAvatar.jobs.sole["args"]
   end
 

@@ -46,7 +46,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
 
     assert_equal("channel_id", @entry.reload.provider_parent_id)
     assert_equal(9743, @entry.reload.embed_duration)
-    assert_nil @feed.reload.custom_icon, "the channel row is the icon; nothing is copied out of the embed"
+    assert_nil @feed.reload.settings["custom_icon"], "the channel row is the icon; nothing is copied out of the embed"
   end
 
   test "should survive a youtube response with no items" do

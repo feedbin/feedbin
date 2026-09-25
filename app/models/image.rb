@@ -94,12 +94,11 @@ class Image < ApplicationRecord
 
   # A micropost avatar by the url it came from, for a reader without a row
   # of its own: the micro.blog replies dialog, and a micropost whose row has
-  # not landed. Tweets never come here: they stay on RemoteFile. Deploy A
-  # only: the proxy on a miss. Deploy B serves a miss through camo instead,
-  # so a live url still renders.
+  # not landed. A miss goes through camo, so a live url still renders.
+  # Tweets never come here: they stay on RemoteFile.
   def self.avatar_url(url)
     return nil if url.blank?
-    avatar_row(url.to_s)&.public_url || RemoteFile.signed_url(url)
+    avatar_row(url.to_s)&.public_url || RemoteFile.camo_url(url.to_s)
   end
 
   # A LEFT JOIN from table to its images rows for provider, keyed by key: a

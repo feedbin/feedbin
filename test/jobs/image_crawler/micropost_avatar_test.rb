@@ -161,22 +161,14 @@ module ImageCrawler
       assert_equal ["https://micro.example/posts/avatars.example.net/a.png", "http://avatars.example.net/a.png"], find_args.last["image_urls"]
     end
 
-    test "passes the proxy's cached object as the second candidate" do
+    test "never passes the proxy's cached object" do
       url = "https://micro.example/a.png"
       RemoteFile.create!(fingerprint: RemoteFile.fingerprint(url), original_url: url, storage_url: "https://icons.example.net/abc/a.png")
       post(url)
 
       MicropostAvatar.schedule(@feed)
 
-      assert_equal [url, "https://icons.example.net/abc/a.png"], find_args.last["image_urls"]
-    end
-
-    test "a backfill schedules off the critical queues" do
-      post("https://micro.example/a.png")
-
-      MicropostAvatar.schedule(@feed, critical: false)
-
-      assert_equal false, find_args.last["critical"]
+      assert_equal [url], find_args.last["image_urls"]
     end
 
     # The receiver's pass covers only the posts its crawl created, so an
@@ -239,14 +231,14 @@ module ImageCrawler
     end
 
     # Find writes whichever candidate landed as the row's url. When the
-    # legacy object won, the row must still answer to the avatar url the
+    # heuristic reading won, the row must still answer to the avatar url the
     # entries carry, or every later lookup misses and downloads again.
-    test "receive re-keys a row that landed on the legacy object to the asked url" do
+    test "receive re-keys a row that landed on another candidate to the asked url" do
       first = post("https://micro.example/a.png")
       second = post("https://micro.example/a.png")
       landed = create_image_row(
         provider: :entry_icon, provider_id: first.id.to_s, feed_id: @feed.id, kind: :avatar,
-        url: "https://icons.example.net/abc/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://icons.example.net/abc/a.png"}
+        url: "http://micro.example/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "http://micro.example/a.png"}
       )
       before = landed.updated_at
 

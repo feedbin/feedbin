@@ -37,7 +37,10 @@ class Feed < ApplicationRecord
 
   enum :feed_type, {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
-  store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format, :meta_title, :meta_description, :meta_crawled_at], coder: JsonConverter
+  # custom_icon_format has no reader. It stays so a Receiver payload queued
+  # by the previous deploy's parser, which still carries the key, updates
+  # the feed rather than raising. Remove it in the next deploy.
+  store :settings, accessors: [:current_feed_url, :custom_icon_format, :meta_title, :meta_description, :meta_crawled_at], coder: JsonConverter
 
   def twitter_user?
     twitter_user.present?
@@ -77,45 +80,12 @@ class Feed < ApplicationRecord
     taggings
   end
 
-  def icon_options
-    items = {}
-    items[custom_icon] = "round" unless options.safe_dig("itunes_image")
-    if custom_icon_format == "round"
-      items[options.safe_dig("image", "url")] = "square"
-    end
-    items[options.safe_dig("json_feed", "icon")] = "square"
-    items[options.safe_dig("json_feed", "author", "avatar")] = "round"
-    items
-  end
-
-  def icon
-    base = icon_options.keys.find { !it.nil? }
-    return nil if base.nil?
-    feed_relative_url(base)
-  end
-
-  # A podcast's artwork is square whatever else the feed offers. That used
-  # to follow from the legacy custom_icon entry in icon_options; the entry
-  # is gone, so the shape comes from the feed being a podcast. Without this
-  # every show renders in the round frame FaviconComponent defaults to.
-  def default_icon_format
-    return "square" if options.safe_dig("itunes_image")
-
-    base = icon_options.keys.find { !it.nil? }
-    return nil if base.nil?
-    icon_options[base]
-  end
-
-  # The renderable URL: images row from our CDN, else the legacy url through
-  # the signing proxy. The feed's own row outranks the shared channel row.
-  # icon/icon_options/default_icon_format still answer the separate question
-  # "which source won and what shape is it". Deploy A only: the proxy
-  # fallback, signed here rather than through Image.avatar_url, which would
-  # cost the sidebar a query per feed that has no row.
+  # The renderable URL of the feed's icon row, or nil. The feed's own row
+  # outranks the shared channel row. A feed with neither renders its host's
+  # favicon.
   def icon_url
     Image.unified_url(icon_image_record&.storage_path) ||
-      Image.unified_url(channel_image_record&.storage_path) ||
-      (icon && RemoteFile.signed_url(icon))
+      Image.unified_url(channel_image_record&.storage_path)
   end
 
   # The frame for this feed's icon, from the kind of the row icon_url
@@ -150,10 +120,6 @@ class Feed < ApplicationRecord
       entries = parsed_feed.entries.map do |parsed_entry|
         entry_hash = parsed_entry.to_entry
         new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
-      end
-      # for micropost feeds
-      if parsed_feed.entries.filter_map(&:title).blank?
-        new_feed.update!(custom_icon_format: "round")
       end
       # The receiver never runs for these entries, so the avatar pass starts
       # here.

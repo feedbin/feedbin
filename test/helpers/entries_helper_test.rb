@@ -13,7 +13,7 @@ class EntriesHelperTest < ActiveSupport::TestCase
     key = EntriesHelper.entries_cache_key(@entry, {})
 
     assert_equal @entry, key.first
-    assert_equal "v15", key.last
+    assert_equal "v16", key.last
     assert_equal 7, key.size
   end
 

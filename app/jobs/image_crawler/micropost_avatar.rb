@@ -32,9 +32,8 @@ module ImageCrawler
       perform_async(feed.id, nil, ids) if ids.any?
     end
 
-    # Returns [attached, scheduled]. critical: a live crawl runs on the
-    # critical queues; the backfill passes false.
-    def self.schedule(feed, entry_ids: nil, critical: true)
+    # Returns [attached, scheduled].
+    def self.schedule(feed, entry_ids: nil)
       entries = pending_entries(feed)
       entries = entries.where(id: entry_ids) if entry_ids
       entries = entries.to_a
@@ -48,7 +47,7 @@ module ImageCrawler
           attach(group, url, existing)
           attached += group.size
         else
-          enqueue(feed, group, url, critical)
+          enqueue(feed, group, url)
           scheduled += 1
         end
       end
@@ -113,23 +112,19 @@ module ImageCrawler
 
     # One download for the group, landing on its first entry. Find tries
     # candidates in order: the strict reading of the avatar url, then the
-    # heuristic one (see FeedIcon.schedule), then the object the proxy
-    # cached, so a dead source still lands as a copy of what was served
-    # before. Deploy A only: the legacy object goes with remote_files. The
-    # proxy was handed the url exactly as the entry carries it. The context
-    # tells the callback which url it asked for and who else waits on it.
-    def self.enqueue(feed, group, url, critical)
+    # heuristic one (see FeedIcon.schedule). The context tells the callback
+    # which url it asked for and who else waits on it.
+    def self.enqueue(feed, group, url)
       entry = group.first
       raw = author_avatar(feed, entry)
       image = Image.new_with_attributes(
         id: "#{entry.public_id}#{SUFFIX}",
         kind: ::Image.kinds[:avatar],
         preset_name: PRESET,
-        image_urls: [url, entry.rebase_url(raw), RemoteFile.legacy_object_url(raw)].compact_blank.uniq,
+        image_urls: [url, entry.rebase_url(raw)].compact_blank.uniq,
         provider: ::Image.providers[:entry_icon],
         provider_id: entry.id,
         feed_id: entry.feed_id,
-        critical: critical,
         context: {"url" => url, "entry_ids" => group.drop(1).map(&:id)}
       )
       Pipeline::Find.perform_async(image.to_h)
