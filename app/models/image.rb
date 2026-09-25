@@ -26,6 +26,7 @@ class Image < ApplicationRecord
     embed_icon:         5,     # embed-provider icon keyed by that provider's own id (YouTube channel avatars)
     website_favicon:    6,     # a host's favicon, keyed by host ("medium.com")
     website_touch_icon: 7,     # a host's apple-touch-icon, keyed by host; deliberately its own provider, see below
+    twitter_avatar:     8,     # a Twitter user's avatar, keyed by the MD5 of its URL (see TwitterAvatar)
   }, prefix: true
 
   # What the picture is, independent of provider. provider keys the row
