@@ -2,11 +2,10 @@ module ImageCrawler
   class Download
     attr_reader :path
 
-    def initialize(url, camo: false, minimum_size: 20_000, etag: nil, last_modified: nil)
+    def initialize(url, minimum_size: 20_000, etag: nil, last_modified: nil)
       @url = url
       @valid = false
       @minimum_size = minimum_size
-      @camo = camo
       @etag = etag
       @last_modified = last_modified
       @not_modified = false
@@ -27,9 +26,7 @@ module ImageCrawler
     # publisher content, so they are attacker-chosen. Feedkit also owns the
     # conditional request, treating a 304 as a bodiless success Response.
     def download_file(url)
-      requested_url = url
-      url = camo_url(url)
-      @response = Feedkit::Request.download(url, block_ssrf: true, **validators_for(requested_url))
+      @response = Feedkit::Request.download(url, block_ssrf: true, **validators_for(url))
 
       if @response.status.code == 304
         # Gated on conditional?: a 304 nobody asked for is a broken server, not
@@ -45,21 +42,10 @@ module ImageCrawler
     # Empty when no validators were passed, and empty when the fetch is for
     # a *derived* URL (Youtube/Vimeo/Instagram overrides fetch a thumbnail or
     # oEmbed target): the validators were computed for @url, and sending them
-    # elsewhere risks a false 304 for a never-validated resource. Compared
-    # before camo substitution, so a camo-wrapped fetch still qualifies.
+    # elsewhere risks a false 304 for a never-validated resource.
     def validators_for(url)
       return {} unless url == @url
       {etag: @etag, last_modified: @last_modified}
-    end
-
-    # camo is true for production's camo, or an origin string for one of
-    # the OutsideCamo hosts. Either way the image keeps its real url.
-    def camo_url(url)
-      case @camo
-      when String then OutsideCamo.url(url, @camo)
-      when true then RemoteFile.camo_url(url)
-      else url
-      end
     end
 
     def conditional?

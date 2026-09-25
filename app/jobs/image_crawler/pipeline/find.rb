@@ -83,7 +83,6 @@ module ImageCrawler
 
         download = begin
           Download.download!(original_url,
-            camo: @image.camo,
             minimum_size: @image.preset.minimum_size,
             **validators_for(row, original_url))
         rescue => exception
@@ -173,7 +172,7 @@ module ImageCrawler
         found = false
 
         download = begin
-          Download.download!(original_url, camo: @image.camo, minimum_size: @image.preset.minimum_size)
+          Download.download!(original_url, minimum_size: @image.preset.minimum_size)
         rescue => exception
           Sidekiq.logger.info @image.trace(message: "download exception", metadata: {exception: exception, original_url: original_url})
           false

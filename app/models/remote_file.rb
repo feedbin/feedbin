@@ -34,12 +34,10 @@ class RemoteFile < ApplicationRecord
     signature == OpenSSL::HMAC.hexdigest("sha1", secret_key, data)
   end
 
-  # host is an origin (scheme, host, port); key signs for that host. The
-  # defaults are production's camo. ImageCrawler::OutsideCamo passes its
-  # own fleet and key.
-  def self.camo_url(url, host: ENV["CAMO_HOST"], key: secret_key)
-    origin = URI(host)
-    signature = OpenSSL::HMAC.hexdigest("sha1", key, url)
+  # CAMO_HOST is an origin: scheme, host and port.
+  def self.camo_url(url)
+    origin = URI(ENV["CAMO_HOST"])
+    signature = OpenSSL::HMAC.hexdigest("sha1", secret_key, url)
     hex_url = url.to_enum(:each_byte).map { |byte| "%02x" % byte }.join
 
     URI::Generic.build(

@@ -142,20 +142,6 @@ module ImageCrawler
         end
       end
 
-      def test_should_use_camo
-        unified do
-          image_url = "http://example.com/image.jpg"
-          camo_url = RemoteFile.camo_url(image_url)
-
-          stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
-
-          image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [image_url], provider: 0, provider_id: 1, camo: true)
-          Find.new.perform(image.to_h)
-
-          assert_requested :get, camo_url
-        end
-      end
-
       def test_should_attach_existing_unified_image_without_downloading
         with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
           original_url = "http://example.com/image.jpg"

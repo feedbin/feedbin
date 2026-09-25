@@ -9,14 +9,14 @@ class RemoteFileTest < ActiveSupport::TestCase
     assert_equal "https://#{URI(ENV["CAMO_HOST"]).host}/#{signature}/#{hex}", RemoteFile.camo_url(url)
   end
 
-  # An origin, scheme and port included, so a plain-http fleet and a
-  # non-default port both work; a different key signs for that fleet.
-  test "camo_url takes another origin and key" do
+  # CAMO_HOST is an origin, so its scheme and a non-default port carry over.
+  test "camo_url keeps the scheme and port of CAMO_HOST" do
     url = "http://example.com/image.jpg"
-    signature = OpenSSL::HMAC.hexdigest("sha1", "other-key", url)
+    signature = OpenSSL::HMAC.hexdigest("sha1", RemoteFile.secret_key, url)
     hex = url.unpack1("H*")
 
-    assert_equal "http://146.190.44.162/#{signature}/#{hex}", RemoteFile.camo_url(url, host: "http://146.190.44.162", key: "other-key")
-    assert_equal "https://camo.example.com:8443/#{signature}/#{hex}", RemoteFile.camo_url(url, host: "https://camo.example.com:8443", key: "other-key")
+    with_env("CAMO_HOST" => "http://camo.example.com:8443") do
+      assert_equal "http://camo.example.com:8443/#{signature}/#{hex}", RemoteFile.camo_url(url)
+    end
   end
 end

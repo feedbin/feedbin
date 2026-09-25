@@ -2,7 +2,6 @@ module ImageCrawler
   class Image
     ATTRIBUTES = %i[
       bytesize
-      camo
       context
       critical
       download_path
