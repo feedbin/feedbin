@@ -26,19 +26,10 @@ class FaviconComponentTest < ComponentTestCase
   test "twitter user favicon" do
     tweet = load_tweet("one")
     @feed.update(options: {twitter_user: tweet["user"]})
-    url = @feed.twitter_user.profile_image_uri_https(:original).to_s
 
-    proxied = render FaviconComponent.new(feed: @feed)
-    assert_includes proxied.to_s, "favicon-wrap icon-round"
-    assert_includes proxied.to_s, "/files/icons/", "Deploy A only: the proxy until the copy lands"
-
-    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
-      output = render FaviconComponent.new(feed: @feed)
-
-      assert_includes output.to_s, "https://images.example.com/#{row.storage_path}"
-      refute_includes output.to_s, "/files/icons/"
-    end
+    output = render FaviconComponent.new(feed: @feed)
+    assert_includes output.to_s, "favicon-wrap icon-round"
+    assert_includes output.to_s, "/files/icons/", "tweet avatars stay on the proxy"
   end
 
   # Deploy A only: a proxy url with no row keeps the legacy derivation for

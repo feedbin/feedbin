@@ -26,9 +26,8 @@ class BackfillImageKinds
 
   # Presets whose rows carry their kind from the call site, so there is
   # nothing to map and nothing to relabel. feed_icon writes avatar or
-  # site_icon per source; micropost_avatar and icon (the copy of the
-  # proxy's cache) write avatar.
-  SELF_LABELED = %w[feed_icon micropost_avatar icon].freeze
+  # site_icon per source; micropost_avatar writes avatar.
+  SELF_LABELED = %w[feed_icon micropost_avatar].freeze
 
   def perform(batch = nil, schedule = false)
     if schedule

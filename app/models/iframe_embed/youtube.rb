@@ -50,11 +50,10 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   # The channel avatar row the channel harvest stores, else the thumbnail
-  # the old card showed, through Image.avatar_url: the copy backfill stored
-  # the ones the proxy cached.
+  # url the card always showed.
   def profile_image
     return nil unless channel
-    channel.channel_image&.public_url || Image.avatar_url(channel.data.safe_dig("snippet", "thumbnails", "medium", "url"))
+    channel.channel_image&.public_url || channel.data.safe_dig("snippet", "thumbnails", "medium", "url")
   end
 
   def cache_key

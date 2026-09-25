@@ -37,9 +37,9 @@ class RemoteFilesController < ApplicationController
     proxy_url = if icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(url))
       icon.storage_url
     else
-      # Deploy A: a miss is served through camo and cached nowhere. The copy
-      # backfill and the avatar crawlers write the rows now; this route goes
-      # with Deploy B.
+      # A miss is served through camo and cached nowhere: remote_files is
+      # frozen as the store for tweet avatars, which have no crawler.
+      # Microposts and feed icons have images rows now.
       camo_url
     end
     

@@ -673,7 +673,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_retweeted_image
     if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https(:original)
-      Image.avatar_url(entry.tweet.user.profile_image_uri_https(:original).to_s)
+      RemoteFile.signed_url(entry.tweet.user.profile_image_uri_https(:original))
     else
       @template.image_url("favicon-profile-default.png")
     end
@@ -690,7 +690,7 @@ class EntryPresenter < BasePresenter
   # Sizes: normal, bigger
   def tweet_profile_image_uri(tweet, size = :original)
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
-      Image.avatar_url(tweet.user.profile_image_uri_https(size).to_s)
+      RemoteFile.signed_url(tweet.user.profile_image_uri_https(size))
     else
       @template.image_url("favicon-profile-default.png")
     end

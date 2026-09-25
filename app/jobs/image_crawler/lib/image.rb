@@ -124,19 +124,6 @@ module ImageCrawler
         content_addressed: true,
         job_class: MicropostAvatar
       },
-      # BackfillAvatarCopies' recipe for the proxy's cached avatars, keyed by
-      # url fingerprint on the remote_file provider. Nothing crawls with it,
-      # so there is no callback.
-      icon: {
-        width: 200,
-        height: 200,
-        minimum_size: nil,
-        crop: :limit_png,
-        format: "png",
-        validate: false,
-        unified: true,
-        content_addressed: true
-      },
       favicon: {
         width: 32,
         height: 32,

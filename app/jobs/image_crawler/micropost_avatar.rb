@@ -43,8 +43,7 @@ module ImageCrawler
       scheduled = 0
 
       groups.each do |url, group|
-        # An earlier post's row, or a copy of the proxy's cache once the copy
-        # backfill runs.
+        # An earlier post's row for the same url.
         if (existing = ::Image.avatar_row(url))
           attach(group, url, existing)
           attached += group.size

@@ -1,7 +1,7 @@
 # One-time: run the micropost avatar pass over every micropost feed that has
-# an entry without a row. Runs after BackfillAvatarCopies, so most avatar
-# urls already have a copied row and the pass attaches rather than
-# downloads.
+# an entry without a row. Entries that share an avatar url share one
+# download, and a url whose source is dead falls back to the object the
+# proxy cached.
 #
 # Fan-out in the SidekiqHelper style: perform(nil, true) pushes one job per
 # SidekiqHelper::BATCH_SIZE feed ids, with `at` timestamps spaced evenly

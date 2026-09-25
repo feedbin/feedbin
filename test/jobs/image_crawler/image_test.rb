@@ -34,7 +34,7 @@ module ImageCrawler
       image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1)
       refute image.unified?
 
-      icon = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:avatar], preset_name: "icon", image_urls: [], provider: ::Image.providers[:remote_file], provider_id: 1)
+      icon = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:avatar], preset_name: "micropost_avatar", image_urls: [], provider: ::Image.providers[:entry_icon], provider_id: 1)
       refute icon.unified?
 
       with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do

@@ -1,19 +1,19 @@
 require "test_helper"
 
 class ImageTest < ActiveSupport::TestCase
-  # Every avatar reader without a row of its own resolves a url here: to a
-  # row holding that url's picture, else to the proxy. Tweet avatars and
-  # embed profile images are legacy data with no crawler; their rows are
-  # copies of the proxy's cache.
-  test "avatar_url resolves a copied row by url, else the proxy" do
-    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      url = "https://pbs.twimg.com/profile_images/1/me.jpg"
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
+  # Deploy A only: a url no micropost row holds goes to the proxy.
+  test "avatar_url falls back to the proxy on a miss" do
+    assert_includes Image.avatar_url("https://avatars.micro.blog/avatars/2/other.jpg"), "/files/icons/"
+    assert_nil Image.avatar_url(nil)
+  end
 
-      assert_equal "https://images.example.com/#{row.storage_path}", Image.avatar_url(url)
-      assert_includes Image.avatar_url("https://pbs.twimg.com/profile_images/2/other.jpg"), "/files/icons/"
-      assert_nil Image.avatar_url(nil)
-    end
+  # Only a micropost author's row answers: a row of another preset under
+  # the same url is not an avatar download.
+  test "avatar_row ignores rows of other presets" do
+    url = "https://avatars.micro.blog/avatars/3/me.jpg"
+    create_image_row(provider: :feed_icon, provider_id: "3", feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "feed_icon"})
+
+    assert_nil Image.avatar_row(url)
   end
 
   # A reply in the micro.blog dialog has no row of its own, but its author's

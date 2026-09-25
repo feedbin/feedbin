@@ -104,13 +104,13 @@ class EntryPresenterTest < ActionView::TestCase
     refute_includes output, "/files/icons/"
   end
 
-  # A copied remote_file row for the same url serves a micropost whose own
-  # row has not landed, and the replies dialog, whose OpenStruct has no row.
+  # Another post's row for the same url serves a micropost whose own row
+  # has not landed, and the replies dialog, whose OpenStruct has no row.
   test "profile_image resolves a micropost avatar by url when the entry has no row" do
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       entry = micropost_entry
       url = entry.micropost.author_avatar
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
+      row = create_image_row(provider: :entry_icon, provider_id: "other-post", feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "micropost_avatar"})
 
       output = presenter_for(Entry.find(entry.id)).profile_image
 
@@ -127,23 +127,9 @@ class EntryPresenterTest < ActionView::TestCase
     )
   end
 
-  # Tweets are the exception: no crawler, only rows copied from the proxy's
-  # cache, resolved by url inside the cached list fragment.
-  test "profile_image renders a tweet author's copied row" do
-    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      entry = tweet_entry
-      url = entry.tweet.main_tweet.user.profile_image_uri_https(:original).to_s
-      row = create_image_row(provider: :remote_file, provider_id: RemoteFile.fingerprint(url), feed_id: nil, kind: :avatar, url: url, variant: "200x200", data: {"preset" => "icon"})
-
-      output = presenter_for(entry).profile_image
-
-      assert_includes output, "https://images.example.com/#{row.storage_path}"
-      refute_includes output, "/files/icons/"
-    end
-  end
-
-  # Deploy A only: the proxy for a tweet avatar that has no row yet.
-  test "profile_image falls back to the proxy for a tweet with no row" do
+  # Tweets are the exception: no crawler and no images row. They stay on
+  # the proxy, which serves what remote_files cached.
+  test "profile_image renders a tweet author through the proxy" do
     output = presenter_for(tweet_entry).profile_image
 
     assert_includes output, "/files/icons/"

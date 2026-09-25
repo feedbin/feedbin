@@ -33,7 +33,7 @@ class FaviconComponent < ApplicationComponent
   end
 
   def icon_twitter_user
-    icon_image(Image.avatar_url(@feed.twitter_user.profile_image_uri_https(:original).to_s), format: "round")
+    icon_image(RemoteFile.signed_url(@feed.twitter_user.profile_image_uri_https(:original)), format: "round")
   end
 
   # The avatar row of this video's own channel, for entries whose channel is
@@ -62,7 +62,8 @@ class FaviconComponent < ApplicationComponent
 
   # Deploy A only: a proxy url with no row has no kind to read, so the
   # shape comes from the legacy derivation over the feed's options. Round
-  # is the frame an unset format rendered in before. Goes with the proxy.
+  # is the frame an unset format rendered in before. Goes with the proxy
+  # fallback in Feed#icon_url.
   def legacy_icon_format
     @feed.custom_icon_format || @feed.default_icon_format || "round"
   end

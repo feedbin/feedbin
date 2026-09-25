@@ -83,25 +83,20 @@ class Image < ApplicationRecord
     provider_website_favicon.where(provider_id: hosts).index_by(&:provider_id)
   end
 
-  # The presets whose rows hold an avatar under the url it came from: a
-  # micropost author's download, or BackfillAvatarCopies' copy of the
-  # proxy's cache.
-  AVATAR_PRESETS = %w[micropost_avatar icon].freeze
-
-  # A row holding this url's avatar picture, or nil. Any one will do: take,
-  # not the newest, which would read and sort the row of every entry ever
-  # attached to the url. One indexed read on url_fingerprint; the preset
-  # comes out of data through Arel, nothing is interpolated.
+  # A micropost author's avatar row for this url, or nil. Any one will do:
+  # take, not the newest, which would read and sort the row of every entry
+  # ever attached to the url. One indexed read on url_fingerprint; the
+  # preset comes out of data through Arel, nothing is interpolated.
   def self.avatar_row(url)
-    variants = AVATAR_PRESETS.map { ImageCrawler::Image.new(preset_name: it).variant }.uniq
-    where(url_fingerprint: variants.map { url_fingerprint_for(url, it) }).where(data_projection("preset").in(AVATAR_PRESETS)).take
+    variant = ImageCrawler::Image.new(preset_name: "micropost_avatar").variant
+    where(url_fingerprint: url_fingerprint_for(url, variant)).where(data_projection("preset").eq("micropost_avatar")).take
   end
 
-  # An avatar by the url it came from, for every reader without a row of
-  # its own: tweets and embed cards (legacy data with no crawler), the
-  # micro.blog replies dialog, and a micropost whose row has not landed.
-  # Deploy A only: the proxy on a miss. Deploy B serves a miss through camo
-  # instead, so a live url still renders.
+  # A micropost avatar by the url it came from, for a reader without a row
+  # of its own: the micro.blog replies dialog, and a micropost whose row has
+  # not landed. Tweets never come here: they stay on RemoteFile. Deploy A
+  # only: the proxy on a miss. Deploy B serves a miss through camo instead,
+  # so a live url still renders.
   def self.avatar_url(url)
     return nil if url.blank?
     avatar_row(url.to_s)&.public_url || RemoteFile.signed_url(url)

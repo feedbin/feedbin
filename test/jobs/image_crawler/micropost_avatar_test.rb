@@ -77,10 +77,11 @@ module ImageCrawler
       assert_nil avatar_row_for(second), "the sibling waits for the callback"
     end
 
+    # Another feed's post with the same avatar already stored it.
     test "attaches every entry whose url the table already holds, with no Find" do
       existing = create_image_row(
-        provider: :remote_file, provider_id: RemoteFile.fingerprint("https://micro.example/a.png"), feed_id: nil, kind: :avatar,
-        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "icon", "final_url" => "https://micro.example/a.png"}
+        provider: :entry_icon, provider_id: "999999", feed_id: nil, kind: :avatar,
+        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://micro.example/a.png"}
       )
       first = post("https://micro.example/a.png")
       second = post("https://micro.example/a.png")
@@ -103,8 +104,8 @@ module ImageCrawler
     # even once the row it was copied from is gone.
     test "an attached row is found by the next lookup for its url" do
       source = create_image_row(
-        provider: :remote_file, provider_id: RemoteFile.fingerprint("https://micro.example/a.png"), feed_id: nil, kind: :avatar,
-        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "icon", "final_url" => "https://micro.example/a.png"}
+        provider: :entry_icon, provider_id: "999999", feed_id: nil, kind: :avatar,
+        url: "https://micro.example/a.png", variant: "200x200", data: {"preset" => "micropost_avatar", "final_url" => "https://micro.example/a.png"}
       )
       attached = post("https://micro.example/a.png")
       MicropostAvatar.schedule(@feed)
