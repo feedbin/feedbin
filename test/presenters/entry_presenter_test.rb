@@ -90,7 +90,7 @@ class EntryPresenterTest < ActionView::TestCase
     output = presenter_for(entry).profile_image
 
     assert_includes output, "favicon-wrap icon-round"
-    assert_includes output, RemoteFile.camo_url(entry.micropost.author_avatar)
+    assert_includes output, Camo.url(entry.micropost.author_avatar)
     refute_includes output, "/files/icons/"
   end
 

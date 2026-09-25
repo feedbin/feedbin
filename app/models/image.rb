@@ -98,7 +98,7 @@ class Image < ApplicationRecord
   # Tweets never come here: they stay on RemoteFile.
   def self.avatar_url(url)
     return nil if url.blank?
-    avatar_row(url.to_s)&.public_url || RemoteFile.camo_url(url.to_s)
+    avatar_row(url.to_s)&.public_url || Camo.url(url)
   end
 
   # A LEFT JOIN from table to its images rows for provider, keyed by key: a

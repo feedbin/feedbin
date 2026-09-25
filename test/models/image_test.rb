@@ -4,7 +4,7 @@ class ImageTest < ActiveSupport::TestCase
   # A url no micropost row holds goes through camo, never the proxy.
   test "avatar_url serves a miss through camo" do
     url = "https://avatars.micro.blog/avatars/2/other.jpg"
-    assert_equal RemoteFile.camo_url(url), Image.avatar_url(url)
+    assert_equal Camo.url(url), Image.avatar_url(url)
     assert_nil Image.avatar_url(nil)
   end
 

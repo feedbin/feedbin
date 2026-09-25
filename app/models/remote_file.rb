@@ -27,25 +27,15 @@ class RemoteFile < ApplicationRecord
   end
 
   def self.secret_key
-    ENV.fetch("CAMO_KEY", "secret")
+    Camo.secret_key
   end
 
   def self.signature_valid?(signature, data)
     signature == OpenSSL::HMAC.hexdigest("sha1", secret_key, data)
   end
 
-  # CAMO_HOST is an origin: scheme, host and port.
   def self.camo_url(url)
-    origin = URI(ENV["CAMO_HOST"])
-    signature = OpenSSL::HMAC.hexdigest("sha1", secret_key, url)
-    hex_url = url.to_enum(:each_byte).map { |byte| "%02x" % byte }.join
-
-    URI::Generic.build(
-      scheme: origin.scheme,
-      host: origin.host,
-      port: (origin.port unless origin.port == origin.default_port),
-      path: "/#{signature}/#{hex_url}"
-    ).to_s
+    Camo.url(url)
   end
 
   def signed_url
