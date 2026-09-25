@@ -8,7 +8,7 @@ gem "llhttp", github: "benubois/llhttp",
               branch: "memory_corruption",
               glob: "mri/*.gemspec"
 
-gem "rails", "8.1.3.1"
+gem "rails", "8.1.4"
 gem "will_paginate"
 
 gem "http",            github: "benubois/http",           branch: "feedbin"
