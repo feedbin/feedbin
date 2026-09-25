@@ -31,8 +31,11 @@ class IframeEmbed::Twitter
     document.search("p").to_s
   end
 
+  # The stored author's avatar through the Twitter avatar route, or the
+  # default avatar, which is our own asset and never goes through the route.
   def profile_image_url
-    TwitterUser.where_lower(screen_name: user).take&.profile_image || ActionController::Base.helpers.image_url("favicon-profile-default.png")
+    stored = TwitterUser.where_lower(screen_name: user).take&.profile_image
+    stored ? TwitterAvatar.path(stored) : ActionController::Base.helpers.image_url("favicon-profile-default.png")
   end
 
   def author_url

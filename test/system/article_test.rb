@@ -73,9 +73,10 @@ class ArticleTest < ApplicationSystemTestCase
 
     wait_for_ajax
 
-    url = RemoteFile.signed_url("https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs.png")
-
-    assert_selector ".profile-image img[src='#{url}']"
+    # The icons path sends a miss to camo, which cannot load in a test, so
+    # the default avatar takes its place. TwitterEmbedPartialTest checks the
+    # path itself.
+    assert_selector ".profile-image img[src*='favicon-profile-default']"
     assert_selector ".tweet-body", text: "iOS 14 will let you"
   end
 

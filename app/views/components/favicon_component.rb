@@ -33,7 +33,7 @@ class FaviconComponent < ApplicationComponent
   end
 
   def icon_twitter_user
-    icon_image(RemoteFile.signed_url(@feed.twitter_user.profile_image_uri_https(:original)), format: "round")
+    icon_image(TwitterAvatar.path(@feed.twitter_user.profile_image_uri_https(:original)), format: "round")
   end
 
   # The avatar row of this video's own channel, for entries whose channel is

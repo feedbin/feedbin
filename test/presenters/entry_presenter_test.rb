@@ -123,11 +123,12 @@ class EntryPresenterTest < ActionView::TestCase
     )
   end
 
-  # Tweets are the exception: no crawler and no images row. They stay on
-  # the proxy, which serves what remote_files cached.
-  test "profile_image renders a tweet author through the proxy" do
-    output = presenter_for(tweet_entry).profile_image
+  # Tweets have no crawler: their avatars resolve through the icons path,
+  # which serves the copy moved out of remote_files, or camo.
+  test "profile_image renders a tweet author through the icons path" do
+    entry = tweet_entry
+    output = presenter_for(entry).profile_image
 
-    assert_includes output, "/files/icons/"
+    assert_includes output, TwitterAvatar.path(entry.tweet.main_tweet.user.profile_image_uri_https(:original))
   end
 end

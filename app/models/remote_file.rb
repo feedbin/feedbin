@@ -9,10 +9,6 @@ class RemoteFile < ApplicationRecord
     Digest::MD5.hexdigest(data)
   end
 
-  def self.signed_url(url)
-    TwitterAvatar.path(url)
-  end
-
   def self.camo_url(url)
     Camo.url(url)
   end

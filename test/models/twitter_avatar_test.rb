@@ -9,10 +9,11 @@ class TwitterAvatarTest < ActiveSupport::TestCase
     assert_equal RemoteFile.fingerprint(URL), TwitterAvatar.fingerprint(URL)
   end
 
-  # The icons path's existing URLs carry this signature, so it must match
-  # what RemoteFile signed.
-  test "sign matches the signature in RemoteFile.signed_url" do
-    assert_equal RemoteFile.signed_url(URL).split("/")[-2], TwitterAvatar.sign(URL)
+  # The icons path's existing URLs carry the signature RemoteFile made:
+  # HMAC-SHA1 of the URL with the camo key. Changing it would break every
+  # URL the CDN has cached.
+  test "sign is the icon proxy's signature" do
+    assert_equal OpenSSL::HMAC.hexdigest("sha1", Camo.secret_key, URL), TwitterAvatar.sign(URL)
   end
 
   test "a signature verifies for its decoded url and not for a changed one" do

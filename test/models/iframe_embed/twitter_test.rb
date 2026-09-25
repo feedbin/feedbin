@@ -74,7 +74,7 @@ class IframeEmbed::TwitterTest < ActiveSupport::TestCase
     fake_relation.define_singleton_method(:take) { fake_user }
     TwitterUser.stub :where_lower, ->(*) { fake_relation } do
       stub_url_cache(default: JSON.dump(oembed_payload)) do
-        assert_equal "https://pic/alice.png", embed.profile_image_url
+        assert_equal TwitterAvatar.path("https://pic/alice.png"), embed.profile_image_url
       end
     end
   end

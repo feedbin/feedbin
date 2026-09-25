@@ -29,7 +29,7 @@ class FaviconComponentTest < ComponentTestCase
 
     output = render FaviconComponent.new(feed: @feed)
     assert_includes output.to_s, "favicon-wrap icon-round"
-    assert_includes output.to_s, "/files/icons/", "tweet avatars stay on the proxy"
+    assert_includes output.to_s, "/files/icons/", "tweet avatars resolve through the icons path"
   end
 
   # An icon url in the options with no row is never proxied: the feed falls
