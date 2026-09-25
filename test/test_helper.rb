@@ -25,17 +25,14 @@ REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path
 
 require File.expand_path("../../config/environment", __FILE__)
 
-# MakeEpub's cover generation renders text with libvips, which on macOS
-# lazily loads the CoreText backend on first use and triggers a one-time
-# +[UIFontDescriptor initialize]. If that class-init is still running on a
-# background thread the moment parallelize() below forks a worker, the
-# child crashes the instant *it* touches the same class post-fork ("may
-# have been in progress in another thread when fork() was called" -- macOS's
-# objc runtime refuses to safely continue). Forcing the same call here,
-# synchronously, in the single-threaded parent before any fork happens
-# retires that one-time init early and removes the race. No-op cost on
-# Linux CI (no objc runtime, but also nothing to warm).
-Vips::Image.text("warmup", font: "Helvetica Bold 16") if RbConfig::CONFIG["host_os"].include?("darwin")
+# MakeEpub's cover renders text with libvips, through Pango. On macOS Pango
+# uses CoreText, which can't be used in a forked parallel test worker: if the
+# parent never rendered text, the child's first render dies in objc's fork
+# check on +[UIFontDescriptor initialize]; if the parent did, the child
+# segfaults in the libdispatch state it inherited. Pango's fontconfig backend
+# uses neither, and it is the only backend on Linux, so this is also what
+# production renders with.
+ENV["PANGOCAIRO_BACKEND"] = "fc"
 
 require "rails/test_help"
 require "sidekiq/testing"

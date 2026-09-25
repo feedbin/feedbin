@@ -81,6 +81,21 @@ class MakeEpubTest < ActiveSupport::TestCase
     assert_equal 1, images.count, "the image under the budget must still be bundled"
   end
 
+  # Parallel test workers are forked from the parent, and macOS's CoreText
+  # crashes a forked child the first time it renders text. See test_helper.
+  test "cover text renders in a forked process" do
+    pid = fork do
+      $stderr.reopen(File::NULL, "w")
+      MakeEpub.new.text_layer("Title", width: 400, opacity: 0.8, font: "Helvetica Bold 16")
+      exit!(0)
+    ensure
+      exit!(1)
+    end
+    _, status = Process.wait2(pid)
+
+    assert status.success?, "rendering text in a forked process failed: #{status.inspect}"
+  end
+
   # UserMailer.kindle is the last thing build does before ensure deletes the
   # file, so the archive has to be read from there.
   def capture_epub
