@@ -12,6 +12,12 @@ class BackfillTwitterAvatars
 
   BATCH_SIZE = 250
 
+  # The legacy icon preset's bounding box: the objects are copied as they
+  # are, so the variant is the one they were cropped to.
+  VARIANT = "400x400".freeze
+
+  CONTENT_TYPES = {"jpg" => "image/jpeg", "png" => "image/png"}.freeze
+
   TWITTER_PREFIXES = %w[
     https://pbs.twimg.com/
     http://pbs.twimg.com/
@@ -63,5 +69,118 @@ class BackfillTwitterAvatars
     batches = self.class.batches
     return if batches.nil?
     Sidekiq::Client.push_bulk("args" => batches.zip, "class" => self.class)
+  end
+
+  # Copies the batch's pending rows one at a time. A row error is logged and
+  # skipped: the row stays pending and shows up in pending.count. Anything
+  # else (the store, the database) raises, and Sidekiq retries the batch.
+  def update(batch)
+    raise "UNIFIED_BUCKET_IMAGES must be configured" unless Image.storage_configured?
+
+    rows = self.class.pending.where(id: self.class.batch_range(batch)).order(:id).to_a
+    copied = 0
+    skipped = 0
+
+    rows.each do |row|
+      Copy.new(row).call
+      copied += 1
+    rescue Copy::RowError, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => exception
+      skipped += 1
+      logger.info "BackfillTwitterAvatars: skipped fingerprint=#{TwitterAvatar.fingerprint(row.original_url)} url=#{row.original_url} reason=#{exception.message}"
+    end
+
+    logger.info "BackfillTwitterAvatars: batch=#{batch} scanned=#{rows.size} copied=#{copied} skipped=#{skipped}"
+    [copied, skipped]
+  end
+
+  # One legacy object, downloaded and read, ready to store unchanged.
+  Prepared = Data.define(:path, :extension, :width, :height, :bytesize, :fingerprint, :placeholder_color) do
+    # Content-addressed on the bytes: identical avatars share one object.
+    def storage_path
+      Image.content_storage_path_for(fingerprint, VARIANT, extension)
+    end
+
+    def content_type
+      CONTENT_TYPES.fetch(extension)
+    end
+  end
+
+  class Copy
+    RowError = Class.new(StandardError)
+
+    EXTENSIONS = {jpeg: "jpg", png: "png"}.freeze
+
+    def initialize(remote_file)
+      @remote_file = remote_file
+    end
+
+    def call
+      prepare do |prepared|
+        File.open(prepared.path) do |file|
+          Image.storage_client.put_object(Image.bucket, prepared.storage_path, file, {
+            "Content-Type"  => prepared.content_type,
+            "Cache-Control" => "max-age=315360000, public, immutable"
+          })
+        end
+
+        Image.attach!(
+          provider: Image.providers[:twitter_avatar],
+          provider_id: TwitterAvatar.fingerprint(@remote_file.original_url),
+          kind: Image.kinds[:avatar],
+          feed_id: nil,
+          url: @remote_file.original_url,
+          variant: VARIANT,
+          image_fingerprint: prepared.fingerprint,
+          original_fingerprint: prepared.fingerprint,
+          storage_path: prepared.storage_path,
+          width: prepared.width,
+          height: prepared.height,
+          bytesize: prepared.bytesize,
+          placeholder_color: prepared.placeholder_color,
+          data: {"source" => "remote_files"}
+        )
+      end
+    end
+
+    # Download, format check, metadata: everything short of writing. Shared
+    # with sizing, which must measure exactly what the copy will do. The file
+    # is removed whatever the block does.
+    def prepare
+      path = download
+      extension = EXTENSIONS[ImageFormat.detect(path)]
+      raise RowError, "unsupported format" if extension.nil?
+
+      yield read(path, extension)
+    ensure
+      FileUtils.rm_f(path) if path
+    end
+
+    private
+
+    # The objects were uploaded public-read. block_ssrf: the URL comes from a
+    # database row, and the objects live on public bucket addresses, so the
+    # guard costs nothing.
+    def download
+      Feedkit::Request.download(@remote_file.storage_url, block_ssrf: true).persist!
+    rescue Feedkit::Error => exception
+      raise RowError, "download failed (#{exception.class})"
+    end
+
+    # placeholder_color decodes every pixel, so a corrupt body fails here and
+    # not in the block.
+    def read(path, extension)
+      processed = ImageCrawler::Processor::Processed.new(path)
+      Prepared.new(
+        path: path,
+        extension: extension,
+        width: processed.width,
+        height: processed.height,
+        bytesize: processed.size,
+        fingerprint: processed.fingerprint,
+        placeholder_color: processed.placeholder_color
+      )
+    rescue Vips::Error
+      raise RowError, "undecodable"
+    end
   end
 end
