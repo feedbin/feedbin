@@ -160,16 +160,6 @@ module ImageCrawler
       assert_equal ["https://micro.example/posts/avatars.example.net/a.png", "http://avatars.example.net/a.png"], find_args.last["image_urls"]
     end
 
-    test "never passes the proxy's cached object" do
-      url = "https://micro.example/a.png"
-      RemoteFile.create!(fingerprint: RemoteFile.fingerprint(url), original_url: url, storage_url: "https://icons.example.net/abc/a.png")
-      post(url)
-
-      MicropostAvatar.schedule(@feed)
-
-      assert_equal [url], find_args.last["image_urls"]
-    end
-
     # The receiver's pass covers only the posts its crawl created, so an
     # older entry whose avatar never landed is not fetched again.
     test "perform with entry ids limits the pass to those entries" do

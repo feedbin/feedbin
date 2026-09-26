@@ -1,8 +1,8 @@
 # A Twitter user's avatar by the URL a tweet carries. Twitter has no crawler:
-# the only stored copies are the ones BackfillTwitterAvatars moved out of
-# remote_files, one images row per URL, keyed by the URL's MD5. The signing
-# is RemoteFile's, so the icons path's existing URLs, and the CDN's cache of
-# them, stay valid.
+# the only stored copies are the ones copied out of the icon proxy's cache,
+# one images row per URL, keyed by the URL's MD5. The signing is the icon
+# proxy's, so the icons path's existing URLs, and the CDN's cache of them,
+# stay valid.
 class TwitterAvatar
   def self.fingerprint(url)
     Digest::MD5.hexdigest(url.to_s)

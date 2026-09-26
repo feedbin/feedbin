@@ -3,13 +3,13 @@ require "test_helper"
 class TwitterAvatarTest < ActiveSupport::TestCase
   URL = "https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs.png"
 
-  # The migrated rows are keyed by the value remote_files used, so the two
-  # must agree while both exist.
-  test "fingerprint matches RemoteFile.fingerprint" do
-    assert_equal RemoteFile.fingerprint(URL), TwitterAvatar.fingerprint(URL)
+  # The copied rows are keyed by the MD5 of the URL, the key remote_files
+  # used. Changing it would orphan every copied avatar.
+  test "fingerprint is the MD5 of the url" do
+    assert_equal Digest::MD5.hexdigest(URL), TwitterAvatar.fingerprint(URL)
   end
 
-  # The icons path's existing URLs carry the signature RemoteFile made:
+  # The icons path's existing URLs carry the signature the icon proxy made:
   # HMAC-SHA1 of the URL with the camo key. Changing it would break every
   # URL the CDN has cached.
   test "sign is the icon proxy's signature" do

@@ -22,7 +22,7 @@ class Image < ApplicationRecord
     entry_link_preview: 1,     # link preview image
     entry_preview:      2,     # main preview image
     feed_icon:          3,     # feed-level icon (mastodon, podcast, youtube, twitter)
-    remote_file:        4,     # adhoc images
+    # 4 was remote_file, the icon proxy's rows; it had none when it went. Do not reuse it.
     embed_icon:         5,     # embed-provider icon keyed by that provider's own id (YouTube channel avatars)
     website_favicon:    6,     # a host's favicon, keyed by host ("medium.com")
     website_touch_icon: 7,     # a host's apple-touch-icon, keyed by host; deliberately its own provider, see below
