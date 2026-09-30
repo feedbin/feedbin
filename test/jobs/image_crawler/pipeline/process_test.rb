@@ -141,6 +141,38 @@ module ImageCrawler
         end
       end
 
+      # A 16:9 video in YouTube's 4:3 sddefault frame, with the face near
+      # the top of the picture: smart_crop centers on the face and pulls
+      # the top bar into the frame.
+      def test_should_crop_out_youtube_letterbox_bars
+        with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
+          picture = Vips::Image.new_from_file(copy_support_file("image.jpeg")).crop(0, 400, 640, 360)
+          download_path = File.join(Dir.tmpdir, "#{SecureRandom.hex}.jpg")
+          picture.embed(0, 60, 640, 480, extend: :black).write_to_file(download_path)
+
+          image = Image.new_with_attributes(
+            id: SecureRandom.hex,
+            kind: ::Image.kinds[:poster], preset_name: "primary",
+            image_urls: [],
+            provider: ::Image.providers[:entry_preview],
+            provider_id: 1,
+            feed_id: 1,
+            original_url: "https://www.youtube.com/embed/oJXKHJeVav0",
+            final_url: "https://i.ytimg.com/vi/oJXKHJeVav0/sddefault.jpg",
+            download_path: download_path
+          )
+
+          Process.new.perform(image.to_h)
+
+          queued = Image.new(Upload.jobs.last["args"].first)
+          processed = Vips::Image.new_from_file(queued.processed_path)
+          assert_operator processed.crop(0, 0, processed.width, 2).avg, :>, 10, "top rows are the letterbox bar"
+          assert_operator processed.crop(0, processed.height - 2, processed.width, 2).avg, :>, 10, "bottom rows are the letterbox bar"
+
+          File.unlink(queued.processed_path)
+        end
+      end
+
       # The icon presets keep their own format: crop! hands the png crops
       # straight back rather than encoding the geometry as jpg.
       def test_should_produce_a_single_png_for_content_addressed_presets

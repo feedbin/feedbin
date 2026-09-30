@@ -19,6 +19,10 @@ module ImageCrawler
       Feedbin::Application.config.youtube_embed_urls + THUMBNAIL_URLS
     end
 
+    def self.thumbnail?(url)
+      THUMBNAIL_URLS.any? { url.to_s.match?(it) }
+    end
+
     def download
       SIZES.each do |option|
         @image_url = "https://i.ytimg.com/vi/#{provider_identifier}/#{option}.jpg"

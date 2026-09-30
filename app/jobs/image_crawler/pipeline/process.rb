@@ -16,7 +16,7 @@ module ImageCrawler
         Sidekiq.logger.info "Process: public_id=#{@image.id} final_url=#{@image.final_url}"
 
         processor = Processor::Cropper.new(@image.download_path,
-          crop:   @image.preset.crop,
+          crop:   @image.crop,
           width:  @image.preset.width,
           height: @image.preset.height
         )

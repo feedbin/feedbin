@@ -95,6 +95,13 @@ module ImageCrawler
       preset.validate
     end
 
+    # A YouTube thumbnail below maxresdefault is a 16:9 picture letterboxed
+    # in a 4:3 frame, so only a centered crop cuts off both bars. smart_crop
+    # follows faces and drags a bar back into the frame.
+    def crop
+      Download::Youtube.thumbnail?(final_url) ? :fill_crop : preset.crop
+    end
+
     # The row is written by now, so the callback needs only to know which
     # one: storage_path and provider_id. The caller's context rides through
     # every stage untouched and comes back here.
