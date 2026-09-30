@@ -16,7 +16,7 @@ class Share::ServiceTest < ActiveSupport::TestCase
     @entry.update_column(:url, nil)
     assert_nil @entry.reload.fully_qualified_url
 
-    stub_request(:post, "https://www.instapaper.com/api/1/bookmarks/add").to_return(status: 400, body: "")
+    stub_request(:post, "https://www.instapaper.com/api/2/bookmarks").to_return(status: 400, body: "")
 
     response = nil
     assert_no_difference -> { ShareRetry.jobs.count } do
@@ -24,11 +24,11 @@ class Share::ServiceTest < ActiveSupport::TestCase
     end
 
     assert response[:error].present?, "the user should be told why it could not be shared"
-    assert_not_requested :post, "https://www.instapaper.com/api/1/bookmarks/add"
+    assert_not_requested :post, "https://www.instapaper.com/api/2/bookmarks"
   end
 
   test "a failure that could succeed later is still retried" do
-    stub_request(:post, "https://www.instapaper.com/api/1/bookmarks/add").to_return(status: 500, body: "")
+    stub_request(:post, "https://www.instapaper.com/api/2/bookmarks").to_return(status: 500, body: "")
 
     assert_difference -> { ShareRetry.jobs.count }, +1 do
       Share::Instapaper.new(@klass).share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id))

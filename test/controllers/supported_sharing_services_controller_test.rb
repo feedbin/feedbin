@@ -150,6 +150,69 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should authorize instapaper with oauth2 and share with the bearer token" do
+    access_token = "instapaper_token"
+
+    login_as @user
+
+    with_env("INSTAPAPER_KEY" => "the-key", "INSTAPAPER_SECRET" => "the-secret") do
+      post :create, params: {supported_sharing_service: {service_id: "instapaper", operation: "authorize"}}
+
+      state = session[:oauth2_state]
+      assert state.present?, "authorize should have issued a state nonce"
+      assert_match %r{\Ahttps://www\.instapaper\.com/oauth2/authorize\?}, @response.redirect_url
+      assert_match %r{state=#{state}}, CGI.unescape(@response.redirect_url)
+
+      stub_request(:post, "https://www.instapaper.com/oauth2/token")
+        .to_return(
+          status: 200,
+          headers: {content_type: "application/json"},
+          body: {token_type: "Bearer", access_token: access_token, user: {id: 42, username: "reader@example.com"}}.to_json
+        )
+
+      assert_difference -> { SupportedSharingService.count }, +1 do
+        get :oauth2_response, params: {id: "instapaper", code: "code", state: state}
+        assert_redirected_to sharing_services_url
+      end
+    end
+
+    share = @user.supported_sharing_services.find_by(service_id: "instapaper")
+    assert_equal access_token, share.access_token
+    assert share.ok?
+
+    entry = create_entry(feeds(:daring_fireball))
+    bookmark = stub_request(:post, "https://www.instapaper.com/api/2/bookmarks")
+      .with(headers: {"Authorization" => "Bearer #{access_token}"}, body: hash_including("url" => entry.fully_qualified_url))
+      .to_return(status: 200, headers: {content_type: "application/json"}, body: {id: 1}.to_json)
+
+    post :share, params: {id: share, entry_id: entry.id}, xhr: true
+    assert_response :success
+    assert_requested bookmark
+  end
+
+  test "should tell the user when the oauth2 code exchange is rejected" do
+    login_as @user
+
+    with_env("INSTAPAPER_KEY" => "the-key", "INSTAPAPER_SECRET" => "the-secret") do
+      post :create, params: {supported_sharing_service: {service_id: "instapaper", operation: "authorize"}}
+      state = session[:oauth2_state]
+
+      stub_request(:post, "https://www.instapaper.com/oauth2/token")
+        .to_return(
+          status: 400,
+          headers: {content_type: "application/json"},
+          body: {error: "invalid_grant", error_description: "The authorization code is invalid, expired, or already used."}.to_json
+        )
+
+      assert_no_difference -> { SupportedSharingService.count } do
+        get :oauth2_response, params: {id: "instapaper", code: "stale", state: state}
+      end
+    end
+
+    assert_redirected_to sharing_services_url
+    assert flash[:alert].present?, "the user should be told the sign-in failed"
+  end
+
   test "should share" do
     Sidekiq::Worker.clear_all
     entry = create_entry(feeds(:daring_fireball))

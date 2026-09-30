@@ -21,7 +21,7 @@ class SupportedSharingServiceTest < ActiveSupport::TestCase
   test "info returns the service definition for a known service_id" do
     info = SupportedSharingService.info("instapaper")
     assert_equal "Instapaper", info.label
-    assert_equal "xauth", info.service_type
+    assert_equal "oauth2", info.service_type
   end
 
   test "info returns nil for an unknown service_id" do
@@ -37,7 +37,7 @@ class SupportedSharingServiceTest < ActiveSupport::TestCase
   test "label, service_type, klass, requires_auth? read from the service info" do
     record = @user.supported_sharing_services.create!(service_id: "instapaper")
     assert_equal "Instapaper", record.label
-    assert_equal "xauth", record.service_type
+    assert_equal "oauth2", record.service_type
     assert_equal "Share::Instapaper", record.klass
     assert record.requires_auth?
   end

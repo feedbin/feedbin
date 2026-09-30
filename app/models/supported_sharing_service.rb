@@ -20,7 +20,7 @@ class SupportedSharingService < ApplicationRecord
       service_id: "instapaper",
       label: "Instapaper",
       requires_auth: true,
-      service_type: "xauth",
+      service_type: "oauth2",
       klass: "Share::Instapaper"
     }),
     OpenStruct.new({
