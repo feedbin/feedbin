@@ -1,5 +1,0 @@
-<% if @user.setting_on?(:starred_feed_enabled) %>
-    <div class="truncate">Feed URL: <%= link_to starred_url(user.starred_token, format: :xml), starred_url(user.starred_token, format: :xml) %></div>
-<% else %>
-    For <a href="/blog/2013/04/10/starred-entry-feed/">integrating with other services</a>.
-<% end %>
