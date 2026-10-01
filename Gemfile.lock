@@ -314,6 +314,7 @@ GEM
       base64 (~> 0.2)
       concurrent-ruby (~> 1.1)
       websocket-driver (~> 0.7)
+    ffi (1.17.4)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
@@ -469,6 +470,7 @@ GEM
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
+    pg (1.6.3)
     pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-darwin)
     pg (1.6.3-x86_64-linux)
@@ -658,6 +660,7 @@ GEM
     tailwindcss-rails (3.3.2)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 3.0)
+    tailwindcss-ruby (3.4.19)
     tailwindcss-ruby (3.4.19-arm64-darwin)
     tailwindcss-ruby (3.4.19-x86_64-darwin)
     tailwindcss-ruby (3.4.19-x86_64-linux)
@@ -701,6 +704,7 @@ PLATFORMS
   arm64-darwin-23
   arm64-darwin-24
   arm64-darwin-25
+  arm64-darwin-27
   x86_64-darwin-20
   x86_64-linux
 
@@ -789,4 +793,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-  4.0.4
+  4.0.22

@@ -92,6 +92,9 @@ jobs:
           RAILS_ENV: test
           KINDLEGEN_PATH: /usr/local/bin/kindlegen
           RUBYOPT: "--yjit --yjit-exec-mem-size=1024"
+          # Ubuntu's libvips uses plain libjpeg, which ignores the mozjpeg
+          # save options and warns about each one on every JPEG save.
+          VIPS_WARNING: "0"
         run: |
           ruby -v
           psql -c 'create database feedbin_test;' -U postgres
