@@ -1746,11 +1746,6 @@ $.extend feedbin,
           feedbin.clearEntry()
         return
 
-    nullForm: ->
-      $(document).on 'ajax:beforeSend', '[data-behavior~=null_form]', (event, xhr) ->
-        xhr.abort()
-        return
-
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
         if $(event.target).is("[data-behavior~=feed_action_parent]")
@@ -1806,33 +1801,6 @@ $.extend feedbin,
           document.location = feedbin.data.login_url
         return
 
-    screenshotTabs: ->
-      $('[data-behavior~=screenshot_nav] li').first().addClass('active')
-      $(document).on 'click', '[data-behavior~=screenshot_nav] a', (event) ->
-        $('[data-behavior~=screenshot_nav] li').removeClass('active')
-        $(@).parent('li').addClass('active')
-        src = $(@).find('img').attr('src')
-        $("[data-behavior~=screenshots] img").addClass('hide')
-        $("[data-behavior~=screenshots] img[src='#{src}']").removeClass('hide')
-        event.preventDefault()
-        return
-
-      $(document).on 'click', '[data-behavior~=screenshot_previous], [data-behavior~=screenshot_next]', (event) ->
-        selectedScreenshot = $('[data-behavior~=screenshot_nav] li.active')
-        button = $(event.target).data('behavior')
-        if button.match(/screenshot_next/)
-          nextScreenshot = selectedScreenshot.next()
-          if nextScreenshot.length == 0
-            nextScreenshot = $('li:first-child', $('[data-behavior~=screenshot_nav]'))
-        else
-          nextScreenshot = selectedScreenshot.prev()
-          if nextScreenshot.length == 0
-            nextScreenshot = $('li:last-child', $('[data-behavior~=screenshot_nav]'))
-
-        nextScreenshot.find('a')[0]?.click()
-        event.preventDefault()
-        return
-
     sourceable: ->
       $(document).on 'click', '[data-sourceable-payload-param]', (event) ->
         custom = new CustomEvent("sourceable:selected", {detail: {data: $(@).data("sourceablePayloadParam"), target: event.currentTarget}})
@@ -1861,16 +1829,6 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         feedbin.showPanel(3)
-
-    addFields: ->
-      $(document).on 'click', '[data-behavior~=add_fields]', (event) ->
-        time = new Date().getTime() + '_insert'
-        id = $(@).data('id')
-        regexp = new RegExp(id, 'g')
-        content = $(@).data('fields').replace(regexp, time)
-        $('[data-behavior~=add_fields_target]').find('tbody').prepend(content)
-        event.preventDefault()
-        return
 
     removeFields: ->
       $(document).on 'click', '[data-behavior~=remove_fields]', (event) ->
@@ -2279,16 +2237,12 @@ $.extend feedbin,
             container.addClass('hide')
           ), 4000
 
-    feedsSearch: ->
-      $(document).on 'submit', '[data-behavior~=feeds_search]', ->
-        feedbin.hideSubscribeResults()
-
     formProcessing: ->
-      $(document).on 'submit', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
+      $(document).on 'submit', '[data-behavior~=spinner], [data-behavior~=search_form]', ->
         $(@).attr('data-processing', 'true')
         return
 
-      $(document).on 'ajax:complete', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
+      $(document).on 'ajax:complete', '[data-behavior~=spinner], [data-behavior~=search_form]', ->
         $(@).attr('data-processing', 'false')
         if feedbin.closeSubcription
           setTimeout ( ->
@@ -2302,55 +2256,6 @@ $.extend feedbin,
         window.xhrEvent = xhr
         feedbin.showNotification('Search error.', true);
         return
-
-    deleteAssociatedRecord: ->
-      $(document).on 'click', '.remove_fields', (event) ->
-        $(@).parents('[data-behavior~=associated_record]').hide(feedbin.fastAnimation)
-
-    editAction: ->
-      $(document).on 'click', '[data-behavior~=edit_action]', (event) ->
-        actionForm = $(@).parents('.action-form')
-        editForm = actionForm.find('.action-edit-form')
-        actionDescription = $(@).parents('.action-form').find('.action-description')
-        if editForm.hasClass('hide')
-          editForm.removeClass('hide')
-          actionForm.addClass('selected')
-          actionDescription.addClass('hide')
-        else
-          editForm.addClass('hide')
-          actionForm.removeClass('selected')
-          actionDescription.removeClass('hide')
-        event.stopPropagation()
-        event.preventDefault()
-        return
-
-    serviceOptions: ->
-      open = (container, height) ->
-        callback = -> container.addClass('fully-open')
-        setTimeout callback, feedbin.fastAnimation
-        container.addClass('open').css
-          height: height
-
-      close = (container, height) ->
-        container.removeClass('fully-open')
-        container.removeClass('open')
-        container.css
-          height: 0
-
-      $(document).on 'click', '[data-behavior~=toggle_service_options]', (event) ->
-        height = $(@).parents('li').find('.service-options').outerHeight()
-        container = $(@).closest('li').find('.service-options-wrap')
-        if container.hasClass('open')
-          close(container, height)
-        else
-          open(container, height)
-        event.preventDefault()
-
-    selectText: ->
-      $(document).on 'mouseup', '[data-behavior~=select_text]', (event) ->
-        $(@).select()
-        event.preventDefault()
-      return
 
     fuzzyFilter: ->
       feeds = $('[data-sort-name]')
@@ -2455,14 +2360,6 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
-    selectCategory: ->
-      $(document).on 'click', '[data-behavior~=selected_category]', (event) ->
-        $(@).find('[data-behavior~=categories]').toggleClass('hide')
-
-    toggleContent: ->
-      $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
-        $(@).parents("form").submit()
-
     linkActionsHover: ->
       cacheLink = (link) ->
         unless link.is("[data-link-cached]")
@@ -2531,13 +2428,6 @@ $.extend feedbin,
           href = $(@).attr('href')
           feedbin.loadLink(href)
           event.preventDefault()
-
-    showMessage: ->
-      $(document).on 'click', '[data-behavior~=show_message]', (event) ->
-        message = $(@).data("message")
-        if message
-          feedbin.showNotification(message)
-        event.preventDefault()
 
     autoSubmit: ->
       callback = (event) ->
@@ -2616,12 +2506,6 @@ $.extend feedbin,
 
       $(document).on 'submit', '[data-behavior~=close_dialog_on_submit]', (event) ->
         feedbin.closeDialog()
-
-    showContainer: ->
-      $(document).on 'click', '[data-behavior~=show_container]', (event) ->
-        target = $(@).data('target')
-        $("[data-container~=#{target}]").slideToggle("fast")
-        event.preventDefault()
 
     showApp: ->
       $('.app-wrap').addClass('show')
