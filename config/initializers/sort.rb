@@ -51,10 +51,6 @@ String.class_eval do
 end
 
 module Enumerable
-  def natural_sort
-    natural_sort_by
-  end
-
   def natural_sort_by(&stringifier)
     sort_by do |element|
       element = yield(element) if stringifier

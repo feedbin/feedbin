@@ -69,23 +69,6 @@ class SupportedSharingServiceTest < ActiveSupport::TestCase
     refute without_sheet.has_share_sheet?
   end
 
-  test "auth_present? reflects whether an access token is stored" do
-    record = @user.supported_sharing_services.create!(service_id: "instapaper")
-    refute record.auth_present?
-
-    record.update!(access_token: "tok")
-    assert record.auth_present?
-  end
-
-  test "remove_access! clears the access token and secret" do
-    record = @user.supported_sharing_services.create!(service_id: "instapaper", access_token: "tok", access_secret: "sec")
-
-    record.remove_access!
-
-    assert_nil record.reload.access_token
-    assert_nil record.access_secret
-  end
-
   test "completions returns the saved completions or an empty array" do
     record = @user.supported_sharing_services.create!(service_id: "email")
     assert_equal [], record.completions

@@ -49,24 +49,10 @@ class Import < ApplicationRecord
     (pending.to_f / all.to_f) * 100
   end
 
-  def percentage_failed
-    all = import_items.count
-    return 0 if all == 0
-    failed = import_items.failed.count
-    (failed.to_f / all.to_f) * 100
-  end
-
   def percentage_complete
     all = import_items.count
     return 0 if all == 0
     complete = import_items.complete.count
-    (complete.to_f / all.to_f) * 100
-  end
-
-  def percentage_fixable
-    all = import_items.count
-    return 0 if all == 0
-    complete = import_items.fixable.count
     (complete.to_f / all.to_f) * 100
   end
 end

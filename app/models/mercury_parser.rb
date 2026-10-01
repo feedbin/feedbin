@@ -14,13 +14,6 @@ class MercuryParser
     instance
   end
 
-  def self.parse_with_html(...)
-    Librato.increment "readability.first_parse"
-    instance = new(...)
-    instance.result
-    instance
-  end
-
   def title
     result["title"]
   end

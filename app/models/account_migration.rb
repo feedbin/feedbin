@@ -12,10 +12,6 @@ class AccountMigration < ApplicationRecord
     (pending.to_f / all.to_f) * 100
   end
 
-  def method_name
-
-  end
-
   def streams
     fw_streams.safe_dig("streams").filter do |stream|
       stream.safe_dig("search_term").nil? && stream.safe_dig("feeds").count > 0

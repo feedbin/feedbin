@@ -175,16 +175,8 @@ class Feed < ApplicationRecord
     end
   end
 
-  def list_unsubscribe
-    options.safe_dig("email_headers", "List-Unsubscribe")
-  end
-
   def json_feed
     options&.respond_to?(:dig) && options&.safe_dig("json_feed")
-  end
-
-  def has_subscribers?
-    subscriptions_count > 0
   end
 
   def web_sub_secret

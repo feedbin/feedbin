@@ -26,12 +26,6 @@ class SendStats
     end
   end
 
-  def yjit_stats
-    RubyVM::YJIT.runtime_stats.each do |name, value|
-      Librato.measure "yjit.jobs.#{name}", value, source: Socket.gethostname
-    end
-  end
-
   def sidekiq_queue_depth
     Sidekiq::Queue.all.each do |queue|
       Librato.measure "sidekiq.queue_depth.#{queue.name}", queue.size

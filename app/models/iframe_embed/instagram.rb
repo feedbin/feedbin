@@ -52,10 +52,4 @@ class IframeEmbed::Instagram
       JSON.parse(response)
     end
   end
-
-  def page_data
-    @page_data ||= begin
-      UrlCache.new(permalink).body
-    end
-  end
 end

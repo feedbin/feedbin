@@ -150,10 +150,6 @@ class SupportedSharingService < ApplicationRecord
     end
   end
 
-  def remove_access!
-    update(access_token: nil, access_secret: nil)
-  end
-
   # Hook that gets called after a service is successfully activated
   def after_activate
     result = service.try(:after_activate)
@@ -222,10 +218,6 @@ class SupportedSharingService < ApplicationRecord
 
   def has_share_sheet?
     info.respond_to? :has_share_sheet
-  end
-
-  def auth_present?
-    access_token.present?
   end
 
   def completions

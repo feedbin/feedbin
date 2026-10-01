@@ -77,14 +77,6 @@ class Entry < ApplicationRecord
     mode.to_s == "extended" ? includes(:feed).preload(:owned_image_records) : includes(:feed)
   }
 
-  def self.sort_preference(sort)
-    if sort == "ASC"
-      order("published ASC")
-    else
-      order("published DESC")
-    end
-  end
-
   def newsletter?
     feed.newsletter?
   end
