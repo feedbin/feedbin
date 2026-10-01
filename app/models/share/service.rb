@@ -20,6 +20,8 @@ class Share::Service
         klass.auth_error!
         response[:url] = Rails.application.routes.url_helpers.sharing_services_path
         response[:error] = "#{klass.label} authentication error."
+      elsif status == :unreachable
+        response[:error] = "Could not connect to #{klass.label}."
       else
         response[:error] = "There was a problem connecting to #{klass.label}."
         ShareRetry.perform_in(1.minute, klass.id, params)

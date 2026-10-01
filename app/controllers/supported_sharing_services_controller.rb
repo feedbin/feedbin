@@ -101,6 +101,8 @@ class SupportedSharingServicesController < ApplicationController
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       end
     end
+  rescue Share::Service::AuthError => exception
+    redirect_to sharing_services_url, alert: exception.message
   rescue OAuth2::Error => exception
     ErrorService.notify(
       error_class: "SupportedSharingServicesController#oauth2_response",

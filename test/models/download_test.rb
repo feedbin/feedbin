@@ -35,4 +35,14 @@ class DownloadTest < ActiveSupport::TestCase
 
     assert_equal "/epub/images/#{download.filename}", download.file_path.to_s
   end
+
+  test "refuses to download an image from a private address" do
+    download = Download.new("http://127.0.0.1:9/image.png")
+
+    assert_raises Feedkit::PrivateNetworkAddress do
+      download.download
+    end
+  ensure
+    download&.delete
+  end
 end

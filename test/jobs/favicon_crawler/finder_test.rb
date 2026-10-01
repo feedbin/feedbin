@@ -99,6 +99,29 @@ module FaviconCrawler
       assert_empty ImageCrawler::Pipeline::Find.jobs
     end
 
+    test "an invalid host schedules nothing" do
+      Finder.new.perform("source: youtube https://example.com")
+
+      assert_empty ImageCrawler::Pipeline::Find.jobs
+    end
+
+    test "fetches the homepage with Feedkit's private address check" do
+      options = nil
+      response = Struct.new(:body, :url, :redirects).new(ONE_ICON, @page_url.to_s, [])
+      download = ->(_url, **args) do
+        options = args
+        response
+      end
+
+      Feedkit::Request.stub(:download, download) do
+        Finder.new.perform(@page_url.host)
+      end
+
+      assert_equal true, options[:block_ssrf]
+      assert_equal({connect: 5, write: 5, read: 5}, options[:timeout])
+      assert_equal 1, find_jobs.size
+    end
+
     # One crawl per host per hour, whatever the number of subscribe events.
     test "the gate admits one crawl per host per hour" do
       stub_homepage

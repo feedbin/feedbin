@@ -18,6 +18,7 @@ module FaviconCrawler
     def perform(host, force = false)
       @host = host.to_s.downcase
       return if @host.blank?
+      return unless homepage_url
 
       unless force || RedisLock.acquire("favicon_crawl:#{@host}", GATE.to_i)
         Librato.increment("favicon.gated")
@@ -59,7 +60,8 @@ module FaviconCrawler
       return @icon_links if defined?(@icon_links)
       @icon_links = begin
         homepage = download_homepage
-        Nokogiri::HTML5(homepage.to_s).search(xpath)
+        base_url = homepage.redirects.last&.to || homepage.url
+        Nokogiri::HTML5(homepage.body).search(xpath)
           .reject {
             it["href"].to_s.strip.empty?
           }
@@ -75,7 +77,7 @@ module FaviconCrawler
             index.nil? ? ICON_NAMES.length : index
           }
           .map {
-            [it["rel"].to_s.strip.downcase, Addressable::URI.join(homepage.uri, it["href"])]
+            [it["rel"].to_s.strip.downcase, Addressable::URI.join(base_url, it["href"])]
           }
       rescue => exception
         Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@host}"
@@ -94,12 +96,17 @@ module FaviconCrawler
     end
 
     def default_favicon_location
-      URI::HTTP.build(host: @host, path: "/favicon.ico")
+      homepage_url.dup.tap { it.path = "/favicon.ico" }
     end
 
     def download_homepage
-      url = URI::HTTP.build(host: @host)
-      HTTP.timeout(write: 5, connect: 5, read: 5).follow.get(url)
+      Feedkit::Request.download(homepage_url.to_s, block_ssrf: true, timeout: {connect: 5, write: 5, read: 5})
+    end
+
+    def homepage_url
+      @homepage_url ||= URI::HTTP.build(host: @host)
+    rescue URI::InvalidComponentError
+      nil
     end
 
     def xpath

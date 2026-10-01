@@ -10,13 +10,16 @@ class IframeEmbed::Youtube < IframeEmbed
   def image_url
     url = data["thumbnail_url"].sub "hqdefault", "maxresdefault"
     status = Rails.cache.fetch("youtube_thumb_status:#{Digest::SHA1.hexdigest(url)}") {
-      HTTP.head(url).status
+      HTTP.timeout(write: 5, connect: 5, read: 5)
+        .head(url, socket_class: Feedkit::PrivateAddressCheck::Socket).status
     }
     if status == 200
       url
     else
       data["thumbnail_url"]
     end
+  rescue HTTP::Error, OpenSSL::SSL::SSLError, Feedkit::PrivateNetworkAddress, URI::InvalidURIError
+    data["thumbnail_url"]
   end
 
   def canonical_url

@@ -19,7 +19,7 @@ class ChapterParser
       Sidekiq.logger.info "Found chapters entry=#{@entry.id}"
       @entry.update(chapters:)
     end
-  rescue HTTP::TimeoutError, HTTP::ConnectionError
+  rescue HTTP::Error, OpenSSL::SSL::SSLError, Feedkit::PrivateNetworkAddress, Addressable::URI::InvalidURIError
   end
 
   def parse_chapters
@@ -61,9 +61,9 @@ class ChapterParser
       )
 
     unless basic_auth.empty?
-      http = http.basic_auth(basic_auth)
+      http = http.basic_auth(**basic_auth)
     end
 
-    http.get(@url)
+    http.get(@url, socket_class: Feedkit::PrivateAddressCheck::Socket)
   end
 end

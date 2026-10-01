@@ -128,7 +128,7 @@ class Feed < ApplicationRecord
   end
 
   def check
-    Feedkit::Request.download(feed_url)
+    Feedkit::Request.download(feed_url, block_ssrf: true)
   end
 
   def volume

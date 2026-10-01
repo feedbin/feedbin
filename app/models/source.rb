@@ -38,7 +38,7 @@ class Source
   end
 
   def create_from_url!(url)
-    create_from_request!(Feedkit::Request.download(url))
+    create_from_request!(Feedkit::Request.download(url, block_ssrf: true))
   end
 
   def create_from_request!(response)

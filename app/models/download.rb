@@ -20,7 +20,9 @@ class Download
 
   def download
     File.open(file_path, "wb") do |f|
-      @response = HTTP.timeout(write: 5, connect: 5, read: 20).follow(max_hops: 5).get(url)
+      # Stream into the caller's filename while checking every connected address.
+      @response = HTTP.timeout(write: 5, connect: 5, read: 20).follow(max_hops: 5)
+        .get(url, socket_class: Feedkit::PrivateAddressCheck::Socket)
       @response.body.each { |chunk| f.write(chunk) }
     end
     file_path

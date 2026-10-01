@@ -60,6 +60,30 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     end
   end
 
+  test "a video API timeout preserves existing embeds and skips the channel request" do
+    embed = Embed.youtube_video.create!(provider_id: "video_id", data: {"snippet" => {"title" => "Existing title"}})
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos}).to_timeout
+
+    assert_no_difference "Embed.count" do
+      HarvestEmbeds::Download.new.perform(["video_id"])
+    end
+
+    assert_equal "Existing title", embed.reload.data.dig("snippet", "title")
+    assert_not_requested :get, %r{www.googleapis.com/youtube/v3/channels}
+  end
+
+  test "a channel API timeout still saves the available video metadata" do
+    stub_youtube_api
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/channels}).to_timeout
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    video = Embed.youtube_video.find_by!(provider_id: "video_id")
+    assert_equal "channel_id", video.parent_id
+    assert_equal 9743, video.duration_in_seconds
+    assert_nil Embed.youtube_channel.find_by(provider_id: "channel_id")
+  end
+
   test "should add provider_parent_id from existing embed" do
     Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
 

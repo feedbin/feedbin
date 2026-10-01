@@ -34,4 +34,17 @@ class Share::ServiceTest < ActiveSupport::TestCase
       Share::Instapaper.new(@klass).share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id))
     end
   end
+
+  test "an unreachable server is reported without a retry" do
+    service = Share::Instapaper.new(@klass)
+    response = nil
+
+    service.stub(:add, :unreachable) do
+      assert_no_difference -> { ShareRetry.jobs.count } do
+        response = service.share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id))
+      end
+    end
+
+    assert_match(/Could not connect/, response[:error])
+  end
 end

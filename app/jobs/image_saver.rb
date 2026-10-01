@@ -8,7 +8,7 @@ class ImageSaver
     @entry = Entry.find(entry_id)
     Nokogiri::HTML5(content).css("img").each do |image|
       src = image["src"]
-      next unless src.start_with?("http")
+      next unless src&.start_with?("http")
       file = Download.new(src)
       unless already_uploaded? file
         upload file
@@ -16,7 +16,7 @@ class ImageSaver
     # Per image, not per entry: one unreachable host or one src this cannot be
     # made sense of should cost that image, and leave the well-formed ones
     # further down the document archived.
-    rescue HTTP::Error, Addressable::URI::InvalidURIError
+    rescue HTTP::Error, OpenSSL::SSL::SSLError, Feedkit::PrivateNetworkAddress, Addressable::URI::InvalidURIError
       next
     ensure
       file.delete if file
@@ -27,7 +27,7 @@ class ImageSaver
     # naming the gem's top-level module read as a broad catch and caught
     # nothing. HTTP::Error is the base class this meant, and is what every other
     # rescue of this gem in the app names.
-  rescue ActiveRecord::RecordNotFound, HTTP::Error
+  rescue ActiveRecord::RecordNotFound, HTTP::Error, OpenSSL::SSL::SSLError, Feedkit::PrivateNetworkAddress
   end
 
   private

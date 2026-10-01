@@ -24,6 +24,22 @@ class ImageSaverTest < ActiveSupport::TestCase
     end
   end
 
+  test "skips images without a src" do
+    @entry.update!(content: "<img>")
+
+    ImageSaver.new.perform(@entry.id)
+
+    assert @entry.reload.archived_images?
+  end
+
+  test "continues after a private address is refused" do
+    Download.stub(:new, ->(*) { raise Feedkit::PrivateNetworkAddress }) do
+      ImageSaver.new.perform(@entry.id)
+    end
+
+    assert @entry.reload.archived_images?
+  end
+
   test "swallows an entry deleted between enqueue and perform" do
     id = @entry.id
     @entry.destroy!

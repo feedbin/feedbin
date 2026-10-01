@@ -29,5 +29,23 @@ module WebSub
         Subscribe.new.perform(feed.id)
       end
     end
+
+    test "a TLS failure from a hub does not fail the job" do
+      hub_url = "https://hub.example.com/"
+      feed = Feed.first
+      feed.update!(hubs: [hub_url])
+      stub_request(:post, hub_url).to_raise(OpenSSL::SSL::SSLError)
+
+      assert_nothing_raised { Subscribe.new.perform(feed.id) }
+    end
+
+    test "a redirect loop from a hub does not fail the job" do
+      hub_url = "https://hub.example.com/"
+      feed = Feed.first
+      feed.update!(hubs: [hub_url])
+      stub_request(:post, hub_url).to_return(status: 301, headers: {location: hub_url})
+
+      assert_nothing_raised { Subscribe.new.perform(feed.id) }
+    end
   end
 end

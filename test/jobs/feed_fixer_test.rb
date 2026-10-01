@@ -32,6 +32,22 @@ class FeedFixerTest < ActiveSupport::TestCase
     assert(@user.reload.setting_on?(:fix_feeds_available))
   end
 
+  test "checks discovered feed candidates with a private address guard" do
+    url = "https://example.com/feed/"
+    response = Feedkit::Request.download(url)
+    options = nil
+    download = ->(_url, **args) do
+      options = args
+      response
+    end
+
+    Feedkit::Request.stub(:download, download) do
+      FeedFixer.new.validate_option(url)
+    end
+
+    assert_equal true, options[:block_ssrf]
+  end
+
   test "should skip same feed url" do
     feed_url = @subscription.feed.feed_url
 

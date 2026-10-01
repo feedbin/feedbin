@@ -49,6 +49,14 @@ class IframeEmbed::YoutubeTest < ActiveSupport::TestCase
     end
   end
 
+  test "image_url does not probe a private thumbnail address" do
+    embed = IframeEmbed::Youtube.new(@url)
+    thumbnail = "http://127.0.0.1:9/vi/ABC/hqdefault.jpg"
+    embed.stub(:data, {"thumbnail_url" => thumbnail}) do
+      assert_equal thumbnail, embed.image_url
+    end
+  end
+
   test "channel_name and profile_image are falsy when there is no Embed record" do
     embed = IframeEmbed::Youtube.new(@url)
     refute embed.channel_name

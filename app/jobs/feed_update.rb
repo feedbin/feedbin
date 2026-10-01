@@ -9,6 +9,7 @@ class FeedUpdate
     response = Feedkit::Request.download(url,
       username: parsed_url.username,
       password: parsed_url.password,
+      block_ssrf: true
     )
     result = response.parse(original_url: feed.feed_url)
     feed_data = result.to_feed.compact_blank.except(:feed_url)
@@ -21,6 +22,6 @@ class FeedUpdate
     end
 
     Entry.import!(entries, on_duplicate_key_update: {conflict_target: :public_id, columns: [:title, :url, :author, :content, :data]})
-  rescue Feedkit::NotFeed
+  rescue Feedkit::Error
   end
 end

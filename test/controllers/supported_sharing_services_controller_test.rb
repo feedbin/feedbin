@@ -150,6 +150,17 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "mastodon callback handles a private server" do
+    login_as @user
+    session[:oauth2_state] = "state"
+    OauthServer.create!(host: "127.0.0.1", data: {"client_id" => "id", "client_secret" => "secret"})
+
+    get :oauth2_response, params: {id: "mastodon", code: "code", state: "state", mastodon_host: "127.0.0.1"}
+
+    assert_redirected_to sharing_services_url
+    assert_match(/Could not connect to the Mastodon server/, flash[:alert])
+  end
+
   test "should authorize instapaper with oauth2 and share with the bearer token" do
     access_token = "instapaper_token"
 

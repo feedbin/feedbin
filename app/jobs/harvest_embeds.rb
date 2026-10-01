@@ -50,12 +50,14 @@ class HarvestEmbeds
       items = []
 
       videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
+      return unless videos
+
       # No "items" key is the ordinary answer for deleted, private, or
       # region-blocked ids -- normalise to [].
       video_items = videos.safe_dig("items") || []
       channel_ids = video_items.map { |video| video.safe_dig("snippet", "channelId") }.uniq
       channels    = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
-      channel_items = channels.safe_dig("items") || []
+      channel_items = channels&.safe_dig("items") || []
 
       video_embeds = video_items.map do
         Embed.new(
@@ -138,7 +140,7 @@ class HarvestEmbeds
         }
       }
       response = UrlCache.new("https://www.googleapis.com/youtube/v3/#{type}", options).body
-      JSON.parse(response)
+      JSON.parse(response) if response
     end
 
 

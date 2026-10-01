@@ -49,7 +49,7 @@ module WebSub
       # A hub that resolves privately will never become valid, so this is logged
       # rather than raised: raising would burn the job's whole retry budget.
       Rails.logger.error("WebSub refused hub url=#{url} exception=#{exception.inspect}")
-    rescue HTTP::TimeoutError, HTTP::ConnectionError => exception
+    rescue HTTP::Error, OpenSSL::SSL::SSLError => exception
       Rails.logger.error("WebSub HTTP Error exception=#{exception.inspect}")
     end
   end

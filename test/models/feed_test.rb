@@ -1,6 +1,15 @@
 require "test_helper"
 
 class FeedTest < ActiveSupport::TestCase
+  test "check refuses private network addresses" do
+    options = nil
+    Feedkit::Request.stub(:download, ->(_url, **args) { options = args }) do
+      feeds(:daring_fireball).check
+    end
+
+    assert_equal true, options[:block_ssrf]
+  end
+
   # A url in the feed's options is never rendered: only a row is. A feed
   # without one renders its host's favicon.
   test "icon_url is the stored row, never the options url through the proxy" do

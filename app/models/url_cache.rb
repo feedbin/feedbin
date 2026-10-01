@@ -34,5 +34,7 @@ class UrlCache
         [request.to_s, request.headers.to_h]
       end
     }
+  rescue HTTP::Error, OpenSSL::SSL::SSLError, Addressable::URI::InvalidURIError, URI::InvalidURIError
+    nil
   end
 end

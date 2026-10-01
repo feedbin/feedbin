@@ -64,6 +64,14 @@ class UrlCacheTest < ActiveSupport::TestCase
     assert_nil UrlCache.new(url).body
   end
 
+  test "an upstream timeout returns no body and is not cached" do
+    url = "http://example.com/oembed-#{SecureRandom.hex(6)}"
+    stub_request(:get, url).to_timeout
+
+    assert_nil UrlCache.new(url).body
+    assert_nil Rails.cache.read(UrlCache.new(url).cache_key)
+  end
+
   test "a successful response is cached" do
     url = "http://example.com/oembed-#{SecureRandom.hex(6)}"
     stub_request(:get, url).to_return(status: 200, body: "the real page")

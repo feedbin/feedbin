@@ -70,7 +70,7 @@ class FeedFixer
   end
 
   def validate_option(url)
-    result = Feedkit::Request.download(url).parse
+    result = Feedkit::Request.download(url, block_ssrf: true).parse
     option = Feed.create_with(result.to_feed).new
 
     valid_entries = result.entries.find do |parsed|
