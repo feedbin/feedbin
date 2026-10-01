@@ -8,11 +8,11 @@
 
 **Tech Stack:** Ruby 4.0.7, Rails 8.1, Prism (Ruby's built-in parser), `git grep`, ImageMagick 7 (`magick`), Sprockets, Safari MCP (`mcp__safari-mcp__*`), computer use (`mcp__computer-use__*`).
 
-**Spec:** `/private/tmp/claude-501/-Users-ben-Sites-feedbin/c01c4b71-471d-4360-8e15-b9cddfd10b60/scratchpad/2026-10-01-unused-code-sweep-design.md`. The spec and the scripts are in the session scratchpad, not in the repo. Read the spec before Task 1. Its section numbers (for example "spec 5.1") appear in this plan.
+**Spec:** `doc/plans/2026-10-01-unused-code-sweep-design.md`. The scripts are in `doc/plans/unused-code-sweep/bin/`. Read the spec before Task 1. Its section numbers (for example "spec 5.1") appear in this plan.
 
 ## Global Constraints
 
-- Repo `~/Sites/feedbin`, branch `cleanup`. Apart from this plan (`doc/plans/`), the repo gets deletions only. No other new file is committed.
+- Repo `~/Sites/feedbin`, branch `cleanup`. Apart from the record in `doc/plans/` (the spec, this plan, and the scripts), the repo gets deletions only. No other new file is committed.
 - Out of scope: gems, dead features, database tables and columns, production coverage, refactors of remaining code (spec 3).
 - Never delete a job class, a public route, a Rake task, or a `script/` file without Ben's decision (spec 5.2).
 - When there is a doubt, keep the unit and put it on the kept list with the reason (spec 5.3).
@@ -24,7 +24,7 @@
 - Use `magick compare`, never a bare `compare` (that runs Araxis Merge on this Mac).
 - Commit messages have no `Co-Authored-By` line and no AI attribution.
 - Browser work uses Safari MCP (`mcp__safari-mcp__*`), not the Browser pane. Computer use has a read-only tier in Safari: it takes screenshots only.
-- The scratchpad belongs to the session that wrote this plan. If the work moves to a new session, copy the spec, this plan, and the whole `sweep/` folder first, and change the `SWEEP=` path in every command.
+- The scripts run from a scratchpad copy (Task 1 step 0), never from `doc/plans/`, so their output stays out of the repo. The `SWEEP=` path in the commands is the scratchpad of the session that wrote this plan. In another session, change it in every command to `<that session's scratchpad>/sweep`.
 
 ## Review Focus
 
@@ -38,7 +38,7 @@ These five failure modes can pass every test and still break the app. Each one h
 
 ## Files
 
-All work files are in the scratchpad. Nothing here goes into the repo.
+The source of the scripts is `doc/plans/unused-code-sweep/bin/`. Task 1 step 0 copies them to `$SWEEP/bin`. They run from there, and all their output stays in the scratchpad.
 
 | Path (under `$SWEEP`) | Purpose |
 | --- | --- |
@@ -64,9 +64,9 @@ All work files are in the scratchpad. Nothing here goes into the repo.
 | `out/ledger.tsv` | The record of every decision. Columns: `category unit defined_at outcome reason`. `outcome` is `deleted`, `kept`, or `decision`. |
 | `out/checks/<label>/` | Logs from `check.sh`. |
 | `shots/<label>/` | Screenshots from one click-through. |
-| `out/dryrun-2026-10-01/` | Finder output from the planning dry run. Use it only to compare counts. |
+| `out/dryrun-2026-10-01/` | Finder output from the planning dry run. It exists only in the planning session's scratchpad. The dry-run table below has its counts. |
 
-All scripts were written and run against the repo during planning on 2026-10-01. Each one passes `ruby -c` or `bash -n`. `check.sh` and `pick_entries.rb` were not run end to end, because the OrbStack network was down. Task 1 runs them first.
+All scripts were written and run against the repo during planning on 2026-10-01. Each one passes `ruby -c` or `bash -n`, and the Ruby scripts pass `standardrb`. A full rerun after the style fixes gave the same counts as the table below. `check.sh` and `pick_entries.rb` were not run end to end, because the OrbStack network was down. Task 1 runs them first.
 
 **Planning dry-run counts** (before any deletion, with the seeded inventory). Use them to see if a finder breaks:
 
@@ -204,7 +204,16 @@ SWEEP=/private/tmp/claude-501/-Users-ben-Sites-feedbin/c01c4b71-471d-4360-8e15-b
 - Repo: no change
 
 **Interfaces:**
-- Produces: `out/computed.tsv` (read by every finder through `lib.rb#computed`), `out/checks/baseline/` (read by `check.sh`), `out/verify_computed.baseline.txt`, `out/base_sha.txt`.
+- Consumes: the scripts in `doc/plans/unused-code-sweep/bin/`.
+- Produces: `$SWEEP/bin/` (the copy every later task runs), `out/computed.tsv` (read by every finder through `lib.rb#computed`), `out/checks/baseline/` (read by `check.sh`), `out/verify_computed.baseline.txt`, `out/base_sha.txt`.
+
+- [ ] **Step 0: Copy the scripts to the scratchpad.**
+
+  ```bash
+  SWEEP=/private/tmp/claude-501/-Users-ben-Sites-feedbin/c01c4b71-471d-4360-8e15-b9cddfd10b60/scratchpad/sweep; mkdir -p $SWEEP/bin $SWEEP/out && cp ~/Sites/feedbin/doc/plans/unused-code-sweep/bin/* $SWEEP/bin/ && ls $SWEEP/bin | wc -l
+  ```
+
+  Expected: `18`.
 
 - [ ] **Step 1: Check the working copies.**
 
@@ -228,7 +237,7 @@ SWEEP=/private/tmp/claude-501/-Users-ben-Sites-feedbin/c01c4b71-471d-4360-8e15-b
   SWEEP=/private/tmp/claude-501/-Users-ben-Sites-feedbin/c01c4b71-471d-4360-8e15-b9cddfd10b60/scratchpad/sweep; cd ~/Sites/feedbin && source ~/.bash_profile >/dev/null 2>&1; ruby $SWEEP/bin/computed_sites.rb && ruby $SWEEP/bin/seed_computed.rb
   ```
 
-  Expected: `80 prefixes` (or close) and `41 rows`. If the counts are far off, compare with `out/dryrun-2026-10-01/computed.tsv`.
+  Expected: `80 prefixes` (or close) and `41 rows`. If the counts are far off, read `DROP` and `NARROW` in `seed_computed.rb`.
 
 - [ ] **Step 5: Review the inventory by hand.** Read `$SWEEP/out/computed.tsv`. For each row, open the site in the third column and confirm two things:
   1. The prefix or name can name a unit (an icon, a partial, a class, a CSS class).
