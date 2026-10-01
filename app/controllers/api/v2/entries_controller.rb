@@ -1,7 +1,6 @@
 module Api
   module V2
     class EntriesController < ApiController
-      respond_to :json
       before_action :correct_user, only: [:show]
       before_action :limit_ids, only: [:index]
 

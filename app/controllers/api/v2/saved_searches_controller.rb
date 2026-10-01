@@ -1,8 +1,6 @@
 module Api
   module V2
     class SavedSearchesController < ApiController
-      respond_to :json
-
       before_action :validate_content_type, only: [:create]
       before_action :validate_create, only: [:create]
 

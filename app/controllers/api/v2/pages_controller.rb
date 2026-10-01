@@ -1,8 +1,6 @@
 module Api
   module V2
     class PagesController < ApiController
-      respond_to :json
-
       def create
         status_too_many_requests and return if rate_limited?(100, 1.day)
         if params[:url]

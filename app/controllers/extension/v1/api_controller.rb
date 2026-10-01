@@ -1,7 +1,6 @@
 module Extension
   module V1
     class ApiController < ApplicationController
-      respond_to :json
       prepend_before_action :cors_headers
       skip_before_action :verify_authenticity_token
       skip_before_action :authorize, only: [:options]

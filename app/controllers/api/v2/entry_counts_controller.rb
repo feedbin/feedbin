@@ -1,7 +1,6 @@
 module Api
   module V2
     class EntryCountsController < ApiController
-      respond_to :json
       skip_before_action :valid_user
 
       def post_frequency

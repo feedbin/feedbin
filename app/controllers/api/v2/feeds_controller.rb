@@ -3,8 +3,6 @@ module Api
     class FeedsController < ApiController
       before_action :correct_user
 
-      respond_to :json
-
       def show
         @feed = Feed.find(params[:id])
         fresh_when(@feed)

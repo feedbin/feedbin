@@ -1,8 +1,6 @@
 module Api
   module V2
     class IconsController < ApiController
-      respond_to :json
-
       def index
         feed_ids = current_user.subscriptions.pluck(:feed_id)
         hosts = Feed.where(id: feed_ids).distinct.pluck(:host).compact

@@ -1,8 +1,6 @@
 module Api
   module V2
     class ImportsController < ApiController
-      respond_to :json
-
       before_action :validate_xml, only: [:create]
 
       def index

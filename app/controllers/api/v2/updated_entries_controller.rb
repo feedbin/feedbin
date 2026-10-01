@@ -1,8 +1,6 @@
 module Api
   module V2
     class UpdatedEntriesController < ApiController
-      respond_to :json
-
       def index
         @user = current_user
         entries = @user.updated_entries.order(updated_at: :desc)

@@ -23,7 +23,6 @@ gem "twitter-text",    github: "feedbin/twitter-text",    branch: "feedbin", glo
 gem "librato-metrics", github: "feedbin/librato-metrics", branch: "feedbin"
 gem "librato-rails",   github: "feedbin/librato-rails",   branch: "feedbin"
 
-gem "net-protocol"
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
 gem "apnotic"
@@ -56,7 +55,6 @@ gem "premailer-rails"
 gem "pitchfork"
 gem "redcarpet"
 gem "redis", "< 5"
-gem "responders"
 gem "reverse_markdown"
 gem "ruby-vips"
 gem "rubyzip", require: "zip"
@@ -79,13 +77,9 @@ group :development do
   gem "ruby-prof"
   gem "better_errors"
   gem "binding_of_caller"
-  gem "htmlbeautifier"
   gem "listen"
   gem "lookbook"
   gem "foreman"
-  gem "pry"
-  gem "guard"
-  gem "guard-minitest"
 end
 
 group :development, :test do
@@ -105,6 +99,5 @@ group :development, :test do
   gem "cuprite"
   gem "standard"
   gem "webmock"
-  gem "simplecov"
   gem "puma"
 end
