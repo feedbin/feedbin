@@ -78,7 +78,7 @@ module ImageCrawler
 
     # Only 304: a 404 or 500 reported as "unchanged" would make a dead icon
     # look permanently current. Exercises #download_file directly because
-    # Download::Default's `rescue Down::Error` would swallow the re-raise.
+    # Download::Default's `rescue Feedkit::Error` would swallow the re-raise.
     def test_should_still_raise_for_a_non_304_response_error
       url = "http://example.com/favicon.ico"
       stub_request(:get, url).to_return(status: 404, body: "")

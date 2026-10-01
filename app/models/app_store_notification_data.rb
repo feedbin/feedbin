@@ -16,6 +16,7 @@ class AppStoreNotificationData
     body[:endDate] = format_date(end_date)
 
     response = HTTP
+      .timeout(write: 5, connect: 5, read: 10)
       .auth("Bearer %<token>s" % {token: token})
       .post("https://api.storekit.itunes.apple.com/inApps/v1/notifications/history", json: body)
       .parse
@@ -27,6 +28,7 @@ class AppStoreNotificationData
 
   def self.from_order_id(order_id)
     response = HTTP
+      .timeout(write: 5, connect: 5, read: 10)
       .auth("Bearer %<token>s" % {token: token})
       .get("https://api.storekit.itunes.apple.com/inApps/v1/lookup/%<order_id>s" % {order_id: order_id})
       .parse
@@ -43,6 +45,7 @@ class AppStoreNotificationData
     }
 
     response = HTTP
+      .timeout(write: 5, connect: 5, read: 10)
       .auth("Bearer %<token>s" % {token: token})
       .post("https://api.storekit.itunes.apple.com/inApps/v1/notifications/history", json: body)
       .parse
@@ -54,6 +57,7 @@ class AppStoreNotificationData
 
   def self.apps
     response = HTTP
+      .timeout(write: 5, connect: 5, read: 10)
       .auth("Bearer %<token>s" % {token: token})
       .get("https://api.appstoreconnect.apple.com/v1/apps")
       .parse

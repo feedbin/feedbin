@@ -1,6 +1,5 @@
 class Share::MicroBlog < Share::Service
-  include HTTParty
-  base_uri "https://micro.blog"
+  BASE_URL = "https://micro.blog"
 
   def initialize(klass = nil)
     @klass = klass
@@ -10,8 +9,8 @@ class Share::MicroBlog < Share::Service
   end
 
   def request_token(username, password)
-    response = self.class.post("/account/verify", query: {token: password}, timeout: 10)
-    if response.parsed_response["token"]
+    response = client.post("#{BASE_URL}/account/verify", params: {token: password})
+    if parse(response)["token"]
       OpenStruct.new(token: password, secret: "n/a")
     else
       raise OAuth::Unauthorized.new(OpenStruct.new(code: response.code, message: "Unauthorized"))
@@ -27,11 +26,9 @@ class Share::MicroBlog < Share::Service
       body[:name] = params["name"]
     end
 
-    headers = {
-      "Authorization" => "Bearer #{@auth_token}"
-    }
-
-    response = self.class.post("/micropub", body: body, headers: headers, timeout: 10)
+    response = client
+      .auth("Bearer #{@auth_token}")
+      .post("#{BASE_URL}/micropub", form: body)
 
     code = if response.code == 202
       200
@@ -40,11 +37,23 @@ class Share::MicroBlog < Share::Service
     end
 
     code
-  rescue Net::OpenTimeout
+  rescue HTTP::Error
     500
   end
 
   def share(params)
     authenticated_share(@klass, params)
+  end
+
+  private
+
+  def client
+    HTTP.timeout(write: 5, connect: 5, read: 5)
+  end
+
+  def parse(response)
+    JSON.parse(response.to_s)
+  rescue JSON::ParserError
+    {}
   end
 end

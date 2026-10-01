@@ -31,6 +31,7 @@ class Share::Raindrop < Share::Service
     end
 
     response = HTTP
+      .timeout(write: 5, connect: 5, read: 10)
       .headers(@client.headers)
       .post(@client.client.connection.build_url("/rest/v1/raindrop"),
         json: {

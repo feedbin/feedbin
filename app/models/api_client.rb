@@ -49,7 +49,11 @@ class ApiClient
       path: path,
       query: default_params.merge(params).to_query
     })
-    response = HTTP.follow().headers(user_agent: "Feedbin").get(url)
+    response = HTTP
+      .timeout(write: 5, connect: 5, read: 30)
+      .follow(max_hops: 5)
+      .headers(user_agent: "Feedbin")
+      .get(url)
 
     raise ApiClient::Error.new(response.status.reason) unless response.status.success?
 

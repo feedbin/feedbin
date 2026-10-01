@@ -39,6 +39,11 @@ module Api
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        # Net::HTTP waits 60 seconds per phase by default, and this runs in a
+        # request thread.
+        http.open_timeout = 5
+        http.write_timeout = 5
+        http.read_timeout = 10
 
         request = Net::HTTP::Post.new(uri.request_uri)
         request["Accept"] = "application/json"

@@ -84,7 +84,7 @@ module FeedCrawler
 
     def report
       if ENV["FEED_REFRESHER_REPORT_URL"]
-        HTTP.get(ENV["FEED_REFRESHER_REPORT_URL"])
+        HTTP.timeout(write: 5, connect: 5, read: 5).get(ENV["FEED_REFRESHER_REPORT_URL"])
       end
     end
 

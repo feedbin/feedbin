@@ -54,20 +54,17 @@ class Share::RaindropTest < ActiveSupport::TestCase
   end
 
   test "add posts to the raindrop bookmarks endpoint and returns the response code" do
-    fake_response = OpenStruct.new(status: OpenStruct.new(code: 200))
-    HTTP.stub :headers, ->(*) {
-      Class.new {
-        define_method(:post) { |*args| fake_response }
-      }.new
-    } do
-      share = Share::Raindrop.new(@klass)
-      assert_equal 200, share.add(entry_id: @entry.id)
-    end
+    stub = stub_request(:post, "https://api.raindrop.io/rest/v1/raindrop")
+      .with(headers: {"Authorization" => "Bearer tok"})
+      .to_return(status: 200)
+    share = Share::Raindrop.new(@klass)
+    assert_equal 200, share.add(entry_id: @entry.id)
+    assert_requested stub
   end
 
   test "add refreshes an expired token and updates the klass" do
     @klass.update!(oauth2_token: {access_token: "old", expires_at: (Time.now - 60).to_i}.to_json)
-    fake_response = OpenStruct.new(status: OpenStruct.new(code: 200))
+    stub_request(:post, "https://api.raindrop.io/rest/v1/raindrop").to_return(status: 200)
     refreshed = OpenStruct.new(
       to_hash: {access_token: "new"},
       headers: {},
@@ -78,15 +75,9 @@ class Share::RaindropTest < ActiveSupport::TestCase
     fake_token.define_singleton_method(:expired?) { true }
     fake_token.define_singleton_method(:refresh!) { refreshed }
     OAuth2::AccessToken.stub :from_hash, ->(*) { fake_token } do
-      HTTP.stub :headers, ->(*) {
-        Class.new {
-          define_method(:post) { |*| fake_response }
-        }.new
-      } do
-        share = Share::Raindrop.new(@klass)
-        share.add(entry_id: @entry.id)
-        assert_equal({access_token: "new"}.to_json, @klass.reload.oauth2_token)
-      end
+      share = Share::Raindrop.new(@klass)
+      share.add(entry_id: @entry.id)
+      assert_equal({access_token: "new"}.to_json, @klass.reload.oauth2_token)
     end
   end
 end

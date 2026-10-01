@@ -10,7 +10,7 @@ class Turnstile
     }
     params[:remoteip] = remoteip if remoteip.present?
 
-    result = HTTP.post(VERIFY_URL, form: params).parse
+    result = HTTP.timeout(write: 5, connect: 5, read: 5).post(VERIFY_URL, form: params).parse
     result["success"] == true
   rescue
     false

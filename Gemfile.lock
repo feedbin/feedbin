@@ -276,7 +276,6 @@ GEM
       addressable
       base64
       ssrf_filter (~> 1.5)
-    csv (3.3.6)
     cuprite (0.18)
       capybara (~> 3.0)
       ferrum (~> 0.18.0)
@@ -291,9 +290,6 @@ GEM
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
-    down (5.6.0)
-      addressable (~> 2.8)
-      base64 (~> 0.3)
     drb (2.2.3)
     equalizer (0.0.11)
     erb (6.0.7)
@@ -372,10 +368,6 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
-    httparty (0.24.3)
-      csv
-      mini_mime (>= 1.0.0)
-      multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
@@ -467,8 +459,6 @@ GEM
     nenv (0.3.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-http-persistent (4.0.8)
-      connection_pool (>= 2.2.4, < 4)
     net-http2 (0.19.0)
       http-2 (>= 1.0)
     net-imap (0.6.7)
@@ -791,7 +781,6 @@ DEPENDENCIES
   cuprite
   debug
   dotenv-rails (= 2.8.1)
-  down
   evernote_oauth
   faker
   feedjira!
@@ -806,7 +795,6 @@ DEPENDENCIES
   htmlbeautifier
   htmlentities
   http!
-  httparty
   image_processing
   importmap-rails
   jbuilder
@@ -823,7 +811,6 @@ DEPENDENCIES
   minitest-mock
   minitest-stub-const
   minitest-stub_any_instance
-  net-http-persistent
   net-protocol
   oauth
   oauth2

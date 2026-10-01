@@ -46,6 +46,21 @@ class Share::ApiSharesTest < ActiveSupport::TestCase
     assert_equal 503, Share::Pinboard.new(klass).add(url: "https://x")
   end
 
+  test "Pinboard#add returns 500 when the request times out" do
+    klass = @user.supported_sharing_services.create!(service_id: "pinboard", access_token: "tok")
+    stub_request(:get, %r{api\.pinboard\.in/v1/posts/add}).to_timeout
+    assert_equal 500, Share::Pinboard.new(klass).add(url: "https://x")
+  end
+
+  test "Pinboard#add sends the bookmark as query params" do
+    klass = @user.supported_sharing_services.create!(service_id: "pinboard", access_token: "tok")
+    stub = stub_request(:get, "https://api.pinboard.in/v1/posts/add")
+      .with(query: {auth_token: "tok", format: "json", url: "https://x", description: "x"})
+      .to_return(status: 200, body: '{"result_code":"done"}')
+    Share::Pinboard.new(klass).add(url: "https://x", description: "x")
+    assert_requested stub
+  end
+
   test "Pinboard#share delegates to authenticated_share" do
     klass = @user.supported_sharing_services.create!(service_id: "pinboard", access_token: "tok")
     share = Share::Pinboard.new(klass)
@@ -83,6 +98,22 @@ class Share::ApiSharesTest < ActiveSupport::TestCase
     assert_equal 500, Share::MicroBlog.new(klass).add("content" => "hi")
   end
 
+  test "MicroBlog#add posts form-encoded content with a bearer token" do
+    klass = @user.supported_sharing_services.create!(service_id: "micro_blog", access_token: "tok")
+    stub = stub_request(:post, "https://micro.blog/micropub")
+      .with(body: {content: "hi", name: "title"}, headers: {"Authorization" => "Bearer tok"})
+      .to_return(status: 202, body: "")
+    Share::MicroBlog.new(klass).add("content" => "hi", "name" => "title")
+    assert_requested stub
+  end
+
+  test "MicroBlog#request_token raises OAuth::Unauthorized when the response is not JSON" do
+    stub_request(:post, %r{micro\.blog/account/verify}).to_return(status: 502, body: "<html>Bad Gateway</html>")
+    assert_raises(OAuth::Unauthorized) do
+      Share::MicroBlog.new.request_token("user", "bad")
+    end
+  end
+
   test "MicroBlog#add returns 500 when the request times out" do
     klass = @user.supported_sharing_services.create!(service_id: "micro_blog", access_token: "tok")
     stub_request(:post, "https://micro.blog/micropub").to_timeout
@@ -95,6 +126,26 @@ class Share::ApiSharesTest < ActiveSupport::TestCase
     share.stub :authenticated_share, ->(_k, params) { {ok: params[:content]} } do
       assert_equal({ok: "x"}, share.share(content: "x"))
     end
+  end
+
+  # ---- Share::Pocket ----------------------------------------------------------
+
+  test "Pocket#add posts JSON and returns the response code" do
+    klass = @user.supported_sharing_services.create!(service_id: "pocket", access_token: "tok")
+    stub = stub_request(:post, "https://getpocket.com/v3/add")
+      .with(
+        body: {url: "https://x", access_token: "tok", consumer_key: ENV["POCKET_CONSUMER_KEY"]}.to_json,
+        headers: {"Content-Type" => "application/json; charset=UTF-8", "X-Accept" => "application/json"}
+      )
+      .to_return(status: 200, body: "{}")
+    assert_equal 200, Share::Pocket.new(klass).add("entry_url" => "https://x")
+    assert_requested stub
+  end
+
+  test "Pocket#add returns 500 when the request times out" do
+    klass = @user.supported_sharing_services.create!(service_id: "pocket", access_token: "tok")
+    stub_request(:post, "https://getpocket.com/v3/add").to_timeout
+    assert_equal 500, Share::Pocket.new(klass).add("entry_url" => "https://x")
   end
 
   # ---- Share::Readability -----------------------------------------------------

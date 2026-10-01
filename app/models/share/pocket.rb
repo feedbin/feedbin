@@ -1,7 +1,5 @@
 class Share::Pocket < Share::Service
-  include HTTParty
-  base_uri "https://getpocket.com"
-  headers "Content-Type" => "application/json; charset=UTF-8", "X-Accept" => "application/json"
+  BASE_URL = "https://getpocket.com"
 
   PATHS = {
     auth_authorize: "/auth/authorize",
@@ -28,21 +26,15 @@ class Share::Pocket < Share::Service
   end
 
   def request_token
-    options = {
-      body: {consumer_key: ENV["POCKET_CONSUMER_KEY"], redirect_uri: redirect_uri}.to_json
-    }
-    response = self.class.post(PATHS[:oauth_request], options)
+    response = post(:oauth_request, consumer_key: ENV["POCKET_CONSUMER_KEY"], redirect_uri: redirect_uri)
     if response.code == 200
-      code = response.parsed_response["code"]
+      code = parse(response)["code"]
       OpenStruct.new(token: code, secret: code, authorize_url: authorize_url(code))
     end
   end
 
   def authorize(code)
-    options = {
-      body: {consumer_key: ENV["POCKET_CONSUMER_KEY"], code: code}.to_json
-    }
-    self.class.post(PATHS[:oauth_authorize], options)
+    post(:oauth_authorize, consumer_key: ENV["POCKET_CONSUMER_KEY"], code: code)
   end
 
   def response_valid?(session, params)
@@ -50,15 +42,15 @@ class Share::Pocket < Share::Service
     valid = false
     if response.code == 200
       valid = true
-      @access_token = response.parsed_response["access_token"]
+      @access_token = parse(response)["access_token"]
     elsif response.code != 403
       ErrorService.notify(
         error_class: "Share::Pocket#response_valid?",
         error_message: "response invalid",
         parameters: {
           code: response.code,
-          body: response.body,
-          headers: response.headers
+          body: response.to_s,
+          headers: response.headers.to_h
         }
       )
       raise OAuth::Unauthorized
@@ -71,17 +63,12 @@ class Share::Pocket < Share::Service
   end
 
   def add(params)
-    options = {
-      body: {
-        url: params["entry_url"],
-        access_token: @access_token,
-        consumer_key: ENV["POCKET_CONSUMER_KEY"]
-      }.to_json,
-      timeout: 10
-    }
-    response = self.class.post(PATHS[:add], options)
+    response = post(:add,
+      url: params["entry_url"],
+      access_token: @access_token,
+      consumer_key: ENV["POCKET_CONSUMER_KEY"])
     response.code
-  rescue Net::OpenTimeout
+  rescue HTTP::Error
     500
   end
 
@@ -94,6 +81,22 @@ class Share::Pocket < Share::Service
   end
 
   def url_for(path)
-    URI.join(self.class.base_uri, PATHS[path])
+    URI.join(BASE_URL, PATHS[path])
+  end
+
+  private
+
+  def post(path, body)
+    HTTP.timeout(write: 5, connect: 5, read: 5)
+      .headers("Content-Type" => "application/json; charset=UTF-8", "X-Accept" => "application/json")
+      .post(url_for(path), body: body.to_json)
+  end
+
+  # Pocket answers with JSON when asked for it, but the parse should not
+  # depend on the server sending a matching content type.
+  def parse(response)
+    JSON.parse(response.to_s)
+  rescue JSON::ParserError
+    {}
   end
 end

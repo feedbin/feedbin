@@ -28,7 +28,7 @@ module ImageCrawler
             url: "https://vimeo.com/#{provider_identifier}"
           }
         }
-        JSON.load(HTTP.get(OEMBED_URL, **options).to_s)
+        JSON.load(HTTP.timeout(write: 5, connect: 5, read: 10).get(OEMBED_URL, **options).to_s)
       end
     end
   end
