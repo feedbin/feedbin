@@ -1830,13 +1830,6 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         feedbin.showPanel(3)
 
-    removeFields: ->
-      $(document).on 'click', '[data-behavior~=remove_fields]', (event) ->
-        $(@).prev('input[type=hidden]').val(1)
-        $(@).closest('tr').addClass('hide')
-        event.preventDefault()
-        return
-
     sortFeeds: ->
       feedbin.sortFeeds()
 
