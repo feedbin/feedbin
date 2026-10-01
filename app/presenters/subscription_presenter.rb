@@ -42,10 +42,6 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
-  def bar_class(data)
-    data.count == 0 ? "zero" : ""
-  end
-
   def bar_count(data)
     type = subscription.feed.twitter_feed? ? "tweet" : "article"
     @template.pluralize(data.count, type)
@@ -54,12 +50,6 @@ class SubscriptionPresenter < BasePresenter
   def muted_status
     if subscription.muted
       "muted"
-    end
-  end
-
-  def mute_class
-    if subscription.muted
-      "status-muted"
     end
   end
 

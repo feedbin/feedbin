@@ -190,14 +190,6 @@ class EntryPresenter < BasePresenter
     entry.summary.respond_to?(:length) && entry.summary.length > 0
   end
 
-  def show_body?
-    if entry.tweet?
-      true
-    else
-      has_content? && title?
-    end
-  end
-
   def retweet_text
     HTMLEntities.new.decode(entry.tweet.tweet_summary(entry.tweet.main_tweet.quoted_status))
   end
@@ -329,20 +321,6 @@ class EntryPresenter < BasePresenter
     articles
   end
 
-  def media_subtitle
-    if entry.data && entry.data["itunes_subtitle"]
-      subtitle = @template.strip_tags(entry.data["itunes_subtitle"])
-      body = @template.strip_tags(entry.content)
-      decoder = HTMLEntities.new
-      body = decoder.decode(body)
-      unless body.include?(subtitle)
-        @template.content_tag :figcaption do
-          @template.raw(subtitle)
-        end
-      end
-    end
-  end
-
   def feed_domain_matches?(comparison)
     uri = URI.parse(entry.feed.site_url)
     uri.host == comparison || uri.host == comparison.sub("www.", "")
@@ -367,18 +345,8 @@ class EntryPresenter < BasePresenter
     nil
   end
 
-  def has_media?
-    !media_type.nil? || content.include?("<iframe")
-  end
-
   def youtube?
     entry.data && entry.data["youtube_video_id"].present?
-  end
-
-  def attached_image
-    if entry.processed_image?
-      image(entry.processed_image, entry.placeholder_color)
-    end
   end
 
   def image(src, placeholder_color = nil)
@@ -429,27 +397,6 @@ class EntryPresenter < BasePresenter
     decoder.decode(@template.strip_tags(entry.summary))
   end
 
-  def trimmed_summary(text)
-    output = ""
-    parts = text.split(". ")
-    a = parts.each_with_index do |part, index|
-      new_part = part + ". "
-      output << new_part
-      if index == 0
-        if output.length > 180
-          output = output[0..180]
-          output = output[0..-2]
-          return output << "…"
-        end
-      else
-        if output.length > 180
-          return output.sub(new_part, "")
-        end
-      end
-    end
-    output
-  end
-
   def app_title
     entry.title.present? ? decoder.decode(@template.strip_tags(entry.title.strip)) : nil
   end
@@ -460,10 +407,6 @@ class EntryPresenter < BasePresenter
 
   def has_diff?
     entry.content_diff.present?
-  end
-
-  def is_updated_entry?
-    @locals && @locals[:updated_entries].respond_to?(:include?) && @locals[:updated_entries].include?(entry.id)
   end
 
   def audio_duration
@@ -582,18 +525,6 @@ class EntryPresenter < BasePresenter
         @template.strip_tags(entry.feed.title)
       end
     end
-  end
-
-  def embedded_image
-    return unless data&.safe_dig("media_type") =~ /^image/i
-    return unless data&.safe_dig("media_url") =~ /^http/i
-    @template.camo_link(data&.safe_dig("media_url"))
-  end
-
-  def embedded_video
-    return unless data&.safe_dig("media_type") =~ /^video/i
-    return unless data&.safe_dig("media_url") =~ /^http/i
-    @template.camo_link(data&.safe_dig("media_url"))
   end
 
   def tweet_classes(tweet)

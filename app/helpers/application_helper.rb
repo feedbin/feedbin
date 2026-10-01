@@ -6,11 +6,6 @@ module ApplicationHelper
     presenter
   end
 
-  def component(name, *args, **kwargs, &block)
-    component = "#{name}_component".camelize.constantize
-    render(component.new(*args, **kwargs), &block)
-  end
-
   def native?
     request.user_agent&.include?("TurbolinksFeedbin")
   end
@@ -72,10 +67,6 @@ module ApplicationHelper
       end
     end
     icon
-  end
-
-  def icon_exists?(name)
-    get_icon(name).present?
   end
 
   def svg_options(name, options = {})
@@ -187,17 +178,6 @@ module ApplicationHelper
     url
   end
 
-  def pretty_url_parts(url)
-    parts = pretty_url(url).split("/")
-    host = parts.shift
-    if parts.length > 0
-      path = "/#{parts.join("/")}"
-    else
-      path = nil
-    end
-    [host, path]
-  end
-
   def short_url_alt(url)
     url = pretty_url(url)
     url.truncate(40, omission: "…#{url.last(10)}")
@@ -235,25 +215,6 @@ module ApplicationHelper
       address.join("\n")
     else
       address.join("<br>").html_safe
-    end
-  end
-
-  def toggle_switch(options = {})
-    css_class = options.delete(:class)
-    defaults = {
-      class: "switch #{css_class}"
-    }
-    content_tag :span, defaults.merge(options) do
-      content_tag :span, class: "switch-inner" do
-        svg_tag "icon-check"
-      end
-    end
-  end
-
-  def radio_button_control
-    content_tag :span, class: "radio-button" do
-      content_tag :span, class: "radio-button-inner" do
-      end
     end
   end
 
