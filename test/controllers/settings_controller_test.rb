@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class SettingsControllerTest < ActionController::TestCase
   setup do
@@ -99,14 +100,13 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "settings_update with invalid params alerts and redirects" do
     login_as @user
-    User.any_instance.stub :save, false do
-      User.any_instance.stub :errors, OpenStruct.new(full_messages: ["bad"]) do
-        patch :settings_update, params: {user: {entry_sort: "ASC"}}
+    User.stub_any_instance(:save, false) do
+      User.stub_any_instance(:errors, OpenStruct.new(full_messages: ["bad"])) do
+        patch :settings_update, params: {id: @user.id, user: {entry_sort: "ASC"}}
       end
     end
     assert_redirected_to settings_url
-  rescue NoMethodError
-    skip "any_instance not available"
+    assert_equal "bad.", flash[:alert]
   end
 
   test "settings_update with redirect_to param redirects to that URL" do

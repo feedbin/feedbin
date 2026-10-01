@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class EntriesControllerTest < ActionController::TestCase
   setup do
@@ -402,13 +403,12 @@ class EntriesControllerTest < ActionController::TestCase
     @user.subscriptions.create!(feed: feed)
     entry = feed.entries.create!(content: "<p>x</p>", title: "T", url: "/x", public_id: SecureRandom.hex)
 
-    EntryDeleter.any_instance.stub :delete_entries, true do
+    deleted = []
+    EntryDeleter.stub_any_instance(:delete_entries, ->(*args) { deleted << args }) do
       delete :destroy, params: {id: entry.id}, xhr: true
     end
     assert_response :success
-  rescue NoMethodError
-    # Skip if any_instance helper isn't available
-    skip "any_instance not available"
+    assert_equal [[feed.id, entry.id]], deleted
   end
 
   # ---- newsletter ------------------------------------------------------------

@@ -72,8 +72,7 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     get :index, params: {since: date}, format: :json
 
     expected = Entry.where("created_at > :time", {time: entry.created_at})
-    skip "diagnose missing ids on travis"
-    # assert_equal_ids expected, parse_json
+    assert_equal_ids expected, parse_json
   end
 
   test "should accept a minute-precision since" do
