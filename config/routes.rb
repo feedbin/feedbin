@@ -183,17 +183,17 @@ Rails.application.routes.draw do
   resources :billing_events, only: [:show]
   resources :in_app_purchases, only: [:show]
   resources :app_store_notifications, only: [:show]
-  resources :password_resets
+  resources :password_resets, only: [:new, :create, :edit, :update]
   resources :sharing_services, path: "settings/sharing", only: [:index, :create, :update, :destroy]
   resources :actions, path: "settings/actions", only: [:index, :create, :new, :update, :destroy, :edit]
   resources :mutes, only: [:index, :create, :destroy]
   resources :devices, only: [:create]
-  resources :account_migrations, path: "settings/account_migrations" do
+  resources :account_migrations, path: "settings/account_migrations", only: [:index] do
     member do
       patch :start
     end
   end
-  resources :fix_feeds, path: "settings/subscriptions/fix" do
+  resources :fix_feeds, path: "settings/subscriptions/fix", only: [:index, :update, :destroy] do
     member do
       delete :destroy_subscription
     end
@@ -216,7 +216,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :sessions do
+  resources :sessions, only: [:new, :create, :destroy] do
     collection do
       get :refresh
     end
@@ -246,7 +246,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :users, id: /.*/ do
+  resources :users, id: /.*/, only: [:new, :create, :update, :destroy] do
     member do
       patch :settings_update, controller: :settings
       patch :view_settings_update, controller: :settings
@@ -254,26 +254,20 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :feeds, only: [:index, :edit, :create, :update] do
+  resources :feeds, only: [:update] do
     patch :rename
     resources :entries, only: [:index], controller: :feeds_entries
     collection do
-      get :view_unread
-      get :view_all
-      get :view_starred
       get :auto_update
       post :search
     end
     member do
-      get :modal_edit
-      get :edit_tags
       get :pages, to: "pages_entries#index"
     end
   end
 
   resources :entries, only: [:show, :index, :destroy] do
     member do
-      post :content
       post :unread_entries, to: "unread_entries#update"
       post :starred_entries, to: "starred_entries#update"
       post :mark_as_read, to: "entries#mark_as_read"
@@ -307,9 +301,9 @@ Rails.application.routes.draw do
       end
     end
 
-    resource :newsletters do
+    resource :newsletters, only: [:show] do
       scope module: "newsletters" do
-        resources :addresses do
+        resources :addresses, only: [:new, :create, :show, :update, :destroy] do
           member do
             patch :activate
           end
@@ -317,7 +311,7 @@ Rails.application.routes.draw do
             get :inactive
           end
         end
-        resources :senders
+        resources :senders, only: [:index, :update]
       end
     end
 
@@ -326,9 +320,6 @@ Rails.application.routes.draw do
     resources :imports, only: [:create, :show] do
       member do
         post :replace_all
-      end
-      collection do
-        post :create_remote
       end
     end
 
@@ -417,12 +408,12 @@ Rails.application.routes.draw do
 
   constraints lambda { |request| AuthConstraint.admin?(request) } do
     namespace :admin do
-      resources :users do
+      resources :users, only: [:index, :destroy] do
         member do
           post :reset_password
         end
       end
-      resources :feeds
+      resources :feeds, only: [:index]
     end
   end
 
