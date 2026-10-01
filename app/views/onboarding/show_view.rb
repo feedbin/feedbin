@@ -170,7 +170,7 @@ module Onboarding
               name: "import[upload]",
               data: stimulus_item(target: :file_input, actions: {change: :file_selected}, for: controller)
             )
-            form_with class: "w-full h-full group", model: Import.new, url: helpers.onboarding_imports_path, method: :post, data: stimulus_item(target: :form, data: {remote: true}, for: controller) do |form|
+            form_with class: "w-full h-full group", model: Import.new, url: onboarding_imports_path, method: :post, data: stimulus_item(target: :form, data: {remote: true}, for: controller) do |form|
               form.hidden_field :filename, data: stimulus_item(target: :filename_field, for: controller)
               form.hidden_field :xml, data: stimulus_item(target: :xml_field, for: controller)
               div data: stimulus_item(target: :dropzone, actions: {dragover: :drag_over, dragleave: :drag_leave, drop: :drop, dragstart: :drag_start }, for: controller), class: "w-full h-full border rounded-xl border-dashed flex flex-center transition-colors group-data-[upload-dragging-value=true]:border-blue-700 group-data-[upload-dragging-value=true]:bg-blue-300 group-data-[upload-error-value=true]:border-red-600 group-data-[upload-error-value=true]:bg-red-300" do

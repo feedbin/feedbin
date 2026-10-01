@@ -129,6 +129,14 @@ class ActiveSupport::TestCase
 
   fixtures :all
 
+  # The database rolls back after every test; the Redis-backed Rails.cache
+  # does not. A response UrlCache stored in one test (a stubbed YouTube video,
+  # say) was handed to the next test in the same worker as the real thing, so
+  # every test starts with an empty cache.
+  setup do
+    Rails.cache.clear
+  end
+
   # Keep the outside_transaction pool out of the fixture transaction, which
   # otherwise wraps every pool established during a test.
   skip_transactional_tests_for_database(OutsideTransaction::DATABASE_NAME.to_sym)
