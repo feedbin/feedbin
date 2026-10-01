@@ -132,12 +132,6 @@ module Shared
             url: sidekiq_web_path,
             icon: "menu-icon-sidekiq"
           ))
-          render(::SettingsNav::NavComponent.new(
-            title: "Lookbook",
-            subtitle: "Feedkit components",
-            url: "/lookbook",
-            icon: "menu-icon-lookbook"
-          ))
         end
       end
 

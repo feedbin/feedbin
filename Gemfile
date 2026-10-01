@@ -77,8 +77,6 @@ group :development do
   gem "ruby-prof"
   gem "better_errors"
   gem "binding_of_caller"
-  gem "listen"
-  gem "lookbook"
   gem "foreman"
 end
 

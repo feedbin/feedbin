@@ -138,10 +138,6 @@ Rails.application.routes.draw do
 
   mount StripeEvent::Engine, at: "/stripe"
 
-  if Rails.env.development?
-    mount Lookbook::Engine, at: "/lookbook"
-  end
-
   constraints lambda { |request| AuthConstraint.admin?(request) } do
     mount Sidekiq::Web, at: "/sidekiq"
   end
