@@ -453,10 +453,6 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil saved_entry("<p>Text.</p>").content_diff
   end
 
-  test "Entry does not load the legacy original column" do
-    refute_includes Entry.column_names, "original"
-  end
-
   private
 
   def saved_entry(content)

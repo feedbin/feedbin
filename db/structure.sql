@@ -512,7 +512,6 @@ CREATE TABLE public.entries (
     old_public_id character varying(255),
     starred_entries_count bigint DEFAULT 0 NOT NULL,
     data json,
-    original json,
     source text,
     image_url text,
     processed_image_url text,
@@ -3135,6 +3134,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261003130000'),
 ('20261003120000'),
 ('20260912120000'),
 ('20260814120000'),

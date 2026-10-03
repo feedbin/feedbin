@@ -53,15 +53,6 @@ module FeedCrawler
       assert_nil @entry.reload.compressed_original_content
     end
 
-    test "significant change on an unconverted entry writes a temporary original" do
-      Entry.where(id: @entry.id).update_all(original: {"content" => "<p>Legacy original.</p>"}.to_json)
-
-      EntryUpdate.create!(update_data(significant(@old_content)), @entry.reload)
-
-      assert_equal @old_content, @entry.reload.original_content
-      assert_equal({"content" => "<p>Legacy original.</p>"}, Entry.where(id: @entry.id).pick(:original))
-    end
-
     private
 
     def update_data(content)
