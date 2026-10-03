@@ -207,3 +207,40 @@ At the end, the chat gets three things:
 2. Every commit passes the automated checks in section 7.1.
 3. The final click-through has no console errors, no `Completed 500`, and no screen difference without an explanation.
 4. The kept list and the decision list are complete, and each entry has a reason.
+
+## 13. Second pass: dead-method finder (2026-10-03)
+
+The first pass searched method names only, so two methods with one name hid each other, and a class whose methods call each other looked used. The second pass adds a finder that knows owners and scopes.
+
+### 13.1 Tools (in `unused-code-sweep/bin/`)
+
+| File | Job |
+| --- | --- |
+| `method_index.rb` | Prism index of defs (full nested owner, instance or singleton side, line range), references (receiver kind, lexical owner and nesting), constant references, namespaces, interpolated-name patterns, and `send` with a non-literal name. Plain Ruby. |
+| `method_index_test.rb` | Fixture tests for the index. `ruby doc/plans/unused-code-sweep/bin/method_index_test.rb` |
+| `dead_methods.rb` | Loads the app, resolves each def at runtime, and decides which references can reach it. Run outside the sandbox (it needs the test database): `RAILS_ENV=test bin/rails runner doc/plans/unused-code-sweep/bin/dead_methods.rb`. About 3 seconds. Writes `tmp/dead_methods/`. |
+| `open_sends_reviewed.tsv` | `send(var)` sites reviewed by hand, with the names each one can call. |
+| `coverage_hook.rb` | Optional. Method coverage from a test run: `RUBYOPT="-r$PWD/doc/plans/unused-code-sweep/bin/coverage_hook.rb" bundle exec rake`. The finder adds a coverage column. |
+| `dead_methods_expectations.rb` | Regression checks: live code that an earlier version flagged by mistake, and dead code it must find. Run after the finder. |
+
+### 13.2 How a reference reaches a def
+
+- Symbols, words in strings and templates, top-level code, and blocks that frameworks run with `instance_exec` reach every def with that name.
+- `obj.name` with an unknown receiver reaches every non-private def with that name.
+- `Const.name` resolves `Const` the way Ruby does (lexical scopes, then ancestors, then top level) and reaches only defs on its singleton side. A mailer constant also reaches its public actions.
+- `name`, `self.name` and `super` reach a def only when the caller's class and the def's class can be the same object. A module's instance methods also reach class level when something extends the module.
+- Anything that cannot be resolved counts as reaching.
+
+A def is kept, not reported, when it overrides an ancestor's method, is a routed action, is an entry point, is defined dynamically or inside a template, or matches a strong dynamic-name pattern or an unreviewed `send(var)` on a receiver that can hold it.
+
+### 13.3 Buckets
+
+`1-shadowed`, `2-no-reference`, `3-test-only`, `4-only-from-dead` and `5-name-used-elsewhere` are strong evidence. `6-loose-pattern`, `7-unresolved` and `8-gem-word` (the name is a word in gem or stdlib source, so a library may call it as a hook) need a careful look: `8` correctly holds `JsonConverter.dump` and the `MercuryParser` Marshal hooks. `namespaces.tsv` lists classes and modules that nothing outside their own bodies names. A job there is a decision, not a deletion: it can be queued from the console or sit in the Sidekiq scheduled set.
+
+### 13.4 Validation
+
+On `main` the finder reported every method that the first pass deleted from a class that still exists (33 of 57 deleted defs; three of them in bucket 8). The other 24 were in classes deleted whole, and the namespace check reported 10 of those 13 classes.
+
+### 13.5 Results
+
+Deleted after a manual check of each candidate: three batches on 2026-10-03 (models and mailers; helpers, presenters and controllers; jobs and views). Left as decisions for Ben: `AppStoreNotificationData` (only tests use it); the jobs `BackfillGuid`, `BackfillProviderIds`, `NewsletterUpdater`, `PodcastClearUnused`, `QueuedEntryLimiter` and `SaveTwitterUsers` (nothing in the repo queues them); `OnboardingMessage` and the five `MarketingMailer#onboarding_*` emails (the code that queues them is commented out in `User`); and `lib/redis_protocol.rb` (a standalone script that the app never loads).
