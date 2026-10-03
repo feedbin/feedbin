@@ -226,7 +226,52 @@ class BackfillEntrySettingsTest < ActiveSupport::TestCase
     assert_equal [5_000], spans.uniq
   end
 
+  test "build starts a pass with fresh counters" do
+    entry = entry_with(@newsletter_feed, settings: string_form("newsletter" => "From: a", "newsletter_from" => "A <a@example.com>"), data: object_form("type" => "newsletter"))
+    batches = (Entry.maximum(:id) / BackfillEntrySettings::BATCH_SIZE.to_f).ceil
+    BackfillEntrySettings.new.build
+    run_backfill(entry)
+
+    BackfillEntrySettings.new.build
+
+    assert_equal({pending: batches, changed: 0, repaired: 0}, BackfillEntrySettings.progress)
+  end
+
+  test "perform counts its finished job, the rows it changed and the rows it repaired" do
+    entries = changing_rows + [entry_with(@other_feed, settings: object_form("embed_duration" => 3), data: object_form({}))]
+    BackfillEntrySettings.new.build
+    pending = BackfillEntrySettings.progress[:pending]
+
+    batches = run_backfill(*entries).size
+
+    assert_equal({pending: pending - batches, changed: 2, repaired: 1}, BackfillEntrySettings.progress)
+  end
+
+  # A full-table check cannot finish under production's statement timeout, so
+  # a finished pass that changed and repaired nothing is the completion gate.
+  test "a second pass changes and repairs nothing" do
+    entries = changing_rows
+    BackfillEntrySettings.new.build
+    run_backfill(*entries)
+
+    BackfillEntrySettings.new.build
+    run_backfill(*entries)
+
+    progress = BackfillEntrySettings.progress
+    assert_equal 0, progress[:changed]
+    assert_equal 0, progress[:repaired]
+  end
+
   private
+
+  # Two rows the SQL statements change and one the Ruby path repairs.
+  def changing_rows
+    [
+      entry_with(@newsletter_feed, settings: string_form("newsletter" => "From: a", "newsletter_from" => "A <a@example.com>"), data: object_form("newsletter_text" => "Hello", "type" => "newsletter")),
+      entry_with(@other_feed, settings: string_form("embed_duration" => 647), data: object_form({})),
+      entry_with(@newsletter_feed, settings: string_form("newsletter" => "a\u0000b", "newsletter_from" => "N <n@example.com>"), data: object_form("type" => "newsletter"))
+    ]
+  end
 
   # Writes settings and data exactly as a production row holds them.
   def entry_with(feed, settings:, data:)

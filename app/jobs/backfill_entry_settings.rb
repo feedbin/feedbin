@@ -4,6 +4,11 @@
 # newsletter_text and the Mailgun payload. One job for each range of ids:
 # production ids are sparse (about 2.6% in use), so the range is larger than
 # SidekiqHelper::BATCH_SIZE.
+#
+# Each build is a pass. Redis counters track it, because a full-table check
+# cannot finish under production's statement timeout: a pass is done when no
+# jobs are pending, and a done pass that changed and repaired no rows proves
+# the cleanup is complete.
 class BackfillEntrySettings
   include Sidekiq::Worker
 
@@ -15,6 +20,10 @@ class BackfillEntrySettings
   # dense range of newsletter rows stays well inside both limits.
   SUB_RANGE = 5_000
   NUL_ESCAPE = "\\u0000"
+  PENDING_KEY = "backfill_entry_settings:pending"
+  CHANGED_KEY = "backfill_entry_settings:changed"
+  REPAIRED_KEY = "backfill_entry_settings:repaired"
+  COUNTER_TTL = 30.days.to_i
   DELETED_SETTINGS_KEYS = %w[newsletter media_image].freeze
   DELETED_NEWSLETTER_DATA_KEYS = %w[newsletter newsletter_text].freeze
 
@@ -79,22 +88,46 @@ class BackfillEntrySettings
     FOR UPDATE OF entries
   SQL
 
+  def self.progress
+    pending, changed, repaired = Sidekiq.redis do |redis|
+      [redis.get(PENDING_KEY), redis.get(CHANGED_KEY), redis.get(REPAIRED_KEY)]
+    end
+    {pending: pending.to_i, changed: changed.to_i, repaired: repaired.to_i}
+  end
+
   def perform(batch)
+    changed = 0
+    repaired = 0
     # exec_update does not clear the query cache, and Sidekiq runs jobs inside
     # the Rails executor, where the cache is on.
     Entry.uncached do
       last = batch * BATCH_SIZE
       ((batch - 1) * BATCH_SIZE + 1).step(last, SUB_RANGE) do |first|
         binds = [first, [first + SUB_RANGE - 1, last].min, newsletter_type, NUL_ESCAPE]
-        connection.exec_update(NEWSLETTER_SQL, "BackfillEntrySettings newsletter", binds)
-        connection.exec_update(OTHER_SQL, "BackfillEntrySettings other", binds)
-        connection.select_values(NUL_ROWS_SQL, "BackfillEntrySettings NUL rows", binds).each { repair(it) }
+        changed += connection.exec_update(NEWSLETTER_SQL, "BackfillEntrySettings newsletter", binds)
+        changed += connection.exec_update(OTHER_SQL, "BackfillEntrySettings other", binds)
+        connection.select_values(NUL_ROWS_SQL, "BackfillEntrySettings NUL rows", binds).each do |id|
+          repair(id)
+          repaired += 1
+        end
       end
+    end
+    Sidekiq.redis do |redis|
+      redis.incrby(CHANGED_KEY, changed)
+      redis.incrby(REPAIRED_KEY, repaired)
+      redis.decr(PENDING_KEY)
     end
   end
 
+  # Starts a pass: resets the counters, then queues every range.
   def build
     batches = (Entry.maximum(:id) / BATCH_SIZE.to_f).ceil
+    Sidekiq.redis do |redis|
+      redis.set(PENDING_KEY, batches)
+      redis.set(CHANGED_KEY, 0)
+      redis.set(REPAIRED_KEY, 0)
+      [PENDING_KEY, CHANGED_KEY, REPAIRED_KEY].each { redis.expire(it, COUNTER_TTL) }
+    end
     Sidekiq::Client.push_bulk(
       "args" => (1..batches).each_slice(1).to_a,
       "class" => self.class
