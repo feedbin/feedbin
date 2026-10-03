@@ -18,8 +18,8 @@ class EntrySettingsCoderTest < ActiveSupport::TestCase
     assert_nil EntrySettingsCoder.load(nil)
   end
 
-  test "dump writes the JSON string form" do
-    assert_equal '{"embed_duration":647}', EntrySettingsCoder.dump({"embed_duration" => 647})
+  test "dump returns the hash, which jsonb stores as an object" do
+    assert_equal({"embed_duration" => 647}, EntrySettingsCoder.dump({"embed_duration" => 647}))
   end
 
   test "dump drops the keys that nothing reads" do
@@ -29,12 +29,12 @@ class EntrySettingsCoderTest < ActiveSupport::TestCase
       "newsletter_from" => "News <news@example.com>"
     })
 
-    assert_equal({"newsletter_from" => "News <news@example.com>"}, JSON.parse(dumped))
+    assert_equal({"newsletter_from" => "News <news@example.com>"}, dumped)
   end
 
   test "dump removes NUL characters from string values" do
     dumped = EntrySettingsCoder.dump({"newsletter_from" => "Ne\0ws <news@example.com>", "archived_images" => true})
 
-    assert_equal({"newsletter_from" => "News <news@example.com>", "archived_images" => true}, JSON.parse(dumped))
+    assert_equal({"newsletter_from" => "News <news@example.com>", "archived_images" => true}, dumped)
   end
 end

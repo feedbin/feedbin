@@ -498,13 +498,22 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal({"newsletter_from" => "News <news@example.com>", "archived_images" => true}, read_settings(@entry))
   end
 
-  test "a settings write keeps the JSON string form, which the code before this deploy reads" do
+  test "a settings write stores an object that SQL can read" do
     @entry.save!
 
     Entry.find(@entry.id).update!(embed_duration: 647)
 
-    assert_equal "string", settings_type(@entry)
-    assert_equal({"embed_duration" => 647}, JSON.parse(JSON.parse(raw_settings(@entry))))
+    assert_equal "object", settings_type(@entry)
+    assert_equal "647", Entry.uncached { Entry.connection.select_value("SELECT settings ->> 'embed_duration' FROM entries WHERE id = $1", "embed_duration", [@entry.id]) }
+  end
+
+  # A jsonb object cannot hold NUL; the old string form held it as an escape.
+  test "a settings value with a NUL character saves without it" do
+    @entry.save!
+
+    Entry.find(@entry.id).update!(newsletter_from: "Ne\0ws <news@example.com>")
+
+    assert_equal "News <news@example.com>", Entry.find(@entry.id).newsletter_from
   end
 
   private
