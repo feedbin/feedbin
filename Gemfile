@@ -69,6 +69,7 @@ gem "strong_migrations", "< 2"
 gem "tailwindcss-ruby", "< 4"
 gem "tailwindcss-rails", "< 4"
 gem "web-push"
+gem "zstd-ruby"
 gem "autotuner"
 
 group :development do

@@ -695,6 +695,7 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.8.3)
+    zstd-ruby (2.0.10)
 
 PLATFORMS
   arm64-darwin-20
@@ -788,6 +789,7 @@ DEPENDENCIES
   web-push
   webmock
   will_paginate
+  zstd-ruby
 
 BUNDLED WITH
   4.0.22
