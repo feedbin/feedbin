@@ -140,6 +140,17 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert_equal feed.feed_type, "newsletter"
   end
 
+  test "stores the sender and recipient, not the raw source or the text part" do
+    NewsletterReceiver.new.perform(@token, @s3_url_html)
+
+    entry = Entry.last
+    assert_nil entry.settings["newsletter"]
+    assert_equal "Ben Ubois <ben@benubois.com>", entry.newsletter_from
+    assert_equal "token@newsletters.feedbin.com", entry.newsletter_to
+    assert_equal @token, entry.newsletter_token
+    assert_equal({"type" => "newsletter", "format" => "html", "newsletter_to" => @token}, entry.data)
+  end
+
   test "stores a newsletter whose body carries a NUL byte" do
     url = "https://bucket.s3.amazonaws.com/path.to.nul.email"
     stub_request(:get, url).to_return(status: 200, body: <<~EMAIL.gsub("\n", "\r\n"))
@@ -204,10 +215,10 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
       author: "Clean Author",
       content: binary,
       published: Time.now,
-      data: {newsletter_text: invalid_utf8, type: "newsletter"}
+      data: {newsletter_to: invalid_utf8, type: "newsletter"}
     }
 
-    assert_equal ["content", "data.newsletter_text"], receiver.send(:unstorable_attributes, attributes)
+    assert_equal ["content", "data.newsletter_to"], receiver.send(:unstorable_attributes, attributes)
   end
 
   test "keeps the source email when the newsletter could not be stored" do
@@ -249,16 +260,16 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
 
   test "unstorable_attributes is empty when every attribute is storable" do
     receiver = NewsletterReceiver.new
-    attributes = {author: "José", content: "<p>ok</p>", data: {newsletter_text: "fin"}}
+    attributes = {author: "José", content: "<p>ok</p>", data: {newsletter_to: "fin"}}
 
     assert_empty receiver.send(:unstorable_attributes, attributes)
   end
 
   test "unstorable_attributes names an attribute carrying a NUL byte" do
     receiver = NewsletterReceiver.new
-    attributes = {author: "Clean", title: "before\0after", data: {newsletter_text: "also\0bad"}}
+    attributes = {author: "Clean", title: "before\0after", data: {newsletter_to: "also\0bad"}}
 
-    assert_equal ["title", "data.newsletter_text"], receiver.send(:unstorable_attributes, attributes)
+    assert_equal ["title", "data.newsletter_to"], receiver.send(:unstorable_attributes, attributes)
   end
 
   test "records the failing attributes and re-raises when an entry insert is rejected" do

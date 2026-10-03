@@ -147,11 +147,10 @@ class NewsletterReceiver
         published: Time.now,
         updated: Time.now,
         public_id: newsletter.entry_id,
-        newsletter: newsletter.to_s,
         newsletter_from: newsletter.from,
         newsletter_to: newsletter.to_email,
         newsletter_token: @address.local,
-        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter_to: newsletter.full_token}
+        data: {type: "newsletter", format: newsletter.format, newsletter_to: newsletter.full_token}
       }
       feed.entries.create!(attributes).tap do |record|
         NewsletterSaver.perform_async(record.id)

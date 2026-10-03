@@ -90,16 +90,6 @@ class EmailNewsletter
     html ? "html" : "text"
   end
 
-  def headers
-    {
-      "List-Unsubscribe" => @email["List-Unsubscribe"]&.decoded
-    }
-  end
-
-  def to_s
-    to_utf8(@email.to_s)
-  end
-
   private
 
   # The decoded email body can be a string that is not valid UTF-8 — either
