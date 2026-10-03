@@ -5,6 +5,10 @@ class Entry < ApplicationRecord
 
   store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration, :newsletter_to, :newsletter_token], coder: JSON
 
+  # Deploy 1 stops loading the legacy column. BackfillOriginalContent still
+  # reads it by name. Deploy 2 drops the column and removes this line.
+  self.ignored_columns += ["original"]
+
   enum :provider, [:twitter, :youtube, :favicon, :entry_icon], prefix: true
 
   belongs_to :feed
