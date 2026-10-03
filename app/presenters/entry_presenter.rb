@@ -160,6 +160,23 @@ class EntryPresenter < BasePresenter
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
+  # API v2 keeps the shape of the old original hash. Only content is the
+  # first version. The other fields are the entry's current values.
+  def api_original
+    original = entry.original_content
+    return nil if original.nil?
+    {
+      author: entry.author,
+      content: original,
+      title: entry.title,
+      url: entry.url,
+      entry_id: entry.entry_id,
+      published: entry.published,
+      data: entry.data,
+      fingerprint: entry.fingerprint
+    }
+  end
+
   def app_content
     ContentFormatter.app_format(formatted_content, entry)
   rescue => e

@@ -4,7 +4,7 @@ present entry do |entry_presenter|
   json.url entry.fully_qualified_url
   json.published entry.published.iso8601(6)
   json.created_at entry.created_at.iso8601(6)
-  json.original entry.original
+  json.original entry_presenter.api_original
   json.content_diff entry.content_diff if params[:include_content_diff] == "true"
   json.twitter_id entry.twitter_id
   json.twitter_thread_ids entry.twitter_thread_ids

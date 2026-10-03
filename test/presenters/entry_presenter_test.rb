@@ -131,4 +131,36 @@ class EntryPresenterTest < ActionView::TestCase
 
     assert_includes output, TwitterAvatar.path(entry.tweet.main_tweet.user.profile_image_uri_https(:original))
   end
+
+  test "api_original keeps the old shape with the original content and current values" do
+    content = "<p>Old text.</p><p>New text.</p>"
+    fingerprint = SecureRandom.uuid
+    entry = @feed.entries.create!(
+      public_id: SecureRandom.hex,
+      title: "Current title",
+      author: "Current author",
+      url: "https://example.com/post",
+      entry_id: "entry-1",
+      fingerprint: fingerprint,
+      content: content,
+      data: {"media" => []}
+    )
+    entry.update!(compressed_original_content: OriginalContent.compress("<p>Old text.</p>", base: content))
+    entry.reload
+
+    result = presenter_for(entry).api_original
+
+    assert_equal %i[author content title url entry_id published data fingerprint], result.keys
+    assert_equal "<p>Old text.</p>", result[:content]
+    assert_equal ["Current author", "Current title", "https://example.com/post", "entry-1"], result.values_at(:author, :title, :url, :entry_id)
+    assert_equal entry.published, result[:published]
+    assert_equal({"media" => []}, result[:data])
+    assert_equal fingerprint, result[:fingerprint]
+  end
+
+  test "api_original is nil without an original" do
+    entry = @feed.entries.create!(public_id: SecureRandom.hex, content: "<p>Text.</p>")
+
+    assert_nil presenter_for(entry).api_original
+  end
 end

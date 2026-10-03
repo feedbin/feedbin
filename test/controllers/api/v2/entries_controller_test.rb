@@ -141,6 +141,44 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     assert parse_json["errors"].any? { |error| error.key?("since") }, parse_json.inspect
   end
 
+  test "original keeps its keys and formats" do
+    login_as @user
+    entry = @entries.first
+    entry.update!(compressed_original_content: OriginalContent.compress("<p>Old text.</p>", base: entry.content))
+
+    get :show, params: {id: entry, include_original: "true"}, format: :json
+    assert_response :success
+
+    original = parse_json["original"]
+    assert_equal %w[author content title url entry_id published data fingerprint], original.keys
+    assert_equal "<p>Old text.</p>", original["content"]
+    assert_equal entry.title, original["title"]
+    assert_equal entry.url, original["url"]
+    assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\z/, original["published"])
+  end
+
+  test "original is null without one" do
+    login_as @user
+
+    get :show, params: {id: @entries.first, include_original: "true"}, format: :json
+    assert_response :success
+
+    result = parse_json
+    assert result.key?("original")
+    assert_nil result["original"]
+  end
+
+  test "extended mode returns the same original" do
+    login_as @user
+    entry = @entries.first
+    entry.update!(compressed_original_content: OriginalContent.compress("<p>Old text.</p>", base: entry.content))
+
+    get :show, params: {id: entry, mode: "extended"}, format: :json
+    assert_response :success
+
+    assert_equal "<p>Old text.</p>", parse_json.dig("original", "content")
+  end
+
   private
 
   def entry_keys(all = false)
