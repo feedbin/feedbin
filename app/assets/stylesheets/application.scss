@@ -3930,51 +3930,101 @@ img.responsive {
   }
 }
 
+/*
+  Inline diff: new text gets a denim-blue highlighter stroke, one hue across
+  all themes (a light wash in Day and Sunset, a mid-tone with white text in
+  Dusk and Night). Removed text uses the theme's muted gray with a thin strike.
+
+  Contrast (WCAG):            text on highlight   highlight vs page
+    Day     #c8e0ff           7.7:1               1.35:1
+    Sunset  #bddaff           7.9:1               1.28:1
+    Dusk    #395f8f  white    6.5:1               2.3:1
+    Night   #284e7d  white    8.5:1               2.5:1
+*/
+
+/* Day (and the default) */
 .inline-diff {
-  ins {
-    background: #c1ead1;
-    color: #022f14;
-    a {
-      color: #022f14;
-    }
-  }
+  --diff-marker: #c8e0ff;
+  --diff-accent: #467cc0;
+  --diff-link: #0755b9;
+  --diff-removed: var(--color-500, #707680);
+}
 
-  ins,
-  .diff-ins {
-    text-decoration: none;
-  }
+.theme-sunset .inline-diff {
+  --diff-marker: #bddaff;
+  --diff-accent: #4076b9;
+  --diff-link: #0755b9;
+}
 
-  ins a,
-  .diff-ins a,
-  a.diff-ins {
-    text-decoration: underline;
-  }
+.theme-dusk .inline-diff {
+  --diff-marker: #395f8f;
+  --diff-accent: #69a1e8;
+  --diff-link: #ffffff;
+  --diff-ins-text: #ffffff;
+}
 
-  img.diff-ins,
-  code.diff-ins {
-    border: 2px solid #c1ead1;
-  }
+.theme-midnight .inline-diff {
+  --diff-marker: #284e7d;
+  --diff-accent: #5d94da;
+  --diff-link: #ffffff;
+  --diff-ins-text: #ffffff;
+}
 
-  del {
-    background: #eec2cb;
-    color: #33030d;
-    a {
-      color: #33030d;
-    }
-    img {
-      opacity: 0.5;
-    }
-    text-decoration: line-through;
+@media (prefers-color-scheme: dark) {
+  .theme-auto .inline-diff {
+    --diff-marker: #395f8f;
+    --diff-accent: #69a1e8;
+    --diff-link: #ffffff;
+    --diff-ins-text: #ffffff;
   }
+}
 
-  img.diff-del,
-  code.diff-del {
-    border: 2px solid #eec2cb;
-  }
+/* New text: a marker stroke over the lower part of the line, like a pen.
+   Each word is its own element, so no horizontal padding (it would split a
+   run of words into separate boxes); the gradient joins up seamlessly. */
+.inline-diff ins {
+  color: var(--diff-ins-text, inherit);
+  text-decoration: none;
+  background: linear-gradient(to bottom, transparent 30%, var(--diff-marker) 30%, var(--diff-marker) 94%, transparent 94%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
 
-  img.diff-del {
-    opacity: 0.5;
-  }
+/* Feedbin's link blue is too light on the highlight in light themes. */
+.inline-diff a ins,
+.inline-diff ins a {
+  color: var(--diff-link);
+}
+
+/* Removed text steps back: muted, with a thin strike. */
+.inline-diff del {
+  color: var(--diff-removed);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+/* Media that was added or removed. */
+.inline-diff :is(img, iframe, video).diff-ins {
+  outline: 4px solid var(--diff-marker);
+  outline-offset: 4px;
+}
+
+.inline-diff :is(img, iframe, video).diff-del {
+  width: 40%;
+  height: auto;
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+/* Formatting added or removed around unchanged text, e.g. a new link. */
+.inline-diff :is(a, em, strong, i, b, code, span, sup, sub).diff-ins {
+  background: linear-gradient(to bottom, transparent 88%, var(--diff-accent) 88%);
+}
+
+.inline-diff :is(a, em, strong, i, b, code, span, sup, sub).diff-del {
+  color: inherit;
+  text-decoration: underline dotted var(--diff-removed);
+  text-underline-offset: 0.2em;
 }
 
 .radio input {
