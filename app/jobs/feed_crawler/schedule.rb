@@ -68,10 +68,6 @@ module FeedCrawler
       report
     end
 
-    def priority?
-      @priority ||= count % 2 == 0
-    end
-
     def last_refresh
       last_refresh = Time.at(Sidekiq.redis { it.get(LAST_REFRESH_KEY) }.to_i)
     end

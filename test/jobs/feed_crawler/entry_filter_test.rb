@@ -64,7 +64,7 @@ module FeedCrawler
         end
       end
 
-      results = EntryFilter.filter!(entries, check_for_changes: false)
+      results = EntryFilter.new(entries, check_for_changes: false).filter
       assert_equal 0, results.length
     end
 
@@ -76,7 +76,7 @@ module FeedCrawler
         end
       end
 
-      results = EntryFilter.filter!(entries)
+      results = EntryFilter.new(entries).filter
       assert_equal 0, results.length
     end
 
@@ -88,7 +88,7 @@ module FeedCrawler
         end
       end
 
-      results = EntryFilter.filter!(entries)
+      results = EntryFilter.new(entries).filter
       assert_equal 0, results.length
     end
 

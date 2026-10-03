@@ -1,9 +1,5 @@
 module FeedCrawler
   class EntryFilter
-    def self.filter!(*args, **kwargs)
-      new(*args, **kwargs).filter
-    end
-
     def initialize(entries, check_for_changes: true, always_check_recent: false, date_filter: nil)
       @entries = entries.first(300)
       @public_ids = @entries.map(&:public_id)
