@@ -250,7 +250,7 @@ end
 ```
 
 - **Deploy A** has the same `load`, but `dump` returns `JSON.generate(...)` of the same hash. So it still writes today's string format, and old processes can read every row.
-- **Deploy C** removes `DELETED_KEYS` and the `except`, after Block 4 shows 0 rows with a deleted key.
+- **Deploy C** removes `DELETED_KEYS` and the `except`, after a pass ends with `pending: 0, changed: 0, repaired: 0` in `BackfillEntrySettings.progress`.
 - **`load` returns nil for a blank string.** `ActiveRecord::Store` calls `load("")` for a NULL column. `JSON.parse("")` raises, so the guard is required. The store then gives `{}`.
 - **`JSON.parse`, not `JSON.load`.** `JSON.load` can create objects from `json_class` keys.
 - **NUL removal is flat.** All `settings` values are strings, booleans or integers.
@@ -290,13 +290,26 @@ New file `app/jobs/backfill_entry_settings.rb`. It follows the shape of `Backfil
 # newsletter_text and the Mailgun payload. One job for each range of ids:
 # production ids are sparse (about 2.6% in use), so the range is larger than
 # SidekiqHelper::BATCH_SIZE.
+#
+# Each build is a pass. Redis counters track it, because a full-table check
+# cannot finish under production's statement timeout: a pass is done when no
+# jobs are pending, and a done pass that changed and repaired no rows proves
+# the cleanup is complete.
 class BackfillEntrySettings
   include Sidekiq::Worker
 
   sidekiq_options queue: :utility
 
   BATCH_SIZE = 100_000
+  # Production cancels a statement after 15 s, and an app write that waits on
+  # a row lock after 10 s. Each statement covers at most this many ids, so a
+  # dense range of newsletter rows stays well inside both limits.
+  SUB_RANGE = 5_000
   NUL_ESCAPE = "\\u0000"
+  PENDING_KEY = "backfill_entry_settings:pending"
+  CHANGED_KEY = "backfill_entry_settings:changed"
+  REPAIRED_KEY = "backfill_entry_settings:repaired"
+  COUNTER_TTL = 30.days.to_i
   DELETED_SETTINGS_KEYS = %w[newsletter media_image].freeze
   DELETED_NEWSLETTER_DATA_KEYS = %w[newsletter newsletter_text].freeze
 
@@ -361,20 +374,46 @@ class BackfillEntrySettings
     FOR UPDATE OF entries
   SQL
 
+  def self.progress
+    pending, changed, repaired = Sidekiq.redis do |redis|
+      [redis.get(PENDING_KEY), redis.get(CHANGED_KEY), redis.get(REPAIRED_KEY)]
+    end
+    {pending: pending.to_i, changed: changed.to_i, repaired: repaired.to_i}
+  end
+
   def perform(batch)
+    changed = 0
+    repaired = 0
     # exec_update does not clear the query cache, and Sidekiq runs jobs inside
     # the Rails executor, where the cache is on.
     Entry.uncached do
-      first = (batch - 1) * BATCH_SIZE + 1
-      binds = [first, first + BATCH_SIZE - 1, newsletter_type, NUL_ESCAPE]
-      connection.exec_update(NEWSLETTER_SQL, "BackfillEntrySettings newsletter", binds)
-      connection.exec_update(OTHER_SQL, "BackfillEntrySettings other", binds)
-      connection.select_values(NUL_ROWS_SQL, "BackfillEntrySettings NUL rows", binds).each { repair(it) }
+      last = batch * BATCH_SIZE
+      ((batch - 1) * BATCH_SIZE + 1).step(last, SUB_RANGE) do |first|
+        binds = [first, [first + SUB_RANGE - 1, last].min, newsletter_type, NUL_ESCAPE]
+        changed += connection.exec_update(NEWSLETTER_SQL, "BackfillEntrySettings newsletter", binds)
+        changed += connection.exec_update(OTHER_SQL, "BackfillEntrySettings other", binds)
+        connection.select_values(NUL_ROWS_SQL, "BackfillEntrySettings NUL rows", binds).each do |id|
+          repair(id)
+          repaired += 1
+        end
+      end
+    end
+    Sidekiq.redis do |redis|
+      redis.incrby(CHANGED_KEY, changed)
+      redis.incrby(REPAIRED_KEY, repaired)
+      redis.decr(PENDING_KEY)
     end
   end
 
+  # Starts a pass: resets the counters, then queues every range.
   def build
     batches = (Entry.maximum(:id) / BATCH_SIZE.to_f).ceil
+    Sidekiq.redis do |redis|
+      redis.set(PENDING_KEY, batches)
+      redis.set(CHANGED_KEY, 0)
+      redis.set(REPAIRED_KEY, 0)
+      [PENDING_KEY, CHANGED_KEY, REPAIRED_KEY].each { redis.expire(it, COUNTER_TTL) }
+    end
     Sidekiq::Client.push_bulk(
       "args" => (1..batches).each_slice(1).to_a,
       "class" => self.class
@@ -430,7 +469,8 @@ Notes:
 - **`data` is `json`.** The cast through `jsonb` changes key order and spacing. No reader depends on either.
 - **The Ruby path removes NUL characters from values.** Such a value cannot exist in a `jsonb` object. Today's string form holds it only as an escape.
 - **Rows that SQL fails on.** A newsletter row whose unwrapped `settings` is not an object would make `- 'newsletter'` raise `cannot delete from scalar`. The job then fails and retries, and the error shows the range. The coder always wrote a hash, so no such rows are expected.
-- **Lock time.** Each statement locks the rows it changes until it ends. An app write to one of those rows waits for it.
+- **Timeouts and lock time.** Production cancels a statement after 15 s (`statement_timeout`) and an app write that waits on a row lock after 10 s (`lock_timeout`). So each statement covers at most 5,000 IDs (`SUB_RANGE`), and a job runs 20 of them for its 100,000-ID range. Each statement locks only the rows it changes, until it ends.
+- **Pass counters.** A full-table check cannot finish under the 15 s timeout. Each `build` starts a pass and resets three Redis counters: `pending` (jobs not finished), `changed` (rows the SQL statements changed) and `repaired` (rows the Ruby path rewrote). `BackfillEntrySettings.progress` reads them. A failed job retries and does not count until it finishes.
 
 ## Rollout
 
@@ -459,8 +499,9 @@ When deploy A runs on every web and Sidekiq process, change `dump` to return the
 1. Limit the `utility` queue's concurrency.
 2. In a console, run `BackfillEntrySettings.new.build`.
 3. Watch replication lag, WAL volume and autovacuum on `entries` and its TOAST table.
-4. When the queue is empty, run `build` again. The second run catches rows that the first run skipped and changes few or none.
-5. Run Block 4 on a replica. All three counts must be 0.
+4. When `BackfillEntrySettings.progress[:pending]` is 0, the pass is done. Run `build` again. The second pass catches rows that changed during the first one.
+5. Repeat until a pass ends with `pending: 0, changed: 0, repaired: 0` in `BackfillEntrySettings.progress`. That is the completion gate.
+6. Optional spot check: run Block 4 on the production console. It reads the 0.1% sample, and all three counts must be 0.
 
 ### Phase 4: Deploy C
 
@@ -569,7 +610,7 @@ One test for each of the 17 row shapes in the dev test:
 
 ## Appendix: console blocks
 
-Each block ran on the dev database with `bin/rails runner`. Blocks 1–3 also ran on seeded rows of every shape with a 100% sample, in a transaction that was rolled back. Block 4 ran before and after the job on the same seeded rows. Every query uses bind parameters. No block prints a stored value: only key names, counts and sizes.
+Each block ran on the dev database with `bin/rails runner`. Blocks 1–3 also ran on seeded rows of every shape with a 100% sample, in a transaction that was rolled back. Block 4 ran before and after the real job on seeded rows (17, 1 and 2 before; 0, 0 and 0 after), in a transaction that was rolled back. Every query uses bind parameters. No block prints a stored value: only key names, counts and sizes.
 
 ### Block 1: sizes by row type (production console)
 
@@ -834,29 +875,36 @@ end
 end
 ```
 
-### Block 4: rows still to fix (replica console, after Phase 3)
+### Block 4: spot check of rows still to fix (production console, after Phase 3)
 
 ```ruby
-# Block 4: rows the backfill has not fixed yet. Reads every row, so run it on a replica.
+# Block 4: rows the backfill has not fixed yet, in the 0.1% block sample.
+# BackfillEntrySettings.progress is the completion gate; this is a spot check.
+# Run it after the backfill: before it, the check reads every raw source in
+# the sample.
 conn = Entry.connection
 started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+sample_percent = 0.1
 newsletter_type = Feed.feed_types.fetch("newsletter")
 nul_escape = "\\u0000"
 # uncached: a second run of this block in the same session must read the table again.
-row = Entry.uncached { conn.select_one(<<~SQL, "settings_remaining", [newsletter_type, nul_escape]) }
+row = Entry.uncached { conn.select_one(<<~SQL, "settings_remaining", [sample_percent, newsletter_type, nul_escape]) }
   SELECT
+    count(*) AS sampled_rows,
     count(*) FILTER (WHERE jsonb_typeof(entries.settings) = 'string') AS string_rows,
     count(*) FILTER (WHERE jsonb_typeof(entries.settings) = 'object'
       AND entries.settings ?| ARRAY['newsletter', 'media_image']) AS deleted_settings_key_rows,
-    count(*) FILTER (WHERE feeds.feed_type = $1 AND CASE
-      WHEN strpos(COALESCE(entries.data::text, ''), $2) > 0 THEN true
+    count(*) FILTER (WHERE feeds.feed_type = $2 AND CASE
+      WHEN strpos(COALESCE(entries.data::text, ''), $3) > 0 THEN true
       ELSE entries.data::jsonb ?| ARRAY['newsletter', 'newsletter_text']
     END) AS deleted_data_key_rows
-  FROM entries
+  FROM entries TABLESAMPLE SYSTEM ($1) REPEATABLE (42)
   LEFT JOIN feeds ON feeds.id = entries.feed_id
 SQL
 puts "elapsed seconds: #{(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(1)}"
+puts "sampled rows: #{row["sampled_rows"]}"
 puts "rows still stored as a JSON string: #{row["string_rows"]}"
 puts "object rows still holding a deleted settings key: #{row["deleted_settings_key_rows"]}"
 puts "newsletter rows still holding a deleted data key (or a NUL escape): #{row["deleted_data_key_rows"]}"
+puts "BackfillEntrySettings.progress: #{BackfillEntrySettings.progress.inspect}"
 ```

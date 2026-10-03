@@ -18,7 +18,7 @@
 - Empty `settings` after the cleanup is stored as SQL `NULL`, never `{}`.
 - Backfill: queue `utility`, `BATCH_SIZE = 100_000`, one job for each ID range, ranges in ascending order. Every change happens in SQL computed from the row itself, inside `Entry.uncached`. `updated_at` never changes.
 - Never interpolate values or identifiers into SQL. Use bind parameters (`$1`, `$2`, ...) with `exec_update`, `select_value`, `select_values` and `select_one`.
-- Deploy order: Deploy A (Tasks 1–2). Deploy B (Tasks 3–4), only after Deploy A runs on every web and Sidekiq process. The backfill, after Deploy B. Deploy C (Task 5), only after Block 4 of the spec shows 0, 0 and 0.
+- Deploy order: Deploy A (Tasks 1–2). Deploy B (Tasks 3–4), only after Deploy A runs on every web and Sidekiq process. The backfill, after Deploy B. Deploy C (Task 5), only after a pass ends with `pending: 0, changed: 0, repaired: 0` in `BackfillEntrySettings.progress`.
 - The Postgres 19 upgrade and smaller files on disk are out of scope. Do not mention them in code, comments or commits.
 - Work on the branch `entry-settings-cleanup`, created from `main`, in the worktree `.worktrees/entry-settings-cleanup`. The main checkout at `~/Sites/feedbin` belongs to another session on the branch `original-content-compression`. Do not change, stash or check out anything there.
 - That branch also changes `app/models/entry.rb` and `test/models/entry_test.rb`. When both branches reach `main`, keep both sets of changes.
@@ -1083,12 +1083,15 @@ Ben runs these steps. They are not code changes.
 1. Limit the concurrency of the `utility` queue.
 2. In a production console, run `BackfillEntrySettings.new.build`. It queues 53,921 jobs.
 3. While it runs, watch replication lag, WAL volume, and autovacuum on `entries` and its TOAST table. The spec estimates about 29 million row versions and at least 60 GiB of WAL.
-4. When the `utility` queue is empty, run `BackfillEntrySettings.new.build` a second time. It catches rows that changed during the first run, and it changes few or none.
-5. When the queue is empty again, run Block 4 from the spec's appendix on a replica console. All three counts must be `0`.
+4. When `BackfillEntrySettings.progress[:pending]` is `0`, the pass is done. Run `BackfillEntrySettings.new.build` again. The second pass catches rows that changed during the first one.
+5. Repeat until a pass ends with `pending: 0, changed: 0, repaired: 0` in `BackfillEntrySettings.progress`. That is the completion gate.
+6. Optional spot check: run Block 4 from the spec's appendix on the production console. It reads the 0.1% sample, and all three counts must be `0`.
+
+The final review added two things to the job after Task 4 (commits `80ebdb62` and `353ef36b`): each statement covers at most 5,000 IDs (`SUB_RANGE`), because production cancels a statement after 15 s and an app lock wait after 10 s; and the Redis pass counters behind `BackfillEntrySettings.progress`, because a full-table check cannot finish under that timeout.
 
 ---
 
-## Deploy C (after Block 4 shows 0, 0 and 0)
+## Deploy C (after a backfill pass that changed and repaired nothing)
 
 ### Task 5: Remove the fallbacks and the backfill
 
@@ -1104,7 +1107,7 @@ Ben runs these steps. They are not code changes.
 - Delete: `test/jobs/backfill_entry_settings_test.rb`
 
 **Interfaces:**
-- Consumes: the coder from Task 3. The backfill from Task 4 has run, and Block 4 shows 0, 0 and 0.
+- Consumes: the coder from Task 3. The backfill from Task 4 has run, and a pass ends with `pending: 0, changed: 0, repaired: 0` in `BackfillEntrySettings.progress`.
 - Produces:
   - `EntrySettingsCoder.dump(hash)` → the `Hash` without NUL characters in string values. `DELETED_KEYS` no longer exists.
   - `EntryPresenter#newsletter_from` reads `entry.newsletter_from` only.
