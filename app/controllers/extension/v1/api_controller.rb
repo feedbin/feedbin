@@ -52,11 +52,6 @@ module Extension
         render partial: "api/v2/shared/api_error", status: :not_found
       end
 
-      def status_forbidden
-        @error = {status: 403, errors: []}
-        render partial: "api/v2/shared/api_error", status: :forbidden
-      end
-
       def validate_content_type
         unless request.media_type == "application/json"
           @error = {status: 415, message: 'Please use the "Content-Type: application/json; charset=utf-8" header', errors: []}

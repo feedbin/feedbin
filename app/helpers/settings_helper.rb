@@ -1,10 +1,4 @@
 module SettingsHelper
-  def get_tag_names(tags, feed_id)
-    if names = tags[feed_id]
-      names.join(", ")
-    end
-  end
-
   def tag_options
     tags = @user.feed_tags.map { |tag|
       [tag.name, tag.name]

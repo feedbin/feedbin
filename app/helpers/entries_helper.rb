@@ -32,10 +32,6 @@ module EntriesHelper
     }
   end
 
-  def entries_cache_key(entry, favicons = {})
-    EntriesHelper.entries_cache_key(entry, favicons)
-  end
-
   def format_text(text)
     text ||= ""
     decoder = HTMLEntities.new

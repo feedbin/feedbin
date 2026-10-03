@@ -90,10 +90,6 @@ module Api
       def validate_create
         needs_nested params[:saved_search], "query", "name"
       end
-
-      def out_of_bounds?
-        @entries.respond_to?(:out_of_bounds?) && @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
-      end
     end
   end
 end

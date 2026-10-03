@@ -50,8 +50,4 @@ class RecentlyPlayedEntriesController < ApplicationController
   def recently_played_entry_params
     params.require(:recently_played_entry).permit(:progress, :duration)
   end
-
-  def queued_entry_params
-    params.require(:recently_played_entry).permit(:progress, :duration)
-  end
 end

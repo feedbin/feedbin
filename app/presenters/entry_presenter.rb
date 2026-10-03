@@ -186,10 +186,6 @@ class EntryPresenter < BasePresenter
     entry.content_format == "text"
   end
 
-  def has_content?
-    entry.summary.respond_to?(:length) && entry.summary.length > 0
-  end
-
   def retweet_text
     HTMLEntities.new.decode(entry.tweet.tweet_summary(entry.tweet.main_tweet.quoted_status))
   end
