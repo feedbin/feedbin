@@ -509,17 +509,10 @@ CREATE TABLE public.entries (
     updated_at timestamp without time zone NOT NULL,
     entry_id text,
     public_id character varying(255),
-    old_public_id character varying(255),
     starred_entries_count bigint DEFAULT 0 NOT NULL,
     data json,
-    source text,
-    image_url text,
-    processed_image_url text,
-    image json,
     recently_played_entries_count bigint DEFAULT 0,
-    thread_id bigint,
     settings jsonb,
-    main_tweet_id text,
     queued_entries_count bigint DEFAULT 0 NOT NULL,
     fingerprint uuid,
     guid uuid,
@@ -2385,13 +2378,6 @@ CREATE INDEX index_entries_on_feed_id_include_id_published_created_at ON public.
 
 
 --
--- Name: index_entries_on_main_tweet_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_entries_on_main_tweet_id ON public.entries USING btree (main_tweet_id) WHERE (main_tweet_id IS NOT NULL);
-
-
---
 -- Name: index_entries_on_provider_and_provider_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2403,13 +2389,6 @@ CREATE INDEX index_entries_on_provider_and_provider_id ON public.entries USING b
 --
 
 CREATE UNIQUE INDEX index_entries_on_public_id ON public.entries USING btree (public_id);
-
-
---
--- Name: index_entries_on_thread_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_entries_on_thread_id ON public.entries USING btree (thread_id) WHERE (thread_id IS NOT NULL);
 
 
 --
@@ -3134,6 +3113,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261003140000'),
 ('20261003130000'),
 ('20261003120000'),
 ('20260912120000'),
