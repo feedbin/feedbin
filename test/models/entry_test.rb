@@ -387,8 +387,77 @@ class EntryTest < ActiveSupport::TestCase
     assert_not_nil entries.first.author_avatar_record
   end
 
+  test "original_content reads the compressed column" do
+    entry = saved_entry("<p>Old text.</p><p>New text.</p>")
+    entry.update!(compressed_original_content: OriginalContent.compress("<p>Old text.</p>", base: entry.content))
+
+    assert_equal "<p>Old text.</p>", entry.reload.original_content
+  end
+
+  test "original_content survives later content changes" do
+    entry = saved_entry("<p>First.</p>")
+    second = "<p>First.</p><p>Second.</p>"
+    entry.update!(content: second, compressed_original_content: OriginalContent.compress("<p>First.</p>", base: second))
+    entry.update!(content: "<p>First.</p><p>Second.</p><p>Third.</p>")
+    entry.update!(content: "<p>Only the fourth version.</p>")
+
+    assert_equal "<p>First.</p>", entry.reload.original_content
+  end
+
+  test "a save that sets the compressed column with new content keeps the new value" do
+    entry = saved_entry("<p>Old text.</p>")
+    blob = OriginalContent.compress("<p>Old text.</p>", base: "<p>New text.</p>")
+    entry.update!(content: "<p>New text.</p>", compressed_original_content: blob)
+
+    assert_equal blob, entry.reload.compressed_original_content
+  end
+
+  test "a save without a content change keeps the stored value" do
+    entry = saved_entry("<p>New text.</p>")
+    blob = OriginalContent.compress("<p>Old text.</p>", base: entry.content)
+    entry.update!(compressed_original_content: blob)
+    entry.update!(title: "A new title")
+
+    assert_equal blob, entry.reload.compressed_original_content
+  end
+
+  test "content changed outside callbacks makes original_content nil" do
+    entry = saved_entry("<p>New text.</p>")
+    entry.update!(compressed_original_content: OriginalContent.compress("<p>Old text.</p>", base: entry.content))
+    entry.update_columns(content: "<p>Rewritten without callbacks.</p>")
+
+    entry.reload
+    assert_nil entry.original_content
+    assert_nil entry.content_diff
+  end
+
+  test "content changed to blank clears the stored value" do
+    entry = saved_entry("<p>New text.</p>")
+    entry.update!(compressed_original_content: OriginalContent.compress("<p>Old text.</p>", base: entry.content))
+    entry.update!(content: "")
+
+    assert_nil entry.reload.compressed_original_content
+  end
+
+  test "content_diff marks the added text" do
+    entry = saved_entry("<p>This is the text.</p>")
+    entry.update!(
+      content: "<p>This is the new text.</p>",
+      compressed_original_content: OriginalContent.compress("<p>This is the text.</p>", base: "<p>This is the new text.</p>")
+    )
+
+    assert_match %r{<ins>new\s*</ins>}, entry.reload.content_diff
+  end
+
+  test "content_diff is nil without an original" do
+    assert_nil saved_entry("<p>Text.</p>").content_diff
+  end
 
   private
+
+  def saved_entry(content)
+    @user.feeds.first.entries.create!(public_id: SecureRandom.hex, content: content)
+  end
 
   # FactoryHelper's factory, keyed to an entry. It seeds a legacy url so the
   # read-path tests can prove the row's legacy pointer is ignored. Entry is

@@ -27,6 +27,7 @@ class Entry < ApplicationRecord
   before_create :provider_metadata
 
   before_update :create_summary
+  before_save :recompress_original_content
 
   after_commit :cache_public_id, on: [:create, :update]
   after_commit :find_images, on: :create
@@ -198,12 +199,17 @@ class Entry < ApplicationRecord
     record if record&.kind_avatar?
   end
 
+  def original_content
+    OriginalContent.decompress(compressed_original_content, base: content)
+  end
+
   def content_diff
     @content_diff ||= begin
       result = nil
-      if content && original && original["content"].present? && original["content"].length != content.length
+      original = original_content
+      if content && original.present? && original.length != content.length
         begin
-          before = ContentFormatter.format!(original["content"], self)
+          before = ContentFormatter.format!(original, self)
           after = ContentFormatter.format!(content, self)
           result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
           result = result.html_safe
@@ -364,6 +370,16 @@ class Entry < ApplicationRecord
   end
 
   private
+
+  # A stored value only decompresses against the content it was made from, so
+  # every content change must re-encode it. Skip when this save also sets the
+  # column: the caller already made it against the new content.
+  def recompress_original_content
+    return unless will_save_change_to_content? && compressed_original_content?
+    return if will_save_change_to_compressed_original_content?
+    original = OriginalContent.decompress(compressed_original_content, base: content_in_database)
+    self.compressed_original_content = OriginalContent.compress(original, base: content)
+  end
 
   def provider_metadata
     if tweet? && tweet.main_tweet

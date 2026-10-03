@@ -86,7 +86,8 @@ class ArticleTest < ApplicationSystemTestCase
     entry = @entries.first
 
     entry.update(content: "<p>This is the text.</p>")
-    entry.update(content: "<p>This is the new text.</p>", original: {content: entry.content})
+    new_content = "<p>This is the new text.</p>"
+    entry.update(content: new_content, compressed_original_content: OriginalContent.compress(entry.content, base: new_content))
 
     login_as(@user)
 
