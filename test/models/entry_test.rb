@@ -240,7 +240,7 @@ class EntryTest < ActiveSupport::TestCase
     with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
       feed = create_feeds(users(:ben)).first
       entry = create_entry(feed)
-      entry.update!(media_image: "https://old.example.com/abc/cover.jpg")
+      write_settings(entry, JSON.generate(JSON.generate({"media_image" => "https://old.example.com/abc/cover.jpg"})))
 
       assert_nil entry.itunes_image
 
@@ -273,13 +273,13 @@ class EntryTest < ActiveSupport::TestCase
         "processed_url" => "https://bucket.s3.amazonaws.com/abc/a.jpg",
         "width" => 542, "height" => 304, "placeholder_color" => "aabbcc"
       },
-      media_image: "https://bucket.s3.amazonaws.com/abc/cover.jpg",
       data: {
         "twitter_link_image_processed" => "https://bucket.s3.amazonaws.com/abc/link.jpg",
         "twitter_link_image_placeholder_color" => "ccddee",
         "itunes_image_processed" => "https://bucket.s3.amazonaws.com/abc/itunes.jpg"
       }
     )
+    write_settings(entry, JSON.generate(JSON.generate({"media_image" => "https://bucket.s3.amazonaws.com/abc/cover.jpg"})))
 
     with_env("UNIFIED_IMAGE_HOST" => "https://images.example.com") do
       assert_nil entry.processed_image
@@ -453,7 +453,79 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil saved_entry("<p>Text.</p>").content_diff
   end
 
+  test "the raw source and media_image are no longer settings accessors" do
+    refute_respond_to Entry.new, :newsletter
+    refute_respond_to Entry.new, :media_image
+  end
+
+  test "settings reads the JSON string form that old rows hold" do
+    @entry.save!
+    write_settings(@entry, JSON.generate(JSON.generate({"embed_duration" => 647, "newsletter_from" => "News <news@example.com>"})))
+
+    entry = Entry.find(@entry.id)
+
+    assert_equal 647, entry.embed_duration
+    assert_equal "News <news@example.com>", entry.newsletter_from
+  end
+
+  test "settings reads the object form that the backfill writes" do
+    @entry.save!
+    write_settings(@entry, JSON.generate({"embed_duration" => 647}))
+
+    assert_equal 647, Entry.find(@entry.id).embed_duration
+  end
+
+  test "settings reads a NULL column as empty" do
+    @entry.save!
+    write_settings(@entry, nil)
+
+    entry = Entry.find(@entry.id)
+
+    assert_equal({}, entry.settings)
+    assert_nil entry.embed_duration
+  end
+
+  test "a settings write drops the raw source and media_image" do
+    @entry.save!
+    write_settings(@entry, JSON.generate(JSON.generate({
+      "newsletter" => "From: News <news@example.com>",
+      "media_image" => "https://example.com/a.jpg",
+      "newsletter_from" => "News <news@example.com>"
+    })))
+
+    Entry.find(@entry.id).update!(archived_images: true)
+
+    assert_equal({"newsletter_from" => "News <news@example.com>", "archived_images" => true}, read_settings(@entry))
+  end
+
+  test "a settings write keeps the JSON string form, which the code before this deploy reads" do
+    @entry.save!
+
+    Entry.find(@entry.id).update!(embed_duration: 647)
+
+    assert_equal "string", settings_type(@entry)
+    assert_equal({"embed_duration" => 647}, JSON.parse(JSON.parse(raw_settings(@entry))))
+  end
+
   private
+
+  def write_settings(entry, json)
+    Entry.connection.exec_update("UPDATE entries SET settings = $1::jsonb WHERE id = $2", "write_settings", [json, entry.id])
+  end
+
+  def raw_settings(entry)
+    Entry.uncached { Entry.connection.select_value("SELECT settings::text FROM entries WHERE id = $1", "raw_settings", [entry.id]) }
+  end
+
+  def settings_type(entry)
+    Entry.uncached { Entry.connection.select_value("SELECT jsonb_typeof(settings) FROM entries WHERE id = $1", "settings_type", [entry.id]) }
+  end
+
+  # The stored hash, whichever form the row holds.
+  def read_settings(entry)
+    value = JSON.parse(raw_settings(entry))
+    value.is_a?(String) ? JSON.parse(value) : value
+  end
 
   def saved_entry(content)
     @user.feeds.first.entries.create!(public_id: SecureRandom.hex, content: content)
