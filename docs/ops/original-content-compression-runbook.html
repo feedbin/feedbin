@@ -185,7 +185,8 @@ puts "legacy_rows_found: #{progress[:found]}"</code></pre></div>
         <div class="check"><input type="checkbox" aria-label="Deploy 2"></div>
         <div class="step-body">
           <h3>Deploy plan task 6</h3>
-          <p>The migration drops <code>original</code>. It needs a short table lock, with a 10-second lock timeout. If it fails with a lock timeout, deploy again.</p>
+          <p>Do not deploy until a finished pass shows <code>pending_jobs: 0</code> and <code>legacy_rows_found: 0</code>. The migration drops <code>original</code> permanently.</p>
+          <p>The migration needs a short table lock, with a 10-second lock timeout. If it fails with a lock timeout, deploy again.</p>
           <div class="stamp"></div>
         </div>
       </li>
