@@ -130,7 +130,6 @@ class EntryDeleterTest < ActiveSupport::TestCase
     entry = @entries.first
     entry.update(
       published: 20.years.ago,
-      image: {"processed_url" => "https://bucket.s3.amazonaws.com/abc/preview.jpg"},
       data: {"twitter_link_image_processed" => "https://bucket.s3.amazonaws.com/abc/link-legacy.jpg"}
     )
 
@@ -138,7 +137,7 @@ class EntryDeleterTest < ActiveSupport::TestCase
 
     assert_equal 1, ImageGarbageCollector.jobs.size
     assert_includes ImageGarbageCollector.jobs.first["args"].first, entry.id
-    assert_empty queries.grep(/twitter_link_image_processed|processed_url/), "the prune must not pluck legacy pointers"
+    assert_empty queries.grep(/twitter_link_image_processed/), "the prune must not pluck legacy pointers"
   end
 
   # One collector job per feed-sized batch, not one per prune: a single job

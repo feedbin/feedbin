@@ -113,7 +113,6 @@ module AccountMigrator
         updated:             Time.at(feed_item.safe_dig("updated_at"))&.utc,
         entry_id:            generated?(feed_item) ? nil : feed_item.safe_dig("guid"),
         public_id:           public_id(feed_item),
-        source:              "import",
         skip_mark_as_unread: true,
       }
     end

@@ -83,12 +83,11 @@ module ImageCrawler
       assert_equal(["https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/100/027/057/original/94aa051201c933c6.png", "https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/321/232/707/original/fd91baf5af1de4eb.png", "https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/513/928/252/original/005201b20fde9798.png"], extracted_urls)
     end
 
-    test "the callback touches the entry and writes nothing onto it" do
+    test "the callback touches the entry" do
       original_updated_at = @entry.updated_at
       EntryImage.new.perform(@entry.public_id, {"storage_path" => "abc/abcdef.jpg", "provider_id" => @entry.id.to_s})
 
       @entry.reload
-      assert_nil @entry.image
       assert @entry.updated_at > original_updated_at, "the callback should touch the entry to bust cached views"
     end
 

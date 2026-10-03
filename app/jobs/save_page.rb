@@ -123,7 +123,7 @@ class SavePage
   end
 
   def build_entry
-    data = TweetPage.tweet(url, user) || {}
+    data = {}
     if match = IframeEmbed::Youtube.recognize_url?(url)
       data[:youtube_video_id] = match[1]
     end

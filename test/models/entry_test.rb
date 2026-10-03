@@ -212,7 +212,6 @@ class EntryTest < ActiveSupport::TestCase
 
   test "preview_image_data reads the row and is nil without one" do
     entry = create_entry(Feed.first)
-    entry.update(image: {"original_url" => "http://old.example.com/i.jpg", "width" => 100, "height" => 50})
     assert_nil entry.preview_image_data
 
     create_image_row(entry)
@@ -268,11 +267,6 @@ class EntryTest < ActiveSupport::TestCase
   test "legacy JSON alone renders nothing from any image method" do
     entry = create_entry(Feed.first)
     entry.update!(
-      image: {
-        "original_url" => "http://example.com/i.jpg",
-        "processed_url" => "https://bucket.s3.amazonaws.com/abc/a.jpg",
-        "width" => 542, "height" => 304, "placeholder_color" => "aabbcc"
-      },
       data: {
         "twitter_link_image_processed" => "https://bucket.s3.amazonaws.com/abc/link.jpg",
         "twitter_link_image_placeholder_color" => "ccddee",
@@ -292,13 +286,11 @@ class EntryTest < ActiveSupport::TestCase
     end
   end
 
-  # Tweet receives the preview row, never the legacy JSON: an entry whose
-  # legacy image is dark can still show its link preview. A preview row
-  # suppresses it again, as before.
-  test "tweet takes its image from the preview row, not the legacy JSON" do
+  # Tweet receives the preview row: without one the tweet shows its link
+  # preview, and a preview row suppresses it.
+  test "tweet takes its image from the preview row" do
     entry = create_entry(Feed.first)
     entry.update!(
-      image: {"original_url" => "http://example.com/i.jpg", "processed_url" => "https://bucket.s3.amazonaws.com/abc/a.jpg", "width" => 542, "height" => 304},
       data: {
         "tweet" => load_tweet("one"),
         "saved_pages" => {"https://example.com/p" => {"result" => {"ok" => true}}}
@@ -310,7 +302,7 @@ class EntryTest < ActiveSupport::TestCase
     tweet = Entry.find(entry.id).tweet
     tweet.main_tweet.stub :urls, [fake_url] do
       tweet.stub :link_tweet?, true do
-        assert tweet.link_preview?, "legacy JSON alone must not suppress the link preview"
+        assert tweet.link_preview?, "without a preview row the link preview shows"
       end
     end
 
@@ -321,17 +313,6 @@ class EntryTest < ActiveSupport::TestCase
         refute tweet.link_preview?, "a preview row suppresses the link preview"
       end
     end
-  end
-
-  # entries.image is inert data since the legacy read removal: no read path
-  # opens it, so the list query must not ship a jsonb blob per entry for it.
-  test "entries_list leaves the inert image column out of the select" do
-    entry = create_entry(Feed.first)
-
-    loaded = Entry.entries_list.find(entry.id)
-
-    refute loaded.has_attribute?(:image), "the list select still loads entries.image"
-    assert loaded.has_attribute?(:data)
   end
 
   # Every shape an entry can hand us for an avatar, resolved against the

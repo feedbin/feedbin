@@ -5,6 +5,10 @@ class Entry < ApplicationRecord
 
   store :settings, accessors: [:archived_images, :newsletter_from, :embed_duration, :newsletter_to, :newsletter_token], coder: EntrySettingsCoder
 
+  # Deploy 1 stops loading these unused columns. Deploy 2 drops them and
+  # removes this line.
+  self.ignored_columns += %w[old_public_id processed_image_url image_url thread_id image source main_tweet_id]
+
   enum :provider, [:twitter, :youtube, :favicon, :entry_icon], prefix: true
 
   belongs_to :feed
@@ -384,7 +388,6 @@ class Entry < ApplicationRecord
   def provider_metadata
     if tweet? && tweet.main_tweet
       self.url = tweet.main_tweet.uri.to_s
-      self.main_tweet_id = tweet.main_tweet.id
       self.provider = self.class.providers[:twitter]
       self.provider_id = tweet.main_tweet.id
     elsif youtube?
