@@ -1,4 +1,8 @@
 class ImportItem < ApplicationRecord
+  # Deploy 2 stops loading this unused column. Deploy 3 drops it and removes
+  # this line.
+  self.ignored_columns += ["item_type"]
+
   serialize :details, type: Hash
   belongs_to :import
   enum :status, [:pending, :complete, :failed, :fixable]

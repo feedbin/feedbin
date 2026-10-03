@@ -4,6 +4,10 @@ class User < ApplicationRecord
 
   has_secure_password reset_token: false
 
+  # Deploy 2 stops loading these unused columns. Deploy 3 drops them and
+  # removes this line.
+  self.ignored_columns += %w[last_4_digits twitter_auth_failures]
+
   store_accessor :settings,
     :entry_sort,
     :previous_read_count,

@@ -1,6 +1,10 @@
 class Subscription < ApplicationRecord
   attr_accessor :entries_count, :post_volume, :sort_data, :tag_names
 
+  # Deploy 2 stops loading this unused column. Deploy 3 drops it and removes
+  # this line.
+  self.ignored_columns += ["show_status"]
+
   belongs_to :user
   belongs_to :feed, counter_cache: true
 
@@ -28,7 +32,6 @@ class Subscription < ApplicationRecord
 
   enum :kind, {default: 0, generated: 1}
   enum :view_mode, {article: 0, extract: 1, newsletter: 2}
-  enum :show_status, {not_show: 0, hidden: 1, subscribed: 2, bookmarked: 3}
   enum :fix_status, {none: 0, present: 1, ignored: 2}, prefix: :fix_suggestion
 
   # The newsletter-sender switch is routed from two places that write these
