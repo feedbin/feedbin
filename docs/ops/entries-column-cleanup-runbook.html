@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Entries Column Cleanup</title>
+<title>Unused Schema Cleanup</title>
 <style>
   :root {
     --bg: #f7f7f5;
@@ -104,7 +104,7 @@
 
 <div class="bar">
   <div class="bar-inner">
-    <h1>Entries column cleanup runbook</h1>
+    <h1>Unused schema cleanup runbook</h1>
     <span class="progress-text" id="progress-text">0 of 0 done</span>
     <button type="button" id="reset">Reset</button>
   </div>
@@ -112,7 +112,7 @@
 </div>
 
 <main>
-  <p class="intro">Drops seven unused columns from <code>entries</code>: <code>old_public_id</code>, <code>processed_image_url</code>, <code>image_url</code>, <code>thread_id</code>, <code>image</code>, <code>source</code> and <code>main_tweet_id</code>. This browser saves your checks.</p>
+  <p class="intro">Drops seven unused columns from <code>entries</code>: <code>old_public_id</code>, <code>processed_image_url</code>, <code>image_url</code>, <code>thread_id</code>, <code>image</code>, <code>source</code> and <code>main_tweet_id</code>. Then drops the <code>favicons</code> and <code>remote_files</code> tables, and four unused columns on <code>users</code>, <code>subscriptions</code> and <code>import_items</code>. This browser saves your checks.</p>
 
   <section class="phase" data-phase>
     <h2>Deploy 1 <span class="phase-check">Complete</span></h2>
@@ -138,8 +138,25 @@
         <div class="check"><input type="checkbox" aria-label="Deploy 2"></div>
         <div class="step-body">
           <h3>Deploy branch <code>drop-entries-columns</code></h3>
-          <p>Do not deploy until deploy 1 is complete. The migration drops the seven columns and their two indexes permanently.</p>
+          <p>Do not deploy until deploy 1 is complete. The migration drops the seven columns and their two indexes permanently. Rails also stops loading <code>users.last_4_digits</code>, <code>users.twitter_auth_failures</code>, <code>subscriptions.show_status</code> and <code>import_items.item_type</code>.</p>
           <p>The migration needs a short table lock, with a 10-second lock timeout. If it fails with a lock timeout, deploy again.</p>
+          <div class="stamp"></div>
+        </div>
+      </li>
+
+    </ol>
+  </section>
+
+  <section class="phase" data-phase>
+    <h2>Deploy 3 <span class="phase-check">Complete</span></h2>
+    <ol class="steps">
+
+      <li class="step" data-step="d3-deploy">
+        <div class="check"><input type="checkbox" aria-label="Deploy 3"></div>
+        <div class="step-body">
+          <h3>Deploy branch <code>drop-unused-tables-and-columns</code></h3>
+          <p>Do not deploy until deploy 2 is complete. The migration drops the <code>favicons</code> and <code>remote_files</code> tables, and the four columns that deploy 2 stopped loading, permanently.</p>
+          <p>The migration needs short locks on <code>users</code> and <code>subscriptions</code>, with a 10-second lock timeout. If it fails with a lock timeout, deploy again.</p>
           <div class="stamp"></div>
         </div>
       </li>
