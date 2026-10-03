@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-03-entry-settings-cleanup-design.md`
 
+**Runbook:** `docs/ops/entry-settings-cleanup-runbook.html` (the deploy and backfill steps, with checkboxes)
+
 ## Global Constraints
 
 - Deleted keys: `settings["newsletter"]` and `settings["media_image"]` in every row; `data["newsletter"]` (the Mailgun payload) and `data["newsletter_text"]` in newsletter rows.
