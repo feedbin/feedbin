@@ -208,6 +208,24 @@ class BackfillEntrySettingsTest < ActiveSupport::TestCase
     assert_equal [batches], BackfillEntrySettings.jobs.last["args"]
   end
 
+  # Production cancels a statement after 15 s and an app write that waits on a
+  # row lock after 10 s. A dense range of newsletter rows can exceed both, so
+  # no statement may cover the whole 100,000-id range.
+  test "no range statement covers more than 5,000 ids" do
+    entry = entry_with(@newsletter_feed, settings: string_form("newsletter" => "From: a", "newsletter_from" => "A <a@example.com>"), data: object_form("type" => "newsletter"))
+    spans = []
+    record_span = ->(*, payload) do
+      next unless ["BackfillEntrySettings newsletter", "BackfillEntrySettings other", "BackfillEntrySettings NUL rows"].include?(payload[:name])
+      first, last = payload[:binds].first(2).map { it.respond_to?(:value) ? it.value : it }
+      spans << last - first + 1
+    end
+
+    ActiveSupport::Notifications.subscribed(record_span, "sql.active_record") { run_backfill(entry) }
+
+    assert_equal 60, spans.size
+    assert_equal [5_000], spans.uniq
+  end
+
   private
 
   # Writes settings and data exactly as a production row holds them.

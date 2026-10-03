@@ -10,6 +10,10 @@ class BackfillEntrySettings
   sidekiq_options queue: :utility
 
   BATCH_SIZE = 100_000
+  # Production cancels a statement after 15 s, and an app write that waits on
+  # a row lock after 10 s. Each statement covers at most this many ids, so a
+  # dense range of newsletter rows stays well inside both limits.
+  SUB_RANGE = 5_000
   NUL_ESCAPE = "\\u0000"
   DELETED_SETTINGS_KEYS = %w[newsletter media_image].freeze
   DELETED_NEWSLETTER_DATA_KEYS = %w[newsletter newsletter_text].freeze
@@ -79,11 +83,13 @@ class BackfillEntrySettings
     # exec_update does not clear the query cache, and Sidekiq runs jobs inside
     # the Rails executor, where the cache is on.
     Entry.uncached do
-      first = (batch - 1) * BATCH_SIZE + 1
-      binds = [first, first + BATCH_SIZE - 1, newsletter_type, NUL_ESCAPE]
-      connection.exec_update(NEWSLETTER_SQL, "BackfillEntrySettings newsletter", binds)
-      connection.exec_update(OTHER_SQL, "BackfillEntrySettings other", binds)
-      connection.select_values(NUL_ROWS_SQL, "BackfillEntrySettings NUL rows", binds).each { repair(it) }
+      last = batch * BATCH_SIZE
+      ((batch - 1) * BATCH_SIZE + 1).step(last, SUB_RANGE) do |first|
+        binds = [first, [first + SUB_RANGE - 1, last].min, newsletter_type, NUL_ESCAPE]
+        connection.exec_update(NEWSLETTER_SQL, "BackfillEntrySettings newsletter", binds)
+        connection.exec_update(OTHER_SQL, "BackfillEntrySettings other", binds)
+        connection.select_values(NUL_ROWS_SQL, "BackfillEntrySettings NUL rows", binds).each { repair(it) }
+      end
     end
   end
 
