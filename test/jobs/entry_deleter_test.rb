@@ -85,7 +85,7 @@ class EntryDeleterTest < ActiveSupport::TestCase
 
   test "should remove UpdatedEntries" do
     @entries.each do |entry|
-      UpdatedEntry.create_from_owners(@user.id, entry)
+      UpdatedEntry.new_from_owners(@user.id, entry).save
     end
     assert_difference -> { UpdatedEntry.where(entry_id: entry_ids).count }, -removed_count do
       EntryDeleter.new.perform(@feed.id)

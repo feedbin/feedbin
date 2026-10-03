@@ -16,10 +16,4 @@ class UpdatedEntryTest < ActiveSupport::TestCase
     assert_nil record.updated
     assert record.new_record?
   end
-
-  test "create_from_owners persists the record" do
-    assert_difference "UpdatedEntry.count", +1 do
-      UpdatedEntry.create_from_owners(@user.id, @entry)
-    end
-  end
 end

@@ -6,7 +6,7 @@ class Api::V2::UpdatedEntriesControllerTest < ApiControllerTestCase
     @feeds = create_feeds(@user)
     @entries = @user.entries
     @entries.map do |entry|
-      UpdatedEntry.create_from_owners(@user.id, entry)
+      UpdatedEntry.new_from_owners(@user.id, entry).save
     end
   end
 

@@ -43,10 +43,7 @@ class ImageFormatTest < ActiveSupport::TestCase
     assert_nil ImageFormat.detect("/nonexistent/#{SecureRandom.hex}")
   end
 
-  test "allowed? and checked!" do
-    assert ImageFormat.allowed?(support_file("favicon.ico"))
-    assert_not ImageFormat.allowed?(write("%!PS-Adobe-3.0"))
-
+  test "checked!" do
     path = support_file("image.png")
     assert_equal path, ImageFormat.checked!(path)
     assert_raises ImageFormat::Unsupported do

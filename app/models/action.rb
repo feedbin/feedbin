@@ -126,8 +126,4 @@ class Action < ApplicationRecord
       hash[:sort] = [{published: "desc"}]
     end
   end
-
-  def _percolator
-    Search.client { it.get(Search.index_name(Action.table_name), id: id) }
-  end
 end

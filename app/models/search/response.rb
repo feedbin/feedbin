@@ -21,9 +21,5 @@ module Search
     def pagination
       Array.new(total).paginate(page: @page, per_page: @per_page)
     end
-
-    def error?
-      @data.key?("error")
-    end
   end
 end

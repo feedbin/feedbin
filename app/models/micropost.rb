@@ -53,18 +53,6 @@ class Micropost
     end
   end
 
-  def microblog?
-    source == :microblog
-  end
-
-  def instagram?
-    source == :instagram
-  end
-
-  def social?
-    source == :social
-  end
-
   def link_preview?
     return false unless data.safe_dig("saved_pages", data.safe_dig("urls")&.first).present?
     return false if data.safe_dig("saved_pages", data.safe_dig("urls")&.first, "result", "error")

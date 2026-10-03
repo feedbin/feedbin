@@ -28,7 +28,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     user = users(:ben)
     subscription = user.subscriptions.first
     entry = create_entry(subscription.feed)
-    UpdatedEntry.create_from_owners(user.id, entry)
+    UpdatedEntry.new_from_owners(user.id, entry).save
 
     subscription.destroy
 

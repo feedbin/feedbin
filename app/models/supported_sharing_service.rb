@@ -200,10 +200,6 @@ class SupportedSharingService < ApplicationRecord
     info.label
   end
 
-  def requires_auth?
-    info.requires_auth
-  end
-
   def service_type
     info.service_type
   end

@@ -34,12 +34,11 @@ class SupportedSharingServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "label, service_type, klass, requires_auth? read from the service info" do
+  test "label, service_type, klass read from the service info" do
     record = @user.supported_sharing_services.create!(service_id: "instapaper")
     assert_equal "Instapaper", record.label
     assert_equal "oauth2", record.service_type
     assert_equal "Share::Instapaper", record.klass
-    assert record.requires_auth?
   end
 
   test "html_options falls back to data-remote when not configured" do

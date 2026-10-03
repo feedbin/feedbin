@@ -446,10 +446,6 @@ class User < ApplicationRecord
     feeds.include_user_title.map { |feed| feed.id }
   end
 
-  def subscribe!(feed)
-    subscriptions.create!(feed_id: feed.id)
-  end
-
   def subscribed_to?(feed_id)
     subscriptions.where(feed_id: feed_id).exists? || podcast_subscriptions.where(feed_id: feed_id).exists?
   end
@@ -560,10 +556,6 @@ class User < ApplicationRecord
     else
       EntryCounterRepair.enqueue(@counter_cache_entry_ids)
     end
-  end
-
-  def billing_issue?
-    billing_issue == "1"
   end
 
   def billing_issue!

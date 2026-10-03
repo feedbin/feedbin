@@ -26,10 +26,6 @@ class ImageFormat
     nil
   end
 
-  def self.allowed?(path)
-    !detect(path).nil?
-  end
-
   # Returns the path, so it can wrap the argument at the point of use:
   #   Vips::Image.new_from_file(ImageFormat.checked!(file))
   def self.checked!(path)

@@ -84,6 +84,7 @@ class ActionTest < ActiveSupport::TestCase
   private
 
   def percolator_found?(action)
-    action._percolator && action._percolator["found"] == true
+    percolator = Search.client { it.get(Search.index_name(Action.table_name), id: action.id) }
+    percolator && percolator["found"] == true
   end
 end

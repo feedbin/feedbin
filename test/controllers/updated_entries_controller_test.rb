@@ -6,7 +6,7 @@ class UpdatedEntriesControllerTest < ActionController::TestCase
     @feeds = create_feeds(@user)
     @entries = @user.entries
     @updated = @entries.each do |entry|
-      UpdatedEntry.create_from_owners(@user.id, entry)
+      UpdatedEntry.new_from_owners(@user.id, entry).save
     end
   end
 

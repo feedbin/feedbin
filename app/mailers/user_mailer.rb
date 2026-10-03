@@ -55,11 +55,6 @@ class UserMailer < ApplicationMailer
     mail to: kindle_address, subject: "Kindle Content", body: ".", from: ENV["KINDLE_EMAIL"]
   end
 
-  def mailtest(user_id)
-    @user = User.find(user_id)
-    mail to: @user.email, subject: "[Feedbin] Starred Items Export Complete", body: ""
-  end
-
   # Takes the address rather than a user id: it is sent after the account has
   # been deleted, so there is no record left to look up.
   def account_closed(email, opml)
