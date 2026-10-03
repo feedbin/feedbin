@@ -98,7 +98,7 @@ module FeedCrawler
         "entries" => [update]
       }
       Receiver.new.perform(params)
-      assert_nil entry.reload.original
+      assert_nil entry.reload.compressed_original_content
     end
 
     test "should create UpdatedEntry" do

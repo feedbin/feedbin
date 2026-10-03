@@ -17,17 +17,8 @@ module FeedCrawler
 
       if significant_change?(current_content, new_content) && @original_entry.published_recently?
         create_update_notifications(@original_entry)
-        if @original_entry.original.nil?
-          update["original"] = {
-            "author"      => @original_entry.author,
-            "content"     => @original_entry.content,
-            "title"       => @original_entry.title,
-            "url"         => @original_entry.url,
-            "entry_id"    => @original_entry.entry_id,
-            "published"   => @original_entry.published,
-            "data"        => @original_entry.data,
-            "fingerprint" => @original_entry.fingerprint,
-          }
+        if @original_entry.original_content.nil?
+          update["compressed_original_content"] = OriginalContent.compress(current_content, base: new_content)
         end
         Librato.increment("entry.change", source: "large")
       else
