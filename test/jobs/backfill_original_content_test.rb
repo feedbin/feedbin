@@ -87,6 +87,39 @@ class BackfillOriginalContentTest < ActiveSupport::TestCase
     assert_equal [1], BackfillOriginalContent.jobs.last["args"]
   end
 
+  test "build starts a pass with fresh counters" do
+    entry_with_legacy_original(content: "<p>New text.</p>", original_content: "<p>Old text.</p>")
+    batches = (Entry.maximum(:id) / BackfillOriginalContent::BATCH_SIZE.to_f).ceil
+    BackfillOriginalContent.new.build
+    BackfillOriginalContent.new.perform(1)
+
+    BackfillOriginalContent.new.build
+
+    assert_equal({pending: batches, found: 0}, BackfillOriginalContent.progress)
+  end
+
+  test "perform counts its finished job and the legacy rows it found" do
+    entry = entry_with_legacy_original(content: "<p>Old text.</p><p>New text.</p>", original_content: "<p>Old text.</p>")
+    BackfillOriginalContent.new.build
+    pending = BackfillOriginalContent.progress[:pending]
+
+    BackfillOriginalContent.new.perform(batch_for(entry))
+
+    assert_equal({pending: pending - 1, found: 1}, BackfillOriginalContent.progress)
+  end
+
+  test "a pass after the conversion finds no legacy rows" do
+    entry = entry_with_legacy_original(content: "<p>Old text.</p><p>New text.</p>", original_content: "<p>Old text.</p>")
+    job = BackfillOriginalContent.new
+    job.build
+    job.perform(batch_for(entry))
+
+    job.build
+    job.perform(batch_for(entry))
+
+    assert_equal 0, BackfillOriginalContent.progress[:found]
+  end
+
   private
 
   def entry_with_legacy_original(content:, original_content:)

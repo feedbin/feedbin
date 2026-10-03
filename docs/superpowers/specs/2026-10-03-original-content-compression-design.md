@@ -304,29 +304,68 @@ New job: `app/jobs/backfill_original_content.rb`. It follows the shape of `Backf
 It does not use `SidekiqHelper::BATCH_SIZE` (5,000) or `build_ids`. Only 2.6% of IDs are in use, so 5,000-ID batches would queue 1,078,413 jobs, and most would find no rows. The job uses its own range of 100,000 IDs. That makes 53,921 jobs, which read an average of about 2,600 rows each. In production, the read query took 0.01 s for a 5,000-ID range. About 9.8 million rows have an `original`, so the backfill makes about 9.8 million single-row UPDATEs.
 
 ```ruby
+# Moves each legacy original value into compressed_original_content and
+# clears the legacy column. One job for each range of ids: production ids are sparse
+# (about 2.6% in use), so the range is larger than SidekiqHelper::BATCH_SIZE.
+# Entry ignores the original column, so this job selects it by name.
+#
+# Each build is a pass. Two Redis counters track it, because a full-table
+# count of the legacy rows cannot finish under production's statement
+# timeout: a pass is done when no jobs are pending, and a done pass that
+# found no legacy rows proves the backfill is complete.
 class BackfillOriginalContent
   include Sidekiq::Worker
   sidekiq_options queue: :utility
 
   BATCH_SIZE = 100_000
+  PENDING_KEY = "backfill_original_content:pending"
+  FOUND_KEY = "backfill_original_content:found"
+  COUNTER_TTL = 30.days.to_i
+
+  def self.progress
+    pending, found = Sidekiq.redis { |redis| [redis.get(PENDING_KEY), redis.get(FOUND_KEY)] }
+    {pending: pending.to_i, found: found.to_i}
+  end
 
   def perform(batch)
     first = (batch - 1) * BATCH_SIZE + 1
+    found = 0
     Entry.where(id: first..(first + BATCH_SIZE - 1)).where.not(original: nil)
       .select(:id, :content, :original, :updated_at)
-      .find_each(batch_size: 500) { |entry| convert(entry) }
+      .find_each(batch_size: 500) do |entry|
+        convert(entry)
+        found += 1
+      end
+    Sidekiq.redis do |redis|
+      redis.incrby(FOUND_KEY, found)
+      redis.decr(PENDING_KEY)
+    end
   end
 
+  # The updated_at condition skips a row the crawler changed after the read.
+  # That row keeps its legacy original, and the next pass converts it. The
+  # legacy value replaces any temporary original EntryUpdate wrote meanwhile.
+  # update_all skips callbacks and leaves updated_at as it is.
   def convert(entry)
     compressed = OriginalContent.compress(entry.original&.dig("content"), base: entry.content)
     Entry.where(id: entry.id, updated_at: entry.updated_at)
       .update_all(compressed_original_content: compressed, original: nil)
   end
 
-  # Newest ranges first: recently updated entries are the ones people read.
+  # Starts a pass: resets both counters, then queues every range, newest
+  # first, because recently updated entries are the ones people read.
   def build
     batches = (Entry.maximum(:id) / BATCH_SIZE.to_f).ceil
-    Sidekiq::Client.push_bulk("class" => self.class, "args" => batches.downto(1).map { [_1] })
+    Sidekiq.redis do |redis|
+      redis.set(PENDING_KEY, batches)
+      redis.set(FOUND_KEY, 0)
+      redis.expire(PENDING_KEY, COUNTER_TTL)
+      redis.expire(FOUND_KEY, COUNTER_TTL)
+    end
+    Sidekiq::Client.push_bulk(
+      "args" => batches.downto(1).map { [it] },
+      "class" => self.class
+    )
   end
 end
 ```
@@ -335,9 +374,10 @@ end
 - **One `UPDATE` per row** writes the new value and clears `original` together. Space in the TOAST table becomes free for reuse as the job runs.
 - **A temporary original gets replaced.** If `EntryUpdate` wrote a temporary original for an unconverted entry, `convert` replaces it with the legacy value, which is the true first version.
 - **Each `UPDATE` also writes a new version of the heap row and its WAL.** The average heap row is about 1.7 KB. Until vacuum runs, the old version is dead space.
-- **The `updated_at` condition protects against a race.** If the crawler changes the row after the job reads it, the `UPDATE` matches no row and writes nothing. That row keeps its legacy `original`, and a second run of `build` converts it.
+- **The `updated_at` condition protects against a race.** If the crawler changes the row after the job reads it, the `UPDATE` matches no row and writes nothing. That row keeps its legacy `original`, and the next pass converts it.
 - **`update_all` skips callbacks and leaves `updated_at` unchanged.** The value is already made against the current content. Clients do not see these entries as updated.
 - **Rows with a blank original or blank content** get `NULL` in both columns.
+- **Two Redis counters track each pass.** `build` starts a pass and resets them. Each job adds the legacy rows it found and marks itself finished. A full-table count of the legacy rows cannot replace this, because production connections have a 15-second `statement_timeout`, and the `utility` queue holds other jobs, so its size cannot show when the backfill is done. A finished pass that found 0 legacy rows proves the backfill is complete.
 
 ## Rollout
 
@@ -358,8 +398,8 @@ After this deploy, nothing reads or writes `original` except the backfill job. U
 ### Phase 2: Backfill
 
 1. In a console, run `BackfillOriginalContent.new.build`. It queues the newest ID ranges first.
-2. When the `utility` queue is empty, run `build` again. The second run converts rows that the first run skipped because of the race condition.
-3. Check that `Entry.where.not(original: nil).count` is `0`. This query scans the whole table. It works with the column ignored.
+2. Read `BackfillOriginalContent.progress`. When `pending` is 0, the pass is done.
+3. If the done pass shows `found` more than 0, run `build` again and repeat step 2. A pass that finds 0 legacy rows proves the backfill is complete. The first pass finds about 9.8 million rows, and the next pass converts the rows that the crawler changed during the first one.
 
 ### Phase 3: Deploy 2
 
@@ -435,6 +475,9 @@ Write each test before its code.
 - The job sets both columns to `NULL` for a row with a blank original.
 - The job sets both columns to `NULL` for a row with blank current content.
 - The job replaces a temporary original with the legacy value.
+- `build` resets the pass counters.
+- `perform` counts its finished job and the legacy rows it found.
+- A pass after the conversion finds 0 legacy rows.
 - A second run over the same range changes nothing.
 - `build` queues one job for each 100,000-ID range, up to `Entry.maximum(:id)`, newest range first.
 - The job does not change `updated_at`.

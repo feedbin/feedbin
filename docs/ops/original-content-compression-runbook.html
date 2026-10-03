@@ -153,32 +153,23 @@ puts "content_diff_present: #{entry&amp;.content_diff.present?.inspect}"</code><
         <div class="step-body">
           <h3>Queue the backfill</h3>
           <div class="code"><button type="button" class="copy">Copy</button><pre><code>BackfillOriginalContent.new.build
-puts "utility_queue_size: #{Sidekiq::Queue.new("utility").size}"</code></pre></div>
-          <p class="expect"><strong>Expected:</strong> about 53,921 more jobs in the <code>utility</code> queue.</p>
+progress = BackfillOriginalContent.progress
+puts "pending_jobs: #{progress[:pending]}"
+puts "legacy_rows_found: #{progress[:found]}"</code></pre></div>
+          <p class="expect"><strong>Expected:</strong> <code>pending_jobs</code> about 53,921 and <code>legacy_rows_found: 0</code>.</p>
           <div class="stamp"></div>
         </div>
       </li>
 
-      <li class="step" data-step="bf-second">
-        <div class="check"><input type="checkbox" aria-label="Queue the second pass"></div>
+      <li class="step" data-step="bf-repeat">
+        <div class="check"><input type="checkbox" aria-label="Repeat until a pass finds no legacy rows"></div>
         <div class="step-body">
-          <h3>Queue the second pass when the queue is empty</h3>
-          <p>This converts the rows that feeds changed during the first pass. Check the queue size with:</p>
-          <div class="code"><button type="button" class="copy">Copy</button><pre><code>puts "utility_queue_size: #{Sidekiq::Queue.new("utility").size}"</code></pre></div>
-          <p>When it is 0, queue the backfill again:</p>
-          <div class="code"><button type="button" class="copy">Copy</button><pre><code>BackfillOriginalContent.new.build
-puts "utility_queue_size: #{Sidekiq::Queue.new("utility").size}"</code></pre></div>
-          <div class="stamp"></div>
-        </div>
-      </li>
-
-      <li class="step" data-step="bf-verify">
-        <div class="check"><input type="checkbox" aria-label="Check that no legacy rows remain"></div>
-        <div class="step-body">
-          <h3>Check that no legacy rows remain</h3>
-          <p>Run this when the queue is empty again. It scans the whole table.</p>
-          <div class="code"><button type="button" class="copy">Copy</button><pre><code>puts "rows_with_legacy_original: #{Entry.where.not(original: nil).count}"</code></pre></div>
-          <p class="expect"><strong>Expected:</strong> <code>rows_with_legacy_original: 0</code>. If it is more than 0, queue the backfill again and repeat this step.</p>
+          <h3>Repeat until a pass finds no legacy rows</h3>
+          <p>Check progress with this block. When <code>pending_jobs</code> is 0, the pass is done.</p>
+          <div class="code"><button type="button" class="copy">Copy</button><pre><code>progress = BackfillOriginalContent.progress
+puts "pending_jobs: #{progress[:pending]}"
+puts "legacy_rows_found: #{progress[:found]}"</code></pre></div>
+          <p class="expect"><strong>Expected:</strong> the first pass finds about 9.8 million rows. When a done pass shows <code>legacy_rows_found: 0</code>, the backfill is complete. If it shows more than 0, queue the backfill again with the block in the step above. If <code>pending_jobs</code> stops falling, a job failed: check the Sidekiq retries.</p>
           <div class="stamp"></div>
         </div>
       </li>
@@ -205,7 +196,7 @@ puts "utility_queue_size: #{Sidekiq::Queue.new("utility").size}"</code></pre></d
 
 <script>
   (function () {
-    var KEY = "runbook:original-content-compression:v2";
+    var KEY = "runbook:original-content-compression:v3";
 
     function load() {
       try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }

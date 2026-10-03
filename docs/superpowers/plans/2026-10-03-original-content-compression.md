@@ -1109,8 +1109,10 @@ Any other hit that reads or writes the `original` column must change before Depl
 Ben runs these steps from `docs/ops/original-content-compression-runbook.html`. They are not code changes. In short:
 
 1. Run `BackfillOriginalContent.new.build`. It queues about 54,000 jobs, newest range first.
-2. When the queue is empty, run `build` again for the rows that changed during the first run.
-3. When the queue is empty again, check that `Entry.where.not(original: nil).count` is `0`.
+2. Read `BackfillOriginalContent.progress` until `pending` is 0.
+3. If that pass found more than 0 legacy rows, run `build` again and repeat. A pass that finds 0 rows means the backfill is complete.
+
+The final review added the two Redis pass counters and `BackfillOriginalContent.progress`. The plan first used a full-table count and the `utility` queue size, which cannot work: production connections have a 15-second `statement_timeout`, and other jobs share the `utility` queue. The spec's "Backfill" section has the current code.
 
 ---
 
