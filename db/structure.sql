@@ -545,40 +545,6 @@ ALTER SEQUENCE public.entries_id_seq OWNED BY public.entries.id;
 
 
 --
--- Name: favicons; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.favicons (
-    id bigint NOT NULL,
-    host text,
-    favicon text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    data json,
-    url character varying
-);
-
-
---
--- Name: favicons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.favicons_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: favicons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.favicons_id_seq OWNED BY public.favicons.id;
-
-
---
 -- Name: feed_stats; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -715,7 +681,6 @@ CREATE TABLE public.import_items (
     details text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    item_type character varying(255),
     status bigint DEFAULT 0 NOT NULL,
     error jsonb,
     site_url text,
@@ -1090,41 +1055,6 @@ ALTER SEQUENCE public.recently_read_entries_id_seq OWNED BY public.recently_read
 
 
 --
--- Name: remote_files; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.remote_files (
-    id bigint NOT NULL,
-    fingerprint uuid NOT NULL,
-    original_url text NOT NULL,
-    storage_url text NOT NULL,
-    data jsonb DEFAULT '{}'::jsonb,
-    settings jsonb DEFAULT '{}'::jsonb,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: remote_files_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.remote_files_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: remote_files_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.remote_files_id_seq OWNED BY public.remote_files.id;
-
-
---
 -- Name: saved_searches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1254,7 +1184,6 @@ CREATE TABLE public.subscriptions (
     media_only boolean DEFAULT false,
     kind bigint DEFAULT 0,
     view_mode bigint DEFAULT 0,
-    show_status bigint DEFAULT 0 NOT NULL,
     fix_status bigint DEFAULT 0
 );
 
@@ -1552,7 +1481,6 @@ CREATE TABLE public.users (
     email character varying(255),
     password_digest character varying(255),
     customer_id character varying(255),
-    last_4_digits character varying(255),
     plan_id bigint,
     admin boolean DEFAULT false,
     suspended boolean DEFAULT false,
@@ -1568,8 +1496,7 @@ CREATE TABLE public.users (
     expires_at timestamp without time zone,
     newsletter_token character varying,
     price_tier bigint,
-    page_token character varying,
-    twitter_auth_failures bigint
+    page_token character varying
 );
 
 
@@ -1684,13 +1611,6 @@ ALTER TABLE ONLY public.entries ALTER COLUMN id SET DEFAULT nextval('public.entr
 
 
 --
--- Name: favicons id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.favicons ALTER COLUMN id SET DEFAULT nextval('public.favicons_id_seq'::regclass);
-
-
---
 -- Name: feed_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1786,13 +1706,6 @@ ALTER TABLE ONLY public.recently_played_entries ALTER COLUMN id SET DEFAULT next
 --
 
 ALTER TABLE ONLY public.recently_read_entries ALTER COLUMN id SET DEFAULT nextval('public.recently_read_entries_id_seq'::regclass);
-
-
---
--- Name: remote_files id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.remote_files ALTER COLUMN id SET DEFAULT nextval('public.remote_files_id_seq'::regclass);
 
 
 --
@@ -1999,14 +1912,6 @@ ALTER TABLE ONLY public.entries
 
 
 --
--- Name: favicons favicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.favicons
-    ADD CONSTRAINT favicons_pkey PRIMARY KEY (id);
-
-
---
 -- Name: feed_stats feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2116,14 +2021,6 @@ ALTER TABLE ONLY public.recently_played_entries
 
 ALTER TABLE ONLY public.recently_read_entries
     ADD CONSTRAINT recently_read_entries_pkey PRIMARY KEY (id);
-
-
---
--- Name: remote_files remote_files_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.remote_files
-    ADD CONSTRAINT remote_files_pkey PRIMARY KEY (id);
 
 
 --
@@ -2389,13 +2286,6 @@ CREATE INDEX index_entries_on_provider_and_provider_id ON public.entries USING b
 --
 
 CREATE UNIQUE INDEX index_entries_on_public_id ON public.entries USING btree (public_id);
-
-
---
--- Name: index_favicons_on_host; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_favicons_on_host ON public.favicons USING btree (host);
 
 
 --
@@ -2693,13 +2583,6 @@ CREATE INDEX index_recently_read_entries_on_user_id_and_id ON public.recently_re
 
 
 --
--- Name: index_remote_files_on_fingerprint; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_remote_files_on_fingerprint ON public.remote_files USING btree (fingerprint);
-
-
---
 -- Name: index_saved_searches_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2788,13 +2671,6 @@ CREATE INDEX index_subscriptions_on_media_only ON public.subscriptions USING btr
 --
 
 CREATE INDEX index_subscriptions_on_show_retweets ON public.subscriptions USING btree (show_retweets);
-
-
---
--- Name: index_subscriptions_on_show_status; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_subscriptions_on_show_status ON public.subscriptions USING btree (show_status);
 
 
 --
@@ -3029,13 +2905,6 @@ CREATE UNIQUE INDEX index_users_on_starred_token ON public.users USING btree (st
 
 
 --
--- Name: index_users_on_twitter_auth_failures; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_twitter_auth_failures ON public.users USING btree (twitter_auth_failures);
-
-
---
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3113,6 +2982,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261003150000'),
 ('20261003140000'),
 ('20261003130000'),
 ('20261003120000'),

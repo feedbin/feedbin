@@ -1,10 +1,6 @@
 class Subscription < ApplicationRecord
   attr_accessor :entries_count, :post_volume, :sort_data, :tag_names
 
-  # Deploy 2 stops loading this unused column. Deploy 3 drops it and removes
-  # this line.
-  self.ignored_columns += ["show_status"]
-
   belongs_to :user
   belongs_to :feed, counter_cache: true
 
