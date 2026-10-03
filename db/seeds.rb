@@ -28,7 +28,6 @@ if Rails.env.development?
   u = User.new(email: "ben@benubois.com", password: "passw0rd", password_confirmation: "passw0rd", admin: true)
   u.plan = plan
   u.update_auth_token = true
-  u.mute_filter_available = true
   u.save
 
   feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")

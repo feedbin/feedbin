@@ -1212,10 +1212,7 @@ $.extend feedbin,
     $('[data-behavior~=toggle_extract]').find('.active').length > 0
 
   prepareShareForm: ->
-    $('.field-cluster input, .field-cluster textarea').val('')
-    $('.sharing-controls [type="checkbox"]').attr('checked', false);
-
-    title = $('.entry-header h1').first().text()
+    title =$('.entry-header h1').first().text()
     $('[data-behavior~=share_form] .title-placeholder').val(title)
 
     feedId = feedbin.selectedEntryData.feed_id
@@ -1262,7 +1259,6 @@ $.extend feedbin,
   closeEntryBasement: (timeout = feedbin.fastAnimation) ->
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
-      $('.field-cluster input, .field-cluster textarea').blur()
       $('.entry-basement').removeClass('open')
     ), timeout
 
@@ -1279,7 +1275,6 @@ $.extend feedbin,
 
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
-      $('.field-cluster input, .field-cluster textarea', selectedPanel).first().select()
     ), feedbin.fastAnimation
 
     clearTimeout(feedbin.closeEntryBasementTimeount)
@@ -1475,8 +1470,6 @@ $.extend feedbin,
   readabilityXHR: null
 
   markReadData: {}
-
-  closeSubcription: false
 
   player: null
 
@@ -2237,11 +2230,6 @@ $.extend feedbin,
 
       $(document).on 'ajax:complete', '[data-behavior~=spinner], [data-behavior~=search_form]', ->
         $(@).attr('data-processing', 'false')
-        if feedbin.closeSubcription
-          setTimeout ( ->
-            feedbin.hideSubscribe()
-          ), 600
-          feedbin.closeSubcription = false
         return
 
     searchError: ->

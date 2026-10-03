@@ -56,7 +56,6 @@ class User < ApplicationRecord
     :floaty,
     :feed_search,
     :password_resettable,
-    :mute_filter_available,
     :needs_onboarding
 
   has_one :coupon

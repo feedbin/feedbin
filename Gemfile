@@ -68,7 +68,6 @@ gem "stripe_event"
 gem "strong_migrations", "< 2"
 gem "tailwindcss-ruby", "< 4"
 gem "tailwindcss-rails", "< 4"
-gem "uglifier"
 gem "web-push"
 gem "autotuner"
 
