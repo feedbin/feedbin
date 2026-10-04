@@ -585,6 +585,13 @@ One test for each of the 17 row shapes in the dev test:
 | One deploy for the coder | Old processes raise `TypeError` on an object row while the deploy runs. |
 | `JsonConverter` as the final coder | It does not remove NUL characters, so a save of such a value into a `jsonb` object raises. |
 
+## Outcome (2026-10-04)
+
+- **Backfill:** one pass changed 28,577,948 rows and repaired 130 NUL rows. No job failed. Before the pass, console samples had already cleaned about 5,400 rows in 3 ranges.
+- **Gate:** Ben skipped the second pass. The first pass covered every range, and after Deploy B no code writes a deleted key or the string form. The read-only 0.1% sample check (142,627 rows) found 0 string rows and 0 rows with a deleted key, and the job queues and retry sets were empty.
+- **Space:** after a manual `VACUUM`, the TOAST table holds 317.5 million live chunks, at most 602.0 GiB. So at least 682.7 GiB of its 1,284.8 GiB is reusable. The files keep their size; new rows fill this space first.
+- **Timing:** a dense range with 4,120 raw-source newsletters took 7.78 s, about 0.4 s for each 5,000-ID statement. The pass started at about 21:05 UTC on 2026-10-03; its end time was not recorded.
+
 ## Risks
 
 - **The deletion is permanent.** No code reads the deleted values. This is the goal.

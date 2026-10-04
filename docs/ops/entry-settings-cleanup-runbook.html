@@ -206,8 +206,8 @@ puts "rows_repaired: #{progress[:repaired]}"</code></pre></div>
         <div class="check"><input type="checkbox" aria-label="Deploy plan task 5"></div>
         <div class="step-body">
           <h3>Deploy plan task 5</h3>
-          <p>Plan task 5 is not built yet. Ask Claude to implement it: it removes the old sender fallback, changes the starred-feed cache key and deletes the backfill job.</p>
-          <p>Deploy only after a done pass shows <code>pending_jobs: 0</code>, <code>rows_changed: 0</code> and <code>rows_repaired: 0</code>. The deleted keys are gone for good after the backfill.</p>
+          <p>Deploy the branch <code>entry-settings-deploy-c</code>. It removes the old sender fallback, changes the starred-feed cache key and deletes the backfill job.</p>
+          <p>The branch stacks on <code>drop-unused-tables-and-columns</code>, so deploy it only after that branch has shipped. The backfill gate passed on 2026-10-04: one finished pass, and a sample with no rows left to fix.</p>
           <div class="stamp"></div>
         </div>
       </li>
