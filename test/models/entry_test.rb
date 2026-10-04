@@ -466,6 +466,16 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil entry.embed_duration
   end
 
+  test "a settings write turns an old string row into an object and keeps its keys" do
+    @entry.save!
+    write_settings(@entry, JSON.generate(JSON.generate({"newsletter_from" => "News <news@example.com>"})))
+
+    Entry.find(@entry.id).update!(archived_images: true)
+
+    assert_equal "object", settings_type(@entry)
+    assert_equal({"newsletter_from" => "News <news@example.com>", "archived_images" => true}, JSON.parse(raw_settings(@entry)))
+  end
+
   test "a settings write stores an object that SQL can read" do
     @entry.save!
 
@@ -496,12 +506,6 @@ class EntryTest < ActiveSupport::TestCase
 
   def settings_type(entry)
     Entry.uncached { Entry.connection.select_value("SELECT jsonb_typeof(settings) FROM entries WHERE id = $1", "settings_type", [entry.id]) }
-  end
-
-  # The stored hash, whichever form the row holds.
-  def read_settings(entry)
-    value = JSON.parse(raw_settings(entry))
-    value.is_a?(String) ? JSON.parse(value) : value
   end
 
   def saved_entry(content)
