@@ -182,15 +182,16 @@ puts "rows_repaired: #{progress[:repaired]}"</code></pre></div>
         </div>
       </li>
       <li class="step" data-step="bf-repeat">
-        <div class="check"><input type="checkbox" aria-label="Repeat until a pass changes nothing"></div>
+        <div class="check"><input type="checkbox" aria-label="Wait until the pass is done"></div>
         <div class="step-body">
-          <h3>Repeat until a pass changes nothing</h3>
+          <h3>Wait until the pass is done</h3>
           <p>Check progress with this block. When <code>pending_jobs</code> is 0, the pass is done.</p>
           <div class="code"><button type="button" class="copy">Copy</button><pre><code>progress = BackfillEntrySettings.progress
 puts "pending_jobs: #{progress[:pending]}"
 puts "rows_changed: #{progress[:changed]}"
 puts "rows_repaired: #{progress[:repaired]}"</code></pre></div>
-          <p class="expect"><strong>Expected:</strong> the first pass changes about 29 million rows. When a done pass shows <code>rows_changed: 0</code> and <code>rows_repaired: 0</code>, the backfill is complete. If it shows more, queue the backfill again with the block in the step above. If <code>pending_jobs</code> stops falling, a job failed: check the Sidekiq retries.</p>
+          <p class="expect"><strong>Expected:</strong> the pass changes about 29 million rows. If <code>pending_jobs</code> stops falling, a job failed: check the Sidekiq retries.</p>
+          <p><strong>Done on 2026-10-04.</strong> One pass changed 28,577,948 rows and repaired 130. A 0.1% sample found no rows left to fix, so a second pass did not run. After Deploy C, the blocks in this phase raise <code>NameError</code>, because Deploy C deletes the job.</p>
           <div class="stamp"></div>
         </div>
       </li>
