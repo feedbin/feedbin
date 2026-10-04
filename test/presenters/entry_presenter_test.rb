@@ -18,6 +18,21 @@ class EntryPresenterTest < ActionView::TestCase
     }.merge(attributes))
   end
 
+  test "newsletter_from reads the sender from settings" do
+    entry = entry_with(newsletter_from: "\"Example News\" <news@example.com>")
+
+    from = presenter_for(entry).newsletter_from
+
+    assert_equal "Example News", from.name
+    assert_equal "news@example.com", from.address
+  end
+
+  test "newsletter_from ignores the old Mailgun payload in data" do
+    entry = entry_with(data: {"newsletter" => {"data" => {"from" => "Old <old@example.com>"}}})
+
+    assert_nil presenter_for(entry).newsletter_from
+  end
+
   # media_image is entry.itunes_image || entry.feed.icon_url. Distinct
   # values on each side so a regression that returned the show's icon here
   # would visibly fail rather than coincidentally match.

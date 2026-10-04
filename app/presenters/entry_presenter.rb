@@ -142,7 +142,7 @@ class EntryPresenter < BasePresenter
   end
 
   def newsletter_from
-    from = entry.newsletter_from || entry.data && entry.data.safe_dig("newsletter", "data", "from")
+    from = entry.newsletter_from
     name, address = from.split(/[<>]/).map(&:strip)
     OpenStruct.new(name: name.delete('"'), address: address)
   rescue

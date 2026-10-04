@@ -6,7 +6,7 @@ class StarredEntriesController < ApplicationController
 
     if @user&.setting_on?(:starred_feed_enabled)
       @title = "Starred Articles"
-      @entries = Rails.cache.fetch("#{@user.id}:starred_feed:v2") {
+      @entries = Rails.cache.fetch("#{@user.id}:starred_feed:v3") {
         @starred_entries = @user.starred_entries.order("created_at DESC").limit(50)
         entry_ids = @starred_entries.map { |starred_entry| starred_entry.entry_id }
         @entries = Entry.where(id: entry_ids).includes(:feed)

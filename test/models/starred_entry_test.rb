@@ -48,7 +48,7 @@ class StarredEntryTest < ActiveSupport::TestCase
   end
 
   test "expire_caches deletes the user's starred feed cache" do
-    cache_key = "#{@user.id}:starred_feed:v2"
+    cache_key = "#{@user.id}:starred_feed:v3"
     Rails.cache.write(cache_key, "cached value")
 
     StarredEntry.create_from_owners(@user, @entry)

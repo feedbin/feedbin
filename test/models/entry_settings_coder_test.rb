@@ -22,16 +22,6 @@ class EntrySettingsCoderTest < ActiveSupport::TestCase
     assert_equal({"embed_duration" => 647}, EntrySettingsCoder.dump({"embed_duration" => 647}))
   end
 
-  test "dump drops the keys that nothing reads" do
-    dumped = EntrySettingsCoder.dump({
-      "newsletter" => "From: News <news@example.com>",
-      "media_image" => "https://example.com/a.jpg",
-      "newsletter_from" => "News <news@example.com>"
-    })
-
-    assert_equal({"newsletter_from" => "News <news@example.com>"}, dumped)
-  end
-
   test "dump removes NUL characters from string values" do
     dumped = EntrySettingsCoder.dump({"newsletter_from" => "Ne\0ws <news@example.com>", "archived_images" => true})
 

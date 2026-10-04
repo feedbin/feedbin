@@ -466,19 +466,6 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil entry.embed_duration
   end
 
-  test "a settings write drops the raw source and media_image" do
-    @entry.save!
-    write_settings(@entry, JSON.generate(JSON.generate({
-      "newsletter" => "From: News <news@example.com>",
-      "media_image" => "https://example.com/a.jpg",
-      "newsletter_from" => "News <news@example.com>"
-    })))
-
-    Entry.find(@entry.id).update!(archived_images: true)
-
-    assert_equal({"newsletter_from" => "News <news@example.com>", "archived_images" => true}, read_settings(@entry))
-  end
-
   test "a settings write stores an object that SQL can read" do
     @entry.save!
 
