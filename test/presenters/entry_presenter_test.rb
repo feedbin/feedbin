@@ -27,6 +27,22 @@ class EntryPresenterTest < ActionView::TestCase
     assert_equal "news@example.com", from.address
   end
 
+  test "newsletter_from keeps a sender with no display name" do
+    from = presenter_for(entry_with(newsletter_from: "news@example.com")).newsletter_from
+
+    assert_equal "news@example.com", from.name
+    assert_nil from.address
+  end
+
+  test "newsletter_from is nil when the entry has no sender" do
+    assert_nil presenter_for(entry_with({})).newsletter_from
+  end
+
+  test "newsletter_from is nil when the sender is blank" do
+    assert_nil presenter_for(entry_with(newsletter_from: " ")).newsletter_from
+    assert_nil presenter_for(entry_with(newsletter_from: "<>")).newsletter_from
+  end
+
   test "newsletter_from ignores the old Mailgun payload in data" do
     entry = entry_with(data: {"newsletter" => {"data" => {"from" => "Old <old@example.com>"}}})
 

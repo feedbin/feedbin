@@ -142,11 +142,9 @@ class EntryPresenter < BasePresenter
   end
 
   def newsletter_from
-    from = entry.newsletter_from
-    name, address = from.split(/[<>]/).map(&:strip)
-    OpenStruct.new(name: name.delete('"'), address: address)
-  rescue
-    nil
+    name, address = entry.newsletter_from.to_s.split(/[<>]/).map(&:strip)
+    name = name.to_s.delete('"')
+    OpenStruct.new(name: name, address: address) if name.present? || address.present?
   end
 
   def api_content
