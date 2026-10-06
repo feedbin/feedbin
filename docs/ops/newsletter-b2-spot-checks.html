@@ -14,50 +14,63 @@
 </head>
 <body>
 <h1>Newsletter B2 spot checks</h1>
-<p>Run each block in a production Rails console. Each block is self-contained. The main runbook is <code>newsletter-b2-runbook.html</code>.</p>
-<p>The blocks that read from B2 over HTTP need the bucket to be public. A 403 means it is not.</p>
+<p>Run each block in a production Rails console. Each block is self-contained.
+  The main runbook, <a href="newsletter-b2-runbook.html"><code>newsletter-b2-runbook.html</code></a>, says when to run each one.</p>
+<p>The blocks read B2 over HTTP with no credentials, the way the CDN does. A 401 or 403 there means the bucket is not public.</p>
 <ol>
 
-<li><label><input type="checkbox"> <b>1. Connect, list, write, delete.</b></label>
-  Run right after Deploy A. It proves that the key can reach the bucket and write to it. It leaves nothing behind.
+<li><label><input type="checkbox"> <b>1. Write, read publicly, delete (after Deploy A).</b></label>
+  It writes a small gzip page with the real headers, reads it back with no credentials, and deletes it.
 <pre>begin
-  bucket = ENV["NEWSLETTERS_BUCKET"]
-  raise "NEWSLETTERS_BUCKET is not set" if bucket.blank?
+  bucket = NewsletterPage.bucket
   client = NewsletterPage.storage_client
+  key = "_spotcheck/#{Time.now.to_i}.html"
   puts "bucket: #{bucket}"
-  puts "endpoint: #{ENV["UNIFIED_ENDPOINT"]}"
-  listing = client.get_bucket(bucket, "max-keys" => 1)
-  puts "list status: #{listing.status}"
-  key = "_spotcheck/#{Time.now.to_i}.txt"
-  puts "put status: #{client.put_object(bucket, key, "ok", "Content-Type" => "text/plain").status}"
-  puts "delete status: #{client.delete_object(bucket, key).status}"
-end</pre>
-  <span class="expect">Expect: list 200, put 200, delete 204. An exception names the cause: a 403 is a key without access, a 404 is a wrong bucket name.</span></li>
-
-<li><label><input type="checkbox"> <b>2. Save one page and read it back.</b></label>
-  It saves a real newsletter page, then reads it from B2 over HTTP with a gzip request.
-<pre>begin
-  entry = Feed.newsletter.last.entries.order(:id).last
-  page = NewsletterPage.new(entry)
-  puts "entry: #{entry.id}"
-  puts "key: #{page.key}"
-  page.save
-  uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{ENV["NEWSLETTERS_BUCKET"]}/#{page.key}")
+  puts "put status: #{client.put_object(bucket, key, ActiveSupport::Gzip.compress("&lt;title&gt;spot check&lt;/title&gt;"), NewsletterPage::HEADERS).status}"
+  uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{bucket}/#{key}")
   response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
-  puts "status: #{response.code}"
+  puts "public read status: #{response.code}"
   puts "content-encoding: #{response["content-encoding"].inspect}"
   puts "content-type: #{response["content-type"].inspect}"
   puts "cache-control: #{response["cache-control"].inspect}"
-  html = ActiveSupport::Gzip.decompress(response.body).force_encoding(Encoding::UTF_8)
-  puts "decompressed bytes: #{html.bytesize}"
-  puts "has title: #{html.include?("&lt;title&gt;")}"
-  puts "matches a fresh build: #{html == page.document.to_html}"
+  puts "body: #{ActiveSupport::Gzip.decompress(response.body)}" if response.code == "200"
+  puts "delete status: #{client.delete_object(bucket, key).status}"
 end</pre>
-  <span class="expect">Expect: status 200, content-encoding "gzip", content-type "text/html; charset=utf-8", cache-control "max-age=315360000, public", has title true, matches a fresh build true.</span></li>
+  <span class="expect">Expect: put 200, public read 200, content-encoding "gzip", content-type "text/html; charset=utf-8", cache-control "max-age=315360000, public", body "&lt;title&gt;spot check&lt;/title&gt;", delete 204.
+  An exception on the put names the cause: 403 is a key without access to the bucket, 404 is a wrong bucket name.</span></li>
 
-<li><label><input type="checkbox"> <b>3. Sample old pages after the backfill.</b></label>
-  It takes five random newsletter feeds and sends a HEAD request for the first entry of each.
+<li><label><input type="checkbox"> <b>2. Run the saver end to end (after Deploy A, and again after Deploy B).</b></label>
+  It runs the real saver on the newest entry of a recent newsletter feed. Then it reads the B2 copy and, during the dual write, the S3 copy.
+  Each copy must carry a <code>Last-Modified</code> from this run.
 <pre>begin
+  entry = Feed.newsletter.order(id: :desc).limit(20).lazy.filter_map { it.entries.order(:id).last }.first
+  page = NewsletterPage.new(entry)
+  before = entry.url
+  started = Time.now - 30
+  NewsletterSaver.new.perform(entry.id)
+  dual = ENV["AWS_S3_BUCKET_NEWSLETTERS"].present?
+  puts "entry: #{entry.id}"
+  puts "key: #{page.key}"
+  puts "url changed: #{before != entry.reload.url}"
+  puts "S3 dual write on: #{dual}"
+  uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{NewsletterPage.bucket}/#{page.key}")
+  response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
+  puts "B2 status: #{response.code}"
+  puts "B2 written by this run: #{Time.httpdate(response["last-modified"]) >= started}"
+  puts "B2 content-encoding: #{response["content-encoding"].inspect}"
+  puts "B2 matches a fresh build: #{ActiveSupport::Gzip.decompress(response.body).force_encoding(Encoding::UTF_8) == page.document.to_html}"
+  if dual
+    s3 = Fog::Storage.new(STORAGE).head_object(ENV["AWS_S3_BUCKET_NEWSLETTERS"], page.key)
+    puts "S3 written by this run: #{Time.httpdate(s3.headers["Last-Modified"]) >= started}"
+  end
+end</pre>
+  <span class="expect">Expect: url changed false, B2 status 200, B2 written by this run true, B2 content-encoding "gzip", B2 matches a fresh build true.
+  During the dual write, also S3 written by this run true. After Deploy B, S3 dual write on is false and there is no S3 line.</span></li>
+
+<li><label><input type="checkbox"> <b>3. Sample old pages on B2 (after the backfill).</b></label>
+  It takes five random newsletter feeds and sends a HEAD request for the oldest entry of each.
+<pre>begin
+  bucket = NewsletterPage.bucket
   ids = Feed.newsletter.limit(500).pluck(:id).sample(5)
   puts "feeds sampled: #{ids.size}"
   ids.each do |feed_id|
@@ -67,61 +80,41 @@ end</pre>
       next
     end
     key = NewsletterPage.new(entry).key
-    uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{ENV["NEWSLETTERS_BUCKET"]}/#{key}")
+    uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{bucket}/#{key}")
     response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.head(uri.request_uri) }
     puts "feed #{feed_id} #{key}: status #{response.code}, content-encoding #{response["content-encoding"].inspect}"
   end
 end</pre>
-  <span class="expect">Expect: status 200 and content-encoding "gzip" on every line. A 404 on an entry with content means the backfill missed it. Run the backfill again.</span></li>
+  <span class="expect">Expect: status 200 and content-encoding "gzip" on every line. A 404 means the backfill has not reached that feed, or its job is dead. Check the progress block in the runbook.</span></li>
 
-<li><label><input type="checkbox"> <b>4. Run the saver end to end.</b></label>
-  It runs the real saver on the newest entry of a newsletter feed. That entry already has its public URL, so the URL must not change.
+<li><label><input type="checkbox"> <b>4. Read pages through the public host (after the CDN cutover).</b></label>
+  It reads a new page from <code>NEWSLETTER_HOST</code> with a gzip request.
+  Then it requests the stored URL of five old entries, and a key that does not exist.
 <pre>begin
-  entry = Feed.newsletter.last.entries.order(:id).last
-  before = entry.url
-  NewsletterSaver.new.perform(entry.id)
-  entry.reload
-  puts "url before: #{before}"
-  puts "url after: #{entry.url}"
-  puts "url changed: #{before != entry.url}"
-  puts "NEWSLETTER_HOST: #{ENV["NEWSLETTER_HOST"].inspect}"
-  puts "S3 dual write on: #{ENV["AWS_S3_BUCKET_NEWSLETTERS"].present?}"
-end</pre>
-  <span class="expect">Expect: url changed false. "S3 dual write on" is true until Deploy B, then false.</span></li>
-
-<li><label><input type="checkbox"> <b>5. Confirm the S3 copy exists (before Deploy B).</b></label>
-  It proves that the dual write reaches S3, which the CDN still reads until the origin moves.
-<pre>begin
-  bucket = ENV["AWS_S3_BUCKET_NEWSLETTERS"]
-  raise "AWS_S3_BUCKET_NEWSLETTERS is not set" if bucket.blank?
-  entry = Feed.newsletter.last.entries.order(:id).last
-  key = NewsletterPage.new(entry).key
-  puts "key: #{key}"
-  begin
-    puts "S3 status: #{Fog::Storage.new(STORAGE).head_object(bucket, key).status}"
-  rescue Excon::Error::NotFound
-    puts "S3 status: 404"
-  end
-end</pre>
-  <span class="expect">Expect: S3 status 200 for an entry saved after Deploy A. Run check 4 first if it says 404.</span></li>
-
-<li><label><input type="checkbox"> <b>6. Read a page through the public host (after the CDN cutover).</b></label>
-  It requests the same entry from <code>NEWSLETTER_HOST</code> with a gzip request. It also requests a key that does not exist.
-<pre>begin
-  entry = Feed.newsletter.last.entries.order(:id).last
-  url = entry.newsletter_url
-  puts "url: #{url}"
-  uri = URI(url)
+  host = ENV["NEWSLETTER_HOST"]
+  head = ->(url) { uri = URI(url); Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.head(uri.request_uri) } }
+  entry = Feed.newsletter.order(id: :desc).limit(20).lazy.filter_map { it.entries.order(:id).last }.first
+  uri = URI(entry.newsletter_url)
   response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
+  puts "new page: #{uri}"
   puts "status: #{response.code}"
   puts "content-encoding: #{response["content-encoding"].inspect}"
   puts "content-type: #{response["content-type"].inspect}"
   puts "cache-control: #{response["cache-control"].inspect}"
   puts "readable html: #{ActiveSupport::Gzip.decompress(response.body).include?("&lt;title&gt;")}"
-  missing = URI("https://#{uri.host}/zzz/missing-spot-check.html")
-  puts "missing key status: #{Net::HTTP.start(missing.host, missing.port, use_ssl: true) { |http| http.head(missing.request_uri) }.code}"
+  Feed.newsletter.limit(500).pluck(:id).sample(5).each do |feed_id|
+    old = Entry.where(feed_id: feed_id).order(:id).first
+    next if old.nil?
+    if old.url.to_s.start_with?("https://#{host}/")
+      puts "old stored url #{old.url}: status #{head.(old.url).code}"
+    else
+      puts "old stored url #{old.url}: not on NEWSLETTER_HOST, skipped"
+    end
+  end
+  puts "missing key status: #{head.("https://#{host}/zzz/missing-spot-check.html").code}"
 end</pre>
-  <span class="expect">Expect: status 200, the same three headers as check 2, readable html true, missing key status 404. A missing "content-encoding" means the CDN removed the header or decompressed the body. To roll back, point the CDN origin at S3 again.</span></li>
+  <span class="expect">Expect: status 200, the same three headers as check 1, readable html true, status 200 on every old stored URL on the host, and missing key status 404.
+  No content-encoding means the CDN removed the header or decompressed the body.</span></li>
 
 </ol>
 </body>

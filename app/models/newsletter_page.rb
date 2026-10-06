@@ -10,11 +10,21 @@ class NewsletterPage
 
   CLIENT_LOCK = Mutex.new
 
-  # One client for the process, so repeated puts reuse the open connection
-  # instead of paying a new TLS handshake each time. Excon keeps a socket for
-  # each thread, so threads can share it.
+  # One client for the process. Without persistent: fog drops the connection
+  # after every request, so each put would pay a new TLS handshake. Excon keeps
+  # a socket for each thread, so Sidekiq threads can share the client, and
+  # put_object is idempotent, so Excon retries a put on a stale socket.
   def self.storage_client
-    CLIENT_LOCK.synchronize { @storage_client ||= Fog::Storage.new(STORAGE_IMAGES) }
+    CLIENT_LOCK.synchronize { @storage_client ||= Fog::Storage.new(storage_options) }
+  end
+
+  def self.storage_options
+    STORAGE_IMAGES.merge(persistent: true)
+  end
+
+  # A blank bucket would reach B2 as a path that starts with the key.
+  def self.bucket
+    ENV["NEWSLETTERS_BUCKET"].presence || raise("NEWSLETTERS_BUCKET is not set")
   end
 
   def initialize(entry)
@@ -37,12 +47,13 @@ class NewsletterPage
     HEADERS
   end
 
+  # Memoized: the saver puts the same body to S3 and to B2.
   def body
-    ActiveSupport::Gzip.compress(document.to_html)
+    @body ||= ActiveSupport::Gzip.compress(document.to_html)
   end
 
   def save
-    self.class.storage_client.put_object(ENV["NEWSLETTERS_BUCKET"], key, body, headers)
+    self.class.storage_client.put_object(self.class.bucket, key, body, headers)
     url
   end
 

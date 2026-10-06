@@ -54,8 +54,20 @@ class NewsletterPageTest < ActiveSupport::TestCase
     assert_includes ActiveSupport::Gzip.decompress(NewsletterPage.new(@entry).body), "<title>"
   end
 
-  test "storage client is shared" do
+  test "storage client is shared and keeps its connection open" do
     assert_same NewsletterPage.storage_client, NewsletterPage.storage_client
+    assert_equal true, NewsletterPage.storage_options[:persistent]
+  end
+
+  test "save refuses a blank bucket" do
+    with_env("NEWSLETTERS_BUCKET" => "") do
+      error = assert_raises(RuntimeError) { @page.save }
+      assert_equal "NEWSLETTERS_BUCKET is not set", error.message
+    end
+  end
+
+  test "body is built once" do
+    assert_same @page.body, @page.body
   end
 
   test "save puts the object on B2" do

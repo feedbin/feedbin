@@ -48,7 +48,7 @@ Move all existing newsletter pages with a backfill.
    B2 does not decompress. Every current browser sends `Accept-Encoding: gzip`. There is no plain variant.
 7. **Drop the S3-only headers on B2.** Do not send `x-amz-acl` or `x-amz-storage-class`.
    B2 sets visibility on the bucket. The bucket must be public, or the CDN must hold a read key.
-   The probe in Step 1 of the rollout confirms this.
+   Spot check 1 in the rollout confirms this.
 
 ## Components
 
@@ -59,11 +59,15 @@ One job: turn an entry into a stored page.
 - `NewsletterPage.new(entry)`.
 - `#key` returns `"#{public_id[0..2]}/#{public_id}.html"`.
 - `#document` holds the logic that moves out of `NewsletterSaver`: `build_document`, `document_title`, `text_email_css`.
-- `#body` returns the gzipped document.
+- `#body` returns the gzipped document. It is memoized, because the dual write puts the same body twice.
 - `#headers` returns the object headers: `Content-Type`, `Content-Encoding`, `Cache-Control`.
   The `Cache-Control` value stays `max-age=315360000, public`. The page never changes at its key.
 - `#url` returns the public URL, built from `NEWSLETTER_HOST` and `#key`. It returns `nil` when `NEWSLETTER_HOST` is unset.
 - `#save` puts the object on B2. It returns `#url`.
+- `.storage_client` is one Fog client for each process, built with `STORAGE_IMAGES` plus `persistent: true`.
+  Without `persistent`, fog-aws drops the connection after every request. A test against a local server counted 10 connections for 10 puts without it and 1 with it.
+  Excon keeps a socket for each thread, so Sidekiq threads share the client safely. `put_object` is idempotent, so Excon retries a put on a stale socket.
+- `.bucket` returns `NEWSLETTERS_BUCKET`. It raises when the value is blank. A blank bucket would otherwise reach B2 as a path that starts with the key.
 
 `Entry#newsletter_url` calls `NewsletterPage#url`. This gives one definition of the URL.
 
@@ -81,19 +85,22 @@ The receiver sets `entry.url` to the local `newsletter_entry_url`. That route re
 
 - Add no new storage hash. `NewsletterPage` uses `STORAGE_IMAGES`, which reads the `UNIFIED_*` variables.
 - Add `NEWSLETTERS_BUCKET` to `.env.example`.
-- Do not add a boot check. The saver runs in Sidekiq, and a missing bucket raises on the first job.
+- Do not add a boot check. The saver runs in Sidekiq, and `NewsletterPage.bucket` raises on the first job when the bucket is missing.
   A boot failure would take the web process down for a worker setting.
 
 ### `NewsletterBackfill` (new, `app/jobs/newsletter_backfill.rb`)
 
 It follows `BackfillGuid` and the rule in the project notes: backfills are Sidekiq jobs, not rake tasks.
 
-- `build` enqueues one job for each feed in `Feed.newsletter`.
+- `build` enqueues one job for each feed in `Feed.newsletter`. It refuses to start while the earlier pass still has jobs out (`pending` above 0), unless it gets `force: true`.
+  A second build under running jobs would reset the counters, and their decrements would end the new pass early.
 - `perform(feed_id)` reads the feed's entries with `find_in_batches(batch_size: 500)`.
   For each entry it calls `NewsletterPage.new(entry).save` against B2 only.
 - A put that fails raises. Sidekiq retries the feed job. A retry is safe, because a put overwrites the same key with the same body.
-- The job skips an entry whose `content` is `nil`. It counts these entries so the operator can see them.
-- It runs on the `utility` queue.
+- The job saves every entry, including one whose `content` is `nil`. The old saver built a page for those too, so a skip would turn a blank page into a 404.
+- The job counts `mismatched` entries: a `url` on `NEWSLETTER_HOST` that is not the page URL. Since 2022 the saver stored `NEWSLETTER_HOST` plus the S3 response path.
+  If that path held a bucket name, the link breaks at the cutover. The job counts these entries. It does not change them.
+- It runs on the `backfill` queue: 2 servers with 20 threads each. Sidekiq supplies all the parallelism. A feed holds about 400 entries at most, so one job for each feed is small enough.
 - Redis pass counters track progress, and a `.progress` method reports them.
   A full-table count times out under the production 15 s `statement_timeout`. The counters avoid it.
 
@@ -116,18 +123,18 @@ The origin rule maps the public path `/<key>` to that origin path. This is a CDN
 
 ## Rollout
 
-Each step is a production step and goes in the runbook (`docs/ops/newsletter-b2-runbook.html`).
-The plan phase writes the runbook.
+The runbook is `docs/ops/newsletter-b2-runbook.html`. The spot checks are in `docs/ops/newsletter-b2-spot-checks.html`.
 
-1. **Probe.** Put one gzip object on B2 with the saver headers. Read it through the B2 endpoint.
-   Confirm that the response carries `Content-Encoding: gzip` and the long `Cache-Control`. Confirm that the bucket serves it without a key.
-2. **Deploy A.** Create the B2 bucket and set `UNIFIED_BUCKET_NEWSLETTERS`. Deploy the dual-write saver.
-3. **Backfill.** Run `NewsletterBackfill.new.build`. Watch `.progress` until it reaches the total.
-4. **Catch up.** Run `NewsletterBackfill.new.build` a second time. This covers any save that failed during the first pass.
-5. **Spot check.** Request three old pages and one new page from B2 and check the headers.
-6. **Cutover.** Move the CDN origin from S3 to B2. Run the acceptance check on the public host.
+1. **Check stored URLs.** Before anything else, sample stored `entry.url` values against `Entry#newsletter_url`.
+2. **Bucket and env.** Create a public B2 bucket with the lifecycle "Keep only the last version". Add `NEWSLETTERS_BUCKET` to `production_env` in 1Password.
+3. **Deploy A.** Merge to `main` and run `cap production deploy`. Run spot checks 1 and 2.
+4. **Backfill.** Run `NewsletterBackfill.new.build`. Watch `.progress` until `pending` is 0. Retry dead jobs if `pending` stalls. `mismatched` must be 0.
+   There is no second pass: Sidekiq retries failed jobs, and the saver writes every page created after Deploy A.
+5. **Spot check.** Sample old pages on B2.
+6. **Cutover.** Move the CDN origin from S3 to B2. Read new pages and old stored URLs through the public host.
 7. **Deploy B.** The migration is complete when the public acceptance check passes. Deploy B right after it.
-   Deploy B removes the S3 write and the `AWS_S3_BUCKET_NEWSLETTERS` setting. Keep the S3 objects. A rollback is one origin change, and the objects stay until the S3 bucket is retired.
+   Deploy B removes `AWS_S3_BUCKET_NEWSLETTERS` from `production_env` and deploys again. The env file ships with each release, so a restart is not enough.
+   Keep the S3 objects. After Deploy B, a rollback to S3 misses every page saved since Deploy B.
 8. **Retire S3.** Delete the old bucket when you no longer need the rollback.
 
 ## Testing
@@ -137,9 +144,11 @@ The plan phase writes the runbook.
   These cases move from `test/jobs/newsletter_saver_test.rb`.
 - `NewsletterSaver`: B2 put carries the three headers and no `x-amz-*` headers. The S3 put happens only while the legacy bucket is set.
   `entry.url` stays the same when it already equals the page URL.
-- `NewsletterBackfill`: it enqueues only newsletter feeds. It puts one object for each entry. It skips an entry with no content.
-  A second run puts the same keys and changes no row.
+- `NewsletterBackfill`: it enqueues only newsletter feeds. It puts one object for each entry, including one with no content. It changes no row.
+  It counts a mismatched URL. It refuses a second build while a pass runs. A failed put leaves `pending` unchanged.
+- `NewsletterPage`: the client is shared and persistent. A blank bucket raises. The body is built once.
 - `Entry#newsletter_url` returns the value of `NewsletterPage#url`.
+- Every console block in both runbooks ran against WebMock stubs of B2, S3, and the CDN before the deploy.
 
 Tests stub the B2 endpoint with WebMock. They run with `bundle exec rake`.
 

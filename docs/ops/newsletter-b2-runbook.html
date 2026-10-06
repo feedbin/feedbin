@@ -7,51 +7,139 @@
 <style>
   body { font: 16px/1.5 system-ui; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; }
   pre { background: #f3f3f3; padding: .75rem; overflow-x: auto; }
-  li { margin: 1rem 0; }
-  @media (prefers-color-scheme: dark) { body { background: #111; color: #eee; } pre { background: #222; } }
+  li { margin: 1.25rem 0; }
+  .expect { font-size: .9em; opacity: .8; }
+  .stop { color: #b00020; }
+  @media (prefers-color-scheme: dark) { body { background: #111; color: #eee; } pre { background: #222; } .stop { color: #ff6b81; } }
 </style>
 </head>
 <body>
 <h1>Newsletter pages to B2</h1>
-<p>Spec: <code>docs/superpowers/specs/2026-10-05-newsletter-storage-b2-design.md</code></p>
+<p>Spec: <code>docs/superpowers/specs/2026-10-05-newsletter-storage-b2-design.md</code>.
+  Spot checks: <a href="newsletter-b2-spot-checks.html"><code>newsletter-b2-spot-checks.html</code></a>.
+  Run each console block in a production Rails console.</p>
+
+<h2>Before Deploy A</h2>
 <ol>
-<li><label><input type="checkbox"> <b>Create the bucket.</b></label>
-  Make a public B2 bucket in the same account as the image store. Make sure the <code>UNIFIED_*</code> application key can write to it.
-  Set <code>NEWSLETTERS_BUCKET</code> to its name on the web and Sidekiq hosts. Leave <code>AWS_S3_BUCKET_NEWSLETTERS</code> set.</li>
-<li><label><input type="checkbox"> <b>Deploy A.</b></label>
-  Deploy the branch. New newsletters now go to B2 and to S3.</li>
-<li><label><input type="checkbox"> <b>Probe B2.</b></label>
-  In a Rails console, run this block. It prints a curl command.
+<li><label><input type="checkbox"> <b>Check the shape of stored URLs.</b></label>
+  This runs on the code in production today. Since 2022 the saver stored <code>NEWSLETTER_HOST</code> plus the S3 response path.
+  The B2 origin serves <code>/&lt;key&gt;</code> only. If the stored path holds anything else, such as an S3 bucket name, those links break at the cutover.
 <pre>begin
-  entry = Entry.joins(:feed).where(feeds: {feed_type: Feed.feed_types[:newsletter]}).last
-  page = NewsletterPage.new(entry)
-  page.save
-  puts "curl -sI -H 'Accept-Encoding: gzip' #{ENV["UNIFIED_ENDPOINT"]}/#{ENV["NEWSLETTERS_BUCKET"]}/#{page.key}"
+  host = ENV["NEWSLETTER_HOST"]
+  puts "NEWSLETTER_HOST: #{host.inspect}"
+  entries = Feed.newsletter.order(id: :desc).limit(20).flat_map { it.entries.order(id: :desc).limit(5).to_a }
+  on_host = entries.select { it.url.to_s.start_with?("https://#{host}/") }
+  puts "entries sampled: #{entries.size}"
+  puts "url on NEWSLETTER_HOST: #{on_host.size}"
+  puts "url equals newsletter_url: #{on_host.count { it.url == it.newsletter_url }}"
+  on_host.reject { it.url == it.newsletter_url }.first(3).each { puts "differs: #{it.url} (expected #{it.newsletter_url})" }
 end</pre>
-  Run the printed command. The response must show <code>content-encoding: gzip</code>, <code>content-type: text/html; charset=utf-8</code>, and <code>cache-control: max-age=315360000, public</code>.
-  If the response is 403 or 404, stop. The bucket is not public or the key has no access.</li>
-<li><label><input type="checkbox"> <b>Backfill.</b></label>
-  Make sure both Sidekiq servers (20 threads each) run the <code>backfill</code> queue. Run this block. Run it again later to read the counters.
+  <span class="expect">Expect: the last two counts are equal and no "differs" lines.</span>
+  <span class="stop">If they differ, stop. The stored URLs need a fix before this migration.</span></li>
+
+<li><label><input type="checkbox"> <b>Create the bucket.</b></label>
+  Make a B2 bucket in the same account as the image store.
+  <ul>
+    <li>Set it to public.</li>
+    <li>Set its lifecycle to "Keep only the last version of the file". B2 keeps every version by default, and each re-save of a page would be stored and billed again.</li>
+    <li>Make sure the <code>UNIFIED_*</code> application key is allowed on this bucket. A key restricted to the image bucket is not.</li>
+  </ul></li>
+
+<li><label><input type="checkbox"> <b>Add the bucket to the production env.</b></label>
+  In 1Password, open the item <code>feedbin</code> in the <code>Development</code> vault. In the <code>production_env</code> field, add <code>NEWSLETTERS_BUCKET</code> with the name of the bucket from the previous step.
+  Do not change <code>AWS_S3_BUCKET_NEWSLETTERS</code>. The saver needs it for the dual write. The deploy uploads this field as <code>.env</code>.</li>
+</ol>
+
+<h2>Deploy A: write to S3 and B2</h2>
+<ol start="4">
+<li><label><input type="checkbox"> <b>Merge and push.</b></label>
+  Capistrano deploys <code>main</code> from GitHub.
+<pre>cd ~/Sites/feedbin
+git switch main
+git merge --ff-only newsletter
+git push origin main</pre></li>
+
+<li><label><input type="checkbox"> <b>Deploy.</b></label>
+  The deploy pauses Sidekiq, uploads <code>.env</code>, and restarts the web and background services. There is no migration.
+<pre>cd ~/Sites/deploy/feedbin
+bundle exec cap production deploy</pre>
+  From now on the saver writes each new page to S3 first, then to B2. The CDN still reads S3.</li>
+
+<li><label><input type="checkbox"> <b>Run spot checks 1 and 2.</b></label>
+  Check 1 proves that the key can write to the bucket and that the bucket serves the gzip headers publicly.
+  Check 2 runs the saver and proves that both copies were written.
+  <span class="stop">If either check fails, stop. New newsletters still reach S3, so nothing is broken for readers. Sidekiq retries the B2 writes once the cause is fixed.</span></li>
+</ol>
+
+<h2>Backfill</h2>
+<ol start="7">
+<li><label><input type="checkbox"> <b>Check the backfill workers.</b></label>
+<pre>begin
+  workers = Sidekiq::ProcessSet.new.select { it["queues"].include?("backfill") }
+  puts "processes on the backfill queue: #{workers.size}"
+  workers.each { puts "#{it["hostname"]}: concurrency #{it["concurrency"]}" }
+end</pre>
+  <span class="expect">Expect: 2 processes, concurrency 20 each.</span></li>
+
+<li><label><input type="checkbox"> <b>Start the backfill.</b></label>
+  It enqueues one job for each newsletter feed. It refuses to start while an earlier pass still has jobs out.
 <pre>begin
   NewsletterBackfill.new.build
   puts NewsletterBackfill.progress
+end</pre></li>
+
+<li><label><input type="checkbox"> <b>Watch progress.</b></label>
+  Run this block until <code>pending</code> is 0.
+<pre>begin
+  puts NewsletterBackfill.progress
+  puts "queued: #{Sidekiq::Queue.new("backfill").size}"
+  puts "retrying: #{Sidekiq::RetrySet.new.count { it.klass == "NewsletterBackfill" }}"
+  puts "dead: #{Sidekiq::DeadSet.new.count { it.klass == "NewsletterBackfill" }}"
 end</pre>
-  The pass is done at <code>pending: 0</code>. Check <code>skipped</code>. A non-zero value counts entries that have no content.</li>
-<li><label><input type="checkbox"> <b>Run the backfill a second time.</b></label>
-  Run the block from the previous step. This covers any feed job that failed in the first pass. Wait for <code>pending: 0</code>.</li>
+  <span class="expect">Expect at the end: pending 0, mismatched 0, queued 0, retrying 0, dead 0.</span>
+  <ul>
+    <li>A job that fails retries by itself. It counts only when it finishes.</li>
+    <li>If pending stays above 0 while queued and retrying are 0, some jobs are dead. Run the next step.</li>
+    <li><span class="stop">If mismatched is above 0, stop before the cutover.</span> Those entries have a URL on <code>NEWSLETTER_HOST</code> that the B2 origin will not serve. Step 1 prints examples.</li>
+  </ul></li>
+
+<li><label><input type="checkbox"> <b>Retry dead jobs (only if pending is stuck).</b></label>
+<pre>begin
+  dead = Sidekiq::DeadSet.new.select { it.klass == "NewsletterBackfill" }
+  puts "dead jobs: #{dead.size}"
+  dead.map { it.item["error_message"] }.uniq.first(3).each { puts "error: #{it}" }
+  dead.each(&:retry)
+  puts "retried: #{dead.size}"
+end</pre>
+  Fix the cause the errors name first. Then go back to the previous step.</li>
+
+<li><label><input type="checkbox"> <b>Run spot check 3.</b></label>
+  It samples old pages directly on B2.</li>
+</ol>
+
+<h2>Cutover</h2>
+<ol start="12">
 <li><label><input type="checkbox"> <b>Move the CDN origin.</b></label>
   Point the origin of the <code>NEWSLETTER_HOST</code> CDN at the B2 bucket. Map the public path <code>/&lt;key&gt;</code> to <code>/&lt;bucket&gt;/&lt;key&gt;</code> on the B2 endpoint.
-  Then run this block and run the curl command it prints.
-<pre>begin
-  entry = Entry.joins(:feed).where(feeds: {feed_type: Feed.feed_types[:newsletter]}).last
-  puts "curl -sI -H 'Accept-Encoding: gzip' #{entry.newsletter_url}"
-  puts "curl -s --compressed #{entry.newsletter_url} | head -c 300"
-end</pre>
-  The first command must show the same three headers as the probe. The second must print readable HTML.
-  To roll back, point the origin at S3 again.</li>
-<li><label><input type="checkbox"> <b>Deploy B.</b></label>
-  Unset <code>AWS_S3_BUCKET_NEWSLETTERS</code> on the web and Sidekiq hosts. Restart Sidekiq. The saver now writes to B2 only.
-  The migration is complete at this step.</li>
+  The CDN must pass <code>Content-Encoding</code> through and must not decompress the body.</li>
+
+<li><label><input type="checkbox"> <b>Run spot check 4.</b></label>
+  It reads new and old pages through the public host.
+  <span class="stop">If it fails, point the origin at S3 again. S3 still holds every page until Deploy B.</span></li>
+</ol>
+
+<h2>Deploy B: write to B2 only</h2>
+<ol start="14">
+<li><label><input type="checkbox"> <b>Remove the S3 bucket from the env.</b></label>
+  In the <code>production_env</code> field of the 1Password item <code>feedbin</code>, remove <code>AWS_S3_BUCKET_NEWSLETTERS</code>.
+  A restart alone is not enough, because the env file is uploaded with each release.
+<pre>cd ~/Sites/deploy/feedbin
+bundle exec cap production deploy</pre></li>
+
+<li><label><input type="checkbox"> <b>Run spot check 2 again.</b></label>
+  <span class="expect">Expect: "S3 dual write on: false" and a fresh B2 copy.</span>
+  The migration is complete at this step. From now on a rollback to S3 would miss every page saved after Deploy B.</li>
+
 <li><label><input type="checkbox"> <b>Retire S3.</b></label>
   When you no longer need the rollback, delete the old S3 newsletter bucket.</li>
 </ol>

@@ -15,7 +15,7 @@ class NewsletterBackfillTest < ActiveSupport::TestCase
     NewsletterBackfill.new.build
 
     assert_equal [[@feed.id]], NewsletterBackfill.jobs.map { it["args"] }
-    assert_equal({pending: 1, saved: 0, skipped: 0}, NewsletterBackfill.progress)
+    assert_equal({pending: 1, saved: 0, mismatched: 0}, NewsletterBackfill.progress)
   end
 
   test "perform puts one object for each entry" do
@@ -29,10 +29,10 @@ class NewsletterBackfillTest < ActiveSupport::TestCase
       assert_requested :put, "https://test-account.storage.example.com/newsletters-test/#{entry.public_id[0..2]}/#{entry.public_id}.html"
     end
     assert_requested request, times: @feed.entries.count
-    assert_equal({pending: 0, saved: @feed.entries.count, skipped: 0}, NewsletterBackfill.progress)
+    assert_equal({pending: 0, saved: @feed.entries.count, mismatched: 0}, NewsletterBackfill.progress)
   end
 
-  test "perform skips an entry with no content and counts it" do
+  test "perform saves an entry with no content" do
     entry = create_entry(@feed)
     entry.update_columns(content: nil)
     stub_request(:put, B2)
@@ -40,8 +40,33 @@ class NewsletterBackfillTest < ActiveSupport::TestCase
     NewsletterBackfill.new.build
     NewsletterBackfill.new.perform(@feed.id)
 
-    assert_not_requested :put, "https://test-account.storage.example.com/newsletters-test/#{entry.public_id[0..2]}/#{entry.public_id}.html"
-    assert_equal 1, NewsletterBackfill.progress[:skipped]
+    assert_requested :put, "https://test-account.storage.example.com/newsletters-test/#{entry.public_id[0..2]}/#{entry.public_id}.html"
+  end
+
+  test "perform counts a url on the newsletter host that is not the page url" do
+    matching = create_entry(@feed)
+    with_bucket = create_entry(@feed)
+    elsewhere = create_entry(@feed)
+    stub_request(:put, B2)
+
+    with_env("NEWSLETTER_HOST" => "newsletters.example.com") do
+      matching.update_columns(url: NewsletterPage.new(matching).url)
+      with_bucket.update_columns(url: "https://newsletters.example.com/old-bucket/#{NewsletterPage.new(with_bucket).key}")
+      elsewhere.update_columns(url: "https://example.com/newsletters/#{elsewhere.public_id}")
+
+      NewsletterBackfill.new.build
+      NewsletterBackfill.new.perform(@feed.id)
+    end
+
+    assert_equal 1, NewsletterBackfill.progress[:mismatched]
+  end
+
+  test "build refuses while a pass is running" do
+    NewsletterBackfill.new.build
+
+    assert_raises(RuntimeError) { NewsletterBackfill.new.build }
+    NewsletterBackfill.new.build(force: true)
+    assert_equal 1, NewsletterBackfill.progress[:pending]
   end
 
   test "perform never writes to S3 or changes a row" do
