@@ -17,12 +17,14 @@ class Admin::FeedsControllerTest < ActionController::TestCase
     login_as @user
     get :index, params: {q: @feed.feed_url}
     assert_response :success
+    assert_includes @response.body, ERB::Util.html_escape(@feed.title)
   end
 
   test "GET index with a numeric query takes the id branch" do
     login_as @user
     get :index, params: {q: @feed.id.to_s}
     assert_response :success
+    assert_includes @response.body, ERB::Util.html_escape(@feed.title)
   end
 
   test "GET index survives a query that is not a scalar" do

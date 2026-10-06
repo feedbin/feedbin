@@ -77,15 +77,6 @@ class EntryCounterDriftTest < ActiveSupport::TestCase
     assert_equal [[@feed.id]], EntryCounterRepair::ForFeeds.jobs.map { |job| job["args"].first }
   end
 
-  test "ForFeeds repairs every entry in the feeds it is given" do
-    entries = bulk_create_entries(@feed, 3)
-    entries.each { |entry| entry.update_columns(starred_entries_count: 5) }
-
-    Sidekiq::Testing.inline! { EntryCounterRepair::ForFeeds.new.perform([@feed.id]) }
-
-    entries.each { |entry| assert_equal 0, entry.reload.starred_entries_count }
-  end
-
   test "clearing recently played leaves the counter correct" do
     RecentlyPlayedEntry.create!(user_id: @user.id, entry_id: @entry.id)
     RecentlyPlayedEntry.create!(user_id: @keeper.id, entry_id: @entry.id)

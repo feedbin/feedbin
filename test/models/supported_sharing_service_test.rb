@@ -84,8 +84,17 @@ class SupportedSharingServiceTest < ActiveSupport::TestCase
     assert_equal Set.new(["a@example.com", "b@example.com"]), Set.new(record.reload.completions)
   end
 
-  test "limit_exceeded returns an error response" do
+  test "share returns an error response once the service's limit is exceeded" do
+    flush_redis
     record = @user.supported_sharing_services.create!(service_id: "email")
-    assert_equal({error: "Share limit exceeded"}, record.limit_exceeded)
+    entry = create_feeds(@user, 1).first.entries.first
+    limit = SupportedSharingService.info("email").limit
+
+    EntryMailer.stub :mailer, ->(*) { OpenStruct.new(deliver_later: true) } do
+      limit.times do
+        assert_equal({message: "Email sent to a@example.com."}, record.share(entry_id: entry.id, to: "a@example.com"))
+      end
+      assert_equal({error: "Share limit exceeded"}, record.share(entry_id: entry.id, to: "a@example.com"))
+    end
   end
 end

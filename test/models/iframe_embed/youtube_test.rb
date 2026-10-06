@@ -5,10 +5,6 @@ class IframeEmbed::YoutubeTest < ActiveSupport::TestCase
     @url = "https://www.youtube.com/watch?v=ABC123"
   end
 
-  test "supported_urls returns the application config" do
-    assert_equal Feedbin::Application.config.youtube_embed_urls, IframeEmbed::Youtube.supported_urls
-  end
-
   test "oembed_url is the YouTube oembed endpoint" do
     embed = IframeEmbed::Youtube.new(@url)
     assert_equal "https://www.youtube.com/oembed", embed.oembed_url

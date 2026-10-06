@@ -39,7 +39,10 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     get :autocomplete, params: {id: @service, query: "test"}
     assert_response :success
     data = JSON.parse(@response.body)
-    assert data.length, options.length
+    assert_equal options, data["suggestions"].map { it["value"] }
+
+    get :autocomplete, params: {id: @service, query: "EXAMPLE"}
+    assert_equal ["test@example.com"], JSON.parse(@response.body)["suggestions"].map { it["value"] }
   end
 
   test "should authorize with oauth" do

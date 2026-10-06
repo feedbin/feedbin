@@ -119,8 +119,11 @@ class NewsletterTest < ActiveSupport::TestCase
   end
 
   test "valid? is false when X-Mailgun-Incoming header is missing" do
-    nl = Newsletter.new(base_params("X-Mailgun-Incoming" => nil))
-    refute nl.valid?
+    ENV.stub :[], ->(k) { (k == "MAILGUN_INBOUND_KEY") ? "key" : nil } do
+      signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("SHA256"), "key", "1700000000tok")
+      nl = Newsletter.new(base_params("signature" => signature, "X-Mailgun-Incoming" => nil))
+      refute nl.valid?
+    end
   end
 
   test "valid? is false when the signature does not match" do

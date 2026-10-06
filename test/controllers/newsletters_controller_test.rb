@@ -26,7 +26,7 @@ class NewslettersControllerTest < ActionController::TestCase
       assert_difference "Subscription.count", +1 do
         assert_difference("NewsletterSender.count", 1) do
           assert_difference("Entry.count", 1) do
-            post :create, params: newsletter_params(token, nil)
+            post :create, params: newsletter_params(token)
           end
         end
       end
@@ -44,7 +44,7 @@ class NewslettersControllerTest < ActionController::TestCase
 
     Sidekiq::Testing.inline! do
       assert_no_difference("Subscription.count") do
-        post :create, params: newsletter_params(user.newsletter_authentication_token.token, nil)
+        post :create, params: newsletter_params(user.newsletter_authentication_token.token)
       end
     end
 
@@ -62,7 +62,7 @@ class NewslettersControllerTest < ActionController::TestCase
     Sidekiq::Testing.inline! do
       assert_difference("Tag.count", 1) do
         assert_difference("Entry.count", 1) do
-          post :create, params: newsletter_params(user.newsletter_authentication_token.token, nil)
+          post :create, params: newsletter_params(user.newsletter_authentication_token.token)
         end
       end
     end
@@ -85,7 +85,7 @@ class NewslettersControllerTest < ActionController::TestCase
     Sidekiq::Testing.inline! do
       assert_no_difference("Tag.count") do
         assert_difference("Entry.count", 1) do
-          post :create, params: newsletter_params(user.newsletter_authentication_token.token, nil)
+          post :create, params: newsletter_params(user.newsletter_authentication_token.token)
         end
       end
     end
@@ -103,7 +103,7 @@ class NewslettersControllerTest < ActionController::TestCase
 
     Sidekiq::Testing.inline! do
       assert_difference("Entry.count", 1) do
-        post :create, params: newsletter_params(user.newsletter_authentication_token.token, nil)
+        post :create, params: newsletter_params(user.newsletter_authentication_token.token)
       end
     end
     assert_response :success

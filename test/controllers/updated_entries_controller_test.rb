@@ -10,13 +10,6 @@ class UpdatedEntriesControllerTest < ActionController::TestCase
     end
   end
 
-  test "should get index" do
-    login_as @user
-    get :index, xhr: true
-    assert_response :success
-    assert_equal @updated.length, assigns(:entries).length
-  end
-
   # @entries is built directly (then .sort_by materializes it), not through
   # entries_list, so it needs its own preload. Counts queries -- .loaded?
   # cannot tell a preload from an early N+1.

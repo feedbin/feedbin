@@ -37,13 +37,6 @@ module ImageCrawler
       assert_nil args["feed_id"], "the row belongs to the channel, not to any one feed"
     end
 
-    test "falls back down the thumbnail ladder" do
-      ChannelImage.schedule(channel({"default" => {"url" => "https://yt3.ggpht.com/small.jpg"}}))
-
-      assert_equal ["https://yt3.ggpht.com/small.jpg"],
-        Pipeline::Find.jobs.last["args"].first["image_urls"]
-    end
-
     test "schedules nothing when the channel advertises no thumbnail" do
       record = Embed.youtube_channel.create!(provider_id: "UCabc", data: {})
 

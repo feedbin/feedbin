@@ -5,22 +5,6 @@ class SharingServiceTest < ActiveSupport::TestCase
     @user = users(:new)
   end
 
-  test "active? is always true" do
-    assert SharingService.new.active?
-  end
-
-  test "ok? is always true" do
-    assert SharingService.new.ok?
-  end
-
-  test "auth_error? is always false" do
-    refute SharingService.new.auth_error?
-  end
-
-  test "service_id is 'custom'" do
-    assert_equal "custom", SharingService.new.service_id
-  end
-
   test "share_link returns _blank target for http(s) URLs" do
     service = @user.sharing_services.create!(label: "External", url: "https://example.com/share")
 

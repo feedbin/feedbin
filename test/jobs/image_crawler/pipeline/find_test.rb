@@ -47,7 +47,7 @@ module ImageCrawler
           assert_requested :get, "http://example.com/image/og_image.jpg"
           assert_requested :get, "http://example.com/image/twitter_image.jpg"
 
-          assert_equal 0, EntryImage.jobs.size
+          assert ::Image.entry_images.exists?(provider_id: "1")
           image = Image.new_with_attributes(id: SecureRandom.hex, kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: urls, provider: ::Image.providers[:entry_preview], provider_id: 2, feed_id: 1)
           Find.new.perform(image.to_h)
           assert_equal 1, EntryImage.jobs.size

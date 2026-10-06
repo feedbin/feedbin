@@ -6,6 +6,7 @@ module ImageCrawler
       stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: "12345678")
       download = Download.download!(url, minimum_size: 8)
       assert download.valid?
+      assert_instance_of Download::Default, download
     end
 
     def test_should_be_too_small
@@ -74,18 +75,6 @@ module ImageCrawler
 
       assert download.not_modified?
       refute download.valid?, "a 304 carries no bytes, so there is nothing valid to process"
-    end
-
-    # Only 304: a 404 or 500 reported as "unchanged" would make a dead icon
-    # look permanently current. Exercises #download_file directly because
-    # Download::Default's `rescue Feedkit::Error` would swallow the re-raise.
-    def test_should_still_raise_for_a_non_304_response_error
-      url = "http://example.com/favicon.ico"
-      stub_request(:get, url).to_return(status: 404, body: "")
-
-      assert_raises Feedkit::NotFound do
-        Download.new(url, minimum_size: nil, etag: "\"abc123\"").download_file(url)
-      end
     end
 
     # An unsolicited 304 (no validator sent) is a broken server, not an

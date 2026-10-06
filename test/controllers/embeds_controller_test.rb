@@ -10,17 +10,24 @@ class EmbedsControllerTest < ActionController::TestCase
     assert_redirected_to login_url
   end
 
-  test "GET twitter resolves IframeEmbed::Twitter and assigns it as @media" do
+  test "GET twitter renders the embed when IframeEmbed::Twitter resolves" do
     login_as @user
-    fake_media = OpenStruct.new(url: "https://twitter.com/x/status/1")
+    fake_media = OpenStruct.new(
+      author_url: "https://twitter.com/x",
+      profile_image_url: "https://example.com/avatar.png",
+      permalink: "https://twitter.com/x/status/1",
+      name: "Embedded Author",
+      screen_name: "@x",
+      date: Time.utc(2026, 1, 2),
+      content: "Tweet text",
+      image_url: nil
+    )
     IframeEmbed::Twitter.stub :download, ->(_) { fake_media } do
-      assert_raises(StandardError) do
-        get :twitter, params: {url: "https://twitter.com/x/status/1", dom_id: "e1"}, xhr: true
-      end
-    rescue ActionView::Template::Error
-      # template requires fixtures we are not setting up; controller behavior is what we care about
+      get :twitter, params: {url: "https://twitter.com/x/status/1", dom_id: "e1"}, xhr: true
     end
+    assert_response :success
     assert_equal fake_media, assigns(:media)
+    assert_includes @response.body, "Embedded Author"
   end
 
   test "GET twitter quietly returns 200 when JSON parsing fails" do

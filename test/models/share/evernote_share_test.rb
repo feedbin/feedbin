@@ -19,16 +19,6 @@ class Share::EvernoteShareTest < ActiveSupport::TestCase
     assert_nil share.instance_variable_get(:@token)
   end
 
-  test "initializer wires up EvernoteOAuth client when access_token is present" do
-    @klass.update!(access_token: "tok")
-    fake_client = Object.new
-    EvernoteOAuth::Client.stub :new, ->(*) { fake_client } do
-      share = Share::EvernoteShare.new(@klass)
-      assert_equal fake_client, share.instance_variable_get(:@client)
-      assert_equal "tok", share.instance_variable_get(:@token)
-    end
-  end
-
   test "consumer constructs an OAuth::Consumer with Evernote site config" do
     share = Share::EvernoteShare.new
     consumer = share.consumer
@@ -169,23 +159,6 @@ class Share::EvernoteShareTest < ActiveSupport::TestCase
     EvernoteOAuth::Client.stub :new, ->(*) { fake_client } do
       share = Share::EvernoteShare.new(@klass)
       assert_equal({"Personal" => "g1", "Work" => "g2"}, share.after_activate)
-    end
-  end
-
-  test "note_store memoizes the underlying client.note_store" do
-    @klass.update!(access_token: "tok")
-    counter = 0
-    note_store = Object.new
-    fake_client = Object.new
-    fake_client.define_singleton_method(:note_store) {
-      counter += 1
-      note_store
-    }
-    EvernoteOAuth::Client.stub :new, ->(*) { fake_client } do
-      share = Share::EvernoteShare.new(@klass)
-      assert_equal note_store, share.note_store
-      assert_equal note_store, share.note_store
-      assert_equal 1, counter
     end
   end
 end

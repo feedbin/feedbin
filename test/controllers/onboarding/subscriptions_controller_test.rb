@@ -112,14 +112,4 @@ class Onboarding::SubscriptionsControllerTest < ActionController::TestCase
     assert_response :success
     assert_nil Feed.find_by(feed_url: smuggled)
   end
-
-  test "does not fetch one url per key the client sends" do
-    login_as @user
-    urls = 40.times.to_h { ["http://bulk#{it}.example.com/feed.xml", "subscribe"] }
-
-    assert_no_difference "Subscription.count" do
-      patch :update, params: {feed_url: urls}, xhr: true
-    end
-    assert_response :success
-  end
 end

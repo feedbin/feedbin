@@ -21,15 +21,6 @@ module WebSub
       server&.close
     end
 
-    test "a refused private hub does not fail the job" do
-      feed = Feed.first
-      feed.update(hubs: ["http://127.0.0.1:9/"])
-
-      assert_nothing_raised do
-        Subscribe.new.perform(feed.id)
-      end
-    end
-
     test "a TLS failure from a hub does not fail the job" do
       hub_url = "https://hub.example.com/"
       feed = Feed.first

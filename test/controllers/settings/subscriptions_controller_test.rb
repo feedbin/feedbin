@@ -60,6 +60,7 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
   test "should show_updates multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)
+    @user.subscriptions.update_all(show_updates: false)
     post :update_multiple, params: {operation: "show_updates", subscription_ids: ids}
     assert_equal ids.sort, @user.subscriptions.where(show_updates: true).pluck(:id).sort
     assert_redirected_to settings_subscriptions_url
@@ -84,6 +85,7 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
   test "should unmute multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)
+    @user.subscriptions.update_all(muted: true)
     post :update_multiple, params: {operation: "unmute", subscription_ids: ids}
     assert_equal ids.sort, @user.subscriptions.where(muted: false).pluck(:id).sort
     assert_redirected_to settings_subscriptions_url

@@ -185,17 +185,22 @@ class EntriesControllerTest < ActionController::TestCase
     end
   end
 
-  test "should get search" do
-    login_as @user
-    get :search, params: {query: "\"#{@entries.first.title}\""}, xhr: true
+  test "newsletter renders inline when NEWSLETTER_HOST is not set" do
+    entry = @user.entries.first
+    entry.update!(content: "<p>Newsletter body</p>")
+    with_env("NEWSLETTER_HOST" => nil) do
+      get :newsletter, params: {id: entry.public_id}
+    end
     assert_response :success
-    assert_equal 1, assigns(:page_query).total_entries
+    assert_includes @response.body, "<p>Newsletter body</p>"
   end
 
-  test "should get newsletter" do
+  test "newsletter redirects to the stored page when NEWSLETTER_HOST is set" do
     entry = @user.entries.first
-    get :newsletter, params: {id: entry.public_id}
-    assert_response :success
+    with_env("NEWSLETTER_HOST" => "newsletters.example.com") do
+      get :newsletter, params: {id: entry.public_id}
+    end
+    assert_redirected_to "https://newsletters.example.com/#{entry.public_id[0..2]}/#{entry.public_id}.html"
   end
 
   test "pagination anchor is set to max entry id on first page" do
@@ -320,55 +325,55 @@ class EntriesControllerTest < ActionController::TestCase
     end
   end
 
-  test "mark_direction_as_read below for type=feed handles the feed branch" do
+  test "mark_direction_as_read below for type=feed clears that feed's unread entries except listed ids" do
     login_as @user
     mark_unread(@user)
     feed = @feeds.first
     keep_id = feed.entries.first.id
+    expected = @user.unread_entries.where.not(feed_id: feed.id).pluck(:entry_id) + [keep_id]
 
     post :mark_direction_as_read, params: {direction: "below", type: "feed", data: feed.id, ids: keep_id.to_s}, xhr: true
     assert_response :success
+    assert_equal expected.sort, @user.unread_entries.pluck(:entry_id).sort
   end
 
-  test "mark_direction_as_read below for type=tag handles the tag branch" do
+  test "mark_direction_as_read below for type=tag clears the tagged feeds' unread entries except listed ids" do
     login_as @user
     mark_unread(@user)
     feed = @feeds.first
     tag = Tag.find_or_create_by(name: "T-#{SecureRandom.hex(2)}")
     @user.taggings.create!(feed_id: feed.id, tag: tag)
     keep_id = feed.entries.first.id
+    expected = @user.unread_entries.where.not(feed_id: feed.id).pluck(:entry_id) + [keep_id]
 
     post :mark_direction_as_read, params: {direction: "below", type: "tag", data: tag.id, ids: keep_id.to_s}, xhr: true
     assert_response :success
+    assert_equal expected.sort, @user.unread_entries.pluck(:entry_id).sort
   end
 
   test "mark_direction_as_read below for type=starred clears unreads in starred entries" do
     login_as @user
     mark_unread(@user)
-    @user.starred_entries.create!(entry_id: @user.entries.first.id, feed_id: @user.entries.first.feed_id)
-    keep_id = @user.entries.first.id
+    kept, cleared = @user.entries.first(2)
+    [kept, cleared].each { @user.starred_entries.create!(entry_id: it.id, feed_id: it.feed_id) }
+    expected = @user.unread_entries.pluck(:entry_id) - [cleared.id]
 
-    post :mark_direction_as_read, params: {direction: "below", type: "starred", ids: keep_id.to_s}, xhr: true
+    post :mark_direction_as_read, params: {direction: "below", type: "starred", ids: kept.id.to_s}, xhr: true
     assert_response :success
+    assert_equal expected.sort, @user.unread_entries.pluck(:entry_id).sort
   end
 
-  test "mark_direction_as_read below for type=unread clears all unread entries except listed ids" do
+  test "mark_direction_as_read below for type=unread and type=all clears all unread entries except listed ids" do
     login_as @user
-    mark_unread(@user)
-    keep_id = @user.unread_entries.pluck(:entry_id).first
 
-    post :mark_direction_as_read, params: {direction: "below", type: "unread", ids: keep_id.to_s}, xhr: true
-    assert_response :success
-    assert_equal [keep_id], @user.unread_entries.pluck(:entry_id)
-  end
+    %w[unread all].each do |type|
+      mark_unread(@user)
+      keep_id = @user.unread_entries.pluck(:entry_id).first
 
-  test "mark_direction_as_read below for type=all clears all unread except listed ids" do
-    login_as @user
-    mark_unread(@user)
-    keep_id = @user.unread_entries.pluck(:entry_id).first
-
-    post :mark_direction_as_read, params: {direction: "below", type: "all", ids: keep_id.to_s}, xhr: true
-    assert_response :success
+      post :mark_direction_as_read, params: {direction: "below", type: type, ids: keep_id.to_s}, xhr: true
+      assert_response :success, type
+      assert_equal [keep_id], @user.unread_entries.pluck(:entry_id), type
+    end
   end
 
   test "mark_direction_as_read rejects a collection type it does not handle" do
@@ -409,18 +414,6 @@ class EntriesControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal [[feed.id, entry.id]], deleted
-  end
-
-  # ---- newsletter ------------------------------------------------------------
-
-  test "newsletter renders inline when NEWSLETTER_HOST is not set" do
-    feed = Feed.create!(feed_url: "newsletter://x@a.com", host: "newsletters.feedbin.com", title: "N", feed_type: :newsletter)
-    @user.subscriptions.create!(feed: feed)
-    entry = feed.entries.create!(content: "<p>nl</p>", title: "Hi", url: "/x", public_id: "nl-#{SecureRandom.hex(4)}")
-    ENV.stub :[], ->(k) { nil } do
-      get :newsletter, params: {id: entry.public_id}
-    end
-    assert_response :success
   end
 
   # Relation#present? is records.blank? inverted -- it materializes the whole

@@ -40,10 +40,18 @@ class TweetTest < ActiveSupport::TestCase
   end
 
   test "tweet_text returns auto-linked HTML when entities are present" do
-    tweet = make_tweet
+    tweet = make_tweet(overrides: {
+      "full_text" => "hello https://t.co/abcdefghij",
+      "display_text_range" => [0, 29],
+      "entities" => {"urls" => [{
+        "url" => "https://t.co/abcdefghij",
+        "expanded_url" => "https://example.com/story",
+        "display_url" => "example.com/story",
+        "indices" => [6, 29]
+      }]}
+    })
     text = tweet.tweet_text(tweet.main_tweet)
-    assert_kind_of String, text
-    assert text.length > 0
+    assert_match %r{\Ahello <a [^>]*href="https://t.co/abcdefghij"[^>]*>.*example.com/story.*</a>\z}, text
   end
 
   test "tweet_text falls back to full_text when entities are missing" do
@@ -106,26 +114,33 @@ class TweetTest < ActiveSupport::TestCase
   end
 
   test "link_preview? returns false when image is set" do
-    tweet = make_tweet(image: "/img.png")
-    refute tweet.link_preview?
+    fake_url = OpenStruct.new(expanded_url: URI.parse("https://example.com/p"), indices: [0, 10])
+    tweet = make_tweet(image: "/img.png", link_image: Object.new)
+    tweet.main_tweet.stub :urls, [fake_url] do
+      tweet.stub :link_tweet?, true do
+        tweet.data["saved_pages"] = {"https://example.com/p" => {"result" => {"ok" => true}}}
+        refute tweet.link_preview?
+      end
+    end
   end
 
   test "link_preview? returns false when not a link tweet" do
-    tweet = make_tweet
-    tweet.stub :link_tweet?, false do
-      refute tweet.link_preview?
+    fake_url = OpenStruct.new(expanded_url: URI.parse("https://example.com/p"), indices: [0, 10])
+    tweet = make_tweet(link_image: Object.new)
+    tweet.main_tweet.stub :urls, [fake_url] do
+      tweet.stub :link_tweet?, false do
+        tweet.data["saved_pages"] = {"https://example.com/p" => {"result" => {"ok" => true}}}
+        refute tweet.link_preview?
+      end
     end
   end
 
   test "link_preview? returns false when saved_pages has an error" do
     fake_url = OpenStruct.new(expanded_url: URI.parse("https://example.com/p"), indices: [0, 10])
-    tweet = make_tweet
+    tweet = make_tweet(link_image: Object.new)
     tweet.main_tweet.stub :urls, [fake_url] do
       tweet.stub :link_tweet?, true do
-        tweet.data.merge!(
-          "saved_pages" => {"https://example.com/p" => {"result" => {"error" => "boom"}}},
-          "twitter_link_image_processed" => "x"
-        )
+        tweet.data["saved_pages"] = {"https://example.com/p" => {"result" => {"error" => "boom"}}}
         refute tweet.link_preview?
       end
     end
@@ -193,14 +208,6 @@ class TweetTest < ActiveSupport::TestCase
     tweet.tweet_summary
 
     assert_equal before, tweet.main_tweet.to_h[:full_text]
-  end
-
-  test "tweet_summary returns the same summary twice" do
-    data = load_tweet("one")
-    data.delete("display_text_range")
-    tweet = Tweet.new({"tweet" => data}, nil)
-
-    assert_equal tweet.tweet_summary, tweet.tweet_summary
   end
 
   test "tweet_text renders a reply the same way twice" do

@@ -19,51 +19,13 @@ class EntriesSearchControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:page_query).total_entries
   end
 
-  # The entry list template reaches for the feed's favicon; the search path
-  # builds @entries off the search result, not entries_list, so it needs its
-  # own preload of the images row. Compared across two distinct-feed sizes
-  # rather than a fixed number, spread across feeds so a shared Feed
-  # instance's association cache cannot hide a missing preload.
-  test "search results preload the favicon the shared template renders" do
-    login_as @user
-    token = "faviconpreloadtoken"
-
-    few_feeds = 2.times.map { |index|
-      feed = Feed.create!(feed_url: "http://faviconfew#{index}.example.com/feed.xml", host: "faviconfew#{index}.example.com", title: "Favicon Few #{index}")
-      @user.subscriptions.create!(feed: feed)
-      feed
-    }
-    few_entries = few_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    few_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
-    Search.client { it.refresh }
-
-    with_few_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
-
-    many_feeds = 6.times.map { |index|
-      feed = Feed.create!(feed_url: "http://faviconmany#{index}.example.com/feed.xml", host: "faviconmany#{index}.example.com", title: "Favicon Many #{index}")
-      @user.subscriptions.create!(feed: feed)
-      feed
-    }
-    many_entries = many_feeds.map { |feed| create_entry(feed).tap { |entry| entry.update!(title: "#{token} #{SecureRandom.hex}") } }
-    many_entries.each { Search::SearchIndexStore.new.perform("Entry", it.id) }
-    Search.client { it.refresh }
-
-    with_many_feeds = capture_sql { get :search, params: {query: token}, xhr: true }
-
-    assert_response :success
-    assert_operator assigns(:entries).to_a.size, :>=, 8
-    pattern = /FROM "images"/i
-    few = with_few_feeds.count { it.match?(pattern) }
-    many = with_many_feeds.count { it.match?(pattern) }
-    assert_equal few, many, "the favicon lookup scales with the number of distinct feeds: #{few} then #{many}"
-  end
-
   # The search path builds @entries off the search result, not
-  # entries_list, so it needs its own preload. Counts queries (.loaded?
-  # cannot tell a preload from an early N+1) and compares two distinct-feed
-  # sizes rather than a fixed number, spread across feeds so a shared
-  # instance's association cache cannot hide a missing preload.
-  test "search results preload the preview image entries render" do
+  # entries_list, so it needs its own preload of the images rows the list
+  # renders: the feed's favicon and the entry's preview image. Counts
+  # queries (.loaded? cannot tell a preload from an early N+1) and compares
+  # two distinct-feed sizes rather than a fixed number, spread across feeds
+  # so a shared instance's association cache cannot hide a missing preload.
+  test "search results preload the images rows the entry list renders" do
     login_as @user
     token = "previewimagepreloadtoken"
 

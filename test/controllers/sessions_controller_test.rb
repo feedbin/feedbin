@@ -61,6 +61,7 @@ class SessionsControllerTest < ActionController::TestCase
     login_as @user
     delete :destroy
     assert_redirected_to root_url
+    assert_nil cookies[:auth_token]
   end
 
   test "should get refresh" do

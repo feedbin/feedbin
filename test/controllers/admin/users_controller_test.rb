@@ -20,12 +20,6 @@ class Admin::UsersControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "GET index searches by email when q is provided" do
-    login_as @user
-    get :index, params: {q: @user.email}
-    assert_response :success
-  end
-
   # Relation#+ is Array#+: it loads both relations and hands the view a plain
   # Array, so the pagination metadata is gone and the page simply ends. On a
   # production table that silently hides every account past the first screen.
@@ -64,5 +58,6 @@ class Admin::UsersControllerTest < ActionController::TestCase
       end
     end
     assert sent
+    assert target.reload.setting_on?(:password_resettable)
   end
 end

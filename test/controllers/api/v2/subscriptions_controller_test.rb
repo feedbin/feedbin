@@ -35,8 +35,18 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
 
   test "should show subscription" do
     login_as @user
-    get :index, params: {id: @user.subscriptions.first}, format: :json
+    subscription = @user.subscriptions.first
+    get :show, params: {id: subscription}, format: :json
     assert_response :success
+    assert_equal subscription.id, parse_json["id"]
+    assert_equal subscription.feed_id, parse_json["feed_id"]
+  end
+
+  test "should not show another user's subscription" do
+    login_as @user
+    other = users(:new).subscriptions.create!(feed: feeds(:kottke))
+    get :show, params: {id: other}, format: :json
+    assert_response :forbidden
   end
 
   test "should create subscription" do

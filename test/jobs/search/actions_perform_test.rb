@@ -33,14 +33,6 @@ module Search
       end
     end
 
-    test "should star" do
-      assert_difference "StarredEntry.count", +1 do
-        Throttle.stub :throttle!, true do
-          ActionsPerform.new.perform(@entry.id, [@action.id])
-        end
-      end
-    end
-
     test "should not star past the daily limit" do
       flush_redis
       key = "starred_entries:create:#{@user.id}"

@@ -54,12 +54,6 @@ class OnboardingHealthTest < ActionMailer::TestCase
     end
   end
 
-  test "should skip feeds not in database" do
-    assert_emails 0 do
-      OnboardingHealth.new.perform
-    end
-  end
-
   test "should include multiple unhealthy feeds in email" do
     feed1 = Feed.create_with(
       title: "Daring Fireball",
@@ -80,5 +74,9 @@ class OnboardingHealthTest < ActionMailer::TestCase
     assert_emails 1 do
       OnboardingHealth.new.perform
     end
+
+    body = ActionMailer::Base.deliveries.last.body.to_s
+    assert_includes body, "Daring Fireball"
+    assert_includes body, "Kottke"
   end
 end

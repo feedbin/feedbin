@@ -28,6 +28,7 @@ class EditTest < ApplicationSystemTestCase
     wait_for_ajax
 
     assert_equal feed_name, @user.subscriptions.where(feed: @feed).first.title
+    assert @user.tags.exists?(name: tag_name)
   end
 
   test "Edit tag" do

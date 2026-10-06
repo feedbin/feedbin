@@ -49,12 +49,6 @@ class ImageTest < ActiveSupport::TestCase
       Image.storage_path_for("http://example.com/a.jpg", "200x200")
   end
 
-  test "storage_path_for is sharded by fingerprint prefix" do
-    fingerprint = Image.url_fingerprint_for("http://example.com/a.jpg", "542x304")
-    assert_equal File.join(fingerprint[0..2], "#{fingerprint}.jpg"),
-      Image.storage_path_for("http://example.com/a.jpg", "542x304")
-  end
-
   # kind is the second axis next to provider: provider keys the row, kind
   # says what the picture is. Same enum style so the two read alike.
   test "kind is an enum in the provider style" do

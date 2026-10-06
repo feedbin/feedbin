@@ -61,12 +61,14 @@ class Share::ApiSharesTest < ActiveSupport::TestCase
     assert_requested stub
   end
 
-  test "Pinboard#share delegates to authenticated_share" do
+  test "Pinboard#share sends the bookmark and reports success" do
     klass = @user.supported_sharing_services.create!(service_id: "pinboard", access_token: "tok")
-    share = Share::Pinboard.new(klass)
-    share.stub :authenticated_share, ->(_k, params) { {ok: params[:url]} } do
-      assert_equal({ok: "x"}, share.share(url: "x"))
-    end
+    stub = stub_request(:get, "https://api.pinboard.in/v1/posts/add")
+      .with(query: hash_including("auth_token" => "tok", "url" => "https://x"))
+      .to_return(status: 200, body: '{"result_code":"done"}')
+    result = Share::Pinboard.new(klass).share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id, url: "https://x"))
+    assert_equal({message: "Sent to Pinboard."}, result)
+    assert_requested stub
   end
 
   # ---- Share::MicroBlog -------------------------------------------------------
@@ -120,12 +122,14 @@ class Share::ApiSharesTest < ActiveSupport::TestCase
     assert_equal 500, Share::MicroBlog.new(klass).add("content" => "hi")
   end
 
-  test "MicroBlog#share delegates to authenticated_share" do
+  test "MicroBlog#share posts the content and reports success" do
     klass = @user.supported_sharing_services.create!(service_id: "micro_blog", access_token: "tok")
-    share = Share::MicroBlog.new(klass)
-    share.stub :authenticated_share, ->(_k, params) { {ok: params[:content]} } do
-      assert_equal({ok: "x"}, share.share(content: "x"))
-    end
+    stub = stub_request(:post, "https://micro.blog/micropub")
+      .with(body: {content: "hi"}, headers: {"Authorization" => "Bearer tok"})
+      .to_return(status: 202, body: "")
+    result = Share::MicroBlog.new(klass).share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id, content: "hi"))
+    assert_equal({message: "Sent to Micro.blog."}, result)
+    assert_requested stub
   end
 
   # ---- Share::Pocket ----------------------------------------------------------

@@ -1,17 +1,6 @@
 require "test_helper"
 
 class IframeEmbed::DefaultTest < ActiveSupport::TestCase
-  test "fetch memoizes a UrlCache for the canonical URL" do
-    embed = IframeEmbed::Default.new("https://example.com/video")
-    fake_cache = Object.new
-    fake_cache.define_singleton_method(:body) { "<html><head><title>Hello</title></head></html>" }
-    UrlCache.stub :new, ->(_url) { fake_cache } do
-      first = embed.fetch
-      second = embed.fetch
-      assert_same first, second
-    end
-  end
-
   test "title returns the document title when present" do
     embed = IframeEmbed::Default.new("https://example.com/video")
     fake_cache = Object.new

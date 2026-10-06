@@ -1,7 +1,7 @@
 require "test_helper"
 
 class Api::V2::UsersControllerTest < ApiControllerTestCase
-  test "should get index" do
+  test "should create user" do
     api_content_type
     StripeMock.start
     plan = plans(:trial)

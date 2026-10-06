@@ -22,17 +22,11 @@ class PagesEntriesControllerTest < ActionController::TestCase
 
   test "GET index with view=view_all takes the all-entries branch" do
     login_as @user
+    @user.unread_entries.where(entry_id: @entry.id).delete_all
     get :index, params: {id: @feed.id, view: "view_all"}, xhr: true
     assert_response :success
     refute assigns(:all_unread)
-  end
-
-  test "GET index with view=view_starred takes the starred branch" do
-    login_as @user
-    @user.starred_entries.create!(entry_id: @entry.id, feed_id: @feed.id)
-    get :index, params: {id: @feed.id, view: "view_starred"}, xhr: true
-    assert_response :success
-    refute assigns(:all_unread)
+    assert_includes assigns(:entries), @entry
   end
 
   # The inner query ordered starred_entries.created_at (when the user starred

@@ -15,11 +15,7 @@ class NewsletterPage
   # a socket for each thread, so Sidekiq threads can share the client, and
   # put_object is idempotent, so Excon retries a put on a stale socket.
   def self.storage_client
-    CLIENT_LOCK.synchronize { @storage_client ||= Fog::Storage.new(storage_options) }
-  end
-
-  def self.storage_options
-    STORAGE_IMAGES.merge(persistent: true)
+    CLIENT_LOCK.synchronize { @storage_client ||= Fog::Storage.new(STORAGE_IMAGES.merge(persistent: true)) }
   end
 
   # A blank bucket would reach B2 as a path that starts with the key.

@@ -34,16 +34,6 @@ module ImageCrawler
         end
       end
 
-      def test_should_crop
-        file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 542, height: 304)
-        image = cropper.crop!
-        assert_equal(542, image.width)
-        assert_equal(304, image.height)
-        assert image.file.include?(".jpg")
-        FileUtils.rm image.file
-      end
-
       def test_should_return_same_size_image
         file = copy_support_file("image.jpeg")
         cropper = Processor::Cropper.new(file, crop: :smart_crop, width: 640, height: 828)
@@ -140,13 +130,14 @@ module ImageCrawler
       # must leave the source's dimensions alone.
       def test_should_never_upscale_an_icon
         file = copy_support_file("favicon.ico")
-        layer_width = IconLayer.best(file).width
+        layer = IconLayer.best(file)
 
         cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 200, height: 200)
         image = cropper.crop!
 
-        assert_operator layer_width, :<, 200, "fixture must be smaller than the target for this to prove anything"
-        assert_equal layer_width, image.width
+        assert_operator layer.width, :<, 200, "fixture must be smaller than the target for this to prove anything"
+        assert_equal layer.width, image.width
+        assert_equal layer.height, image.height
         FileUtils.rm image.file
       end
 
@@ -234,21 +225,6 @@ module ImageCrawler
         assert_equal icon.fingerprint, limit.fingerprint
         FileUtils.rm icon.file
         FileUtils.rm limit.file
-      end
-
-      # icon_crop is a limit crop: a 200x200 preset leaves a 180x180 source
-      # alone rather than upscaling.
-      def test_icon_crop_should_not_upscale_a_small_source
-        file = write_solid_png(180, 180, [40, 90, 200])
-        cropper = Processor::Cropper.new(file, crop: :icon_crop, width: 200, height: 200)
-        image = cropper.crop!
-
-        assert_equal(180, image.width)
-        assert_equal(180, image.height)
-        assert image.file.end_with?(".png")
-        FileUtils.rm image.file
-      ensure
-        FileUtils.rm_f file
       end
 
       # Not private: a `private` section would silently swallow any test

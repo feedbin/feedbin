@@ -156,7 +156,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     HarvestEmbeds::Download.new.perform(*job["args"])
 
     # No scheduled jobs should be created since scheduled time is more than 24 hours ago
-    assert_equal 0, HarvestEmbeds::Download.jobs.size
+    assert_empty HarvestEmbeds::Download::Redownload.jobs
   end
 
   test "should not requeue videos with liveBroadcastContent none" do
@@ -164,7 +164,12 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     @entry.provider_youtube!
 
     Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, "video_id") } == 1
-    stub_youtube_api(live_broadcast_content: "none")
+    stub_youtube_api(
+      live_broadcast_content: "none",
+      live_streaming_details: {
+        scheduledStartTime: 1.day.from_now.iso8601
+      }
+    )
 
     HarvestEmbeds.new.perform(nil, true)
     assert_equal 1, HarvestEmbeds::Download.jobs.size
@@ -174,7 +179,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     HarvestEmbeds::Download.new.perform(*job["args"])
 
     # No scheduled jobs should be created since liveBroadcastContent is none
-    assert_equal 0, HarvestEmbeds::Download.jobs.size
+    assert_empty HarvestEmbeds::Download::Redownload.jobs
   end
 
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)

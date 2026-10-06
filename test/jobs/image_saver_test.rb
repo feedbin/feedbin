@@ -6,21 +6,17 @@ class ImageSaverTest < ActiveSupport::TestCase
     @entry.update!(content: '<img src="http://example.com/image.jpg">')
   end
 
-  test "swallows a network failure from the image host and finishes the entry" do
-    Download.stub(:new, ->(*) { raise HTTP::ConnectionError.new("refused") }) do
-      assert_nothing_raised do
-        ImageSaver.new.perform(@entry.id)
-      end
-    end
+  test "swallows a network failure or timeout from the image host and finishes the entry" do
+    [HTTP::ConnectionError.new("refused"), HTTP::TimeoutError.new("too slow")].each do |error|
+      @entry.update!(archived_images: false)
 
-    assert @entry.reload.archived_images?, "one dead host should not abandon the rest of the entry"
-  end
-
-  test "swallows a timeout from the image host" do
-    Download.stub(:new, ->(*) { raise HTTP::TimeoutError.new("too slow") }) do
-      assert_nothing_raised do
-        ImageSaver.new.perform(@entry.id)
+      Download.stub(:new, ->(*) { raise error }) do
+        assert_nothing_raised do
+          ImageSaver.new.perform(@entry.id)
+        end
       end
+
+      assert @entry.reload.archived_images?, "#{error.class}: one dead host should not abandon the rest of the entry"
     end
   end
 

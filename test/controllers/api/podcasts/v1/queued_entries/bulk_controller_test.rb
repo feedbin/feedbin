@@ -22,8 +22,8 @@ class Api::Podcasts::V1::QueuedEntries::BulkControllerTest < ApiControllerTestCa
     patch :update, params: {queued_entries: queued_entries}, format: :json
     assert_response :success
 
-    assert @queued_entries.first.reload.progress, progress
-    assert @queued_entries.last.reload.progress, progress
+    assert_equal progress, @queued_entries.first.reload.progress
+    assert_equal progress, @queued_entries.last.reload.progress
   end
 
 end

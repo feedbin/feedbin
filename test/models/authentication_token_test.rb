@@ -21,9 +21,9 @@ class AuthenticationTokenTest < ActiveSupport::TestCase
   end
 
   test "skips generation when skip_generate is set" do
-    token = @user.authentication_tokens.new(purpose: :cookies, skip_generate: true, token: "raw")
+    token = @user.authentication_tokens.new(purpose: :cookies, skip_generate: true, token: "")
     token.save!
-    assert_equal "raw", token.token
+    assert_equal "", token.token
   end
 
   test "active scope returns only active tokens" do

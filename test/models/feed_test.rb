@@ -272,21 +272,28 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal row, Feed.find(feed.id).site_favicon
   end
 
-  test "ICON_PRELOADS names exactly the three image associations" do
-    assert_equal [:favicon_image_record, :icon_image_record, :channel_image_record], Feed::ICON_PRELOADS
-  end
-
   # Preload these wherever feeds render in a list, or the icon lookups
   # become a query per feed.
-  test "ICON_PRELOADS preloads the favicon row" do
+  test "ICON_PRELOADS preloads every icon row" do
     feed = create_feeds(users(:ben)).first
     create_favicon_row(feed.host)
-    feeds = Feed.where(id: feed.id).includes(*Feed::ICON_PRELOADS).to_a
+    create_image_row(provider: :feed_icon, provider_id: feed.id.to_s, feed_id: feed.id, kind: :cover_art, variant: "200x200")
+    channel = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCpreload")
+    create_image_row(provider: :embed_icon, provider_id: "UCpreload", feed_id: nil, kind: :avatar, variant: "200x200")
+    feeds = Feed.where(id: [feed.id, channel.id]).includes(*Feed::ICON_PRELOADS).to_a
 
-    statements = capture_sql { feeds.each(&:site_favicon) }
+    statements = capture_sql do
+      feeds.each do
+        it.site_favicon
+        it.icon_url
+        it.icon_format
+      end
+    end
 
     assert_empty statements.select { it.match?(/FROM "images"|FROM "favicons"/i) }
-    assert_not_nil feeds.first.favicon_image_record
+    assert_not_nil feeds.find { it.id == feed.id }.favicon_image_record
+    assert_not_nil feeds.find { it.id == feed.id }.icon_image_record
+    assert_not_nil feeds.find { it.id == channel.id }.channel_image_record
   end
 
   test "a feed with no host has no favicon row" do

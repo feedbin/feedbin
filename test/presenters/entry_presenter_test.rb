@@ -128,7 +128,8 @@ class EntryPresenterTest < ActionView::TestCase
   test "profile_image renders the feed's icon for a micropost with no avatar at all" do
     output = presenter_for(micropost_entry(avatar: nil)).profile_image
 
-    refute_includes output, "/files/icons/"
+    assert_includes output, "favicon-default"
+    refute_includes output, "icon-round"
   end
 
   # Another post's row for the same url serves a micropost whose own row

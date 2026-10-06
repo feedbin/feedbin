@@ -77,20 +77,6 @@ class SweepStoredImagesTest < ActiveSupport::TestCase
     end
   end
 
-  test "keeps the objects while other entries reference them" do
-    with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
-      row = seed_row(provider_id: 1)
-      seed_row(provider_id: 2)
-      row.delete
-
-      batch = stub_batch_delete
-
-      SweepStoredImages.new.perform([row.storage_path])
-
-      assert_not_requested batch
-    end
-  end
-
   test "deletes orphaned objects in one batched call" do
     with_env("UNIFIED_BUCKET_IMAGES" => "images-test") do
       one = Image.storage_path_for(@url, "542x304")

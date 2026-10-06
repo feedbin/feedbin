@@ -59,8 +59,8 @@ class Api::Podcasts::V1::PlaylistsControllerTest < ApiControllerTestCase
     patch :update, params: {id: playlist.id, title: title, title_updated_at: Time.now.iso8601(6), sort_order: sort_order, sort_order_updated_at: Time.now.iso8601(6)}, format: :json
     assert_response :success
 
-    assert playlist.reload.title, title
-    assert playlist.reload.sort_order, sort_order
+    assert_equal title, playlist.reload.title
+    assert_equal sort_order, playlist.reload.sort_order
     assert_equal("title", playlist.attribute_changes.first.name)
   end
 
@@ -74,8 +74,8 @@ class Api::Podcasts::V1::PlaylistsControllerTest < ApiControllerTestCase
     patch :update, params: {id: playlist.id, title: "Bookmarks", title_updated_at: 1.second.ago.iso8601(6), sort_order: "newest_first", sort_order_updated_at: 1.second.ago.iso8601(6)}, format: :json
     assert_response :success
 
-    assert playlist.reload.title, title
-    assert playlist.reload.sort_order, "custom"
+    assert_equal title, playlist.reload.title
+    assert_equal "custom", playlist.reload.sort_order
   end
 
 end

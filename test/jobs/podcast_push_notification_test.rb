@@ -106,7 +106,7 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
     end
 
     notification = pool.pushed.first
-    assert_kind_of String, notification.alert[:body]
+    assert_equal "Episode content", notification.alert[:body]
   end
 
   test "uses the only itunes summary option when subtitle is missing" do

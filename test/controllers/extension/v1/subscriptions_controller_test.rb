@@ -110,30 +110,7 @@ class Extension::V1::SubscriptionsControllerTest < ActionController::TestCase
       assert_response :success
     end
 
-    subscription = @user.subscriptions.where(feed: @feed).take!
-    assert subscription.present?
-  end
-
-  test "creates subscription with page token" do
-    @user.subscriptions.where(feed: @feed).destroy_all
-
-    feeds_params = {
-      @feed.id.to_s => {
-        "url" => @feed.feed_url,
-        "subscribe" => "1",
-        "title" => "Test Feed",
-        "media_only" => "0"
-      }
-    }
-
-    assert_difference "Subscription.count", +1 do
-      post :create, params: {
-        feeds: feeds_params,
-        tags: ["tech"],
-        page_token: @user.page_token
-      }, format: :json
-      assert_response :success
-    end
+    assert @user.subscriptions.where(feed: @feed).exists?
   end
 
   test "handles invalid feed id" do

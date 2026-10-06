@@ -85,18 +85,22 @@ class ContentFormatterTest < ActiveSupport::TestCase
 
   test "format! uses newsletter scrub_mode for newsletter feeds" do
     feed = Feed.create!(feed_url: "newsletter://x@example.com", host: "newsletters.feedbin.com", title: "NL", feed_type: :newsletter)
-    entry = feed.entries.create!(content: "<p>Hi</p>", public_id: SecureRandom.hex)
+    entry = feed.entries.create!(content: "<table><tr><td>Hi</td></tr></table>", public_id: SecureRandom.hex)
     assert feed.newsletter?, "expected newsletter feed"
-    refute_nil ContentFormatter.format!(entry.content, entry)
+    result = ContentFormatter.format!(entry.content, entry)
+    refute_includes result, "<table"
+    refute_includes result, "<td"
+    assert_includes result, "Hi"
   end
 
   test "format! adds substack filter when entry is from substack" do
     @entry.newsletter_from = "writer@substack.com"
     @entry.save!
     @entry.reload
-    content = %(<div class="body markup"><p>Hello</p></div>)
+    content = %(<div class="body markup"><p>Hello</p></div><div><p>ignore</p></div>)
     result = ContentFormatter.format!(content, @entry)
-    refute_nil result
+    assert_includes result, "Hello"
+    refute_includes result, "ignore"
   end
 
   test "format! invokes ImageFallback when entry has archived_images" do
@@ -104,10 +108,15 @@ class ContentFormatterTest < ActiveSupport::TestCase
     @entry.save!
     @entry.reload
     assert @entry.archived_images?, "expected archived_images? true"
-    ImageFallback.stub :new, ->(html) { OpenStruct.new(add_fallbacks: html) } do
-      result = ContentFormatter.format!(@entry.content, @entry)
-      refute_nil result
+    invoked = false
+    fallback = ->(html) do
+      invoked = true
+      OpenStruct.new(add_fallbacks: html)
     end
+    ImageFallback.stub :new, fallback do
+      ContentFormatter.format!(@entry.content, @entry)
+    end
+    assert invoked, "expected ImageFallback to run"
   end
 
   test "format! accepts an explicit base_url instead of an entry" do
@@ -124,9 +133,12 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "api_format uses newsletter scrub_mode for newsletter feeds" do
-    feed = Feed.create!(feed_url: "newsletter://y@example.com", host: "newsletters.feedbin.com", title: "NL2")
-    entry = feed.entries.create!(content: "<p>Hi</p>", public_id: SecureRandom.hex)
-    refute_nil ContentFormatter.api_format(entry.content, entry)
+    feed = Feed.create!(feed_url: "newsletter://y@example.com", host: "newsletters.feedbin.com", title: "NL2", feed_type: :newsletter)
+    entry = feed.entries.create!(content: "<table><tr><td>Hi</td></tr></table>", public_id: SecureRandom.hex)
+    result = ContentFormatter.api_format(entry.content, entry)
+    refute_includes result, "<table"
+    refute_includes result, "<td"
+    assert_includes result, "Hi"
   end
 
   test "api_format returns original content when an exception is raised" do

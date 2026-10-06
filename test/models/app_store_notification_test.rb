@@ -95,11 +95,6 @@ class AppStoreNotificationTest < ActiveSupport::TestCase
     assert_equal Time.at(@purchase_date_ms / 1000), notification.purchase_date
   end
 
-  test "ms_to_date converts milliseconds to a Time" do
-    notification = build_notification(product_id: "monthly_pro_v1")
-    assert_equal Time.at(1705320000), notification.ms_to_date(1705320000000)
-  end
-
   test "receipt_date returns a formatted date string" do
     notification = build_notification(product_id: "monthly_pro_v1")
     expected = Time.at(@purchase_date_ms / 1000).to_formatted_s(:date)

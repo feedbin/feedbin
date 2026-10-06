@@ -34,11 +34,12 @@ module Search
     test "should touch actions" do
       entry = @entries.first
       action = @user.actions.create(feed_ids: [entry.feed.id], query: "\"#{entry.title}\"")
+      before = action.reload.updated_at
       Sidekiq::Testing.inline! do
         SearchServerSetup.new.build
       end
       Search.client { _1.refresh }
-      assert_not_equal(action.updated_at, action.reload.updated_at)
+      assert_not_equal(before, action.reload.updated_at)
     end
   end
 end

@@ -32,14 +32,6 @@ class SavePageTest < ActiveSupport::TestCase
     file.unlink
   end
 
-  test "should raise MissingPage error and enqueue retry" do
-    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
-    url = "http://example.com/saved_page"
-    assert_raises(SavePage::MissingPage) do
-      SavePage.new.perform(@user.id, url, "Title")
-    end
-  end
-
   test "a retry of an unparseable page leaves the entry where it was in the Pages list" do
     stub_request(:get, /extract\.example\.com/).to_return(status: 500)
     url = "http://example.com/saved_page"

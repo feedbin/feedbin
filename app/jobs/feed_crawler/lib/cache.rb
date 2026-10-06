@@ -12,10 +12,6 @@ module FeedCrawler
       new.increment(key, **args)
     end
 
-    def self.count(*args)
-      new.count(*args)
-    end
-
     def self.write(key, value, **args)
       new.write(key, value, **args)
     end
@@ -47,10 +43,6 @@ module FeedCrawler
       count = Sidekiq.redis { _1.incr(key) }
       write_key_expiry(key, options)
       count
-    end
-
-    def count(key)
-      Sidekiq.redis { _1.get(key) }.to_i
     end
 
     def write_key_expiry(key, options)

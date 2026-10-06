@@ -212,25 +212,6 @@ class ActiveSupport::TestCase
     path
   end
 
-  def load_xml
-    File.read("test/support/www/atom.xml")
-  end
-
-  def random_string
-    (0...50).map { ("a".."z").to_a[rand(26)] }.join
-  end
-
-  def aws_copy_body
-    <<~EOT
-      <?xml version="1.0" encoding="UTF-8"?>
-      <CopyObjectResult>
-         <ETag>string</ETag>
-         <LastModified>Tue, 02 Mar 2021 12:58:45 GMT</LastModified>
-      </CopyObjectResult>
-    EOT
-  end
-
-
   # Every SELECT issued during the block, so a test can assert on the shape of
   # the query rather than only on the answer it produced.
   def capture_sql
@@ -292,7 +273,7 @@ class ActiveSupport::TestCase
       json: {query: {match_all: {}}})
   end
 
-  def newsletter_params(recipient, signature, title = nil, from = nil)
+  def newsletter_params(recipient)
     {
       newsletter: {
         to: recipient,

@@ -118,24 +118,6 @@ class FaviconComponentTest < ComponentTestCase
     end
   end
 
-  test "feed icon renders from the row" do
-    with_env("UNIFIED_IMAGE_HOST" => "images.example.com") do
-      path = Image.content_storage_path_for(SecureRandom.hex(16), "200x200", "jpg")
-      Image.create!(
-        provider: :feed_icon, provider_id: @feed.id.to_s, feed_id: @feed.id,
-        url: "http://example.com/show.jpg", variant: "200x200",
-        image_fingerprint: SecureRandom.hex(16),
-        original_fingerprint: SecureRandom.hex(16),
-        storage_path: path,
-        width: 200, height: 200, bytesize: 4_000, placeholder_color: "aabbcc"
-      )
-
-      output = render FaviconComponent.new(feed: Feed.find(@feed.id))
-
-      assert_includes output.to_s, path
-    end
-  end
-
   # The stored avatar is already on our own CDN. Wrapping it in the signing
   # proxy would send a request we control back through a redirector built for
   # third-party urls.

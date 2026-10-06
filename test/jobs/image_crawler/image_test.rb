@@ -42,11 +42,6 @@ module ImageCrawler
       assert_raises(KeyError) { Image.new(preset_name: "no_such_preset").preset }
     end
 
-    test "storage_path is derived from original_url" do
-      image = Image.new_with_attributes(id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [], provider: 2, provider_id: 1, original_url: "http://example.com/a.jpg")
-      assert_equal ::Image.storage_path_for("http://example.com/a.jpg", "542x304"), image.storage_path
-    end
-
     test "enqueue_callback names the row the callback reads" do
       image = Image.new_with_attributes(
         id: "a", kind: ::Image.kinds[:poster], preset_name: "primary", image_urls: [],
@@ -74,18 +69,6 @@ module ImageCrawler
 
       _, payload = MicropostAvatar.jobs.last["args"]
       assert_equal({"url" => "http://example.com/a.png", "entry_ids" => [2, 3]}, payload["context"])
-    end
-
-    test "enqueue_callback does nothing for a preset without a callback" do
-      image = Image.new_with_attributes(
-        id: "a", kind: ::Image.kinds[:cover_art], preset_name: "podcast", image_urls: [],
-        provider: ::Image.providers[:entry_icon], provider_id: 1,
-        original_fingerprint: "abc", original_url: "http://example.com/a.jpg"
-      )
-
-      assert_no_difference -> { Sidekiq::Worker.jobs.size } do
-        image.enqueue_callback
-      end
     end
 
     test "create_image records a usage row" do
@@ -306,27 +289,6 @@ module ImageCrawler
       )
 
       refute_equal avatar.storage_path, podcast.storage_path
-    end
-
-    # One host, two icons, two rows: a shared provider would let whichever
-    # preset ran last own the fingerprint and short-circuit the other forever.
-    test "a host's favicon and touch icon are separate rows and separate objects" do
-      fingerprint = Digest::MD5.hexdigest("icon bytes")
-      build = ->(preset, provider) {
-        Image.new_with_attributes(
-          id: "a", kind: ::Image.kinds.fetch(PRESET_KINDS.fetch(preset)), preset_name: preset, image_urls: [],
-          provider: ::Image.providers[provider], provider_id: "example.com",
-          original_url: "http://example.com/icon.png", original_fingerprint: fingerprint
-        )
-      }
-
-      favicon = build.call("favicon", :website_favicon)
-      touch   = build.call("touch_icon", :website_touch_icon)
-
-      assert_equal "32x32", favicon.variant
-      assert_equal "200x200", touch.variant
-      refute_equal favicon.storage_path, touch.storage_path
-      refute_equal favicon.provider, touch.provider
     end
   end
 end

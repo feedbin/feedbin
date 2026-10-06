@@ -46,11 +46,13 @@ class Share::RaindropTest < ActiveSupport::TestCase
     assert_equal "authorization_code", captured.last[:grant_type]
   end
 
-  test "share delegates to authenticated_share" do
-    share = Share::Raindrop.new(@klass)
-    share.stub :authenticated_share, ->(*) { :ok } do
-      assert_equal :ok, share.share({})
-    end
+  test "share posts the entry and reports success" do
+    stub = stub_request(:post, "https://api.raindrop.io/rest/v1/raindrop")
+      .with(body: hash_including("link" => @entry.fully_qualified_url))
+      .to_return(status: 200)
+    result = Share::Raindrop.new(@klass).share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id))
+    assert_equal({message: "Sent to Raindrop.io."}, result)
+    assert_requested stub
   end
 
   test "add posts to the raindrop bookmarks endpoint and returns the response code" do

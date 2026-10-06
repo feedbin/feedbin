@@ -31,11 +31,6 @@ class AccountMigrationTest < ActiveSupport::TestCase
     assert_equal 75.0, migration.percentage_complete
   end
 
-  test "fw_streams is stored in data via store accessor" do
-    migration = @user.account_migrations.create!(api_token: "token", fw_streams: {"streams" => []})
-    assert_equal({"streams" => []}, migration.fw_streams)
-  end
-
   test "streams returns a hash mapping feed_id to stream titles" do
     fw_streams = {
       "streams" => [

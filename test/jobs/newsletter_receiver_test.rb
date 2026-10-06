@@ -65,14 +65,6 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert !feed.newsletter_sender.active?, "Sender should not be active."
   end
 
-  test "doesn't create newsletter if deactivated" do
-    newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
-    @user.newsletter_authentication_token.update(active: false)
-    assert_no_difference("Entry.count") do
-      NewsletterReceiver.new.perform(@token, @s3_url_html)
-    end
-  end
-
   test "creates newsletters with old token" do
     assert_difference "Subscription.count", +1 do
       assert_difference "NewsletterSaver.jobs.size", +1 do
@@ -106,7 +98,7 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
 
     tag = "Newsletters"
-    @user.update(newsletter_tag: tag)
+    @user.newsletter_authentication_token.update(newsletter_tag: tag)
 
     feed = Feed.create!(feed_url: newsletter.feed_url)
     @user.subscriptions.find_or_create_by(feed: feed)
@@ -130,14 +122,17 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     end
   end
 
-  test "Updates Feed" do
+  test "updates the title and type of an existing feed" do
     newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
-    title = SecureRandom.hex
+    feed = Feed.create!(feed_url: newsletter.feed_url, title: "Old title")
+
     assert_difference("Entry.count", 1) do
       NewsletterReceiver.new.perform(@token, @s3_url_html)
     end
-    feed = Feed.find_by_title("Ben Ubois")
-    assert_equal feed.feed_type, "newsletter"
+
+    feed.reload
+    assert_equal "Ben Ubois", feed.title
+    assert_equal "newsletter", feed.feed_type
   end
 
   test "stores the sender and recipient, not the raw source or the text part" do
@@ -250,10 +245,12 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert_requested :delete, @file_url_html
   end
 
-  test "deletes the source email for a token that is not active" do
+  test "stores nothing and deletes the source email for a token that is not active" do
     @user.newsletter_authentication_token.update!(active: false)
 
-    NewsletterReceiver.new.perform(@token, @s3_url_html)
+    assert_no_difference("Entry.count") do
+      NewsletterReceiver.new.perform(@token, @s3_url_html)
+    end
 
     assert_requested :delete, @file_url_html
   end

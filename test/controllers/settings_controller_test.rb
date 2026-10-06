@@ -62,7 +62,7 @@ class SettingsControllerTest < ActionController::TestCase
 
     login_as @user
     post :now_playing, params: {now_playing_entry: @entries.first.id}
-    assert_not_equal @entries.first.id, @user.reload.now_playing_entry.to_s
+    assert_equal @entries.first.id.to_s, @user.reload.now_playing_entry.to_s
   end
 
   test "settings_update cannot write now_playing_entry" do
@@ -119,19 +119,26 @@ class SettingsControllerTest < ActionController::TestCase
     login_as @user
     patch :view_settings_update, params: {id: @user.id, tag_visibility: "1", tag: "42"}, xhr: true
     assert_response :ok
+    assert_equal true, @user.reload.tag_visibility["42"]
+
+    patch :view_settings_update, params: {id: @user.id, tag_visibility: "1", tag: "42"}, xhr: true
+    assert_equal false, @user.reload.tag_visibility["42"]
   end
 
   test "view_settings_update stores column widths in the session" do
     login_as @user
     patch :view_settings_update, params: {id: @user.id, column_widths: "1", column: "main", width: "320"}, xhr: true
     assert_response :ok
+    assert_equal "320", session[:column_widths]["main"]
   end
 
   test "format updates user attributes and merges into the cookie" do
     login_as @user
+    cookies.signed[:settings] = JSON.generate({"font" => "serif", "font_size" => "3"})
     patch :format, params: {id: @user.id, user: {font_size: "5", theme: "dark"}}, xhr: true
     assert_response :success
     assert_equal "5", @user.reload.font_size.to_s
+    assert_equal({"font" => "serif", "font_size" => "5", "theme" => "dark"}, JSON.parse(cookies.signed[:settings]))
   end
 
   test "sticky toggles view_inline on the matching subscription" do

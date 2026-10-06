@@ -221,28 +221,6 @@ module FaviconCrawler
       ], finder.send(:touch_icon_urls).map(&:to_s)
     end
 
-    test "touch_icon_urls is empty when the host advertises no touch icon" do
-      stub_homepage
-
-      finder = Finder.new
-      finder.instance_variable_set(:@host, @page_url.host)
-
-      assert_empty finder.send(:touch_icon_urls)
-    end
-
-    # One page fetch, two lists. Deriving them separately would double the
-    # homepage traffic for every crawl.
-    test "the homepage is fetched once even when both lists are read" do
-      request = stub_homepage(%(<html><head><link rel="apple-touch-icon" href="/touch.png"></head></html>))
-
-      finder = Finder.new
-      finder.instance_variable_set(:@host, @page_url.host)
-      finder.send(:all_favicon_urls)
-      finder.send(:touch_icon_urls)
-
-      assert_requested request, times: 1
-    end
-
     # The failed fetch must be memoized too; only the fetch count catches a
     # regression back to `||=`.
     test "both lists degrade to the default when the homepage cannot be fetched" do

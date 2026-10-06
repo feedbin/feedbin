@@ -26,6 +26,7 @@ class WebSubControllerTest < ActionController::TestCase
 
   test "web_sub unsubscribe" do
     feed = Feed.first
+    feed.update!(push_expiration: 1.day.from_now)
 
     challenge = Faker::Internet.slug
     get :verify, params: {
@@ -38,6 +39,7 @@ class WebSubControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal challenge, @response.body
+    assert_nil feed.reload.push_expiration
   end
 
 

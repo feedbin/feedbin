@@ -18,12 +18,6 @@ class QueuedEntryLimiterTest < ActiveSupport::TestCase
     assert_equal @entries.first(2).map(&:id).sort, @user.queued_entries.pluck(:entry_id).sort
   end
 
-  test "respects the order of entries (most recent first)" do
-    QueuedEntryLimiter.new.perform(@user.id)
-
-    assert_equal @entries.first(2).map(&:id).sort, @user.queued_entries.pluck(:entry_id).sort
-  end
-
   test "handles multiple feeds" do
     feed = feeds(:kottke)
     another_feed = @user.podcast_subscriptions.create!(feed: feed)

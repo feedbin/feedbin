@@ -123,11 +123,6 @@ class EntryCounterRepairTest < ActiveSupport::TestCase
     assert_equal 7, untouched.queued_entries_count
   end
 
-  test "handles an empty id list" do
-    assert_nothing_raised { EntryCounterRepair.new.perform([]) }
-    assert_nothing_raised { EntryCounterRepair.new.perform(nil) }
-  end
-
   test "ForFeeds repairs every entry in the given feeds" do
     star(@user)
     @entry.update_columns(starred_entries_count: 4)
@@ -147,12 +142,6 @@ class EntryCounterRepairTest < ActiveSupport::TestCase
 
     assert_equal 2, EntryCounterRepair.jobs.size
     assert_equal ids, EntryCounterRepair.jobs.flat_map { |job| job["args"].first }
-  end
-
-  test "ForFeeds ignores a blank feed list" do
-    assert_nothing_raised { EntryCounterRepair::ForFeeds.new.perform([]) }
-    assert_nothing_raised { EntryCounterRepair::ForFeeds.enqueue([]) }
-    assert_equal 0, EntryCounterRepair::ForFeeds.jobs.size
   end
 
   test "ForFeeds.enqueue chunks large feed lists" do

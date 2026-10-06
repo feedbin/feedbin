@@ -56,13 +56,6 @@ class Share::TumblrTest < ActiveSupport::TestCase
     refute s.response_valid?({}, {})
   end
 
-  test "user_info GETs /user/info and parses JSON" do
-    fake_response = OpenStruct.new(body: '{"response":{"user":{"blogs":[]}}}')
-    @fake_client.define_singleton_method(:get) { |url| fake_response }
-    info = @share.user_info
-    assert_equal({"response" => {"user" => {"blogs" => []}}}, info)
-  end
-
   test "add posts a link by default and returns 200 when Tumblr returns 201" do
     captured = nil
     fake_response = OpenStruct.new(code: "201")
@@ -102,15 +95,25 @@ class Share::TumblrTest < ActiveSupport::TestCase
     assert_equal "quoted text", captured[1][:quote]
   end
 
-  test "share delegates to authenticated_share" do
-    @share.stub :authenticated_share, ->(klass, params) { {forwarded: params} } do
-      assert_equal({forwarded: {ok: 1}}, @share.share(ok: 1))
+  test "share posts the entry's link and reports success" do
+    captured = nil
+    @fake_client.define_singleton_method(:post) do |url, opts|
+      captured = opts
+      OpenStruct.new(code: "201")
     end
+    result = @share.share(ActiveSupport::HashWithIndifferentAccess.new(entry_id: @entry.id, site: "blog.tumblr.com"))
+    assert_equal({message: "Sent to Tumblr."}, result)
+    assert_equal @entry.fully_qualified_url, captured[:url]
   end
 
   test "after_activate returns the hosts of the user's Tumblr blogs" do
+    requested = nil
     fake_response = OpenStruct.new(body: '{"response":{"user":{"blogs":[{"url":"https://a.tumblr.com"},{"url":"https://b.tumblr.com"}]}}}')
-    @fake_client.define_singleton_method(:get) { |url| fake_response }
+    @fake_client.define_singleton_method(:get) do |url|
+      requested = url
+      fake_response
+    end
     assert_equal ["a.tumblr.com", "b.tumblr.com"], @share.after_activate
+    assert_equal "https://api.tumblr.com/v2/user/info", requested
   end
 end

@@ -123,5 +123,6 @@ class IframeEmbed::TwitterTest < ActiveSupport::TestCase
       embed = IframeEmbed::Twitter.download("https://twitter.com/alice/status/12345")
     end
     assert_kind_of IframeEmbed::Twitter, embed
+    assert_equal "Alice", embed.name
   end
 end

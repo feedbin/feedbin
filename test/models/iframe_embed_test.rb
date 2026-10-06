@@ -27,8 +27,10 @@ class IframeEmbedTest < ActiveSupport::TestCase
   end
 
   test "iframe_src merges in query params from iframe_params" do
-    embed = IframeEmbed.new("https://example.com/video?foo=1")
-    assert_equal "https://example.com/video?foo=1", embed.iframe_src
+    embed = IframeEmbed::Youtube.new("https://www.youtube.com/embed/abc123?start=10")
+    query = Rack::Utils.parse_query(URI(embed.iframe_src).query)
+    assert_equal "10", query["start"]
+    assert_equal "1", query["autoplay"]
   end
 
   test "clean_name returns the lowercased class name" do

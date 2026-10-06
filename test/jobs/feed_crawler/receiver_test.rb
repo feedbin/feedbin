@@ -91,6 +91,7 @@ module FeedCrawler
     test "should not create original nil content" do
       entry = @feed.entries.create!(url: "url", public_id: SecureRandom.hex, content: nil)
       update = build_entry(entry.public_id, true)
+      update["content"] = update["content"] * 10
       params = {
         "feed" => {
           "id" => @feed.id

@@ -8,21 +8,14 @@ module FeedCrawler
 
     def test_should_delete
       cache_key = "cache_key"
-      Cache.increment(cache_key)
-      assert_equal(1, Cache.count(cache_key))
+      Cache.write(cache_key, {key: "value"})
+      assert_equal({key: "value"}, Cache.read(cache_key))
       Cache.delete(cache_key)
-      assert_equal(0, Cache.count(cache_key))
+      assert_equal({}, Cache.read(cache_key))
     end
 
     def test_should_increment
       assert_equal(1, Cache.increment("cache_key"))
-    end
-
-    def test_should_get_count
-      cache_key = "cache_key"
-      assert_equal(0, Cache.count(cache_key))
-      Cache.increment(cache_key)
-      assert_equal(1, Cache.count(cache_key))
     end
 
     def test_should_cache_values

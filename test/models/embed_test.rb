@@ -63,17 +63,6 @@ class EmbedTest < ActiveSupport::TestCase
     assert_equal channel, video.channel
   end
 
-  test "chapters memoizes and delegates to TextToChapters" do
-    embed = Embed.new(source: :youtube_video, provider_id: "v8", data: {
-      "snippet" => {"description" => "00:00 Intro\n01:00 Topic"},
-      "contentDetails" => {"duration" => "PT5M"}
-    })
-
-    chapters = embed.chapters
-    assert_kind_of Array, chapters
-    assert_same chapters, embed.chapters
-  end
-
   test "chapters handles missing description gracefully" do
     embed = Embed.new(source: :youtube_video, provider_id: "v9", data: {
       "contentDetails" => {"duration" => "PT5M"}

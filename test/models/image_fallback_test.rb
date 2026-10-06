@@ -27,19 +27,32 @@ class ImageFallbackTest < ActiveSupport::TestCase
 
     fake_file = Object.new
     fake_file.define_singleton_method(:url) { |_| "https://signed.example/x" }
+    file_key = nil
     fake_files = Object.new
-    fake_files.define_singleton_method(:new) { |key:| fake_file }
+    fake_files.define_singleton_method(:new) do |key:|
+      file_key = key
+      fake_file
+    end
     fake_directory = Object.new
     fake_directory.define_singleton_method(:files) { fake_files }
+    directory_key = nil
     fake_directories = Object.new
-    fake_directories.define_singleton_method(:new) { |key:| fake_directory }
+    fake_directories.define_singleton_method(:new) do |key:|
+      directory_key = key
+      fake_directory
+    end
     fake_storage = Object.new
     fake_storage.define_singleton_method(:directories) { fake_directories }
 
-    Download.stub :new, ->(_) { OpenStruct.new(path: "k") } do
-      Fog::Storage.stub :new, ->(_) { fake_storage } do
-        assert_equal "https://signed.example/x", fallback.fallback_url("https://example.com/a.png")
+    with_env("AWS_S3_BUCKET_ARCHIVE" => "archive-bucket") do
+      Download.stub :new, ->(_) { OpenStruct.new(path: "k") } do
+        Fog::Storage.stub :new, ->(_) { fake_storage } do
+          assert_equal "https://signed.example/x", fallback.fallback_url("https://example.com/a.png")
+        end
       end
     end
+
+    assert_equal "archive-bucket", directory_key
+    assert_equal "k", file_key
   end
 end

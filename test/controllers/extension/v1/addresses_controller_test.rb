@@ -6,7 +6,7 @@ class Extension::V1::AddressesControllerTest < ActionController::TestCase
     @request.headers["Content-Type"] = "application/json"
   end
 
-  test "should get new when authenticated with email and password" do
+  test "should get new when authenticated with page token" do
     get :new, params: {page_token: @user.page_token}, format: :json
     assert_response :success
 

@@ -134,23 +134,6 @@ module FeedCrawler
       assert_requested request
     end
 
-    def test_should_do_nothing_if_not_modified
-      feed_id = 1
-      etag = "etag"
-      last_modified = "last_modified"
-
-      data = CrawlData.new({
-        etag: etag,
-        last_modified: last_modified,
-        download_fingerprint: nil,
-      })
-
-      url = "http://example.com/atom.xml"
-      stub_request(:get, url).with(headers: {"If-None-Match" => etag, "If-Modified-Since" => last_modified}).to_return(status: 304)
-      Downloader.new.perform(feed_id, url, 10, data.to_h)
-      assert_equal 0, ParserCritical.jobs.size
-    end
-
     def test_should_keep_conditional_headers_after_not_modified
       etag = "etag"
       last_modified = "last_modified"

@@ -20,7 +20,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
 
     # should not allow twice in a row
     assert_no_difference -> { ActionMailer::Base.deliveries.count } do
-      assert_no_difference -> { @user.password_reset_sent_at } do
+      assert_no_difference -> { @user.reload.password_reset_sent_at } do
         Sidekiq::Testing.inline! do
           post :create, params: {email: @user.email}
         end
@@ -49,6 +49,8 @@ class PasswordResetsControllerTest < ActionController::TestCase
     @user.save
     post :update, params: {id: token, user: {password: "new password"}}
     assert_redirected_to login_url
+    assert @user.reload.authenticate("new password")
+    assert_nil @user.password_reset_token
   end
 
   test "trial user without turnstile env sees email message" do

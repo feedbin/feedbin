@@ -1,5 +1,5 @@
 class Theme
-  attr_accessor :name, :slug
+  attr_reader :name, :slug
   def initialize(name, slug)
     @name = name
     @slug = slug

@@ -19,32 +19,10 @@ class SubscribeTest < ApplicationSystemTestCase
 
     feed = Feed.find_by_feed_url!(feed_url)
 
-    feed.entries.first(3) do |entry|
-      expect_text(entry.title)
+    within ".feeds-column" do
+      assert_text feed.title
     end
-  end
-
-  test "Subscribe form" do
-    feed_url = "http://www.example.com/atom.xml"
-    stub_request_file("atom.xml", feed_url)
-
-    user = users(:ben)
-    login_as(user)
-
-    find("[data-behavior~=show_subscribe]").click
-
-    within("dialog") do
-      fill_in "q", with: feed_url
-      page.execute_script("$('dialog [data-behavior~=spinner]').submit()")
-      find("[data-behavior~=subscription_options]")
-      click_button "Add"
-    end
-
-    feed = Feed.find_by_feed_url!(feed_url)
-
-    feed.entries.first(3) do |entry|
-      expect_text(entry.title)
-    end
+    assert user.subscriptions.exists?(feed: feed)
   end
 
   test "Basic auth form" do

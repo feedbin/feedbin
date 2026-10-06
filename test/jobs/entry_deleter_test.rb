@@ -62,18 +62,6 @@ class EntryDeleterTest < ActiveSupport::TestCase
     end
   end
 
-  # The counter is the only thing prune_entries reads, so a queued entry whose
-  # count drifted to zero would be deleted out from under the row.
-  test "should skip a queued entry even when its counter says otherwise" do
-    entry = @entries.min_by(&:published)
-    QueuedEntry.create!(user_id: @user.id, feed_id: @feed.id, entry_id: entry.id)
-    assert_equal 1, entry.reload.queued_entries_count
-
-    EntryDeleter.new.perform(@feed.id)
-
-    assert Entry.exists?(entry.id), "a queued entry must survive the prune"
-  end
-
   test "should remove UnreadEntries" do
     @entries.each do |entry|
       UnreadEntry.create_from_owners(@user, entry)

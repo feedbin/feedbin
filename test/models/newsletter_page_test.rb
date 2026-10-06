@@ -6,14 +6,15 @@ class NewsletterPageTest < ActiveSupport::TestCase
     @page = NewsletterPage.new(@entry)
   end
 
-  test "key uses the public id prefix" do
-    assert_equal "#{@entry.public_id[0..2]}/#{@entry.public_id}.html", @page.key
+  test "key is the first three characters of the public id, then the id" do
+    @entry.update_columns(public_id: "abcdef0123")
+    assert_equal "abc/abcdef0123.html", NewsletterPage.new(@entry).key
   end
 
-  test "url has the host and no bucket name" do
+  test "url is the host and the key, without a bucket name" do
+    @entry.update_columns(public_id: "abcdef0123")
     with_env("NEWSLETTER_HOST" => "newsletters.example.com") do
-      assert_equal "https://newsletters.example.com/#{@page.key}", @page.url
-      assert_equal @entry.newsletter_url, @page.url
+      assert_equal "https://newsletters.example.com/abc/abcdef0123.html", NewsletterPage.new(@entry).url
     end
   end
 
@@ -27,13 +28,6 @@ class NewsletterPageTest < ActiveSupport::TestCase
     document = ActiveSupport::Gzip.decompress(@page.body)
     assert_includes document, "<title>#{@entry.title}</title>"
     assert_includes document, @entry.content
-  end
-
-  test "headers tell the browser the body is gzip" do
-    assert_equal "gzip", @page.headers["Content-Encoding"]
-    assert_equal "text/html; charset=utf-8", @page.headers["Content-Type"]
-    assert_equal "max-age=315360000, public", @page.headers["Cache-Control"]
-    assert_empty @page.headers.keys.grep(/\Ax-amz/i)
   end
 
   test "text email gets a heading and style" do
@@ -54,11 +48,6 @@ class NewsletterPageTest < ActiveSupport::TestCase
     assert_includes ActiveSupport::Gzip.decompress(NewsletterPage.new(@entry).body), "<title>"
   end
 
-  test "storage client is shared and keeps its connection open" do
-    assert_same NewsletterPage.storage_client, NewsletterPage.storage_client
-    assert_equal true, NewsletterPage.storage_options[:persistent]
-  end
-
   test "save refuses a blank bucket" do
     with_env("NEWSLETTERS_BUCKET" => "") do
       error = assert_raises(RuntimeError) { @page.save }
@@ -66,13 +55,13 @@ class NewsletterPageTest < ActiveSupport::TestCase
     end
   end
 
-  test "body is built once" do
-    assert_same @page.body, @page.body
-  end
-
   test "save puts the object on B2" do
     request = stub_request(:put, "https://test-account.storage.example.com/newsletters-test/#{@page.key}")
-      .with(headers: {"Content-Encoding" => "gzip", "Content-Type" => "text/html; charset=utf-8"})
+      .with(headers: {
+        "Content-Encoding" => "gzip",
+        "Content-Type" => "text/html; charset=utf-8",
+        "Cache-Control" => "max-age=315360000, public"
+      })
       .with { |req| ActiveSupport::Gzip.decompress(req.body).include?(@entry.content) }
 
     @page.save

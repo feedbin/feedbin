@@ -48,11 +48,5 @@ module Search
 
       assert action.reload.broken?
     end
-
-    test "is a no-op when the user has no actions" do
-      assert_nothing_raised do
-        RemoveFeedFromAction.new.perform(@user.id, @feed_to_remove.id)
-      end
-    end
   end
 end

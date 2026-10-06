@@ -36,13 +36,6 @@ class AppStoreNotificationDataTest < ActiveSupport::TestCase
     assert_equal @renewal, decoded["data"]["signedRenewalInfo"]
   end
 
-  test "data is memoized across calls" do
-    obj = AppStoreNotificationData.new(@notification)
-    first = obj.data
-    second = obj.data
-    assert_same first, second
-  end
-
   test "original_transaction_id reads from the decoded transaction info" do
     obj = AppStoreNotificationData.new(@notification)
     assert_equal "tx-1234", obj.original_transaction_id
@@ -56,11 +49,6 @@ class AppStoreNotificationDataTest < ActiveSupport::TestCase
   test "product_id reads from the decoded transaction info" do
     obj = AppStoreNotificationData.new(@notification)
     assert_equal "monthly_pro_v1", obj.product_id
-  end
-
-  test "format_date converts a Time to milliseconds since epoch" do
-    t = Time.utc(2024, 1, 1)
-    assert_equal t.to_i * 1_000, AppStoreNotificationData.send(:format_date, t)
   end
 
   test "most_recent_possible_start returns the API min date when 180 days back is earlier" do

@@ -37,7 +37,7 @@ class Extension::V1::AuthenticationControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "returns not found with invalid page token" do
+  test "returns unauthorized with invalid page token" do
     post :index, params: {page_token: "invalid_token"}, format: :json
     assert_response :unauthorized
   end

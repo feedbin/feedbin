@@ -11,12 +11,6 @@ class SourceableTest < ActiveSupport::TestCase
     assert_equal false, sourceable.jumpable
   end
 
-  test "accepts optional section and jumpable" do
-    sourceable = Sourceable.new(type: "Tag", id: 1, title: "Tech", section: "Tags", jumpable: true)
-    assert_equal "Tags", sourceable.section
-    assert_equal true, sourceable.jumpable
-  end
-
   test "to_h returns a hash containing every attribute" do
     sourceable = Sourceable.new(type: "Feed", id: 7, title: "Example", section: "Feeds", jumpable: true)
     hash = sourceable.to_h

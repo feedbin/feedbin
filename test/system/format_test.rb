@@ -36,10 +36,10 @@ class FormatTest < ApplicationSystemTestCase
     assert_equal (new_size + 1).to_s, @user.reload.font_size
 
     find("label[for=toggle_full_screen]").click
-    page.has_selector?("body.full-screen")
+    assert_selector "body.full-screen"
 
     find("label[for=user_entry_width]").click
-    page.has_selector?("body.fluid-1")
+    assert_selector "body.fluid-1"
 
     find("a[href='/settings/appearance']").click
     wait_for_ajax

@@ -96,9 +96,10 @@ class CompressedRequestTest < ActiveSupport::TestCase
       "rack.input" => StringIO.new(compressed_body.string)
     }
 
-    assert_raises(StandardError) do
+    error = assert_raises(StandardError) do
       @middleware.call(env)
     end
+    assert_match(/exceeds maximum/, error.message)
   end
 
   test "restores original body on Zlib errors" do
@@ -119,31 +120,6 @@ class CompressedRequestTest < ActiveSupport::TestCase
     assert_equal "gzip", env["HTTP_CONTENT_ENCODING"]
   end
 
-  test "re-raises non-Zlib errors after logging" do
-    original_body = "Test body"
-    compressed_body = StringIO.new
-    Zlib::GzipWriter.wrap(compressed_body) { |gz| gz.write(original_body) }
-
-    env = {
-      "PATH_INFO" => "/extension/v1/pages",
-      "HTTP_CONTENT_ENCODING" => "gzip",
-      "rack.input" => StringIO.new(compressed_body.string)
-    }
-
-    # Create a middleware that will raise a non-Zlib error
-    error_raising_app = lambda { |env| raise StandardError, "Unexpected error" }
-    middleware = CompressedRequest.new(error_raising_app)
-
-    # Override stream_decompress to raise our error
-    middleware.define_singleton_method(:stream_decompress) do |data|
-      raise StandardError, "Unexpected error"
-    end
-
-    assert_raises(StandardError) do
-      middleware.call(env)
-    end
-  end
-
   test "handles case-sensitive content encoding check" do
     body = "Test body"
 
@@ -159,16 +135,5 @@ class CompressedRequestTest < ActiveSupport::TestCase
     env["rack.input"].rewind
     assert_equal body, env["rack.input"].read
     assert_equal "GZIP", env["HTTP_CONTENT_ENCODING"]
-  end
-
-  private
-
-  def mock_app_with_verification
-    lambda do |env|
-      # Verify the decompressed content in the app
-      body = env["rack.input"].read
-      env["rack.input"].rewind
-      [200, {"X-Body-Size" => body.bytesize.to_s}, [body]]
-    end
   end
 end

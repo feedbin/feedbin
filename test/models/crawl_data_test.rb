@@ -11,10 +11,10 @@ class CrawlDataTest < ActiveSupport::TestCase
     feed = CrawlData.new
     feed.download_error(Exception.new)
 
-    feed = CrawlData.new
+    feed = CrawlData.new(feed.to_h)
     feed.download_success(@feed.id)
 
-    feed = CrawlData.new
+    feed = CrawlData.new(feed.to_h)
     assert feed.ok?(@feed.feed_url)
   end
 

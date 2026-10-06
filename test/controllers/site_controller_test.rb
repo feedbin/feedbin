@@ -11,12 +11,6 @@ class SiteControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should get headers" do
-    login_as @user
-    get :index
-    assert_response :success
-  end
-
   test "manifest declares a POST share target" do
     login_as @user
     get :manifest, params: {theme: "day", format: :json}
