@@ -31,7 +31,7 @@ end</pre>
   Run the printed command. The response must show <code>content-encoding: gzip</code>, <code>content-type: text/html; charset=utf-8</code>, and <code>cache-control: max-age=315360000, public</code>.
   If the response is 403 or 404, stop. The bucket is not public or the key has no access.</li>
 <li><label><input type="checkbox"> <b>Backfill.</b></label>
-  Run this block. Run it again later to read the counters.
+  Make sure both Sidekiq servers (20 threads each) run the <code>backfill</code> queue. Run this block. Run it again later to read the counters.
 <pre>begin
   NewsletterBackfill.new.build
   puts NewsletterBackfill.progress

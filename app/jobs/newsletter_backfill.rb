@@ -9,7 +9,7 @@
 # each feed, and a feed holds a few hundred entries at most.
 class NewsletterBackfill
   include Sidekiq::Worker
-  sidekiq_options queue: :utility
+  sidekiq_options queue: :backfill
 
   COUNTERS = %w[pending saved skipped].freeze
   TTL = 30.days.to_i
