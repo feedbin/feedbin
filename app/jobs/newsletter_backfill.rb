@@ -5,7 +5,8 @@
 #   NewsletterBackfill.new.build
 #   NewsletterBackfill.progress  # => {pending: 0, saved: 123, skipped: 0}
 #
-# A pass is done at pending: 0.
+# A pass is done at pending: 0. Sidekiq supplies the parallelism: one job for
+# each feed, and a feed holds a few hundred entries at most.
 class NewsletterBackfill
   include Sidekiq::Worker
   sidekiq_options queue: :utility

@@ -54,6 +54,10 @@ class NewsletterPageTest < ActiveSupport::TestCase
     assert_includes ActiveSupport::Gzip.decompress(NewsletterPage.new(@entry).body), "<title>"
   end
 
+  test "storage client is shared" do
+    assert_same NewsletterPage.storage_client, NewsletterPage.storage_client
+  end
+
   test "save puts the object on B2" do
     request = stub_request(:put, "https://test-account.storage.example.com/newsletters-test/#{@page.key}")
       .with(headers: {"Content-Encoding" => "gzip", "Content-Type" => "text/html; charset=utf-8"})

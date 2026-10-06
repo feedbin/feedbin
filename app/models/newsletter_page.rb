@@ -8,6 +8,15 @@ class NewsletterPage
     "Cache-Control" => "max-age=315360000, public"
   }.freeze
 
+  CLIENT_LOCK = Mutex.new
+
+  # One client for the process, so repeated puts reuse the open connection
+  # instead of paying a new TLS handshake each time. Excon keeps a socket for
+  # each thread, so threads can share it.
+  def self.storage_client
+    CLIENT_LOCK.synchronize { @storage_client ||= Fog::Storage.new(STORAGE_IMAGES) }
+  end
+
   def initialize(entry)
     @entry = entry
   end
@@ -33,7 +42,7 @@ class NewsletterPage
   end
 
   def save
-    Fog::Storage.new(STORAGE_IMAGES).put_object(ENV["NEWSLETTERS_BUCKET"], key, body, headers)
+    self.class.storage_client.put_object(ENV["NEWSLETTERS_BUCKET"], key, body, headers)
     url
   end
 
