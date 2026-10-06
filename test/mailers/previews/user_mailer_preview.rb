@@ -1,4 +1,4 @@
-# Preview all emails at http://localhost:3000/rails/mailers/marketing_mailer
+# Preview all emails at http://localhost:3000/rails/mailers/user_mailer
 class UserMailerPreview < ActionMailer::Preview
   def subscription_reminder
     UserMailer.subscription_reminder(BillingEvent.first.id)
