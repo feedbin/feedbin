@@ -40,7 +40,8 @@ Move all existing newsletter pages with a backfill.
 4. **Write to both stores until the cutover.**
    New newsletters arrive all the time. The CDN reads from S3 until the origin moves.
    If the saver wrote only to B2, each new newsletter would give a 404 until the cutover.
-   The saver therefore writes to B2 first, then to S3, while the legacy S3 config is present.
+   The saver therefore writes to S3 first, then to B2, while the legacy S3 config is present.
+   A B2 failure then raises and retries, and the page is already on S3 where the CDN reads it.
 5. **Reuse the `UNIFIED_*` account, key, and endpoint.** Only one variable is new: `NEWSLETTERS_BUCKET`.
    The B2 application key must have access to the new bucket.
 6. **Store gzip only. Serve gzip always.**

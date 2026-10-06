@@ -19,7 +19,7 @@
 <ol>
 
 <li><label><input type="checkbox"> <b>1. Connect, list, write, delete.</b></label>
-  Run before Deploy A. It proves that the key can reach the bucket and write to it. It leaves nothing behind.
+  Run right after Deploy A. It proves that the key can reach the bucket and write to it. It leaves nothing behind.
 <pre>begin
   bucket = ENV["NEWSLETTERS_BUCKET"]
   raise "NEWSLETTERS_BUCKET is not set" if bucket.blank?

@@ -80,4 +80,15 @@ class NewsletterSaverTest < ActiveSupport::TestCase
       assert_equal updated, @entry.reload.updated_at
     end
   end
+
+  test "A B2 failure leaves the S3 copy written" do
+    stub_request(:put, B2).to_return(status: 500)
+    s3 = stub_request(:put, /s3\.amazonaws\.com/)
+
+    with_env("AWS_S3_BUCKET_NEWSLETTERS" => "legacy-newsletters") do
+      assert_raises(Excon::Error) { NewsletterSaver.new.perform(@entry.id) }
+    end
+
+    assert_requested s3
+  end
 end
