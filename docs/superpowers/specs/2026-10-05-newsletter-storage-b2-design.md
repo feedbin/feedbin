@@ -48,7 +48,7 @@ Move all existing newsletter pages with a backfill.
    B2 does not decompress. Every current browser sends `Accept-Encoding: gzip`. There is no plain variant.
 7. **Drop the S3-only headers on B2.** Do not send `x-amz-acl` or `x-amz-storage-class`.
    B2 sets visibility on the bucket. The bucket must be public, or the CDN must hold a read key.
-   Spot check 1 in the rollout confirms this.
+   Runbook step 6 confirms this.
 
 ## Components
 
@@ -123,11 +123,11 @@ The origin rule maps the public path `/<key>` to that origin path. This is a CDN
 
 ## Rollout
 
-The runbook is `docs/ops/newsletter-b2-runbook.html`. The spot checks are in `docs/ops/newsletter-b2-spot-checks.html`.
+The runbook is `docs/ops/newsletter-b2-runbook.html`. It holds every check inline.
 
 1. **Check stored URLs.** Before anything else, sample stored `entry.url` values against `Entry#newsletter_url`.
 2. **Bucket and env.** Create a public B2 bucket with the lifecycle "Keep only the last version". Add `NEWSLETTERS_BUCKET` to `production_env` in 1Password.
-3. **Deploy A.** Merge to `main` and run `cap production deploy`. Run spot checks 1 and 2.
+3. **Deploy A.** Merge to `main` and run `cap production deploy`. Check a public gzip read and run the saver end to end.
 4. **Backfill.** Run `NewsletterBackfill.new.build`. Watch `.progress` until `pending` is 0. Retry dead jobs if `pending` stalls. `mismatched` must be 0.
    There is no second pass: Sidekiq retries failed jobs, and the saver writes every page created after Deploy A.
 5. **Spot check.** Sample old pages on B2.
@@ -148,7 +148,7 @@ The runbook is `docs/ops/newsletter-b2-runbook.html`. The spot checks are in `do
   It counts a mismatched URL. It refuses a second build while a pass runs. A failed put leaves `pending` unchanged.
 - `NewsletterPage`: the client is shared and persistent. A blank bucket raises. The body is built once.
 - `Entry#newsletter_url` returns the value of `NewsletterPage#url`.
-- Every console block in both runbooks ran against WebMock stubs of B2, S3, and the CDN before the deploy.
+- Every console block in the runbook ran against WebMock stubs of B2, S3, and the CDN before the deploy.
 
 Tests stub the B2 endpoint with WebMock. They run with `bundle exec rake`.
 

@@ -8,7 +8,7 @@
   body { font: 16px/1.5 system-ui; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; }
   pre { background: #f3f3f3; padding: .75rem; overflow-x: auto; }
   li { margin: 1.25rem 0; }
-  .expect { font-size: .9em; opacity: .8; }
+  .expect { display: block; font-size: .9em; opacity: .8; margin-top: .25rem; }
   .stop { color: #b00020; }
   @media (prefers-color-scheme: dark) { body { background: #111; color: #eee; } pre { background: #222; } .stop { color: #ff6b81; } }
 </style>
@@ -16,8 +16,8 @@
 <body>
 <h1>Newsletter pages to B2</h1>
 <p>Spec: <code>docs/superpowers/specs/2026-10-05-newsletter-storage-b2-design.md</code>.
-  Spot checks: <a href="newsletter-b2-spot-checks.html"><code>newsletter-b2-spot-checks.html</code></a>.
-  Run each console block in a production Rails console.</p>
+  Run each Ruby block in a production Rails console. Each block is self-contained.</p>
+<p>The checks read B2 over HTTP with no credentials, the way the CDN does. A 401 or 403 there means the bucket is not public.</p>
 
 <h2>Before Deploy A</h2>
 <ol>
@@ -65,14 +65,58 @@ git push origin main</pre></li>
 bundle exec cap production deploy</pre>
   From now on the saver writes each new page to S3 first, then to B2. The CDN still reads S3.</li>
 
-<li><label><input type="checkbox"> <b>Run spot checks 1 and 2.</b></label>
-  Check 1 proves that the key can write to the bucket and that the bucket serves the gzip headers publicly.
-  Check 2 runs the saver and proves that both copies were written.
-  <span class="stop">If either check fails, stop. New newsletters still reach S3, so nothing is broken for readers. Sidekiq retries the B2 writes once the cause is fixed.</span></li>
+<li><label><input type="checkbox"> <b>Check that the key can write and the bucket serves gzip publicly.</b></label>
+  This writes a small gzip page with the real headers, reads it back with no credentials, and deletes it.
+<pre>begin
+  bucket = NewsletterPage.bucket
+  client = NewsletterPage.storage_client
+  key = "_spotcheck/#{Time.now.to_i}.html"
+  puts "bucket: #{bucket}"
+  puts "put status: #{client.put_object(bucket, key, ActiveSupport::Gzip.compress("&lt;title&gt;spot check&lt;/title&gt;"), NewsletterPage::HEADERS).status}"
+  uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{bucket}/#{key}")
+  response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
+  puts "public read status: #{response.code}"
+  puts "content-encoding: #{response["content-encoding"].inspect}"
+  puts "content-type: #{response["content-type"].inspect}"
+  puts "cache-control: #{response["cache-control"].inspect}"
+  puts "body: #{ActiveSupport::Gzip.decompress(response.body)}" if response.code == "200"
+  puts "delete status: #{client.delete_object(bucket, key).status}"
+end</pre>
+  <span class="expect">Expect: put 200, public read 200, content-encoding "gzip", content-type "text/html; charset=utf-8", cache-control "max-age=315360000, public", body "&lt;title&gt;spot check&lt;/title&gt;", delete 204.</span>
+  <span class="expect">An exception on the put names the cause: 403 is a key without access to the bucket, 404 is a wrong bucket name.</span>
+  <span class="stop">If this fails, stop. New newsletters still reach S3, so nothing is broken for readers. Sidekiq retries the B2 writes once the cause is fixed.</span></li>
+
+<li id="saver-check"><label><input type="checkbox"> <b>Run the saver end to end.</b></label>
+  This runs the real saver on the newest entry of a recent newsletter feed. Then it reads the B2 copy and, during the dual write, the S3 copy.
+  Each copy must carry a <code>Last-Modified</code> from this run.
+<pre>begin
+  entry = Feed.newsletter.order(id: :desc).limit(20).lazy.filter_map { it.entries.order(:id).last }.first
+  page = NewsletterPage.new(entry)
+  before = entry.url
+  started = Time.now - 30
+  NewsletterSaver.new.perform(entry.id)
+  dual = ENV["AWS_S3_BUCKET_NEWSLETTERS"].present?
+  puts "entry: #{entry.id}"
+  puts "key: #{page.key}"
+  puts "url changed: #{before != entry.reload.url}"
+  puts "S3 dual write on: #{dual}"
+  uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{NewsletterPage.bucket}/#{page.key}")
+  response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
+  puts "B2 status: #{response.code}"
+  puts "B2 written by this run: #{Time.httpdate(response["last-modified"]) >= started}"
+  puts "B2 content-encoding: #{response["content-encoding"].inspect}"
+  puts "B2 matches a fresh build: #{ActiveSupport::Gzip.decompress(response.body).force_encoding(Encoding::UTF_8) == page.document.to_html}"
+  if dual
+    s3 = Fog::Storage.new(STORAGE).head_object(ENV["AWS_S3_BUCKET_NEWSLETTERS"], page.key)
+    puts "S3 written by this run: #{Time.httpdate(s3.headers["Last-Modified"]) >= started}"
+  end
+end</pre>
+  <span class="expect">Expect: url changed false, S3 dual write on true, B2 status 200, B2 written by this run true, B2 content-encoding "gzip", B2 matches a fresh build true, S3 written by this run true.</span>
+  <span class="stop">If this fails, stop, for the same reason as the previous step.</span></li>
 </ol>
 
 <h2>Backfill</h2>
-<ol start="7">
+<ol start="8">
 <li><label><input type="checkbox"> <b>Check the backfill workers.</b></label>
 <pre>begin
   workers = Sidekiq::ProcessSet.new.select { it["queues"].include?("backfill") }
@@ -100,7 +144,7 @@ end</pre>
   <ul>
     <li>A job that fails retries by itself. It counts only when it finishes.</li>
     <li>If pending stays above 0 while queued and retrying are 0, some jobs are dead. Run the next step.</li>
-    <li><span class="stop">If mismatched is above 0, stop before the cutover.</span> Those entries have a URL on <code>NEWSLETTER_HOST</code> that the B2 origin will not serve. Step 1 prints examples.</li>
+    <li><span class="stop">If mismatched is above 0, stop before the cutover.</span> Those entries have a URL on <code>NEWSLETTER_HOST</code> that the B2 origin will not serve.</li>
   </ul></li>
 
 <li><label><input type="checkbox"> <b>Retry dead jobs (only if pending is stuck).</b></label>
@@ -113,31 +157,75 @@ end</pre>
 end</pre>
   Fix the cause the errors name first. Then go back to the previous step.</li>
 
-<li><label><input type="checkbox"> <b>Run spot check 3.</b></label>
-  It samples old pages directly on B2.</li>
+<li><label><input type="checkbox"> <b>Sample old pages on B2.</b></label>
+  This takes five random newsletter feeds and sends a HEAD request for the oldest entry of each.
+<pre>begin
+  bucket = NewsletterPage.bucket
+  ids = Feed.newsletter.limit(500).pluck(:id).sample(5)
+  puts "feeds sampled: #{ids.size}"
+  ids.each do |feed_id|
+    entry = Entry.where(feed_id: feed_id).order(:id).first
+    if entry.nil?
+      puts "feed #{feed_id}: no entries"
+      next
+    end
+    key = NewsletterPage.new(entry).key
+    uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{bucket}/#{key}")
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.head(uri.request_uri) }
+    puts "feed #{feed_id} #{key}: status #{response.code}, content-encoding #{response["content-encoding"].inspect}"
+  end
+end</pre>
+  <span class="expect">Expect: status 200 and content-encoding "gzip" on every line. A 404 means the backfill missed that feed. Check step 10.</span></li>
 </ol>
 
 <h2>Cutover</h2>
-<ol start="12">
+<ol start="13">
 <li><label><input type="checkbox"> <b>Move the CDN origin.</b></label>
   Point the origin of the <code>NEWSLETTER_HOST</code> CDN at the B2 bucket. Map the public path <code>/&lt;key&gt;</code> to <code>/&lt;bucket&gt;/&lt;key&gt;</code> on the B2 endpoint.
   The CDN must pass <code>Content-Encoding</code> through and must not decompress the body.</li>
 
-<li><label><input type="checkbox"> <b>Run spot check 4.</b></label>
-  It reads new and old pages through the public host.
-  <span class="stop">If it fails, point the origin at S3 again. S3 still holds every page until Deploy B.</span></li>
+<li><label><input type="checkbox"> <b>Read pages through the public host.</b></label>
+  This reads a new page from <code>NEWSLETTER_HOST</code> with a gzip request.
+  Then it requests the stored URL of five old entries, and a key that does not exist.
+<pre>begin
+  host = ENV["NEWSLETTER_HOST"]
+  head = ->(url) { uri = URI(url); Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.head(uri.request_uri) } }
+  entry = Feed.newsletter.order(id: :desc).limit(20).lazy.filter_map { it.entries.order(:id).last }.first
+  uri = URI(entry.newsletter_url)
+  response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
+  puts "new page: #{uri}"
+  puts "status: #{response.code}"
+  puts "content-encoding: #{response["content-encoding"].inspect}"
+  puts "content-type: #{response["content-type"].inspect}"
+  puts "cache-control: #{response["cache-control"].inspect}"
+  puts "readable html: #{ActiveSupport::Gzip.decompress(response.body).include?("&lt;title&gt;")}"
+  Feed.newsletter.limit(500).pluck(:id).sample(5).each do |feed_id|
+    old = Entry.where(feed_id: feed_id).order(:id).first
+    next if old.nil?
+    if old.url.to_s.start_with?("https://#{host}/")
+      puts "old stored url #{old.url}: status #{head.(old.url).code}"
+    else
+      puts "old stored url #{old.url}: not on NEWSLETTER_HOST, skipped"
+    end
+  end
+  puts "missing key status: #{head.("https://#{host}/zzz/missing-spot-check.html").code}"
+end</pre>
+  <span class="expect">Expect: status 200, the same three headers as step 6, readable html true, status 200 on every old stored URL on the host, and missing key status 404.
+  No content-encoding means the CDN removed the header or decompressed the body.</span>
+  <span class="stop">If this fails, point the origin at S3 again. S3 still holds every page until Deploy B.</span></li>
 </ol>
 
 <h2>Deploy B: write to B2 only</h2>
-<ol start="14">
+<ol start="15">
 <li><label><input type="checkbox"> <b>Remove the S3 bucket from the env.</b></label>
   In the <code>production_env</code> field of the 1Password item <code>feedbin</code>, remove <code>AWS_S3_BUCKET_NEWSLETTERS</code>.
   A restart alone is not enough, because the env file is uploaded with each release.
 <pre>cd ~/Sites/deploy/feedbin
 bundle exec cap production deploy</pre></li>
 
-<li><label><input type="checkbox"> <b>Run spot check 2 again.</b></label>
-  <span class="expect">Expect: "S3 dual write on: false" and a fresh B2 copy.</span>
+<li><label><input type="checkbox"> <b>Run the saver check again.</b></label>
+  Run the block from <a href="#saver-check">step 7</a> again.
+  <span class="expect">Expect: S3 dual write on false, no S3 line, and the other values as in step 7.</span>
   The migration is complete at this step. From now on a rollback to S3 would miss every page saved after Deploy B.</li>
 
 <li><label><input type="checkbox"> <b>Retire S3.</b></label>
