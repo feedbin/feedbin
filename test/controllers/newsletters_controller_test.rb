@@ -9,7 +9,7 @@ class NewslettersControllerTest < ActionController::TestCase
     stub_request(:get, /benubois\.com/)
       .to_return(status: 200, body: "", headers: {})
 
-    stub_request(:put, /s3\.amazonaws\.com/)
+    stub_request(:put, /test-account\.storage\.example\.com/)
       .to_return(status: 200, body: "", headers: {})
 
     @newsletter_html = Mail.from_source(File.read(support_file("email_html.eml")))

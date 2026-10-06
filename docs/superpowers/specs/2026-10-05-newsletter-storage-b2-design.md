@@ -1,7 +1,7 @@
 # Newsletter pages move from S3 to B2
 
 Date: 2026-10-05
-Status: draft, awaiting review
+Status: approved 2026-10-05
 
 ## Goal
 
@@ -41,7 +41,7 @@ Move all existing newsletter pages with a backfill.
    New newsletters arrive all the time. The CDN reads from S3 until the origin moves.
    If the saver wrote only to B2, each new newsletter would give a 404 until the cutover.
    The saver therefore writes to B2 first, then to S3, while the legacy S3 config is present.
-5. **Reuse the `UNIFIED_*` credentials and endpoint.** Add one variable: `UNIFIED_BUCKET_NEWSLETTERS`.
+5. **Reuse the `UNIFIED_*` account, key, and endpoint.** Only one variable is new: `NEWSLETTERS_BUCKET`.
    The B2 application key must have access to the new bucket.
 6. **Store gzip only. Serve gzip always.**
    B2 does not decompress. Every current browser sends `Accept-Encoding: gzip`. There is no plain variant.
@@ -76,11 +76,10 @@ One job: turn an entry into a stored page.
 Behavior change: with `NEWSLETTER_HOST` unset, the saver no longer overwrites `entry.url` with a raw storage host.
 The receiver sets `entry.url` to the local `newsletter_entry_url`. That route renders the page itself, so development works without a CDN.
 
-### Storage config (`config/initializers/s3.rb`)
+### Storage config
 
-- Add `STORAGE_NEWSLETTERS`. It reads `UNIFIED_ACCESS_KEY_ID`, `UNIFIED_SECRET_ACCESS_KEY`, `UNIFIED_ENDPOINT`, and `UNIFIED_REGION`.
-  It uses path-style access and the same connection timeouts as `STORAGE_IMAGES`.
-- Add `UNIFIED_BUCKET_NEWSLETTERS` to `.env.example`.
+- Add no new storage hash. `NewsletterPage` uses `STORAGE_IMAGES`, which reads the `UNIFIED_*` variables.
+- Add `NEWSLETTERS_BUCKET` to `.env.example`.
 - Do not add a boot check. The saver runs in Sidekiq, and a missing bucket raises on the first job.
   A boot failure would take the web process down for a worker setting.
 
@@ -126,8 +125,9 @@ The plan phase writes the runbook.
 4. **Catch up.** Run `NewsletterBackfill.new.build` a second time. This covers any save that failed during the first pass.
 5. **Spot check.** Request three old pages and one new page from B2 and check the headers.
 6. **Cutover.** Move the CDN origin from S3 to B2. Run the acceptance check on the public host.
-7. **Soak.** Keep the S3 objects and the dual write for one week. A rollback is one origin change.
-8. **Deploy B.** Remove the S3 write and the `AWS_S3_BUCKET_NEWSLETTERS` setting. Retire the S3 bucket.
+7. **Deploy B.** The migration is complete when the public acceptance check passes. Deploy B right after it.
+   Deploy B removes the S3 write and the `AWS_S3_BUCKET_NEWSLETTERS` setting. Keep the S3 objects. A rollback is one origin change, and the objects stay until the S3 bucket is retired.
+8. **Retire S3.** Delete the old bucket when you no longer need the rollback.
 
 ## Testing
 
@@ -151,6 +151,4 @@ Tests stub the B2 endpoint with WebMock. They run with `bundle exec rake`.
 
 ## Open items for review
 
-- Confirm that reuse of the `UNIFIED_*` key is acceptable. If not, name a separate key set.
-- Confirm that the B2 bucket is public. If it is private, the CDN needs a read credential, and the runbook needs a step for it.
-- Confirm the one-week soak.
+None. The review settled the key set (reuse `UNIFIED_*`), the bucket (public), and the soak (none).

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Newsletter pages to B2 runbook</title>
+<style>
+  body { font: 16px/1.5 system-ui; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; }
+  pre { background: #f3f3f3; padding: .75rem; overflow-x: auto; }
+  li { margin: 1rem 0; }
+  @media (prefers-color-scheme: dark) { body { background: #111; color: #eee; } pre { background: #222; } }
+</style>
+</head>
+<body>
+<h1>Newsletter pages to B2</h1>
+<p>Spec: <code>docs/superpowers/specs/2026-10-05-newsletter-storage-b2-design.md</code></p>
+<ol>
+<li><label><input type="checkbox"> <b>Create the bucket.</b></label>
+  Make a public B2 bucket in the same account as the image store. Make sure the <code>UNIFIED_*</code> application key can write to it.
+  Set <code>NEWSLETTERS_BUCKET</code> to its name on the web and Sidekiq hosts. Leave <code>AWS_S3_BUCKET_NEWSLETTERS</code> set.</li>
+<li><label><input type="checkbox"> <b>Deploy A.</b></label>
+  Deploy the branch. New newsletters now go to B2 and to S3.</li>
+<li><label><input type="checkbox"> <b>Probe B2.</b></label>
+  In a Rails console, run this block. It prints a curl command.
+<pre>begin
+  entry = Entry.joins(:feed).where(feeds: {feed_type: Feed.feed_types[:newsletter]}).last
+  page = NewsletterPage.new(entry)
+  page.save
+  puts "curl -sI -H 'Accept-Encoding: gzip' #{ENV["UNIFIED_ENDPOINT"]}/#{ENV["NEWSLETTERS_BUCKET"]}/#{page.key}"
+end</pre>
+  Run the printed command. The response must show <code>content-encoding: gzip</code>, <code>content-type: text/html; charset=utf-8</code>, and <code>cache-control: max-age=315360000, public</code>.
+  If the response is 403 or 404, stop. The bucket is not public or the key has no access.</li>
+<li><label><input type="checkbox"> <b>Backfill.</b></label>
+  Run this block. Run it again later to read the counters.
+<pre>begin
+  NewsletterBackfill.new.build
+  puts NewsletterBackfill.progress
+end</pre>
+  The pass is done at <code>pending: 0</code>. Check <code>skipped</code>. A non-zero value counts entries that have no content.</li>
+<li><label><input type="checkbox"> <b>Run the backfill a second time.</b></label>
+  Run the block from the previous step. This covers any feed job that failed in the first pass. Wait for <code>pending: 0</code>.</li>
+<li><label><input type="checkbox"> <b>Move the CDN origin.</b></label>
+  Point the origin of the <code>NEWSLETTER_HOST</code> CDN at the B2 bucket. Map the public path <code>/&lt;key&gt;</code> to <code>/&lt;bucket&gt;/&lt;key&gt;</code> on the B2 endpoint.
+  Then run this block and run the curl command it prints.
+<pre>begin
+  entry = Entry.joins(:feed).where(feeds: {feed_type: Feed.feed_types[:newsletter]}).last
+  puts "curl -sI -H 'Accept-Encoding: gzip' #{entry.newsletter_url}"
+  puts "curl -s --compressed #{entry.newsletter_url} | head -c 300"
+end</pre>
+  The first command must show the same three headers as the probe. The second must print readable HTML.
+  To roll back, point the origin at S3 again.</li>
+<li><label><input type="checkbox"> <b>Deploy B.</b></label>
+  Unset <code>AWS_S3_BUCKET_NEWSLETTERS</code> on the web and Sidekiq hosts. Restart Sidekiq. The saver now writes to B2 only.
+  The migration is complete at this step.</li>
+<li><label><input type="checkbox"> <b>Retire S3.</b></label>
+  When you no longer need the rollback, delete the old S3 newsletter bucket.</li>
+</ol>
+</body>
+</html>

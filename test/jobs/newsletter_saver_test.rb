@@ -1,56 +1,83 @@
 require "test_helper"
 
 class NewsletterSaverTest < ActiveSupport::TestCase
+  B2 = %r{test-account\.storage\.example\.com/newsletters-test/}
+
   setup do
     Sidekiq::Worker.clear_all
+    @entry = create_entry(Feed.first)
   end
 
-  test "Saves to storage" do
-    entry = create_entry(Feed.first)
-    document = "<html><head><title>#{entry.title}</title></head><body>#{entry.content}</body></html>"
-    request = stub_request(:put, /s3\.amazonaws\.com/)
+  test "Saves to B2 with the gzip headers" do
+    request = stub_request(:put, B2)
       .with(headers: {
-        "Content-Encoding"    => "gzip",
-        "Content-Type"        => "text/html; charset=utf-8",
-        "X-Amz-Acl"           => "public-read",
+        "Content-Encoding" => "gzip",
+        "Content-Type" => "text/html; charset=utf-8",
+        "Cache-Control" => "max-age=315360000, public"
+      })
+      .with { |req| ActiveSupport::Gzip.decompress(req.body).include?("<title>#{@entry.title}</title>") }
+
+    NewsletterSaver.new.perform(@entry.id)
+
+    assert_requested request, times: 1
+    assert_not_requested :put, /s3\.amazonaws\.com/
+  end
+
+  test "B2 put carries no x-amz acl or storage class" do
+    request = stub_request(:put, B2).with { |req| req.headers.keys.grep(/\AX-Amz-(Acl|Storage-Class)\z/).empty? }
+
+    NewsletterSaver.new.perform(@entry.id)
+
+    assert_requested request
+  end
+
+  test "Also writes to S3 while the legacy bucket is set" do
+    b2 = stub_request(:put, B2)
+    s3 = stub_request(:put, /s3\.amazonaws\.com/)
+      .with(headers: {
+        "Content-Encoding" => "gzip",
+        "X-Amz-Acl" => "public-read",
         "X-Amz-Storage-Class" => "REDUCED_REDUNDANCY"
       })
-      .with { |request| document == ActiveSupport::Gzip.decompress(request.body)}
+      .with { |req| ActiveSupport::Gzip.decompress(req.body).include?(@entry.content) }
 
-    NewsletterSaver.new.perform(entry.id)
-    assert_requested request
+    with_env("AWS_S3_BUCKET_NEWSLETTERS" => "legacy-newsletters") do
+      NewsletterSaver.new.perform(@entry.id)
+    end
+
+    assert_requested b2
+    assert_requested s3
   end
 
-  test "Saves text email to storage" do
-    entry = create_entry(Feed.first)
-    entry.update(data: {format: "text"})
-    document = "<title>#{entry.title}</title>"
-    request = stub_request(:put, /s3\.amazonaws\.com/)
-      .with { |request| ActiveSupport::Gzip.decompress(request.body).include?(document) }
+  test "Sets entry url from the host and key" do
+    stub_request(:put, B2)
 
-    NewsletterSaver.new.perform(entry.id)
-    assert_requested request
+    with_env("NEWSLETTER_HOST" => "newsletters.example.com") do
+      NewsletterSaver.new.perform(@entry.id)
+    end
+
+    assert_equal "https://newsletters.example.com/#{@entry.public_id[0..2]}/#{@entry.public_id}.html", @entry.reload.url
   end
 
-  test "saves an email nested past the HTML5 tree depth limit" do
-    entry = create_entry(Feed.first)
-    nested = ("<div>" * 450) + "newsletter body" + ("</div>" * 450)
-    entry.update_columns(content: nested)
-    request = stub_request(:put, /s3\.amazonaws\.com/)
-      .with { |request| ActiveSupport::Gzip.decompress(request.body).include?("newsletter body") }
+  test "Leaves entry url alone without a host" do
+    stub_request(:put, B2)
+    url = @entry.url
 
-    NewsletterSaver.new.perform(entry.id)
+    with_env("NEWSLETTER_HOST" => nil) do
+      NewsletterSaver.new.perform(@entry.id)
+    end
 
-    assert_requested request
+    assert_equal url, @entry.reload.url
   end
 
-  test "saves an email that carried no Subject" do
-    entry = create_entry(Feed.first)
-    entry.update_columns(title: nil, content: "<html><body><p>hi</p></body></html>")
-    request = stub_request(:put, /s3\.amazonaws\.com/)
+  test "Does not write the entry when the url is current" do
+    stub_request(:put, B2)
 
-    NewsletterSaver.new.perform(entry.id)
-
-    assert_requested request
+    with_env("NEWSLETTER_HOST" => "newsletters.example.com") do
+      NewsletterSaver.new.perform(@entry.id)
+      updated = @entry.reload.updated_at
+      NewsletterSaver.new.perform(@entry.id)
+      assert_equal updated, @entry.reload.updated_at
+    end
   end
 end
