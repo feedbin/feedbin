@@ -1,4 +1,4 @@
-class Admin::UsersController < ApplicationController
+class Admin::UsersController < Admin::ApplicationController
   def index
     # Relation#+ is Array#+: it loads both relations and returns a plain Array,
     # which drops the pagination metadata the view needs to offer a next page.
@@ -28,11 +28,5 @@ class Admin::UsersController < ApplicationController
     user = User.find(params[:id])
     user.setting_on!(:password_resettable)
     user.send_password_reset
-  end
-
-  def authorize
-    unless current_user.try(:admin?)
-      render_404
-    end
   end
 end

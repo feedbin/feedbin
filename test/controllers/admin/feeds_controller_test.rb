@@ -7,6 +7,12 @@ class Admin::FeedsControllerTest < ActionController::TestCase
     @user.update!(admin: true) if @user.respond_to?(:admin=)
   end
 
+  test "GET index requires admin" do
+    login_as users(:new)
+    get :index
+    assert_response :not_found
+  end
+
   test "GET index renders without a query" do
     login_as @user
     get :index

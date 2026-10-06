@@ -1,4 +1,4 @@
-class Admin::FeedsController < ApplicationController
+class Admin::FeedsController < Admin::ApplicationController
   def index
     feed = if params.key?(:q)
       # key? says the key is there, not that it holds a scalar: ?q[]=1 gives an
