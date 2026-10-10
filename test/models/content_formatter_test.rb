@@ -193,6 +193,25 @@ class ContentFormatterTest < ActiveSupport::TestCase
     end
   end
 
+  test "document parses an element past the default attribute limit" do
+    html = "<div " + Array.new(500) { |i| %(a#{i}="x") }.join(" ") + ">many attributes</div>"
+    assert_includes ContentFormatter.document(html).to_html, "many attributes"
+  end
+
+  test "html_document keeps an element past the default attribute limit" do
+    html = "<div " + Array.new(500) { |i| %(a#{i}="x") }.join(" ") + ">many attributes</div>"
+    document = ContentFormatter.html_document(html)
+    assert_kind_of Nokogiri::HTML5::Document, document
+    assert_equal 500, document.at("div").attributes.size
+  end
+
+  test "html_document falls back to HTML4 past the raised attribute limit" do
+    html = "<div " + Array.new(ContentFormatter::HTML5_MAX_ATTRIBUTES + 1) { |i| %(a#{i}="x") }.join(" ") + ">many attributes</div>"
+    document = ContentFormatter.html_document(html)
+    assert_kind_of Nokogiri::HTML4::Document, document
+    assert_includes document.to_html, "many attributes"
+  end
+
   test "document re-raises unrelated exceptions" do
     Loofah.stub :html5_fragment, ->(*) { raise "something else" } do
       assert_raises(RuntimeError) { ContentFormatter.document("<p>x</p>") }

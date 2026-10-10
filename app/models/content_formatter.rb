@@ -306,7 +306,7 @@ class ContentFormatter
   def self.document(html)
     Loofah.html5_fragment(html)
   rescue => exception
-    if depth_limit?(exception)
+    if parser_limit?(exception)
       return Loofah.html4_fragment(html)
     end
     raise
@@ -320,19 +320,28 @@ class ContentFormatter
   # survives the depth by discarding the body, which loses the newsletter.
   HTML5_MAX_TREE_DEPTH = 10_000
 
+  # Gumbo also stops at 400 attributes on one element, which broken markup
+  # reaches when an unclosed quote turns the rest of a tag into attributes.
+  # Each new attribute is checked against the element's others, so the cost
+  # grows with the square of the count: about 0.3 s at 10,000 and 30 s at
+  # 100,000. The parse holds the GVL that long, stalling every thread in the
+  # process, so the retry raises the limit but never removes it. Past it,
+  # HTML4 parses the rest at the same square-law cost.
+  HTML5_MAX_ATTRIBUTES = 10_000
+
   def self.html_document(html)
     Nokogiri::HTML5(html)
   rescue => exception
-    raise unless depth_limit?(exception)
+    raise unless parser_limit?(exception)
     begin
-      Nokogiri::HTML5(html, max_tree_depth: HTML5_MAX_TREE_DEPTH)
+      Nokogiri::HTML5(html, max_tree_depth: HTML5_MAX_TREE_DEPTH, max_attributes: HTML5_MAX_ATTRIBUTES)
     rescue => exception
-      raise unless depth_limit?(exception)
+      raise unless parser_limit?(exception)
       Nokogiri::HTML4(html)
     end
   end
 
-  def self.depth_limit?(exception)
-    exception.message =~ /Document tree depth limit exceeded|stack level too deep/i
+  def self.parser_limit?(exception)
+    exception.message =~ /Document tree depth limit exceeded|Attributes per element limit exceeded|stack level too deep/i
   end
 end
