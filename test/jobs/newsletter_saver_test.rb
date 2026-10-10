@@ -8,31 +8,15 @@ class NewsletterSaverTest < ActiveSupport::TestCase
     @entry = create_entry(Feed.first)
   end
 
-  test "Saves to B2 only, without S3 headers, when the legacy bucket is unset" do
+  test "Saves to B2 only, without S3 headers, even with the old S3 bucket set" do
     request = stub_request(:put, B2).with { |req| req.headers.keys.grep(/\AX-Amz-(Acl|Storage-Class)\z/).empty? }
-
-    NewsletterSaver.new.perform(@entry.id)
-
-    assert_requested request, times: 1
-    assert_not_requested :put, /s3\.amazonaws\.com/
-  end
-
-  test "Also writes to S3 while the legacy bucket is set" do
-    b2 = stub_request(:put, B2)
-    s3 = stub_request(:put, /s3\.amazonaws\.com/)
-      .with(headers: {
-        "Content-Encoding" => "gzip",
-        "X-Amz-Acl" => "public-read",
-        "X-Amz-Storage-Class" => "REDUCED_REDUNDANCY"
-      })
-      .with { |req| ActiveSupport::Gzip.decompress(req.body).include?(@entry.content) }
 
     with_env("AWS_S3_BUCKET_NEWSLETTERS" => "legacy-newsletters") do
       NewsletterSaver.new.perform(@entry.id)
     end
 
-    assert_requested b2
-    assert_requested s3
+    assert_requested request, times: 1
+    assert_not_requested :put, /s3\.amazonaws\.com/
   end
 
   test "Sets entry url from the host and key" do
@@ -54,16 +38,5 @@ class NewsletterSaverTest < ActiveSupport::TestCase
     end
 
     assert_equal url, @entry.reload.url
-  end
-
-  test "A B2 failure leaves the S3 copy written" do
-    stub_request(:put, B2).to_return(status: 500)
-    s3 = stub_request(:put, /s3\.amazonaws\.com/)
-
-    with_env("AWS_S3_BUCKET_NEWSLETTERS" => "legacy-newsletters") do
-      assert_raises(Excon::Error) { NewsletterSaver.new.perform(@entry.id) }
-    end
-
-    assert_requested s3
   end
 end

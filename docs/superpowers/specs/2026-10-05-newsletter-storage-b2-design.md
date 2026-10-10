@@ -133,7 +133,8 @@ The runbook is `docs/ops/newsletter-b2-runbook.html`. It holds every check inlin
 5. **Spot check.** Sample old pages on B2.
 6. **Cutover.** Move the CDN origin from S3 to B2. Read new pages and old stored URLs through the public host.
 7. **Deploy B.** The migration is complete when the public acceptance check passes. Deploy B right after it.
-   Deploy B removes `AWS_S3_BUCKET_NEWSLETTERS` from `production_env` and deploys again. The env file ships with each release, so a restart is not enough.
+   Deploy B is a code change: it deletes the S3 write from `NewsletterSaver`. It ships only after the cutover.
+   `AWS_S3_BUCKET_NEWSLETTERS` then does nothing, and the same deploy removes it from `production_env`.
    Keep the S3 objects. After Deploy B, a rollback to S3 misses every page saved since Deploy B.
 8. **Retire S3.** Delete the old bucket when you no longer need the rollback.
 

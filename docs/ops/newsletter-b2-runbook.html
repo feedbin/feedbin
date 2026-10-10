@@ -216,16 +216,42 @@ end</pre>
 </ol>
 
 <h2>Deploy B: write to B2 only</h2>
+<p class="stop">Deploy B only after step 14 passes. Until the CDN reads B2, a page saved only to B2 is a 404 for readers.
+  The Deploy B code is on <code>newsletter</code>, so any merge of that branch to <code>main</code> ships it.</p>
 <ol start="15">
 <li><label><input type="checkbox"> <b>Remove the S3 bucket from the env.</b></label>
   In the <code>production_env</code> field of the 1Password item <code>feedbin</code>, remove <code>AWS_S3_BUCKET_NEWSLETTERS</code>.
-  A restart alone is not enough, because the env file is uploaded with each release.
+  The new code no longer reads it. This only tidies the env.</li>
+
+<li><label><input type="checkbox"> <b>Merge, push, and deploy.</b></label>
+  This ships the saver without the S3 write.
+<pre>cd ~/Sites/feedbin
+git switch main
+git merge --ff-only newsletter
+git push origin main</pre>
 <pre>cd ~/Sites/deploy/feedbin
 bundle exec cap production deploy</pre></li>
 
-<li><label><input type="checkbox"> <b>Run the saver check again.</b></label>
-  Run the block from <a href="#saver-check">step 7</a> again.
-  <span class="expect">Expect: S3 dual write on false, no S3 line, and the other values as in step 7.</span>
+<li><label><input type="checkbox"> <b>Run the saver end to end on B2 only.</b></label>
+  This runs the real saver on the newest entry of a recent newsletter feed and reads the B2 copy back.
+<pre>begin
+  entry = Feed.newsletter.order(id: :desc).limit(20).lazy.filter_map { it.entries.order(:id).last }.first
+  page = NewsletterPage.new(entry)
+  before = entry.url
+  started = Time.now - 30
+  NewsletterSaver.new.perform(entry.id)
+  puts "entry: #{entry.id}"
+  puts "key: #{page.key}"
+  puts "url changed: #{before != entry.reload.url}"
+  puts "saver writes to S3: #{NewsletterSaver.method_defined?(:legacy_save)}"
+  uri = URI("#{ENV["UNIFIED_ENDPOINT"]}/#{NewsletterPage.bucket}/#{page.key}")
+  response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.get(uri.request_uri, "Accept-Encoding" => "gzip") }
+  puts "B2 status: #{response.code}"
+  puts "B2 written by this run: #{Time.httpdate(response["last-modified"]) >= started}"
+  puts "B2 content-encoding: #{response["content-encoding"].inspect}"
+  puts "B2 matches a fresh build: #{ActiveSupport::Gzip.decompress(response.body).force_encoding(Encoding::UTF_8) == page.document.to_html}"
+end</pre>
+  <span class="expect">Expect: url changed false, saver writes to S3 false, B2 status 200, B2 written by this run true, B2 content-encoding "gzip", B2 matches a fresh build true.</span>
   The migration is complete at this step. From now on a rollback to S3 would miss every page saved after Deploy B.</li>
 
 <li><label><input type="checkbox"> <b>Retire S3.</b></label>
