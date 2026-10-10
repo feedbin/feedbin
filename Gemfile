@@ -82,7 +82,7 @@ end
 
 group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
-  gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
+  gem "byebug", platforms: [:mri, :windows]
   gem "capybara"
   # Load only the prelude so binding.break works without starting a debugger
   # session during Rails boot. The full session installs fork/at_exit hooks
