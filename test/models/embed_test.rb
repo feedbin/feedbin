@@ -63,6 +63,24 @@ class EmbedTest < ActiveSupport::TestCase
     assert_equal channel, video.channel
   end
 
+  test "parent is the channel, not a video with the same provider_id" do
+    channel = Embed.create!(source: :youtube_channel, provider_id: "shared-id", data: {})
+    Embed.create!(source: :youtube_video, provider_id: "shared-id", data: {})
+    video = Embed.create!(source: :youtube_video, provider_id: "video-1", parent_id: "shared-id", data: {})
+
+    assert_equal channel, video.parent
+    assert_equal channel, Embed.where(id: video.id).includes(:parent).first.parent
+  end
+
+  test "preloading parent filters on source so it can use the (source, provider_id) index" do
+    Embed.create!(source: :youtube_video, provider_id: "video-1", parent_id: "channel-1", data: {})
+
+    # Without source, Postgres cannot use the index and reads the whole table.
+    assert_no_queries_match(/WHERE "embeds"\."provider_id"/) do
+      Embed.youtube_video.where(provider_id: "video-1").includes(:parent).to_a
+    end
+  end
+
   test "chapters handles missing description gracefully" do
     embed = Embed.new(source: :youtube_video, provider_id: "v9", data: {
       "contentDetails" => {"duration" => "PT5M"}

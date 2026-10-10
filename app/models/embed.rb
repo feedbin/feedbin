@@ -1,5 +1,8 @@
 class Embed < ApplicationRecord
-  belongs_to :parent, class_name: "Embed", foreign_key: :parent_id, primary_key: :provider_id
+  # A video's parent is its channel. The source condition lets the lookup use
+  # index_embeds_on_source_and_provider_id; on provider_id alone it reads the
+  # whole table.
+  belongs_to :parent, -> { youtube_channel }, class_name: "Embed", foreign_key: :parent_id, primary_key: :provider_id
 
   # The channel's avatar row. The join rides
   # index_images_on_provider_and_provider_id. Meaningful on youtube_channel
