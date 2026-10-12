@@ -69,6 +69,80 @@ class EntriesControllerTest < ActionController::TestCase
     end
   end
 
+  # ---- toolbar data ----------------------------------------------------------
+
+  TOOLBAR_KEYS = %w[favicon feed_id feed_title header_title id pages subscribed title twitter_id url]
+
+  test "preload with v=2 sends toolbar data and no toolbar html" do
+    login_as @user
+    get :preload, params: {ids: @entries.map(&:id).join(","), v: "2"}, format: :json
+    data = JSON.parse(@response.body)
+    @entries.each do |entry|
+      toolbar = data[entry.id.to_s]["toolbar"]
+      assert_equal TOOLBAR_KEYS, toolbar.keys.sort
+      refute data[entry.id.to_s].key?("content")
+      assert_equal entry.id, toolbar["id"]
+      assert_equal entry.feed_id, toolbar["feed_id"]
+      assert_equal entry.feed.title, toolbar["header_title"]
+      assert_equal false, toolbar["pages"]
+      assert_equal true, toolbar["subscribed"]
+      assert_includes toolbar["favicon"], "favicon-wrap"
+    end
+    refute_includes @response.body, "toggle_settings_menu"
+  end
+
+  test "preload without v keeps the toolbar html for old tabs" do
+    login_as @user
+    get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json
+    data = JSON.parse(@response.body)
+    @entries.each do |entry|
+      assert_includes data[entry.id.to_s]["content"], "toggle_starred"
+      assert data[entry.id.to_s].key?("toolbar")
+    end
+  end
+
+  test "toolbar data for a pages entry" do
+    login_as @user
+    entry = create_pages_entry("https://example.com/article")
+    toolbar = preload_toolbar(entry)
+    assert_equal true, toolbar["pages"]
+    assert_equal false, toolbar["subscribed"]
+    assert_equal "example.com", toolbar["header_title"]
+  end
+
+  test "toolbar data for a pages entry with no host" do
+    login_as @user
+    entry = create_pages_entry("/x")
+    assert_equal "", preload_toolbar(entry)["header_title"]
+  end
+
+  test "toolbar data for a starred entry from a feed with no subscription" do
+    login_as @user
+    feed = Feed.create!(feed_url: "https://other.example/feed", host: "other.example", title: "Other")
+    entry = create_entry(feed)
+    StarredEntry.create_from_owners(@user, entry)
+    toolbar = preload_toolbar(entry)
+    assert_equal false, toolbar["subscribed"]
+    assert_equal "Other", toolbar["header_title"]
+  end
+
+  test "show as js sends toolbar html and toolbar data" do
+    login_as @user
+    entry = @entries.first
+    get :show, params: {id: entry}, xhr: true
+    assert_response :success
+    assert_equal %i[content feed_id inner_content toolbar], assigns(:entries)[entry.id].keys.sort
+  end
+
+  test "show as html sends toolbar data only" do
+    login_as @user
+    entry = @entries.first
+    get :show, params: {id: entry}
+    assert_response :success
+    assert_equal %i[feed_id inner_content toolbar], assigns(:entries)[entry.id].keys.sort
+    assert_equal "/entries/preload.json?v=2", assigns(:data)[:preload_entries_path]
+  end
+
   test "marks feed read" do
     login_as @user
     feed = @feeds.first
@@ -442,4 +516,16 @@ class EntriesControllerTest < ActionController::TestCase
     assert_empty loads, "the unread rows were materialized: #{loads.inspect}"
   end
 
+  private
+
+  def create_pages_entry(url)
+    feed = Feed.create!(feed_url: "https://pages.example/x", host: "pages.example", title: "P", feed_type: :pages)
+    @user.subscriptions.create!(feed: feed)
+    feed.entries.create!(content: "<p>x</p>", title: "T", url: url, public_id: SecureRandom.hex)
+  end
+
+  def preload_toolbar(entry)
+    get :preload, params: {ids: entry.id.to_s, v: "2"}, format: :json
+    JSON.parse(@response.body).dig(entry.id.to_s, "toolbar")
+  end
 end

@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
       login_url: login_url,
       tags_path: tags_path(format: :json),
       user_titles: user_titles,
-      preload_entries_path: preload_entries_path(format: :json),
+      preload_entries_path: preload_entries_path(format: :json, v: 2),
       sticky_readability: @user.setting_on?(:sticky_view_inline),
       readability_settings: readability_settings,
       show_unread_count: @user.setting_on?(:show_unread_count),

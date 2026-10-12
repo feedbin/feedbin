@@ -49,7 +49,9 @@ class EntriesController < ApplicationController
     @user = current_user
     ids = @user.can_read_filter([params[:id].to_i])
     if ids.present?
-      @entries = entries_by_id(ids)
+      # A full page load runs the new JavaScript. The JS response also goes to
+      # tabs that loaded the old JavaScript, which still read content.
+      @entries = entries_by_id(ids, toolbar_html: !request.format.html?)
       UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
       UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
       respond_to do |format|
@@ -69,7 +71,9 @@ class EntriesController < ApplicationController
       ids = params[:ids].split(",").map { |i| i.to_i }
       ids = @user.can_read_filter(ids)
       ViewLinkCacheMultiple.perform_async(@user.id, ids)
-      entries = entries_by_id(ids)
+      # v=2 comes from the new JavaScript's preload_entries_path. A tab that
+      # loaded before the deploy has the old path and still needs content.
+      entries = entries_by_id(ids, toolbar_html: params[:v] != "2")
       render json: entries.to_json
     else
       head :ok
@@ -251,15 +255,20 @@ class EntriesController < ApplicationController
 
   private
 
-  def entries_by_id(entry_ids)
+  # toolbar_html adds content, the old per-entry toolbar markup, for tabs
+  # that loaded the JavaScript from before the toolbar was rendered once.
+  def entries_by_id(entry_ids, toolbar_html:)
     # The full-content render reaches the images rows too: a tweet through
     # Entry#tweet (preview_image_record), a podcast through
     # EntryPresenter#media_image (icon_image_record), both read from
     # owned_image_records. The preload endpoint renders a client-sized batch
-    # of these at once.
+    # of these at once. The toolbar favicon reads channel_image_record for a
+    # playlist video, and the Pages favicons come from one lookup by host.
     entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS)
-      .preload(:owned_image_records)
+      .preload(:owned_image_records, :channel_image_record).to_a
     subscriptions = @user.subscriptions.pluck(:feed_id)
+    favicons = Image.favicons_for_entries(entries)
+    template = view_context
     @title = entries.present? ? "#{entries.first.title} - Feedbin" : "Feedbin"
     entries.each_with_object({}) do |entry, hash|
       locals = {
@@ -269,10 +278,13 @@ class EntriesController < ApplicationController
         subscriptions: subscriptions
       }
       hash[entry.id] = {
-        content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
+        toolbar: EntryPresenter.new(entry, {favicons: favicons}, template).toolbar_data(subscriptions),
         inner_content: render_to_string(partial: "entries/inner_content", formats: [:html], locals: locals),
         feed_id: entry.feed_id
       }
+      if toolbar_html
+        hash[entry.id][:content] = render_to_string(partial: "entries/show", formats: [:html], locals: locals)
+      end
     end
   end
 

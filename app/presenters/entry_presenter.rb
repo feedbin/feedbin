@@ -538,6 +538,26 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  # What the one entry toolbar in the page needs to show this entry. The
+  # first six keys are the old feedbin.selectedEntryData, which the share
+  # menu and the mute form still read. The favicon stays server-rendered:
+  # FaviconComponent resolves it from image rows the client never sees.
+  def toolbar_data(subscriptions)
+    pages = entry.feed.pages?
+    {
+      id: entry.id,
+      feed_id: entry.feed_id,
+      url: entry.fully_qualified_url,
+      title: entry.title,
+      feed_title: entry.feed.title,
+      twitter_id: entry.twitter_id || "",
+      header_title: pages ? entry.hostname.to_s : @template.strip_tags(entry.feed.title).to_s,
+      pages: pages,
+      subscribed: !pages && subscriptions.include?(entry.feed_id),
+      favicon: favicon(entry.feed, entry).to_s
+    }
+  end
+
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
     parent = @locals[:parent] || entry.tweet.main_tweet
