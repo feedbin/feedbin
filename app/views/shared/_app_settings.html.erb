@@ -1,18 +1,13 @@
 <div class="entry-button-wrap settings-button-wrap">
     <%= link_to settings_path, class: "app-settings-button" do %>
         <div class="entry-button">
-            <div class="hamburger-menu-wrap" data-behavior="settings_button_dropdown" title="Settings" role="button">
+            <div class="hamburger-menu-wrap" title="Settings" role="button">
                 <div class="hamburger-menu"></div>
             </div>
         </div>
     <% end %>
 
-    <div class="dropdown-wrap dropdown-right web-settings-button">
-        <button class="reset entry-button" data-behavior="toggle_dropdown" title="Settings" data-toggle="tooltip">
-            <%= svg_tag "icon-menu" %>
-        </button>
-        <div class="dropdown-content group" data-nav="dropdown">
-            <%= render Shared::SettingsNavView.new(user: current_user) %>
-        </div>
-    </div>
+    <a href="<%= settings_path %>" class="entry-button web-settings-button" data-behavior="toggle_settings_menu" title="Settings" data-toggle="tooltip">
+        <%= svg_tag "icon-menu" %>
+    </a>
 </div>

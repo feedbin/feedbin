@@ -58,6 +58,17 @@ class EntriesControllerTest < ActionController::TestCase
     end
   end
 
+  test "preload renders a settings button, not the settings menu" do
+    login_as @user
+    get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json
+    data = JSON.parse(@response.body)
+    @entries.each do |entry|
+      content = data[entry.id.to_s]["content"]
+      assert_includes content, "toggle_settings_menu"
+      refute_includes content, "menu-icon-subscriptions"
+    end
+  end
+
   test "marks feed read" do
     login_as @user
     feed = @feeds.first

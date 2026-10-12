@@ -25,6 +25,17 @@ REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path
 
 require File.expand_path("../../config/environment", __FILE__)
 
+# Points every Redis client at ENV["REDIS_URL"]. `rails test:system` boots the
+# app before this file runs, so the initializers already connected to the
+# .env.test URL instead of the redis-server started above; parallel workers
+# call this again for their own database.
+def connect_test_redis
+  load Rails.root.join("config/initializers/redis.rb")
+  Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
+  Sidekiq.default_configuration.redis = {url: ENV["REDIS_URL"]}
+end
+connect_test_redis
+
 # MakeEpub's cover renders text with libvips, through Pango. On macOS Pango
 # uses CoreText, which can't be used in a forked parallel test worker: if the
 # parent never rendered text, the child's first render dies in objc's fork
@@ -97,10 +108,7 @@ class ActiveSupport::TestCase
   parallelize_setup do |worker|
     ENV["TEST_WORKER"] = worker.to_s
     ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker}"
-
-    load Rails.root.join("config/initializers/redis.rb")
-    Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
-    Sidekiq.default_configuration.redis = {url: ENV["REDIS_URL"]}
+    connect_test_redis
 
     Search.configure!
     Search.setup

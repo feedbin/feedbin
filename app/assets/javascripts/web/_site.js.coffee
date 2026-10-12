@@ -21,6 +21,7 @@ $.extend feedbin,
   extractCache: {}
   previousContentView: 'default'
   formatMenu: null
+  settingsMenu: null
   sourceMenu: null
   hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
@@ -109,6 +110,11 @@ $.extend feedbin,
     content = $('.format-palette')
     button = $('[data-behavior~=toggle_format_menu]')
     feedbin.hideMenu(event, content, button, "formatMenu", force)
+
+  hideSettingsMenu: (event, force = false) ->
+    content = $('.settings-menu')
+    button = $('[data-behavior~=toggle_settings_menu]')
+    feedbin.hideMenu(event, content, button, "settingsMenu", force)
 
   prepareShareMenu: (data) ->
     buildLink = (item, data, index) ->
@@ -644,6 +650,7 @@ $.extend feedbin,
 
   updateEntryContent: (meta, content = "") ->
     feedbin.closeEntryBasement(0)
+    feedbin.hideSettingsMenu(null, true)
     metaTarget = $('[data-behavior~=entry_meta_target]')
     innerContent = $('[data-behavior~=inner_content_target]')
 
@@ -1832,6 +1839,7 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=toggle_format_menu]', (event) ->
         $('.dropdown-wrap.open').removeClass('open')
+        feedbin.hideSettingsMenu(null, true)
         button = $(event.currentTarget)
         menu = $('.format-palette')
         if feedbin.formatMenu
@@ -1854,6 +1862,39 @@ $.extend feedbin,
             }
           }
           feedbin.formatMenu = new Popper(button, menu, options)
+          menu.removeClass('hide')
+          event.stopPropagation()
+
+    showSettingsMenu: ->
+      $(document).on 'click', (event) ->
+        feedbin.hideSettingsMenu(event)
+
+      $(document).on 'click', '[data-behavior~=toggle_settings_menu]', (event) ->
+        event.preventDefault()
+        $('.dropdown-wrap.open').removeClass('open')
+        feedbin.hideFormatMenu(null, true)
+        button = $(event.currentTarget)
+        menu = $('.settings-menu')
+        if feedbin.settingsMenu
+          feedbin.settingsMenu.destroy()
+          feedbin.settingsMenu = null
+          menu.addClass('hide')
+        else
+          options = {
+            placement: 'bottom-end',
+            modifiers: {
+              preventOverflow: {
+                padding: 7
+              },
+              offset: {
+                offset: "-8, -5"
+              },
+              flip: {
+                enabled: false
+              },
+            }
+          }
+          feedbin.settingsMenu = new Popper(button, menu, options)
           menu.removeClass('hide')
           event.stopPropagation()
 
@@ -2358,6 +2399,7 @@ $.extend feedbin,
         feedbin.hideLinkActions()
         feedbin.hideSourceMenu(null, true)
         feedbin.hideFormatMenu(null, true)
+        feedbin.hideSettingsMenu(null, true)
 
 
       $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->

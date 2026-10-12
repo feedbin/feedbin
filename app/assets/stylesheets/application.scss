@@ -4681,10 +4681,6 @@ Settings
   }
   .web-settings-button {
     display: flex;
-    .dropdown-content {
-      top: $toolbar-height - 6;
-      right: 8px !important;
-    }
     .native & {
       display: none;
     }
@@ -4707,6 +4703,13 @@ Settings
       right: base-units(1);
       @include background-color($color-borders);
     }
+  }
+}
+
+.settings-menu.dropdown-content {
+  display: block;
+  &.hide {
+    display: none;
   }
 }
 

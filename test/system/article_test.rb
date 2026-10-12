@@ -139,4 +139,59 @@ class ArticleTest < ApplicationSystemTestCase
 
     assert_selector ".original-meta strong", text: "Originally from:"
   end
+
+  test "settings menu opens from the entry toolbar and closes with escape" do
+    show_article
+    wait_for_ajax
+
+    find(".entry-toolbar [data-behavior~=toggle_settings_menu]").click
+    assert_selector ".settings-menu", text: "Subscriptions"
+
+    find("body").send_keys(:escape)
+    assert_no_selector ".settings-menu", visible: true
+  end
+
+  test "settings menu closes when another entry opens" do
+    show_article_setup
+    other_entry = create_entry(@feed)
+    login_as(@user)
+    click_link(@entries.first.title)
+    wait_for_ajax
+
+    find(".entry-toolbar [data-behavior~=toggle_settings_menu]").click
+    assert_selector ".settings-menu", text: "Subscriptions"
+
+    click_link(other_entry.title)
+    assert_selector ".entry-toolbar", count: 1
+    assert_selector "#source_link h1", text: other_entry.title
+    assert_no_selector ".settings-menu", visible: true
+  end
+
+  test "settings menu opens from the account toolbar" do
+    show_article_setup
+    login_as(@user)
+
+    find(".account-toolbar [data-behavior~=toggle_settings_menu]").click
+    assert_selector ".settings-menu", text: "Subscriptions"
+  end
+
+  test "settings menu and format menu are not open together" do
+    show_article
+    wait_for_ajax
+
+    find(".entry-toolbar [data-behavior~=toggle_format_menu]").click
+    assert_selector ".format-palette", visible: true
+
+    find(".entry-toolbar [data-behavior~=toggle_settings_menu]").click
+    assert_selector ".settings-menu", text: "Subscriptions"
+    assert_no_selector ".format-palette", visible: true
+  end
+
+  test "page renders one settings menu" do
+    show_article
+    wait_for_ajax
+
+    assert_selector "[data-behavior~=toggle_settings_menu]", minimum: 2, visible: :all
+    assert_selector "[data-nav=dropdown]", count: 1, visible: :all
+  end
 end

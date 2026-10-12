@@ -277,6 +277,7 @@ class feedbin.Keyboard
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       $('.dropdown-wrap.open').removeClass('open')
       feedbin.hideFormatMenu()
+      feedbin.hideSettingsMenu()
       feedbin.closeDialog()
       window.dispatchEvent(new CustomEvent("hide-search"))
       feedbin.closeEntryBasement()
