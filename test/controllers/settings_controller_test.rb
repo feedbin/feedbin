@@ -148,6 +148,34 @@ class SettingsControllerTest < ActionController::TestCase
     initial = sub.view_inline
     post :sticky, params: {feed_id: feed.id}, xhr: true
     assert_equal !initial, sub.reload.view_inline
+    assert_includes @response.body, "readability_settings"
+  end
+
+  test "sticky answers json with the new view_inline" do
+    login_as @user
+    feed = @user.feeds.first
+    initial = @user.subscriptions.where(feed_id: feed.id).first.view_inline
+    @request.accept = "application/json"
+    post :sticky, params: {feed_id: feed.id}, xhr: true
+    assert_equal({"view_inline" => !initial}, JSON.parse(@response.body))
+  end
+
+  # An old tab posts with $.post, which sends Accept: */*.
+  test "sticky answers an old tab's */* request with javascript" do
+    login_as @user
+    feed = @user.feeds.first
+    @request.accept = "*/*"
+    post :sticky, params: {feed_id: feed.id}, xhr: true
+    assert_includes @response.body, "readability_settings"
+  end
+
+  test "sticky answers no content when the user has no subscription" do
+    login_as @user
+    feed = @user.feeds.first
+    @user.subscriptions.where(feed_id: feed.id).delete_all
+    @request.accept = "application/json"
+    post :sticky, params: {feed_id: feed.id}, xhr: true
+    assert_response :no_content
   end
 
   test "subscription_view_mode updates the subscription view_mode" do

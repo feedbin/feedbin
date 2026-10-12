@@ -23,6 +23,13 @@ class ExtractsController < ApplicationController
     rescue
       @content = nil
     end
+
+    # JS for tabs from before the entry toolbar was rendered once; the toolbar
+    # controller asks for HTML and does the DOM work itself.
+    respond_to do |format|
+      format.js
+      format.html { render partial: "extracts/entry", locals: {content: @content, content_info: @content_info, entry: @entry, user: @user} }
+    end
   end
 
   def modal

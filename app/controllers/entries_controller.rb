@@ -251,6 +251,12 @@ class EntriesController < ApplicationController
     if @entry.feed.pages?
       EntryDeleter.new.delete_entries(@entry.feed_id, @entry.id)
     end
+
+    # JS first: an old tab's remote form sends a JS Accept header.
+    respond_to do |format|
+      format.js
+      format.json { head :no_content }
+    end
   end
 
   private

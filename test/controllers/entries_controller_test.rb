@@ -501,6 +501,19 @@ class EntriesControllerTest < ActionController::TestCase
     assert_equal [[feed.id, entry.id]], deleted
   end
 
+  test "destroy answers json with no content" do
+    login_as @user
+    entry = create_pages_entry("/x")
+
+    deleted = []
+    EntryDeleter.stub_any_instance(:delete_entries, ->(*args) { deleted << args }) do
+      @request.accept = "application/json"
+      delete :destroy, params: {id: entry.id}, xhr: true
+    end
+    assert_response :no_content
+    assert_equal [[entry.feed_id, entry.id]], deleted
+  end
+
   # Relation#present? is records.blank? inverted -- it materializes the whole
   # relation to answer. This is the path an account with tens of thousands of
   # unread entries takes when it reaches for "mark all read".
