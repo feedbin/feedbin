@@ -81,8 +81,6 @@ class feedbin.CountsBehavior
     $(document).on('click', '[data-behavior~=change_view_mode]', @changeViewMode)
     $(document).on('click', '[data-behavior~=show_entries]', @showEntries)
     $(document).on('ajax:beforeSend', '[data-behavior~=show_entry_content]', @showEntryContent)
-    $(document).on('ajax:beforeSend', '[data-behavior~=toggle_read]', @toggleRead)
-    $(document).on('ajax:beforeSend', '[data-behavior~=toggle_starred]', @toggleStarred)
 
   applyState: =>
     $('li[data-entry-id]').each (index, container) =>
@@ -134,7 +132,9 @@ class feedbin.CountsBehavior
       feed_id: entry.feed_id
       container: container
 
-    if entry.id of feedbin.entries
+    # An entry without toolbar data came from a host still on the old code;
+    # let the request fetch it again.
+    if feedbin.entries[entry.id]?.toolbar
       xhr.abort()
       feedbin.showEntry(entry.id)
 
@@ -171,32 +171,38 @@ class feedbin.CountsBehavior
   isStarred: (entryId) ->
     feedbin.Counts.get().isStarred(entryId)
 
-  toggleRead: (event, xhr) =>
-    if @isRead(feedbin.selectedEntry.id)
-      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'unread')
-      @unmark('read')
+  # The entry-toolbar controller passes the entry it shows. Both toggles
+  # return the new state.
+  toggleRead: (entryId, feedId) =>
+    if @isRead(entryId)
+      feedbin.Counts.get().addEntry(entryId, feedId, 'unread')
+      @unmark('read', entryId)
+      false
     else
-      feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'unread')
-      @mark('read')
+      feedbin.Counts.get().removeEntry(entryId, feedId, 'unread')
+      @mark('read', entryId)
+      true
 
-  mark: (property) ->
+  mark: (property, entryId = feedbin.selectedEntry.id) ->
     feedbin.applyCounts(true)
-    $("[data-entry-id=#{feedbin.selectedEntry.id}]").addClass(property)
+    $("[data-entry-id=#{entryId}]").addClass(property)
 
-  unmark: (property) ->
+  unmark: (property, entryId = feedbin.selectedEntry.id) ->
     feedbin.applyCounts(true)
     if feedbin.specialCollection == 'updated'
-      $(".entry-column [data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
+      $(".entry-column [data-entry-id=#{entryId}]").removeClass(property)
     else
-      $("[data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
+      $("[data-entry-id=#{entryId}]").removeClass(property)
 
-  toggleStarred: (event, xhr) =>
-    if @isStarred(feedbin.selectedEntry.id)
-      feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'starred')
-      @unmark('starred')
+  toggleStarred: (entryId, feedId) =>
+    if @isStarred(entryId)
+      feedbin.Counts.get().removeEntry(entryId, feedId, 'starred')
+      @unmark('starred', entryId)
+      false
     else
-      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'starred')
-      @mark('starred')
+      feedbin.Counts.get().addEntry(entryId, feedId, 'starred')
+      @mark('starred', entryId)
+      true
 
   showEntries: (event) =>
     feedbin.specialCollection = $(event.currentTarget).data('special-collection')

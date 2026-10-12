@@ -6,7 +6,10 @@ require "test_helper"
 # undefined -- so neither shows up at runtime as an error.
 class ToolbarWiringTest < ActiveSupport::TestCase
   LAYOUT = Rails.root.join("app/views/site/logged_in.html.erb")
-  CONTROLLER = Rails.root.join("app/javascript/controllers/toolbar_controller.js")
+  CONTROLLERS = [
+    Rails.root.join("app/javascript/controllers/toolbar_controller.js"),
+    Rails.root.join("app/javascript/controllers/entry_toolbar_controller.js")
+  ]
 
   test "no element declares data-action more than once" do
     offenders = File.readlines(LAYOUT).each_with_index.filter_map { |line, index|
@@ -27,14 +30,29 @@ class ToolbarWiringTest < ActiveSupport::TestCase
     assert_match "mousemove->toolbar#mousing", entries
   end
 
-  test "the toolbar controller only reads values it declares" do
-    source = File.read(CONTROLLER)
-    declared = source[/static values = \{(.*?)\}/m, 1].to_s.scan(/(\w+):/).flatten
+  CONTROLLERS.each do |controller|
+    test "#{controller.basename} only reads values it declares" do
+      source = File.read(controller)
+      declared = source[/static values = \{(.*?)\}/m, 1].to_s.scan(/(\w+):/).flatten
 
-    code = source.gsub(%r{//.*$}, "").gsub(%r{/\*.*?\*/}m, "")
-    used = code.scan(/this\.(\w+)Value\b/).flatten.uniq
+      used = code(source).scan(/this\.(\w+)Value\b/).flatten.uniq
 
-    assert_empty used - declared,
-      "reads an undeclared Stimulus value, which is silently undefined"
+      assert_empty used - declared,
+        "reads an undeclared Stimulus value, which is silently undefined"
+    end
+
+    test "#{controller.basename} only reads targets it declares" do
+      source = File.read(controller)
+      declared = source[/static targets = \[(.*?)\]/m, 1].to_s.scan(/"(\w+)"/).flatten
+
+      used = code(source).scan(/this\.(?:has)?(\w+?)Targets?\b/).flatten.map { it.camelize(:lower) }.uniq
+
+      assert_empty used - declared,
+        "reads an undeclared Stimulus target, which throws at runtime"
+    end
+  end
+
+  def code(source)
+    source.gsub(%r{//.*$}, "").gsub(%r{/\*.*?\*/}m, "")
   end
 end

@@ -166,12 +166,12 @@ class feedbin.Keyboard
 
     # Star
     Mousetrap.bind 's', (event, combo) =>
-      $('[data-behavior~=toggle_starred]').submit()
+      window.dispatchEvent(new CustomEvent("entry-toolbar:star"))
       event.preventDefault()
 
     # Read/Unread
     Mousetrap.bind 'm', (event, combo) =>
-      $('[data-behavior~=toggle_read]').submit()
+      window.dispatchEvent(new CustomEvent("entry-toolbar:read"))
       event.preventDefault()
 
     # Content View

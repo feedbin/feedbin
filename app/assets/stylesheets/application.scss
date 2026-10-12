@@ -2728,7 +2728,8 @@ $feed-title-width: 115px;
     .icon-unread * {
       fill: $color-accent-blue-600;
     }
-    .read & {
+    // The entry-toolbar controller's values; see App::EntryToolbarComponent.
+    [data-entry-toolbar-read-value="true"] & {
       .icon-read {
         display: block;
       }
@@ -2741,7 +2742,7 @@ $feed-title-width: 115px;
     .icon-star-on {
       display: none;
     }
-    .starred & {
+    [data-entry-toolbar-starred-value="true"] & {
       .icon-star-on {
         display: block;
         * {

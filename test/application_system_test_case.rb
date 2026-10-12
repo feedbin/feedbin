@@ -42,7 +42,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
+  # jQuery.active counts jQuery requests; the Stimulus request helper counts
+  # its fetches in feedbin.activeRequests.
   def finished_all_ajax_requests?
-    page.evaluate_script("jQuery.active").zero?
+    page.evaluate_script("jQuery.active + (window.feedbin.activeRequests || 0)").zero?
   end
 end

@@ -76,7 +76,9 @@
                       <%= render App::MuteForm.new %>
                     <% end %>
                 </div>
-                <div class="entry-meta" data-behavior="entry_meta_target" data-toolbar-target="toolbar"></div>
+                <div class="entry-meta" data-behavior="entry_meta_target" data-toolbar-target="toolbar">
+                    <%= render App::EntryToolbarComponent.new %>
+                </div>
                 <div class="inner-column">
                     <div class="entry-content-wrap <%= user_presenter.content_classes %>" data-font-size="<%= user_presenter.font_size %>"  data-font="<%= user_presenter.font %>" data-behavior="entry_content_target">
                             <div class="splash">
