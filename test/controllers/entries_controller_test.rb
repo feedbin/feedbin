@@ -110,6 +110,15 @@ class EntriesControllerTest < ActionController::TestCase
     assert_equal "example.com", toolbar["header_title"]
   end
 
+  # The header sets the title as text, so an escaped title would show its
+  # entities: the old toolbar inserted strip_tags output as HTML.
+  test "toolbar data header_title is plain text" do
+    login_as @user
+    entry = @entries.first
+    entry.feed.update!(title: "Science & <b>Nature</b>")
+    assert_equal "Science & Nature", preload_toolbar(entry)["header_title"]
+  end
+
   test "toolbar data for a pages entry with no host" do
     login_as @user
     entry = create_pages_entry("/x")

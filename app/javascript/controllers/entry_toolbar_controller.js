@@ -48,7 +48,7 @@ export default class extends Controller {
   show(event) {
     const data = event.detail
     if (!data) {
-      this.entryIdValue = 0
+      this.clear()
       return
     }
 
@@ -70,10 +70,7 @@ export default class extends Controller {
     this.feedLinkTarget.href = this.feedUrl(this.editSubscriptionUrlValue, data.feed_id)
     this.sourceLinkTarget.value = data.url
 
-    // The old toolbar left the DOM on each entry, which closed its share menu.
-    this.element.querySelectorAll(".dropdown-wrap.open").forEach((dropdown) => {
-      dropdown.classList.remove("open")
-    })
+    this.closeDropdowns()
 
     feedbin.selectedEntryData = data
     feedbin.prepareShareMenu(data)
@@ -197,6 +194,33 @@ export default class extends Controller {
       feedbin.clearEntry()
       feedbin.fullScreen(false)
     }
+  }
+
+  // The old toolbar left the DOM with its entry. This one stays, so take out
+  // everything that names the entry: the share links and the copy-link field
+  // would still act on it from the keyboard. The entry controls hide while
+  // entryId is 0.
+  clear() {
+    this.entryIdValue = 0
+    this.feedIdValue = 0
+    this.starredValue = false
+    this.readValue = false
+    this.extractValue = false
+    this.loadingValue = false
+    this.pagesValue = false
+    this.subscribedValue = false
+    this.headerTargets.forEach((header) => header.replaceChildren())
+    this.feedLinkTarget.removeAttribute("href")
+    this.sourceLinkTarget.value = ""
+    this.element.querySelectorAll("[data-behavior~=share_options]").forEach((list) => list.replaceChildren())
+    this.closeDropdowns()
+  }
+
+  // The old toolbar left the DOM on each entry, which closed its share menu.
+  closeDropdowns() {
+    this.element.querySelectorAll(".dropdown-wrap.open").forEach((dropdown) => {
+      dropdown.classList.remove("open")
+    })
   }
 
   // A new element each time: jQuery caches data-feed-id the first time

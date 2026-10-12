@@ -1215,6 +1215,13 @@ $.extend feedbin,
     a - b
 
 
+  # Whether the entry toolbar holds an entry. The toolbar stays in the page
+  # when no entry is open, so its share button, share links, and copy-link
+  # field do too; the keyboard shortcuts for them check this first.
+  entryToolbarActive: ->
+    id = $('[data-controller~=entry-toolbar]').attr('data-entry-toolbar-entry-id-value')
+    id? && id != "0"
+
   # The entry toolbar's extract value. attr, not data: jQuery caches what
   # data() reads, and this value changes with every entry.
   readabilityActive: ->

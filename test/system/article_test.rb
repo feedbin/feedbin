@@ -424,10 +424,41 @@ class ArticleTest < ApplicationSystemTestCase
 
     assert_selector "[data-entry-toolbar-entry-id-value='0']", visible: :all
     assert_selector "#source_link h1", text: entry.title
+    # Nothing that still names the previous entry stays on screen.
+    assert_no_selector ".entry-toolbar .entry-feed-title", visible: :all
+    assert_no_selector ".entry-toolbar .button-toggle-starred", visible: true
+    assert_no_selector ".entry-toolbar [data-behavior~=toggle_share_menu]", visible: true
+    assert_selector ".entry-toolbar [data-behavior~=toggle_format_menu]", visible: true
     assert_no_difference "StarredEntry.count" do
       find("body").send_keys("s")
       wait_for_ajax
     end
+  end
+
+  # The toolbar stays in the page with no entry open. Its hidden share button
+  # must not open a dropdown, which would send j and k to the share menu.
+  test "f with no entry open leaves the share menu closed" do
+    show_article_setup
+    login_as(@user)
+    assert_selector "[data-entry-toolbar-entry-id-value='0']", visible: :all
+
+    find("body").send_keys("f")
+
+    assert_no_selector ".dropdown-wrap.open", visible: :all
+  end
+
+  test "clearing the entry resets the toolbar" do
+    show_article
+    wait_for_ajax
+
+    page.execute_script("feedbin.clearEntry()")
+
+    assert_selector "[data-entry-toolbar-entry-id-value='0']", visible: :all
+    assert_equal "", find("#source_link_field", visible: :all).value
+    assert_no_selector ".entry-toolbar .entry-feed-title", visible: :all
+    assert_no_selector ".entry-toolbar [data-behavior~=share_options] li", visible: :all
+    find("body").send_keys("f")
+    assert_no_selector ".dropdown-wrap.open", visible: :all
   end
 
   private

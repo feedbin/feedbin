@@ -551,11 +551,18 @@ class EntryPresenter < BasePresenter
       title: entry.title,
       feed_title: entry.feed.title,
       twitter_id: entry.twitter_id || "",
-      header_title: pages ? entry.hostname.to_s : @template.strip_tags(entry.feed.title).to_s,
+      header_title: pages ? entry.hostname.to_s : toolbar_header_title,
       pages: pages,
       subscribed: !pages && subscriptions.include?(entry.feed_id),
       favicon: favicon(entry.feed, entry).to_s
     }
+  end
+
+  # Plain text, because the toolbar sets it as textContent. strip_tags
+  # returns escaped HTML ("AT&amp;T"), which the old toolbar inserted as HTML;
+  # decode it so the header still reads "AT&T".
+  def toolbar_header_title
+    Nokogiri::HTML5.fragment(@template.strip_tags(entry.feed.title).to_s).text
   end
 
   def tweet_classes(tweet)

@@ -10,6 +10,10 @@ module App
     ENTRY_ID = "ENTRY_ID"
     FEED_ID = "FEED_ID"
 
+    # Shown only while the toolbar holds an entry: with entryId 0 these
+    # buttons would act on nothing, or on a share menu for an earlier entry.
+    ENTRY_CONTROL = "group-data-[entry-toolbar-entry-id-value=0]:tw-hidden"
+
     def view_template
       div class: "toolbar-wrap group", data: controller_data do
         textarea id: "source_link_field", name: "source_link_field", class: "visually-hidden", data: stimulus_item(target: :source_link, for: STIMULUS_CONTROLLER)
@@ -79,23 +83,23 @@ module App
           end
         end
 
-        render partial("sharing_services/sharing_service_button")
+        render partial("sharing_services/sharing_service_button", wrap_class: ENTRY_CONTROL)
 
-        div class: "entry-button-wrap" do
+        div class: "entry-button-wrap #{ENTRY_CONTROL}" do
           toolbar_button(action: :toggle_extract, class: "entry-button button-toggle-content", title: "Extract full content <i>c</i>") do
             Icon("icon-full-content")
             Icon("icon-full-content-on")
           end
         end
 
-        div class: "entry-button-wrap" do
+        div class: "entry-button-wrap #{ENTRY_CONTROL}" do
           toolbar_button(action: :toggle_starred, class: "entry-button button-toggle-starred", title: "Star <i>s</i>") do
             Icon("icon-star-on")
             Icon("icon-star-off")
           end
         end
 
-        div class: "entry-button-wrap" do
+        div class: "entry-button-wrap #{ENTRY_CONTROL}" do
           toolbar_button(action: :toggle_read, class: "entry-button button-toggle-read", title: "Mark as read <i>m</i>") do
             Icon("icon-read")
             Icon("icon-unread")
