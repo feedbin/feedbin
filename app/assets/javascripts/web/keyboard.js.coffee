@@ -176,7 +176,7 @@ class feedbin.Keyboard
 
     # Content View
     Mousetrap.bind 'c', (event, combo) =>
-      $('[data-behavior~=toggle_extract]').submit()
+      window.dispatchEvent(new CustomEvent("entry-toolbar:extract"))
       event.preventDefault()
 
     # Go to unread

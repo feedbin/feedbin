@@ -32,12 +32,14 @@ export default class extends Controller {
 
   // A full page load of /entries/:id calls feedbin.showEntry from a jQuery
   // ready handler, which can run before Stimulus connects this controller.
-  // Its entry-toolbar:show event then had no listener, so show that entry now.
+  // Its entry-toolbar:show event, and the automatic extract that
+  // feedbin.readability() sends after it, then had no listener. Do both now.
   connect() {
     const feedbin = window.feedbin
     const entry = feedbin.selectedEntry && feedbin.entries[feedbin.selectedEntry.id]
     if (entry?.toolbar && !this.entryIdValue) {
       this.show({ detail: entry.toolbar })
+      feedbin.readability()
     }
   }
 
@@ -94,7 +96,82 @@ export default class extends Controller {
     request(this.entryUrl(this.unreadUrlValue, id), { method: "POST" }).catch(() => {})
   }
 
-  toggleExtract() {
+  // feedbin.readability() sends {automatic: true} for a feed with sticky
+  // extract on; only a press by the user flips that setting.
+  toggleExtract(event) {
+    const id = this.entryIdValue
+    if (!id) return
+    const feedbin = window.feedbin
+
+    if (event?.detail?.automatic !== true) {
+      this.toggleSticky(this.feedIdValue)
+    }
+
+    if (this.loadingValue) {
+      feedbin.readabilityXHR?.abort()
+      feedbin.readabilityXHR = null
+      this.loadingValue = false
+      this.extractValue = false
+      feedbin.changeContentView("default")
+    } else if (this.extractValue) {
+      this.extractValue = false
+      feedbin.changeContentView(feedbin.previousContentView)
+    } else if (id in feedbin.extractCache) {
+      this.extractSlot(id).html(feedbin.extractCache[id])
+      feedbin.formatEntryContent(id, false, false)
+      feedbin.changeContentView("extract")
+      this.extractValue = true
+    } else {
+      this.extract(id)
+    }
+  }
+
+  // feedbin.formatEntryContent aborts feedbin.readabilityXHR when another
+  // entry opens. An AbortController answers to the same abort().
+  async extract(id) {
+    const feedbin = window.feedbin
+    const abort = new AbortController()
+    feedbin.readabilityXHR = abort
+    this.loadingValue = true
+    this.extractValue = true
+
+    let html
+    try {
+      const url = `${this.entryUrl(this.extractUrlValue, id)}?extract=true`
+      const response = await request(url, { accept: "text/html", signal: abort.signal })
+      html = await response.text()
+    } catch {
+      if (abort.signal.aborted || this.entryIdValue !== id) return
+      feedbin.readabilityXHR = null
+      this.loadingValue = false
+      this.extractValue = false
+      feedbin.changeContentView("default")
+      return
+    }
+    if (abort.signal.aborted || this.entryIdValue !== id) return
+
+    // Before formatEntryContent, which aborts any request it still finds.
+    feedbin.readabilityXHR = null
+    this.loadingValue = false
+    feedbin.extractCache[id] = html
+    this.extractSlot(id).html(html)
+    feedbin.changeContentView("extract")
+    feedbin.formatEntryContent(id, false, false)
+    feedbin.entryTime()
+  }
+
+  async toggleSticky(feedId) {
+    try {
+      const response = await request(this.feedUrl(this.stickyUrlValue, feedId), { method: "POST" })
+      // No content: the user has no subscription to this feed.
+      if (response.status === 204) return
+      const { view_inline } = await response.json()
+      window.feedbin.data.readability_settings[feedId] = view_inline
+    } catch {}
+  }
+
+  extractSlot(id) {
+    return window.$(`[data-entry-id=${id}] [data-content-option=extract]`)
   }
 
   async delete() {

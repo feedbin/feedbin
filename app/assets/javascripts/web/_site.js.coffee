@@ -861,12 +861,11 @@ $.extend feedbin,
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
-    entryId = feedbin.selectedEntry.id
 
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
-      feedbin.automaticSubmit = true
       feedbin.changeContentView('extract')
-      $('[data-behavior~=toggle_extract]').submit()
+      # automatic: the entry toolbar leaves the sticky setting as it is.
+      window.dispatchEvent(new CustomEvent("entry-toolbar:extract", detail: {automatic: true}))
 
   resetScroll: ->
     $('.entry-content').prop('scrollTop', 0)
@@ -1216,8 +1215,10 @@ $.extend feedbin,
     a - b
 
 
+  # The entry toolbar's extract value. attr, not data: jQuery caches what
+  # data() reads, and this value changes with every entry.
   readabilityActive: ->
-    $('[data-behavior~=toggle_extract]').find('.active').length > 0
+    $('[data-controller~=entry-toolbar]').attr('data-entry-toolbar-extract-value') == "true"
 
   prepareShareForm: ->
     title =$('.entry-header h1').first().text()
@@ -2075,49 +2076,6 @@ $.extend feedbin,
 
     timeago: ->
       feedbin.timeago()
-
-    updateReadability: ->
-      $(document).on 'ajax:complete', '[data-behavior~=toggle_extract]', (event, xhr) ->
-        feedbin.readabilityXHR = null;
-        $('.button-toggle-content').removeClass('loading')
-
-      $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_extract]', (event, xhr) ->
-        entry = $(@).data('entry-id')
-
-        if feedbin.automaticSubmit != true
-          $.post($(@).data("sticky-url"))
-        feedbin.automaticSubmit = false
-
-        if entry of feedbin.extractCache
-          xhr.abort()
-
-          if feedbin.readabilityActive()
-            feedbin.changeContentView(feedbin.previousContentView)
-          else
-            $("[data-content-option~=extract]").html(feedbin.extractCache["#{entry}"]);
-            feedbin.formatEntryContent(entry, false, false);
-            feedbin.changeContentView('extract')
-
-        else if feedbin.readabilityXHR
-          feedbin.readabilityXHR.abort()
-          xhr.abort()
-
-          feedbin.readabilityXHR = null
-          $('.button-toggle-content').removeClass('loading')
-
-          feedbin.changeContentView('default')
-        else
-          $('.button-toggle-content').addClass('loading')
-          feedbin.readabilityXHR = xhr
-
-        if feedbin.readabilityActive()
-          $('.button-toggle-content').removeClass('active')
-          $("#extract").val("true")
-        else
-          $('.button-toggle-content').addClass('active')
-          $("#extract").val("false")
-
-        true
 
     autoUpdate: ->
       setTimeout feedbin.autoUpdate, 300000

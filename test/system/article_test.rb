@@ -166,11 +166,74 @@ class ArticleTest < ApplicationSystemTestCase
     show_article
     wait_for_ajax
 
-    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    extract = stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
     find(".button-toggle-content").click
 
     assert_selector ".original-meta strong", text: "Originally from:"
+    assert_selector "[data-entry-toolbar-extract-value='true']"
+
+    find(".button-toggle-content").click
+    wait_for_ajax
+
+    assert_selector "[data-entry-toolbar-extract-value='false']"
+    assert_no_selector ".original-meta", visible: true
+    assert_requested extract, times: 1
+  end
+
+  test "extract with the c key" do
+    show_article
+    wait_for_ajax
+    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+
+    find("body").send_keys("c")
+
+    assert_selector ".original-meta strong", text: "Originally from:"
+  end
+
+  test "a press while extract loads aborts it" do
+    show_article
+    wait_for_ajax
+    body = File.read(support_file("parsed_page.json"))
+    stub_request(:get, /extract\.example\.com/).to_return do
+      sleep 1
+      {body: body, headers: {"Content-Type" => "application/json; charset=utf-8"}}
+    end
+
+    find("body").send_keys("c")
+    assert_selector "[data-entry-toolbar-loading-value='true']"
+    find("body").send_keys("c")
+
+    assert_selector "[data-entry-toolbar-loading-value='false'][data-entry-toolbar-extract-value='false']"
+    sleep 1.5
+    assert_no_selector ".original-meta"
+  end
+
+  test "automatic extract for a sticky feed does not change the setting" do
+    show_article_setup
+    @user.update!(sticky_view_inline: "1")
+    @user.subscriptions.where(feed: @feed).update_all(view_inline: true)
+    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    login_as(@user)
+
+    click_link(@entries.first.title)
+
+    assert_selector ".original-meta strong", text: "Originally from:"
+    wait_for_ajax
+    assert @user.subscriptions.find_by(feed: @feed).view_inline
+  end
+
+  test "automatic extract on a full page load" do
+    show_article_setup
+    @user.update!(sticky_view_inline: "1")
+    @user.subscriptions.where(feed: @feed).update_all(view_inline: true)
+    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    login_as(@user)
+
+    visit entry_path(@entries.first)
+
+    assert_selector ".original-meta strong", text: "Originally from:"
+    assert_selector "[data-entry-toolbar-extract-value='true']"
   end
 
   test "settings menu opens from the entry toolbar and closes with escape" do

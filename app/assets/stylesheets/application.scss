@@ -2762,7 +2762,7 @@ $feed-title-width: 115px;
       display: none;
     }
     width: 46px;
-    &.loading {
+    [data-entry-toolbar-loading-value="true"] & {
       @keyframes flip {
         50% {
           transform: scaleX(-1);
@@ -2793,7 +2793,7 @@ $feed-title-width: 115px;
   }
 }
 
-.button-toggle-content.active {
+[data-entry-toolbar-extract-value="true"] .button-toggle-content {
   .icon-full-content-on {
     display: block;
 
