@@ -572,6 +572,8 @@ GEM
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
+    requestjs-rails (0.0.14)
+      railties (>= 7.1.0)
     reverse_markdown (3.0.2)
       nokogiri
     rexml (3.4.4)
@@ -768,6 +770,7 @@ DEPENDENCIES
   rails-controller-testing
   redcarpet
   redis (< 5)
+  requestjs-rails
   reverse_markdown
   ruby-prof
   ruby-vips

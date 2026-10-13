@@ -152,7 +152,7 @@ For a feed that is not Pages, the title element keeps `data-behavior="user_title
 
 ### Requests
 
-The controller sends every request with `fetch`. It puts the CSRF token from `<meta name="csrf-token">` in the `X-CSRF-Token` header. No Stimulus controller in the app sends a request today, so the builder adds a small helper for this.
+The controller sends every request with `@rails/request.js` (the `requestjs-rails` gem; Ben decided this after the first build). It sends the CSRF token from `<meta name="csrf-token">` and `X-Requested-With`, and `responseKind` sets the `Accept` header. It does not throw on an HTTP error, so the controller checks `response.ok`. The system tests count fetch requests in the Cuprite driver, not in app code.
 
 Each request builds its URL from the template and from the entry id or feed id at the time the request starts. A response for an entry that is no longer open must not change the screen.
 
@@ -249,7 +249,7 @@ Claude's call: ship in two steps.
 | `GET /entries/:id`, JS | the entry list link | the same link | Both `content` and `toolbar`. It is one entry, so the cost is small. |
 | `GET /entries/:id`, HTML | not possible | a full page load | Toolbar data, no `content` |
 | `GET /extracts/:id/entry` | `Accept: text/javascript` | `Accept: text/html` | `respond_to`: JS gets `entry.js.erb`. HTML gets the partial. |
-| `DELETE /entries/:id` | JS | `fetch` | `respond_to`: JS gets `destroy.js.erb`. Other formats get `204`. |
+| `DELETE /entries/:id` | JS | `@rails/request.js` | `respond_to`: JS gets `destroy.js.erb`. Other formats get `204`. |
 | `POST /settings/sticky/:feed_id` | `$.post` with `Accept: */*` | `Accept: application/json` | `respond_to`: JSON gets JSON. Other formats get `sticky.js.erb`. For `*/*`, Rails uses the first format in the block, so put JS first. |
 
 **New JavaScript with an old server.** During a deploy, app hosts can run old code and new code at the same time for a short period. A page from a new host can send its preload to an old host. The old host ignores the version parameter and returns `content` with no `toolbar`. Claude's call, these rules apply:

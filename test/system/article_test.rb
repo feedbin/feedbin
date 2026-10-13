@@ -30,6 +30,8 @@ class ArticleTest < ApplicationSystemTestCase
       find(".entry-toolbar .button-toggle-starred").click
       wait_for_ajax
     end
+    # Without FETCH_COUNTER, wait_for_ajax would not wait for the star request.
+    assert_equal 0, page.evaluate_script("window.pendingFetches"), "the test driver does not count fetches"
     assert_selector "[data-entry-toolbar-starred-value='true']"
     assert_selector ".entry-toolbar .button-toggle-starred .icon-star-on", visible: true
   end
@@ -207,6 +209,23 @@ class ArticleTest < ApplicationSystemTestCase
     assert_selector "[data-entry-toolbar-loading-value='false'][data-entry-toolbar-extract-value='false']"
     sleep 1.5
     assert_no_selector ".original-meta"
+  end
+
+  # A press by the user flips the feed's sticky setting on the server, and the
+  # JSON answer updates the copy the page keeps.
+  test "an extract press flips the sticky setting" do
+    show_article
+    wait_for_ajax
+    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    subscription = @user.subscriptions.find_by(feed: @feed)
+    initial = subscription.view_inline
+
+    find(".button-toggle-content").click
+    assert_selector ".original-meta strong", text: "Originally from:"
+    wait_for_ajax
+
+    assert_equal !initial, subscription.reload.view_inline
+    assert_equal !initial, page.evaluate_script("feedbin.data.readability_settings[#{@feed.id}]")
   end
 
   test "automatic extract for a sticky feed does not change the setting" do

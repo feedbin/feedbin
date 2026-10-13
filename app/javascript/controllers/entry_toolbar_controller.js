@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
-import { request, userTitle } from "helpers"
+import { get, post, destroy } from "@rails/request.js"
+import { userTitle } from "helpers"
 
 // Connects to data-controller="entry-toolbar"
 //
@@ -82,7 +83,7 @@ export default class extends Controller {
     if (!id) return
 
     this.starredValue = window.feedbin.countsBehavior.toggleStarred(id, this.feedIdValue)
-    request(this.entryUrl(this.starredUrlValue, id), { method: "POST" }).catch(() => {})
+    post(this.entryUrl(this.starredUrlValue, id), { responseKind: "json" }).catch(() => {})
   }
 
   toggleRead() {
@@ -90,7 +91,7 @@ export default class extends Controller {
     if (!id) return
 
     this.readValue = window.feedbin.countsBehavior.toggleRead(id, this.feedIdValue)
-    request(this.entryUrl(this.unreadUrlValue, id), { method: "POST" }).catch(() => {})
+    post(this.entryUrl(this.unreadUrlValue, id), { responseKind: "json" }).catch(() => {})
   }
 
   // feedbin.readability() sends {automatic: true} for a feed with sticky
@@ -134,9 +135,13 @@ export default class extends Controller {
 
     let html
     try {
-      const url = `${this.entryUrl(this.extractUrlValue, id)}?extract=true`
-      const response = await request(url, { accept: "text/html", signal: abort.signal })
-      html = await response.text()
+      const response = await get(this.entryUrl(this.extractUrlValue, id), {
+        query: { extract: "true" },
+        responseKind: "html",
+        signal: abort.signal,
+      })
+      if (!response.ok) throw new Error(`extract failed with ${response.statusCode}`)
+      html = await response.text
     } catch {
       if (abort.signal.aborted || this.entryIdValue !== id) return
       feedbin.readabilityXHR = null
@@ -159,10 +164,10 @@ export default class extends Controller {
 
   async toggleSticky(feedId) {
     try {
-      const response = await request(this.feedUrl(this.stickyUrlValue, feedId), { method: "POST" })
+      const response = await post(this.feedUrl(this.stickyUrlValue, feedId), { responseKind: "json" })
       // No content: the user has no subscription to this feed.
-      if (response.status === 204) return
-      const { view_inline } = await response.json()
+      if (!response.ok || response.statusCode === 204) return
+      const { view_inline } = await response.json
       window.feedbin.data.readability_settings[feedId] = view_inline
     } catch {}
   }
@@ -178,7 +183,8 @@ export default class extends Controller {
     if (!window.confirm("Are you sure you want to delete this page?")) return
 
     try {
-      await request(this.entryUrl(this.deleteUrlValue, id), { method: "DELETE" })
+      const response = await destroy(this.entryUrl(this.deleteUrlValue, id), { responseKind: "json" })
+      if (!response.ok) return
     } catch {
       return
     }
