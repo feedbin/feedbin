@@ -27,6 +27,13 @@ class FeedImportFixerTest < ActiveSupport::TestCase
     assert_equal(@import_item.details[:title], Subscription.last.title)
   end
 
+  test "should skip an item whose import was deleted" do
+    @import_item.import.destroy!
+    assert_no_difference -> { Subscription.count } do
+      FeedImportFixer.new.perform(@user.id, @import_item.id, @discovered_feed.id)
+    end
+  end
+
   test "completes the item once the subscription exists" do
     @import_item.update!(status: :fixable)
 

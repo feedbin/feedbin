@@ -5,7 +5,8 @@ class FeedImportFixer
 
   def perform(user_id, import_item_id, discovered_feed_id = nil)
     user = User.find(user_id)
-    import_item = user.import_items.find(import_item_id)
+    import_item = user.import_items.find_by(id: import_item_id)
+    return if import_item.nil?
 
     discovered_feed = if discovered_feed_id
       DiscoveredFeed.find(discovered_feed_id)

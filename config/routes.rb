@@ -317,7 +317,7 @@ Rails.application.routes.draw do
 
     get :newsletters_pages, to: redirect("/settings/newsletters")
 
-    resources :imports, only: [:create, :show] do
+    resources :imports, only: [:create, :show, :destroy] do
       member do
         post :replace_all
       end

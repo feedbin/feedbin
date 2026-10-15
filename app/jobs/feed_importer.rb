@@ -3,7 +3,8 @@ class FeedImporter
   sidekiq_options queue: :default_critical, retry: false
 
   def perform(import_item_id)
-    @import_item = ImportItem.find(import_item_id)
+    @import_item = ImportItem.find_by(id: import_item_id)
+    return if @import_item.nil?
     import = @import_item.import
     user = import.user
 
