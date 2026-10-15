@@ -33,7 +33,7 @@ class UserDeleter
 
   def subscriptions_opml
     tags = @user.feed_tags
-    feeds = @user.feeds.xml
+    feeds = @user.feeds.xml.where.not(id: @user.taggings.select(:feed_id))
     titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
       hash[feed_id] = title
     }

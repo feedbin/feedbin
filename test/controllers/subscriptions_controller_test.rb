@@ -11,6 +11,21 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should export each feed once" do
+    tagged = feeds(:daring_fireball)
+    untagged = feeds(:kottke)
+    @user.subscriptions.create!(feed: untagged)
+    tagged.tag("Design", @user)
+
+    login_as @user
+    get :index, format: :xml
+    assert_response :success
+
+    outlines = Nokogiri::XML(@response.body).css("outline[xmlUrl]")
+    assert_equal [tagged.feed_url, untagged.feed_url].sort, outlines.map { it["xmlUrl"] }.sort
+    assert_equal [tagged.feed_url], outlines.select { it.parent["text"] == "Design" }.map { it["xmlUrl"] }
+  end
+
   test "should export a tag the user has" do
     tag = @user.feeds.first.tag("Design", @user).first.tag
     login_as @user
