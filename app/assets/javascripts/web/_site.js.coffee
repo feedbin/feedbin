@@ -75,17 +75,19 @@ $.extend feedbin,
       )
       $('head').append(tag)
 
-  sharedMarkRead: ->
+  # showingSource: the entries list shows this source, so the listed entries
+  # belong to it. The source menu can mark any source, not only the shown one.
+  sharedMarkRead: (data = feedbin.markReadData, showingSource = true) ->
     unless $(@).attr('disabled')
       $('.entries li').map ->
         entry_id = $(@).data('entry-id') * 1
 
       if feedbin.data.mark_as_read_confirmation
-        result = confirm(feedbin.markReadData.message)
+        result = confirm(data.message)
         if result
-          feedbin.markRead()
+          feedbin.markRead(data, showingSource)
       else
-        feedbin.markRead()
+        feedbin.markRead(data, showingSource)
     return
 
   hideMenu: (event, content, button, menu, force = false) ->
@@ -1094,24 +1096,30 @@ $.extend feedbin,
   log: (input) ->
     console.log input
 
-  markRead: () ->
+  markRead: (data = feedbin.markReadData, showingSource = true) ->
     feedbin.showPanel(1);
-    $('.entries li').addClass('read')
 
-    if feedbin.markReadData.type == "feed"
-      feedbin.Counts.get().markFeedRead(feedbin.markReadData.data)
+    if data.type == "feed"
+      feedbin.Counts.get().markFeedRead(data.data)
       feedbin.applyCounts(true)
-    else if feedbin.markReadData.type == "tag"
-      feedbin.Counts.get().markTagRead(feedbin.markReadData.data)
+    else if data.type == "tag"
+      feedbin.Counts.get().markTagRead(data.data)
       feedbin.applyCounts(true)
-    else if feedbin.markReadData.type == "all" || feedbin.markReadData.type == "unread"
+    else if data.type == "all" || data.type == "unread"
       feedbin.Counts.get().markAllRead()
       feedbin.applyCounts(false)
 
-    feedbin.markReadData.ids = $('.entries li').map(() ->
-      $(@).data('entry-id')
-    ).get().join()
-    $.post feedbin.data.mark_as_read_path, feedbin.markReadData
+    # A copy, because data is the cached object from jQuery's .data and a
+    # stale date or ids on it would go out with a later menu mark-read.
+    payload = $.extend({}, data)
+    if showingSource
+      $('.entries li').addClass('read')
+      payload.ids = $('.entries li').map(() ->
+        $(@).data('entry-id')
+      ).get().join()
+    else
+      delete payload.date
+    $.post feedbin.data.mark_as_read_path, payload
 
   checkPushPermission: (permissionData) ->
     if (permissionData.permission == 'default')
@@ -1677,11 +1685,12 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=menu_mark_read]', (event) ->
         targetSelector = $(@).data('source-target')
         target = $("[data-feed-id=#{targetSelector}]")
-        feedbin.markReadData = $('[data-mark-read]', target).data('mark-read')
+        data = $('[data-mark-read]', target).data('mark-read')
+        showingSource = target.hasClass('selected')
         feedbin.hideSourceMenu(event, true)
 
         callback = ->
-          feedbin.sharedMarkRead()
+          feedbin.sharedMarkRead(data, showingSource)
         setTimeout callback, 10
 
         event.preventDefault()
