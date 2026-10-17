@@ -310,6 +310,10 @@ class Feed < ApplicationRecord
     nil
   end
 
+  def recently_downloaded?
+    last_download.present? && last_download.after?(1.day.ago) && crawl_data.error_count == 0
+  end
+
   private
 
   def refresh_favicon
