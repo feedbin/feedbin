@@ -63,6 +63,31 @@ class UsersControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "should keep an expired trial suspended while its first charge waits on authentication" do
+    StripeMock.start
+    user = users(:ann)
+    new_plan = plans(:basic_monthly_3)
+    create_stripe_plan(user.plan)
+    create_stripe_plan(new_plan)
+
+    customer = Stripe::Customer.create({email: user.email, plan: user.plan.stripe_id})
+    user.update(customer_id: customer.id)
+    user.deactivate
+
+    login_as user
+    stub_payment_methods do
+      Customer.stub_any_instance(:update_plan, :requires_action) do
+        patch :update, params: {id: user, redirect_to: settings_billing_url, user: {stripe_token: "pm_new_card", plan_id: new_plan.id}}
+      end
+    end
+
+    assert_redirected_to authenticate_settings_billing_url
+    assert_equal new_plan, user.reload.plan
+    assert user.suspended, "an unauthenticated payment must not buy access"
+
+    StripeMock.stop
+  end
+
   test "should destroy user" do
     StripeMock.start
     user = users(:ben)

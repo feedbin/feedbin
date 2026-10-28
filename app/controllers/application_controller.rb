@@ -273,6 +273,25 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # A plan change that charges the card can leave that charge waiting on the
+  # bank's authentication, or declined. The plan has changed in Stripe either
+  # way, so this only decides where the customer goes next. Nothing has been
+  # paid in either case, so a suspension stays until it is: abandoning the
+  # challenge must not buy access, and the subscription_reactivated? webhook
+  # lifts it once the payment lands.
+  def redirect_after_plan_payment(was_suspended, url, notice:)
+    case @user.plan_payment
+    when :requires_action
+      @user.deactivate if was_suspended
+      redirect_to authenticate_settings_billing_url
+    when :declined
+      @user.deactivate if was_suspended
+      redirect_to edit_settings_billing_url, alert: "Your card was declined, please update your billing information."
+    else
+      redirect_to url, notice: notice
+    end
+  end
+
   def set_user
     @user = current_user
   end

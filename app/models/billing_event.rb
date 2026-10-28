@@ -91,10 +91,14 @@ class BillingEvent < ApplicationRecord
       event_object["status"] == "unpaid"
   end
 
+  # A suspended account also comes back through past_due: a trial converted or
+  # a plan changed with a charge the bank wanted authenticated stays suspended
+  # until that payment lands, and the subscription is past_due until then.
   def subscription_reactivated?
-    event_type == "customer.subscription.updated" &&
-      event_object["status"] == "active" &&
-      info.safe_dig("data", "previous_attributes", "status") == "unpaid"
+    return false unless event_type == "customer.subscription.updated" && event_object["status"] == "active"
+
+    previous_status = info.safe_dig("data", "previous_attributes", "status")
+    previous_status == "unpaid" || (previous_status == "past_due" && billable&.suspended?)
   end
 
   def subscription_reminder?

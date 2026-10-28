@@ -29,6 +29,7 @@ class UsersController < ApplicationController
 
   def update
     old_plan_name = @user.plan.stripe_id
+    was_suspended = @user.suspended
     @user.update_auth_token = true
     # user_params first: params.require(:user) answers a missing param with the
     # framework's 400, where reading params[:user][:old_password] ahead of it
@@ -46,11 +47,7 @@ class UsersController < ApplicationController
         Librato.increment("user.paid", source: "signup")
       end
       sign_in @user
-      if params[:redirect_to]
-        redirect_to params[:redirect_to], notice: "Account updated."
-      else
-        redirect_to settings_account_path, notice: "Account updated."
-      end
+      redirect_after_plan_payment(was_suspended, params[:redirect_to] || settings_account_path, notice: "Account updated.")
     else
       if params[:redirect_to]
         redirect_to params[:redirect_to], alert: @user.errors.full_messages.join(". ")

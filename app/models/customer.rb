@@ -49,10 +49,17 @@ class Customer
       invoice.save
       :reopened
     elsif (!invoice.paid && invoice.attempt_count >= 4) || invoice.status == "draft"
-      Stripe::Subscription.update(invoice.subscription,
+      # The re-anchor charges straight away, and without a payment_behavior Stripe
+      # refuses the whole update when the bank wants the customer to authenticate
+      # — routine for Indian cards. allow_incomplete keeps the invoice open with its
+      # PaymentIntent waiting instead, and swapping in the updated subscription
+      # points `dunning_invoice` at that new invoice so `pay_open_invoice` can
+      # collect or authenticate it.
+      @subscription = Stripe::Subscription.update(invoice.subscription,
         {
           billing_cycle_anchor: "now",
-          proration_behavior: "none"
+          proration_behavior: "none",
+          payment_behavior: "allow_incomplete"
         }
       )
       # Re-anchoring bills a fresh period and abandons this one, so say so rather
@@ -68,16 +75,9 @@ class Customer
   # with its PaymentIntent in `requires_action`, and that intent's client secret
   # is what the browser needs to run the challenge. Returns nil when nothing is
   # waiting, so this doubles as the check for whether to offer authentication.
-  # Neither `invoice.payment_intent` nor PaymentIntents themselves exist at the
-  # pinned API version, so both reads happen at the newer one.
   def authentication_client_secret
-    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
-    invoice = dunning_invoice(options)
-    payment_intent_id = invoice && invoice[:payment_intent]
-    return nil if payment_intent_id.blank?
-
-    intent = Stripe::PaymentIntent.retrieve(payment_intent_id, options)
-    intent.client_secret if intent.status == "requires_action"
+    intent = dunning_payment_intent
+    intent.client_secret if intent && intent.status == "requires_action"
   end
 
   # Whether dunning is still working on something, regardless of whether it's the
@@ -146,6 +146,14 @@ class Customer
     "#{card.brand} ××#{card.last4[-2..-1]}"
   end
 
+  # Ending a trial or moving to a plan that bills immediately charges the card as
+  # part of the update. Without a payment_behavior Stripe refuses the whole update
+  # when the bank wants the customer to authenticate, which leaves nothing for
+  # them to authenticate. allow_incomplete applies the change and leaves the
+  # invoice open for dunning instead.
+  #
+  # Returns :requires_action when that charge is waiting on the customer,
+  # :declined when the card was refused, or nil when nothing is owed.
   def update_plan(plan_id, trial_end)
     subscription.trial_end = if trial_end.future?
       trial_end.to_i
@@ -153,7 +161,11 @@ class Customer
       "now"
     end
     subscription.plan = plan_id
-    subscription.save
+    subscription.save(payment_behavior: "allow_incomplete")
+
+    intent = dunning_payment_intent
+    return nil unless intent
+    intent.status == "requires_action" ? :requires_action : :declined
   end
 
   def subscription
@@ -176,6 +188,17 @@ class Customer
 
     invoice = Stripe::Invoice.retrieve(latest_invoice_id, options)
     invoice if invoice.status == "open"
+  end
+
+  # Neither `invoice.payment_intent` nor PaymentIntents themselves exist at the
+  # pinned API version, so both reads happen at the newer one.
+  def dunning_payment_intent
+    options = {stripe_version: STRIPE_INTENTS_API_VERSION}
+    invoice = dunning_invoice(options)
+    payment_intent_id = invoice && invoice[:payment_intent]
+    return nil if payment_intent_id.blank?
+
+    Stripe::PaymentIntent.retrieve(payment_intent_id, options)
   end
 
   # `invoice_settings` isn't part of the customer shape at the pinned API

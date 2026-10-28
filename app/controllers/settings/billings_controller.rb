@@ -32,13 +32,14 @@ class Settings::BillingsController < ApplicationController
 
   def update_plan
     @user = current_user
+    was_suspended = @user.suspended
     plan = Plan.find(params[:plan])
     @user.plan = plan
     # plan_type_valid rejects a plan outside the user's price tier without
     # raising, so an unchecked save told the user their plan had changed while
     # they went on being billed for the old one.
     if @user.save
-      redirect_to settings_billing_url, notice: "Plan successfully changed."
+      redirect_after_plan_payment(was_suspended, settings_billing_url, notice: "Plan successfully changed.")
     else
       redirect_to settings_billing_url, alert: @user.errors.full_messages.to_sentence.presence || "Plan could not be changed."
     end
@@ -100,12 +101,13 @@ class Settings::BillingsController < ApplicationController
       if @user.save
         Rails.cache.delete(FeedbinUtils.payment_details_key(current_user.id))
         customer = Customer.retrieve(@user.customer_id)
-        recovery = customer.reopen_account if customer.unpaid?
+        customer.reopen_account if customer.unpaid?
 
         # A card update is often the answer to a failed charge, so collect what's
-        # owed with the new card. Skipped after a re-anchor, which already wrote
-        # the lapsed period off — collecting it too would double charge.
-        if recovery != :reanchored && customer.pay_open_invoice == :requires_action
+        # owed with the new card. After a re-anchor the subscription's latest
+        # invoice is the fresh period's, never the lapsed one it wrote off, so
+        # this only picks it up when that charge is still waiting.
+        if customer.pay_open_invoice == :requires_action
           # Nothing has been paid yet, so a suspension stays until the customer
           # authenticates — abandoning the challenge must not buy access. The
           # subscription_reactivated? webhook lifts it once the payment lands.

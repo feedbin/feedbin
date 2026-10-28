@@ -53,6 +53,26 @@ class BillingEventTest < ActiveSupport::TestCase
     assert @user.reload.active?
   end
 
+  test "subscription_reactivated? lifts a suspension once a past_due payment lands" do
+    @user.deactivate
+    event = StripeMock.mock_webhook_event("customer.subscription.updated", webhook_defaults)
+    event["data"]["object"]["status"] = "active"
+    event["data"]["previous_attributes"] = {"status" => "past_due"}
+    BillingEvent.create(info: event.as_json)
+
+    assert @user.reload.active?
+  end
+
+  test "subscription_reactivated? ignores past_due recoveries on accounts that were never suspended" do
+    event = StripeMock.mock_webhook_event("customer.subscription.updated", webhook_defaults)
+    event["data"]["object"]["status"] = "active"
+    event["data"]["previous_attributes"] = {"status" => "past_due"}
+    billing_event = BillingEvent.new(info: event.as_json)
+    billing_event.validate
+
+    assert_not billing_event.subscription_reactivated?
+  end
+
   test "subscription_reminder?" do
     event = StripeMock.mock_webhook_event("invoice.upcoming-custom", webhook_defaults)
     assert_difference "ActionMailer::Base.deliveries.count", +1 do

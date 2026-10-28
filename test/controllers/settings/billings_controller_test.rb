@@ -228,21 +228,27 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_equal "Your card has been updated.", flash[:notice]
   end
 
-  test "should not collect a lapsed invoice that reopen_account just wrote off" do
-    paid = []
+  test "should send the customer to authenticate when a plan change charge needs it" do
+    with_card_saving_user("plan-change-action@example.com") do |user|
+      plan = user.available_plans.first
+      Customer.stub_any_instance(:update_plan, :requires_action) do
+        post :update_plan, params: {plan: plan.id}
+      end
+      assert_equal plan, user.reload.plan, "Stripe applied the change, so the account should agree"
+    end
 
-    with_card_saving_user("reanchored@example.com") do |user|
-      Customer.stub_any_instance(:unpaid?, true) do
-        Customer.stub_any_instance(:reopen_account, :reanchored) do
-          Customer.stub_any_instance(:pay_open_invoice, -> { paid << :charged }) do
-            post :update_credit_card, params: {stripe_token: "pm_replacement"}
-          end
-        end
+    assert_redirected_to authenticate_settings_billing_url
+  end
+
+  test "should send the customer to the card form when a plan change charge is declined" do
+    with_card_saving_user("plan-change-declined@example.com") do |user|
+      Customer.stub_any_instance(:update_plan, :declined) do
+        post :update_plan, params: {plan: user.available_plans.first.id}
       end
     end
 
-    assert_empty paid, "re-anchoring bills a fresh period, so charging the lapsed invoice would double up"
-    assert_redirected_to settings_billing_url
+    assert_redirected_to edit_settings_billing_url
+    assert_equal "Your card was declined, please update your billing information.", flash[:alert]
   end
 
   test "should get edit with a setup intent url on the form" do

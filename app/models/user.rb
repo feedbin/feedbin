@@ -2,6 +2,11 @@ class User < ApplicationRecord
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
     :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
 
+  # What a plan change did to the card: :requires_action when the bank wants the
+  # customer to authenticate the charge, :declined when it was refused, nil when
+  # nothing is owed. The plan change itself has gone through either way.
+  attr_reader :plan_payment
+
   has_secure_password reset_token: false
 
   store_accessor :settings,
@@ -372,7 +377,7 @@ class User < ApplicationRecord
     end
 
     if plan_id_changed?
-      stripe_customer.update_plan(plan.stripe_id, trial_end)
+      @plan_payment = stripe_customer.update_plan(plan.stripe_id, trial_end)
     end
 
     self.stripe_token = nil
