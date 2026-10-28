@@ -3192,6 +3192,12 @@ $feed-title-width: 115px;
     font-style: italic;
   }
 
+  svg {
+    max-width: 100%;
+    height: auto;
+    overflow: hidden;
+  }
+
   h1,
   h2,
   h3,

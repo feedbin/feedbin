@@ -8,6 +8,7 @@ module ContentFilters
       doc
         .scrub!(custom_elements)
         .scrub!(:prune)
+        .scrub!(responsive_svg_duplicates)
         .scrub!(video)
         .scrub!(links)
         .scrub!(iframe)
@@ -23,6 +24,16 @@ module ContentFilters
           Loofah::Scrubber::STOP
         elsif node.name.include?("-")
           node.name = "span"
+        end
+      end
+    end
+
+    # Sites often ship a wide and a narrow copy of the same diagram and pick one
+    # with a class-based media query. We strip classes, so both would show.
+    def responsive_svg_duplicates
+      Loofah::Scrubber.new do |node|
+        if node.name == "svg" && node.previous_element&.name == "svg"
+          node.remove
         end
       end
     end
