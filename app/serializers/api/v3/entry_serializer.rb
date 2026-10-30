@@ -167,7 +167,7 @@ module Api
             title: page.title,
             hostname: Addressable::URI.parse(url).host,
             author: page.author,
-            content: ContentFormatter.api_format(page.content, nil)
+            content: ContentFormatter.api_format(page.content, nil, url)
           }
         rescue
           nil

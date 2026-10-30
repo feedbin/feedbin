@@ -38,6 +38,21 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     assert_equal "page", serialize(create_entry(@feed))[:kind]
   end
 
+  # Before this, the nil entry raised inside api_format and the rescue handed
+  # back Mercury's HTML untouched.
+  test "an extracted page is sanitized with its links resolved" do
+    url = "https://example.com/story"
+    page = {"url" => url, "result" => {"title" => "Story", "author" => "A", "content" => %(<p><a href="/more">more</a><script>1</script></p>)}}
+    entry = create_entry(@feed)
+    entry.update!(data: {"saved_pages" => {url => page}})
+
+    extracted = serialize(entry)[:extracted]
+
+    assert_equal 1, extracted.size
+    assert_includes extracted.first[:content], %(href="https://example.com/more")
+    refute_includes extracted.first[:content], "<script"
+  end
+
   test "serializes the preview image row" do
     entry = create_entry(@feed)
     fingerprint = SecureRandom.uuid

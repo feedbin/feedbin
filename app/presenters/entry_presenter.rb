@@ -316,7 +316,7 @@ class EntryPresenter < BasePresenter
       entry.data["saved_pages"].each do |url, page|
         if page["result"]
           parsed = MercuryParser.new(nil, data: page)
-          content = ContentFormatter.api_format(parsed.content, nil)
+          content = ContentFormatter.api_format(parsed.content, nil, url)
           data = {
             url: url,
             title: parsed.title,

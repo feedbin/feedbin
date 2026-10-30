@@ -205,17 +205,18 @@ class ContentFormatter
     new._api_format(*args)
   end
 
-  def _api_format(content, entry)
+  # A saved page has no entry; its own URL is the base for relative links.
+  def _api_format(content, entry, base_url = nil)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub, ContentFilters::Attributes]
     context = {
       scrub_mode: :default,
-      image_base_url: entry.base_url,
-      image_subpage_url: entry.fully_qualified_url || "",
-      href_base_url: entry.base_url,
-      href_subpage_url: entry.fully_qualified_url || ""
+      image_base_url: base_url || entry.base_url,
+      image_subpage_url: base_url || entry.fully_qualified_url || "",
+      href_base_url: base_url || entry.base_url,
+      href_subpage_url: base_url || entry.fully_qualified_url || ""
     }
 
-    if entry.feed.newsletter?
+    if entry&.feed&.newsletter?
       context[:scrub_mode] = :newsletter
     end
     pipeline = HTML::Pipeline.new filters, context

@@ -141,6 +141,14 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_includes result, "Hi"
   end
 
+  test "api_format accepts a base_url instead of an entry" do
+    content = %(<p><a href="/link"><img src="/img.png"></a><script>1</script></p>)
+    result = ContentFormatter.api_format(content, nil, "http://override.example/")
+    assert_includes result, %(href="http://override.example/link")
+    assert_includes result, %(src="http://override.example/img.png")
+    refute_includes result, "<script"
+  end
+
   test "api_format returns original content when an exception is raised" do
     content = %(<p>fine</p>)
     HTML::Pipeline.stub :new, ->(*) { raise "boom" } do
