@@ -20,6 +20,18 @@ class UsersControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
+  test "returns to the page that asked for sign-in after signing up" do
+    StripeMock.start
+    plan = plans(:trial)
+    create_stripe_plan(plan)
+    session[:return_to] = "http://test.host/oauth/authorize?client_id=abc"
+
+    post :create, params: {user: {email: "example@example.com", password: default_password, plan_id: plan.id}}
+
+    assert_redirected_to "http://test.host/oauth/authorize?client_id=abc"
+    StripeMock.stop
+  end
+
   test "should change password" do
     user = users(:ben)
     login_as user

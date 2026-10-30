@@ -20,7 +20,9 @@ class UsersController < ApplicationController
         @user.account_migrations.create(api_token: session.delete(:feed_wrangler_token))
         redirect_to account_migrations_url
       else
-        redirect_to root_url
+        # Back to where sign-in was asked for, such as an app's OAuth
+        # authorization screen, the way signing in returns there.
+        redirect_back_or root_url
       end
     else
       render "new"

@@ -62,6 +62,21 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_url
   end
 
+  test "a new user signs up and comes back to the authorization screen" do
+    StripeMock.start
+    plan = plans(:trial)
+    create_stripe_plan(plan)
+
+    get oauth_authorization_path(authorize_params)
+    assert_redirected_to login_url
+
+    post users_url, params: {user: {email: "new-reader@example.com", password: default_password, plan_id: plan.id}}
+
+    assert_redirected_to oauth_authorization_url(authorize_params)
+  ensure
+    StripeMock.stop
+  end
+
   test "is hidden from users without the feature flag" do
     @user.setting_off!(:api_v3)
     sign_in_as @user
