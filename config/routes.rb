@@ -121,6 +121,7 @@ Rails.application.routes.draw do
       end
 
       namespace :v3 do
+        resources :entries, only: [:index]
         resources :tokens, only: [:index, :destroy]
 
         match "/", to: "api#not_found", via: :all

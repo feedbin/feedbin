@@ -6,18 +6,10 @@ module Api
     module Pagination
       extend ActiveSupport::Concern
 
-      class InvalidLimit < StandardError; end
-
       DEFAULT_LIMIT = 100
       MAX_LIMIT = 1_000
 
       included do
-        # Query parameter errors point at the parameter's name, not a JSON
-        # Pointer, as errors.md describes.
-        rescue_from InvalidLimit do |exception|
-          status_validation_failed([{pointer: "limit", code: "out_of_range", detail: exception.message}])
-        end
-
         rescue_from Cursor::Invalid do
           render_problem :bad_request, "cursor_invalid",
             title: "Invalid cursor",
@@ -52,7 +44,7 @@ module Api
       def page_limit(default: DEFAULT_LIMIT, max: MAX_LIMIT)
         return default unless params.key?(:limit)
         limit = Integer(params[:limit], exception: false)
-        raise InvalidLimit, "limit must be an integer from 1 to #{max}." unless limit&.between?(1, max)
+        raise Problems::InvalidParameter.new("limit must be an integer from 1 to #{max}.", pointer: "limit", code: "out_of_range") unless limit&.between?(1, max)
         limit
       end
 

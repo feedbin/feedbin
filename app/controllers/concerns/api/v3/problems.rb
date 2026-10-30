@@ -6,6 +6,19 @@ module Api
     module Problems
       extend ActiveSupport::Concern
 
+      # A query parameter or body value that was understood but is wrong.
+      # pointer is the query parameter's name, or a JSON Pointer into the
+      # body, as errors.md describes.
+      class InvalidParameter < StandardError
+        attr_reader :pointer, :code
+
+        def initialize(message, pointer:, code: "invalid")
+          super(message)
+          @pointer = pointer
+          @code = code
+        end
+      end
+
       included do
         rescue_from StandardError do |exception|
           raise exception if Rails.application.config.consider_all_requests_local
@@ -23,6 +36,10 @@ module Api
           render_problem :bad_request, "bad_request",
             title: "Bad request",
             detail: "The request body is not valid JSON."
+        end
+
+        rescue_from InvalidParameter do |exception|
+          status_validation_failed([{pointer: exception.pointer, code: exception.code, detail: exception.message}])
         end
 
         rescue_from ActionController::ParameterMissing do |exception|
