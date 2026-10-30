@@ -1,6 +1,6 @@
 # Bearer tokens issued by Doorkeeper, and nothing else: v3 never takes the
-# account password, not even as HTTP Basic auth. Sets @user, then checks the
-# account may use v3 at all.
+# account password, not even as HTTP Basic auth. Sets @user and @token, then
+# checks the account may use v3 at all.
 module Api
   module V3
     module Authentication
@@ -25,6 +25,7 @@ module Api
         token = Doorkeeper::AccessToken.by_token(plaintext)
         return unless token&.accessible?
 
+        @token = token
         token.update_column(:last_used_at, Time.now) unless token.last_used_at&.after?(LAST_USED_RESOLUTION.ago)
         User.includes(:plan).find_by(id: token.resource_owner_id)
       end
