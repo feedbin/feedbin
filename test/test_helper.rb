@@ -2,49 +2,23 @@ ENV["RAILS_ENV"] ||= "test"
 
 require "minitest"
 require "minitest/mock"
-require "socket"
 require "uri"
 require "connection_pool"
 
-if ENV["CI"]
-  REDIS_DATABASE_OFFSET = 0
-elsif !system("command -v redis-server", out: File::NULL, err: File::NULL)
-  # No local redis-server: share the development Redis, such as an OrbStack
-  # container, named in .env. Development uses database 0, so the tests
-  # start at 1 to keep flushdb away from it.
-  require "dotenv"
-  REDIS_DATABASE_OFFSET = 1
-  ENV["REDIS_URL"] = URI(Dotenv.parse(File.expand_path("../.env", __dir__)).fetch("REDIS_URL")).tap { _1.path = "/#{REDIS_DATABASE_OFFSET}" }.to_s
-else
-  REDIS_DATABASE_OFFSET = 0
-  socket = Socket.new(:INET, :STREAM, 0)
-  socket.bind(Addrinfo.tcp("127.0.0.1", 0))
-  port = socket.local_address.ip_port
-  socket.close
-
-  ENV["REDIS_URL"] = "redis://localhost:%d" % port
-  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no --databases 32" % port)
-
-  redis_parent_pid = Process.pid
-  Minitest.after_run do
-    Process.kill("INT", redis_test_instance.pid) if Process.pid == redis_parent_pid
-  end
-end
-
-REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path = "" }.to_s
-
 require File.expand_path("../../config/environment", __FILE__)
 
-# Points every Redis client at ENV["REDIS_URL"]. `rails test:system` boots the
-# app before this file runs, so the initializers already connected to the
-# .env.test URL instead of the redis-server started above; parallel workers
-# call this again for their own database.
+# .env.test points REDIS_URL at the OrbStack Redis, on a database above
+# development's 0. Each parallel worker takes its own database from there.
+REDIS_URL = URI(ENV.fetch("REDIS_URL"))
+REDIS_DATABASE = REDIS_URL.path.delete_prefix("/").to_i
+
+# Points every Redis client at ENV["REDIS_URL"], for a parallel worker's own
+# database.
 def connect_test_redis
   load Rails.root.join("config/initializers/redis.rb")
   Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
   Sidekiq.default_configuration.redis = {url: ENV["REDIS_URL"]}
 end
-connect_test_redis
 
 # MakeEpub's cover renders text with libvips, through Pango. On macOS Pango
 # uses CoreText, which can't be used in a forked parallel test worker: if the
@@ -130,7 +104,7 @@ class ActiveSupport::TestCase
 
   parallelize_setup do |worker|
     ENV["TEST_WORKER"] = worker.to_s
-    ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker + REDIS_DATABASE_OFFSET}"
+    ENV["REDIS_URL"] = REDIS_URL.dup.tap { _1.path = "/#{REDIS_DATABASE + worker}" }.to_s
     connect_test_redis
 
     Search.configure!
