@@ -285,6 +285,8 @@ GEM
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
     domain_name (0.6.20260921)
+    doorkeeper (5.9.9)
+      railties (>= 5)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
@@ -729,6 +731,7 @@ DEPENDENCIES
   connection_pool (< 3)
   cuprite
   debug
+  doorkeeper
   dotenv-rails (= 2.8.1)
   evernote_oauth
   faker

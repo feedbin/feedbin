@@ -1,0 +1,8 @@
+<% content_for :form_content do %>
+<div class="border rounded-md p-6 md:p-12 mb-8">
+  <h1 class="font-bold text-lg mb-4">This app can’t connect to Feedbin</h1>
+  <p class="text-500"><%= (local_assigns[:error_response] ? error_response : @pre_auth.error_response).body[:error_description] %></p>
+</div>
+<% end %>
+
+<%= render template: "layouts/form_page" %>

@@ -1,0 +1,20 @@
+<% content_for :form_content do %>
+<div class="border rounded-md p-6 md:p-12 mb-8">
+  <h1 class="font-bold text-lg mb-4">Allow <%= @pre_auth.client.name %> to use your Feedbin account?</h1>
+  <p class="text-500 mb-2"><%= @pre_auth.client.name %> will be able to read and change your subscriptions, articles, and settings as <strong class="text-600"><%= current_user.email %></strong>.</p>
+  <p class="text-500 mb-8">You can revoke access at any time in Settings &gt; API.</p>
+
+  <div class="flex gap-4">
+    <%= form_tag oauth_authorization_path, method: :delete, class: "flex-1" do %>
+      <%= render "doorkeeper/authorizations/hidden_fields" %>
+      <button type="submit" class="button button-secondary flex w-full">Deny</button>
+    <% end %>
+    <%= form_tag oauth_authorization_path, method: :post, class: "flex-1" do %>
+      <%= render "doorkeeper/authorizations/hidden_fields" %>
+      <button type="submit" class="button flex w-full">Allow</button>
+    <% end %>
+  </div>
+</div>
+<% end %>
+
+<%= render template: "layouts/form_page" %>

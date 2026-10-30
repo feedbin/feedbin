@@ -9,6 +9,11 @@ module LoginHelper
     end
   end
 
+  # For integration tests, which have no @request to put the cookie on.
+  def sign_in_as(user)
+    post sessions_url, params: {email: user.email, password: default_password}
+  end
+
   def default_password_digest
     BCrypt::Password.create(default_password, cost: 4)
   end

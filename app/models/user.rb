@@ -56,7 +56,8 @@ class User < ApplicationRecord
     :floaty,
     :feed_search,
     :password_resettable,
-    :needs_onboarding
+    :needs_onboarding,
+    :api_v3
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -64,6 +65,9 @@ class User < ApplicationRecord
   has_many :feeds, through: :subscriptions
   has_many :entries, through: :feeds
   has_many :imports, dependent: :destroy
+  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner, dependent: :destroy
+  has_many :oauth_access_grants, class_name: "Doorkeeper::AccessGrant", foreign_key: :resource_owner_id, dependent: :delete_all
+  has_many :oauth_access_tokens, class_name: "Doorkeeper::AccessToken", foreign_key: :resource_owner_id, dependent: :delete_all
   has_many :import_items, through: :imports
   has_many :billing_events, as: :billable, dependent: :delete_all
   has_many :taggings, dependent: :delete_all
@@ -226,6 +230,12 @@ class User < ApplicationRecord
 
   def setting_off!(setting_symbol)
     update(setting_symbol => "0")
+  end
+
+  # Feature flag for API v3: the settings page, OAuth authorization, and the
+  # API itself. Turn it on with user.setting_on!(:api_v3).
+  def api_v3_enabled?
+    setting_on?(:api_v3)
   end
 
   def activate_subscriptions

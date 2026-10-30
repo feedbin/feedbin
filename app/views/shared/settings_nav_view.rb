@@ -74,6 +74,15 @@ module Shared
           selected: is_active?(["settings/imports"], %w[index show]),
           icon: "menu-icon-import-export"
         ))
+        if @user.api_v3_enabled?
+          render(::SettingsNav::NavComponent.new(
+            title: "API",
+            subtitle: "Apps & tokens",
+            url: settings_api_applications_path,
+            selected: is_active?(["settings/api_applications"], %w[index new create show]),
+            icon: "menu-icon-api"
+          ))
+        end
       end
 
       render ::SettingsNav::HeaderComponent.new do

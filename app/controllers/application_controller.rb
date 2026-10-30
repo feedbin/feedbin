@@ -20,6 +20,11 @@ class ApplicationController < ActionController::Base
     payload[:request_start] = request.headers["X-Request-Start"]
   end
 
+  # Feature flag for API v3's settings pages and OAuth authorization.
+  def require_api_v3
+    render_404 unless current_user&.api_v3_enabled?
+  end
+
   def render_404
     respond_to do |format|
       format.any do

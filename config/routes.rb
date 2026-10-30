@@ -119,6 +119,11 @@ Rails.application.routes.draw do
         resources :saved_searches, only: [:index, :show, :create, :destroy, :update]
         post "saved_searches/:id/update", to: "saved_searches#update"
       end
+
+      namespace :v3 do
+        match "/", to: "api#not_found", via: :all
+        match "*path", to: "api#not_found", via: :all
+      end
     end
   end
 
@@ -135,6 +140,10 @@ Rails.application.routes.draw do
   end
 
   root to: "site#index"
+
+  use_doorkeeper do
+    skip_controllers :applications, :authorized_applications, :token_info
+  end
 
   mount StripeEvent::Engine, at: "/stripe"
 
@@ -324,6 +333,11 @@ Rails.application.routes.draw do
     end
 
     resources :import_items, only: [:update]
+
+    resources :api_applications, path: "api", only: [:index, :new, :create, :show, :destroy] do
+      resources :tokens, controller: "api_tokens", only: [:create, :destroy]
+    end
+
     get :import_export, to: "imports#index"
 
     get :billing, to: "billings#index"
