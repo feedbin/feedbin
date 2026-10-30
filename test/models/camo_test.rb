@@ -20,6 +20,12 @@ class CamoTest < ActiveSupport::TestCase
     end
   end
 
+  test "url passes through unproxied without CAMO_HOST" do
+    with_env("CAMO_HOST" => nil) do
+      assert_equal "http://example.com/image.jpg", Camo.url("http://example.com/image.jpg")
+    end
+  end
+
   test "url accepts a URI" do
     url = "http://example.com/image.jpg"
     assert_equal Camo.url(url), Camo.url(URI(url))

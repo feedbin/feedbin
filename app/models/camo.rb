@@ -2,8 +2,11 @@
 # directly, and the Twitter avatar route's miss. CAMO_HOST is an origin:
 # scheme, host and port.
 module Camo
+  # Without CAMO_HOST (development) the url passes through unproxied, the
+  # way ContentFormatter skips its asset proxy.
   def self.url(url)
     url = url.to_s
+    return url if ENV["CAMO_HOST"].blank?
     origin = URI(ENV["CAMO_HOST"])
     signature = OpenSSL::HMAC.hexdigest("sha1", secret_key, url)
 
