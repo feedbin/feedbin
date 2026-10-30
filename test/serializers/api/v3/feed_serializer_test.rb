@@ -6,16 +6,15 @@ class Api::V3::FeedSerializerTest < ActiveSupport::TestCase
   end
 
   test "serializes a healthy feed" do
-    json = serialize(posts_per_week: 2.5)
+    json = serialize
 
-    assert_equal %i[object id title description kind feed_url site_url hostname images health stats channel_id list_unsubscribe], json.keys
+    assert_equal %i[object id title description kind feed_url site_url hostname images health channel_id], json.keys
     assert_equal "About things", json[:description]
     assert_equal "xml", json[:kind]
     assert_equal "example.com", json[:hostname]
     assert_equal({favicon: nil, touch_icon: nil, icon: nil}, json[:images])
     assert_equal "ok", json[:health][:status]
     assert_nil json[:health][:message]
-    assert_equal({subscriber_count: 0, posts_per_week: 2.5}, json[:stats])
   end
 
   test "finds the favicon and touch icon by host and the channel's picture" do
@@ -35,7 +34,7 @@ class Api::V3::FeedSerializerTest < ActiveSupport::TestCase
   test "reports a feed that keeps failing" do
     @feed.stub(:crawl_error?, true) do
       @feed.stub(:dead?, true) do
-        health = Api::V3::FeedSerializer.new(@feed, posts_per_week: 0).to_h[:health]
+        health = Api::V3::FeedSerializer.new(@feed).to_h[:health]
         assert_equal "dead", health[:status]
         assert health[:message].present?
       end
@@ -44,8 +43,8 @@ class Api::V3::FeedSerializerTest < ActiveSupport::TestCase
 
   private
 
-  def serialize(posts_per_week: 0.0)
+  def serialize
     feed = Feed.preload(*Feed::ICON_PRELOADS, :touch_icon_image_record).find(@feed.id)
-    Api::V3::FeedSerializer.new(feed, posts_per_week: posts_per_week).to_h
+    Api::V3::FeedSerializer.new(feed).to_h
   end
 end

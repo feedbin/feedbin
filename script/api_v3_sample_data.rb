@@ -67,18 +67,25 @@ newsletter_block = <<~HTML
   </table>
 HTML
 
+channels = 3.times.map { "UC#{SecureRandom.alphanumeric(22)}" }
+channels.each { image_row(_1, provider: :embed_icon, kind: :avatar, variant: "200x200", width: 200, height: 200) }
+
 feeds = {
   article: Feed.create!(feed_url: "https://#{SAMPLE_HOST}/articles.xml", site_url: "https://#{SAMPLE_HOST}", host: SAMPLE_HOST, title: "Sample Articles", feed_type: :xml),
   podcast: Feed.create!(feed_url: "https://#{SAMPLE_HOST}/podcast.xml", site_url: "https://#{SAMPLE_HOST}/podcast", host: SAMPLE_HOST, title: "Sample Podcast", feed_type: :xml),
-  video: Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCsample#{SecureRandom.hex(4)}", site_url: "https://www.youtube.com", host: "www.youtube.com", title: "Sample Channel", feed_type: :xml),
+  video: Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=#{channels.first}", site_url: "https://www.youtube.com", host: "www.youtube.com", title: "Sample Channel", feed_type: :xml),
   newsletter: Feed.create!(feed_url: "https://#{SAMPLE_HOST}/newsletter/#{SecureRandom.hex(4)}", site_url: "https://newsletter.example", host: "newsletter.example", title: "Sample Newsletter", feed_type: :newsletter),
   micropost: Feed.create!(feed_url: "https://mastodon.example/@sample.rss", site_url: "https://mastodon.example/@sample", host: "mastodon.example", title: "Sample Mastodon", feed_type: :xml),
   page: Feed.create!(feed_url: "https://#{SAMPLE_HOST}/pages/#{SecureRandom.hex(4)}", site_url: "https://#{SAMPLE_HOST}", host: SAMPLE_HOST, title: "Pages", feed_type: :pages)
 }
 feeds.each_value { user.subscriptions.create!(feed: _1) }
 image_row(feeds[:podcast].id.to_s, provider: :feed_icon, kind: :cover_art, variant: "200x200", width: 200, height: 200).update!(feed_id: feeds[:podcast].id)
-channels = 3.times.map { "UC#{SecureRandom.alphanumeric(22)}" }
-channels.each { image_row(_1, provider: :embed_icon, kind: :avatar, variant: "200x200", width: 200, height: 200) }
+image_row(feeds[:micropost].id.to_s, provider: :feed_icon, kind: :avatar, variant: "200x200", width: 200, height: 200).update!(feed_id: feeds[:micropost].id)
+# Favicons and touch icons are found by host, shared by every feed on it.
+feeds.values.map(&:host).uniq.each do |host|
+  image_row(host, provider: :website_favicon, kind: :site_icon, variant: "32x32", width: 32, height: 32, bytesize: 1_000)
+  image_row(host, provider: :website_touch_icon, kind: :site_icon, variant: "180x180", width: 180, height: 180, bytesize: 9_000)
+end
 
 PER_FEED.times do |index|
   received = (PER_FEED - index).hours.ago

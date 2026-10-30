@@ -3,9 +3,8 @@ module Api
     # The feed object. Load feeds with Feed::ICON_PRELOADS and
     # :touch_icon_image_record so the image rows come preloaded.
     class FeedSerializer
-      def initialize(feed, posts_per_week:)
+      def initialize(feed)
         @feed = feed
-        @posts_per_week = posts_per_week
       end
 
       def to_h
@@ -24,13 +23,7 @@ module Api
             icon: image(@feed.icon_image_record || @feed.channel_image_record)
           },
           health: health,
-          stats: {
-            subscriber_count: @feed.subscriptions_count,
-            posts_per_week: @posts_per_week
-          },
-          channel_id: @feed.channel_id,
-          # Feedbin doesn't store the List-Unsubscribe header yet.
-          list_unsubscribe: nil
+          channel_id: @feed.channel_id
         }
       end
 

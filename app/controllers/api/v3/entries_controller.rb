@@ -64,12 +64,7 @@ module Api
       # Each feed is serialized once per response, however many of its
       # entries are on the page.
       def serialize(entries)
-        feeds = entries.map(&:feed).uniq(&:id)
-        stats = FeedStat.daily_counts(feed_ids: feeds.map(&:id), interval: "27 days")
-        feed_hashes = feeds.to_h do |feed|
-          posts_per_week = ((stats[feed.id]&.volume || 0) / 4.0).round(1)
-          [feed.id, FeedSerializer.new(feed, posts_per_week: posts_per_week).to_h]
-        end
+        feed_hashes = entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
         entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id]).to_h }
       end
 
