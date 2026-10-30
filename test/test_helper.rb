@@ -6,7 +6,17 @@ require "socket"
 require "uri"
 require "connection_pool"
 
-unless ENV["CI"]
+if ENV["CI"]
+  REDIS_DATABASE_OFFSET = 0
+elsif !system("command -v redis-server", out: File::NULL, err: File::NULL)
+  # No local redis-server: share the development Redis, such as an OrbStack
+  # container, named in .env. Development uses database 0, so the tests
+  # start at 1 to keep flushdb away from it.
+  require "dotenv"
+  REDIS_DATABASE_OFFSET = 1
+  ENV["REDIS_URL"] = URI(Dotenv.parse(File.expand_path("../.env", __dir__)).fetch("REDIS_URL")).tap { _1.path = "/#{REDIS_DATABASE_OFFSET}" }.to_s
+else
+  REDIS_DATABASE_OFFSET = 0
   socket = Socket.new(:INET, :STREAM, 0)
   socket.bind(Addrinfo.tcp("127.0.0.1", 0))
   port = socket.local_address.ip_port
@@ -45,6 +55,13 @@ connect_test_redis
 # production renders with.
 ENV["PANGOCAIRO_BACKEND"] = "fc"
 
+# The first gettext call in a worker asks libintl for the locale. With no
+# LANG or LC_* in the environment, macOS's libintl reads it from
+# CFPreferences, and objc's fork check aborts the child. A shell without a
+# locale, such as an agent's or a launchd job's, then lost every worker that
+# reached libvips' text rendering.
+ENV["LANG"] = "en_US.UTF-8" if ENV.values_at("LANG", "LC_ALL", "LC_MESSAGES").all?(&:blank?)
+
 require "rails/test_help"
 require "sidekiq/testing"
 require "webmock/minitest"
@@ -59,7 +76,13 @@ require "component_test_case"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
-WebMock.disable_net_connect!(allow_localhost: true, allow: ENV['WEBMOCK_ALLOWED_HOSTS']&.split(","))
+# allow_localhost matches loopback names only, so a local Elasticsearch on any
+# other hostname (such as an OrbStack *.orb.local container) is allowed by
+# name. It's the only HTTP service the tests talk to for real.
+WebMock.disable_net_connect!(
+  allow_localhost: true,
+  allow: [URI(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200")).host, *ENV["WEBMOCK_ALLOWED_HOSTS"]&.split(",")]
+)
 Sidekiq.logger.level = Logger::WARN
 
 # fog-aws 3.33 builds DeleteObjects XML by mutating a string literal
@@ -107,7 +130,7 @@ class ActiveSupport::TestCase
 
   parallelize_setup do |worker|
     ENV["TEST_WORKER"] = worker.to_s
-    ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker}"
+    ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker + REDIS_DATABASE_OFFSET}"
     connect_test_redis
 
     Search.configure!
