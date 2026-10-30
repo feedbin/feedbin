@@ -24,9 +24,9 @@ module Api
       def render_ids
         ids = requested_ids
         readable = @user.can_read_filter(ids)
-        entries = Entry.where(id: readable).with_list_associations.index_by(&:id)
+        entries = Entry.where(id: readable).merge(with_associations).index_by(&:id)
         render_list(
-          ids.filter_map { entries[_1] }.map { EntrySerializer.new(_1).to_h },
+          serialize(ids.filter_map { entries[_1] }),
           meta: {missing: ids - entries.keys}
         )
       end
@@ -38,7 +38,7 @@ module Api
 
         column, direction = SORTS.fetch(sort)
         scope = after_cursor(scope, column, direction)
-        entries = scope.with_list_associations
+        entries = scope.merge(with_associations)
           .order(column => direction, :id => direction)
           .limit(limit + 1)
           .to_a
@@ -51,10 +51,26 @@ module Api
 
         meta = total ? {total: total} : {}
         render_list(
-          entries.map { EntrySerializer.new(_1).to_h },
+          serialize(entries),
           page: page_object(limit: limit, next_cursor: next_cursor),
           meta: meta
         )
+      end
+
+      def with_associations
+        Entry.with_list_associations.preload(feed: :touch_icon_image_record)
+      end
+
+      # Each feed is serialized once per response, however many of its
+      # entries are on the page.
+      def serialize(entries)
+        feeds = entries.map(&:feed).uniq(&:id)
+        stats = FeedStat.daily_counts(feed_ids: feeds.map(&:id), interval: "27 days")
+        feed_hashes = feeds.to_h do |feed|
+          posts_per_week = ((stats[feed.id]&.volume || 0) / 4.0).round(1)
+          [feed.id, FeedSerializer.new(feed, posts_per_week: posts_per_week).to_h]
+        end
+        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id]).to_h }
       end
 
       def filtered_entries

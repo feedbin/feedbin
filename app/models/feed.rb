@@ -18,6 +18,7 @@ class Feed < ApplicationRecord
   # The host's favicon row, shared by every feed on the host. Keyed by host
   # the way channel_image_record is keyed by channel_id.
   has_one :favicon_image_record, -> { provider_website_favicon }, class_name: "Image", foreign_key: :provider_id, primary_key: :host
+  has_one :touch_icon_image_record, -> { provider_website_touch_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :host
 
   # Everything FaviconComponent (via #icon_url and #site_favicon) can read when
   # rendering this feed's icon. Preload these wherever feeds render in a list,

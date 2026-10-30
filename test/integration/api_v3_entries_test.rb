@@ -40,7 +40,7 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     get "/v3/entries", params: {ids: entry.id.to_s}, headers: bearer
 
     json = JSON.parse(response.body)["data"].first
-    assert_equal %w[object id feed_id kind title author summary url hostname published_at received_at revision edited_at reading images link_preview attachments origin categories urls content original diff extracted], json.keys
+    assert_equal %w[object id feed_id kind title author summary url hostname published_at received_at revision edited_at reading images link_preview attachments origin categories urls content original diff extracted feed], json.keys
     assert_equal "podcast", json["kind"]
     assert_equal "Entry 2", json["title"]
     assert_equal "example.com", json["hostname"]
@@ -53,6 +53,7 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_includes json["content"]["html"], "Words in entry 2"
     assert_nil json["original"]
     assert_equal [], json["extracted"]
+    assert_equal({"object" => "feed", "id" => @feed.id, "title" => "Example", "kind" => "xml"}, json["feed"].slice("object", "id", "title", "kind"))
 
     attachment = json["attachments"].first
     assert_equal({"url" => "https://example.com/412.mp3", "mime_type" => "audio/mpeg", "kind" => "audio", "title" => nil, "size_in_bytes" => 43018332, "duration_in_seconds" => 6412, "chapters" => [{"start_in_seconds" => 812, "title" => "Filesystems"}]}, attachment)

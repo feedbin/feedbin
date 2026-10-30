@@ -69,6 +69,6 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
   private
 
   def serialize(entry)
-    Api::V3::EntrySerializer.new(Entry.with_list_associations.find(entry.id)).to_h
+    Api::V3::EntrySerializer.new(Entry.with_list_associations.find(entry.id), feed: {}).to_h
   end
 end

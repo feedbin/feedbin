@@ -1,12 +1,14 @@
 module Api
   module V3
-    # The entry object, with every field. Load entries with
-    # Entry.with_list_associations so the image rows and feed come preloaded.
+    # The entry object, with every field and its feed embedded. Load entries
+    # with Entry.with_list_associations so the image rows and feed come
+    # preloaded. feed is the feed's serialized hash, built once per feed.
     class EntrySerializer
       WORDS_PER_MINUTE = 200
 
-      def initialize(entry)
+      def initialize(entry, feed:)
         @entry = entry
+        @feed = feed
       end
 
       def to_h
@@ -40,7 +42,8 @@ module Api
           content: {html: content_html},
           original: original,
           diff: @entry.content_diff&.then { {html: _1.to_s} },
-          extracted: extracted
+          extracted: extracted,
+          feed: @feed
         }
       end
 
