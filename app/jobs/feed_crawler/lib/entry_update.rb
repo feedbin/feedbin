@@ -1,5 +1,7 @@
 module FeedCrawler
   class EntryUpdate
+    REVISED_ATTRIBUTES = %w[title content author url].freeze
+
     def initialize(updated_data, original_entry)
       @updated_data = updated_data
       @original_entry = original_entry
@@ -29,6 +31,13 @@ module FeedCrawler
         if value != @original_entry.public_send(attribute)
           array.push(attribute)
         end
+      end
+
+      # API v3's revision: every change a reader could see, not only the
+      # significant ones that notify.
+      if changes.intersect?(REVISED_ATTRIBUTES)
+        update["revision"] = @original_entry.revision + 1
+        update["edited_at"] = Time.now
       end
 
       Sidekiq.logger.info "Updating entry=#{@original_entry.public_id} changes=#{changes.join(",")}"

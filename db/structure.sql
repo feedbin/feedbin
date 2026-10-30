@@ -521,7 +521,9 @@ CREATE TABLE public.entries (
     provider_parent_id text,
     chapters jsonb,
     categories jsonb,
-    compressed_original_content bytea
+    compressed_original_content bytea,
+    revision integer DEFAULT 1 NOT NULL,
+    edited_at timestamp(6) without time zone
 );
 
 
@@ -2427,6 +2429,13 @@ CREATE UNIQUE INDEX index_embeds_on_source_and_provider_id ON public.embeds USIN
 
 
 --
+-- Name: index_entries_on_edited_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_edited_at_and_id ON public.entries USING btree (edited_at, id) WHERE (edited_at IS NOT NULL);
+
+
+--
 -- Name: index_entries_on_feed_id_include_id_published_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3220,6 +3229,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261030120000'),
 ('20261029120000'),
 ('20261003150000'),
 ('20261003140000'),

@@ -27,6 +27,25 @@ module FeedCrawler
       assert_equal @old_content, @entry.reload.original_content
     end
 
+    test "any change a reader could see bumps the revision" do
+      assert_equal 1, @entry.revision
+      assert_nil @entry.edited_at
+
+      EntryUpdate.create!(update_data(@old_content.sub("Original", "Changed")), @entry)
+
+      entry = @entry.reload
+      assert_equal 2, entry.revision
+      assert_not_nil entry.edited_at
+    end
+
+    test "a change to other attributes leaves the revision alone" do
+      EntryUpdate.create!(update_data(@old_content).merge("fingerprint" => SecureRandom.uuid), @entry)
+
+      entry = @entry.reload
+      assert_equal 1, entry.revision
+      assert_nil entry.edited_at
+    end
+
     test "small change keeps the original" do
       second = significant(@old_content)
       EntryUpdate.create!(update_data(second), @entry)
