@@ -4,8 +4,6 @@ module Api
     # with Entry.with_list_associations so the image rows and feed come
     # preloaded. feed is the feed's serialized hash, built once per feed.
     class EntrySerializer
-      WORDS_PER_MINUTE = 200
-
       def initialize(entry, feed:)
         @entry = entry
         @feed = feed
@@ -26,7 +24,6 @@ module Api
           received_at: @entry.created_at.utc.iso8601,
           revision: @entry.revision,
           edited_at: @entry.edited_at&.utc&.iso8601,
-          reading: reading,
           images: {
             preview: image(@entry.preview_image_record),
             icon: image(icon_record)
@@ -77,12 +74,6 @@ module Api
       # A newsletter has no page of its own, so its url is Feedbin's copy.
       def url
         @url ||= (kind == "newsletter") ? @entry.newsletter_url : @entry.fully_qualified_url
-      end
-
-      def reading
-        words = @entry.content.to_s.to_plain_text.split.size
-        return nil if words.zero?
-        {word_count: words, minutes: (words / WORDS_PER_MINUTE.to_f).ceil}
       end
 
       # Episode art or a micropost author's avatar, then a YouTube channel's
