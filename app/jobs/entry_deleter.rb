@@ -102,6 +102,7 @@ class EntryDeleter
         RecentlyReadEntry.where(entry_id: entry_ids).delete_all
         RecentlyPlayedEntry.where(entry_id: entry_ids).delete_all
         StarredEntry.where(entry_id: entry_ids).delete_all
+        EntryRendering.where(entry_id: entry_ids).delete_all
         Entry.where(id: entry_ids).delete_all
       end
 

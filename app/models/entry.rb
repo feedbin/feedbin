@@ -20,6 +20,12 @@ class Entry < ApplicationRecord
   # The avatar of this video's own channel -- a playlist feed mixes videos
   # from many channels, keyed by provider_parent_id (UC-form).
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
+  # The stored formatting, which may be stale. Read rendering instead.
+  has_one :rendering_record, class_name: "EntryRendering", inverse_of: :entry, dependent: :delete
+
+  # Saves touching these re-render. Data and settings are included because
+  # the formatter reads them (text format, YouTube, newsletter sender).
+  RENDERING_INPUTS = %w[content compressed_original_content url data settings].freeze
 
   before_create :ensure_published
   before_create :create_summary
@@ -30,6 +36,7 @@ class Entry < ApplicationRecord
   before_save :recompress_original_content
 
   after_commit :cache_public_id, on: [:create, :update]
+  after_commit :store_rendering, on: [:create, :update]
   after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
@@ -75,7 +82,8 @@ class Entry < ApplicationRecord
   # What api/v2/entries/_entry.json renders; extended mode also reads the
   # preview image row, at up to 100 entries a request.
   scope :for_api, ->(mode = nil) {
-    mode.to_s == "extended" ? includes(:feed).preload(:owned_image_records) : includes(:feed)
+    scope = includes(:feed).preload(:rendering_record)
+    mode.to_s == "extended" ? scope.preload(:owned_image_records) : scope
   }
 
   def newsletter?
@@ -204,20 +212,25 @@ class Entry < ApplicationRecord
   end
 
   def content_diff
-    @content_diff ||= begin
-      result = nil
-      original = original_content
-      if content && original.present? && original.length != content.length
-        begin
-          before = ContentFormatter.format!(original, self)
-          after = ContentFormatter.format!(content, self)
-          result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
-          result = result.html_safe
-        rescue
-        end
-      end
-      result
+    rendering.diff&.html_safe
+  end
+
+  # Every formatted version of this entry, current with its content and the
+  # formatter: the stored row when it matches, otherwise rendered, stored,
+  # and returned. An unsaved entry is rendered and not stored.
+  def rendering
+    @rendering ||= if new_record?
+      EntryRendering.build(self)
+    elsif rendering_record&.current_for?(self)
+      rendering_record
+    else
+      EntryRendering.render!(self)
     end
+  end
+
+  def reload(*)
+    @rendering = nil
+    super
   end
 
   # nil, not 0, when the feed gave no itunes:duration -- 0 renders as
@@ -367,6 +380,21 @@ class Entry < ApplicationRecord
   end
 
   private
+
+  # Rendering here keeps reads from paying for it. A failure is reported and
+  # the next read renders instead; it must never fail the write.
+  def store_rendering
+    return unless previously_new_record? || saved_changes.keys.intersect?(RENDERING_INPUTS)
+    @rendering = EntryRendering.render!(self)
+    association(:rendering_record).reset
+  rescue => exception
+    @rendering = nil
+    ErrorService.notify(
+      error_class: "Entry#store_rendering",
+      error_message: "rendering failed",
+      parameters: {entry_id: id, exception: exception}
+    )
+  end
 
   # A stored value only decompresses against the content it was made from, so
   # every content change must re-encode it. Skip when this save also sets the

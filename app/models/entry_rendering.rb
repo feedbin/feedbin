@@ -7,7 +7,7 @@
 class EntryRendering < ApplicationRecord
   self.primary_key = :entry_id
 
-  belongs_to :entry
+  belongs_to :entry, inverse_of: :rendering_record
 
   LAYOUT = 1
   VERSIONS = %i[web api full diff].freeze

@@ -430,6 +430,62 @@ class EntryTest < ActiveSupport::TestCase
     assert_match %r{<ins>new\s*</ins>}, entry.reload.content_diff
   end
 
+  test "creating an entry stores its rendering" do
+    entry = saved_entry("<p>Text.</p>")
+    assert EntryRendering.find(entry.id).current_for?(entry)
+  end
+
+  test "updating content re-renders, updating the title does not" do
+    entry = saved_entry("<p>Text.</p>")
+    before = EntryRendering.find(entry.id).blob
+    entry.update!(title: "New title")
+    assert_equal before, EntryRendering.find(entry.id).blob
+    entry.update!(content: "<p>Other.</p>")
+    refute_equal before, EntryRendering.find(entry.id).blob
+  end
+
+  test "rendering re-renders when content changed outside callbacks" do
+    entry = saved_entry("<p>Text.</p>")
+    entry.update_columns(content: "<p>Rewritten without callbacks.</p>")
+    entry = Entry.find(entry.id)
+    assert_equal ContentFormatter.format!(entry.content, entry), entry.rendering.web
+    assert EntryRendering.find(entry.id).current_for?(entry)
+  end
+
+  test "rendering re-renders when the stored VERSION differs" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(version: ContentFormatter::VERSION + 1)
+    entry = Entry.find(entry.id)
+    assert_equal "<p>Text.</p>", entry.rendering.web
+    assert_equal ContentFormatter::VERSION, EntryRendering.find(entry.id).version
+  end
+
+  test "rendering serves a current stored row without rendering" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(blob: EntryRendering.encode({web: "<p>stored</p>", api: ""}, content: entry.content, crc: EntryRendering.inputs_crc(entry)))
+    assert_equal "<p>stored</p>", Entry.find(entry.id).rendering.web
+  end
+
+  test "a rendering failure does not fail the entry write" do
+    EntryRendering.stub(:render!, ->(_) { raise "boom" }) do
+      entry = saved_entry("<p>Text.</p>")
+      assert entry.persisted?
+      assert_nil EntryRendering.find_by(entry_id: entry.id)
+    end
+  end
+
+  test "rendering of an unsaved entry is built, not stored" do
+    entry = Entry.new(content: "<p>x</p>", feed: @user.feeds.first)
+    assert_equal "<p>x</p>", entry.rendering.web
+    assert_equal 0, EntryRendering.count
+  end
+
+  test "deleting entries deletes their renderings" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryDeleter.new.delete_entries(entry.feed_id, [entry.id])
+    assert_nil EntryRendering.find_by(entry_id: entry.id)
+  end
+
   test "content_diff is nil without an original" do
     assert_nil saved_entry("<p>Text.</p>").content_diff
   end
