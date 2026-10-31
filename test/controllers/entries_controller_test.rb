@@ -58,6 +58,16 @@ class EntriesControllerTest < ActionController::TestCase
     end
   end
 
+  test "preload reads the stored renderings in one query" do
+    @entries.each { EntryRendering.render!(_1) }
+    login_as @user
+    statements = capture_sql do
+      get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json
+    end
+    assert_operator @entries.length, :>, 1
+    assert_equal 1, statements.count { _1.include?(%(FROM "entry_renderings")) }
+  end
+
   test "preload renders a settings button, not the settings menu" do
     login_as @user
     get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json
