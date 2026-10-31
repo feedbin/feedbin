@@ -87,35 +87,8 @@ class EntryPresenter < BasePresenter
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
-  def is_numeric?(string)
-    string = string.strip
-    begin
-      string.to_i.to_s == string
-    rescue
-      false
-    end
-  end
-
-  def update_media_queries(html)
-    regex = /@media(.*?)\(max-width:(.*?)px\)(.*?){/
-    html.gsub(regex) do |string|
-      matches = string.match(regex)
-      if matches[2] && is_numeric?(matches[2])
-        number = matches[2].to_i
-        if number >= 400
-          number = 10_000
-        end
-        string = "@media#{matches[1]}(max-width:#{number}px)#{matches[3]}{"
-      end
-      string
-    end
-  rescue
-    html
-  end
-
   def newsletter_content
-    output = update_media_queries(formatted_content)
-    output = ContentFormatter.newsletter_format(output)
+    output = ContentFormatter.newsletter_format(formatted_content)
     output = <<-eod
     <style>
     body {

@@ -232,6 +232,29 @@ class ContentFormatter
     def context
       {whitelist: Sanitize::Config::RELAXED}.merge(camo_context)
     end
+
+    def call(content)
+      super(self.class.media_queries(content))
+    end
+
+    # Email layouts switch to a narrow single column below a max-width
+    # breakpoint. Shown in the reader pane, which is narrower than the email
+    # was designed for, that column would win, so any breakpoint of 400px or
+    # more is pushed out of reach.
+    def self.media_queries(html)
+      regex = /@media(.*?)\(max-width:(.*?)px\)(.*?){/
+      html.gsub(regex) do |string|
+        matches = string.match(regex)
+        width = matches[2].strip
+        if width.to_i.to_s == width
+          width = width.to_i >= 400 ? 10_000 : width.to_i
+          string = "@media#{matches[1]}(max-width:#{width}px)#{matches[3]}{"
+        end
+        string
+      end
+    rescue
+      html
+    end
   end
 
   class Evernote < Format

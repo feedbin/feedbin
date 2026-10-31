@@ -94,6 +94,17 @@ class ContentFormatterTest < ActiveSupport::TestCase
     end
   end
 
+  test "newsletter_format widens max-width media queries of 400px and up" do
+    input = "<style>@media screen and (max-width:480px) { .a {} } @media (max-width:320px) { .b {} }</style><p>x</p>"
+    result = ContentFormatter.newsletter_format(input)
+    assert_includes result, "(max-width:10000px)"
+    assert_includes result, "(max-width:320px)"
+  end
+
+  test "Full.media_queries leaves a non-numeric width alone" do
+    assert_equal "@media (max-width:abcpx) {", ContentFormatter::Full.media_queries("@media (max-width:abcpx) {")
+  end
+
   test "newsletter_format applies camo proxying when configured" do
     content = %(<p><img src="http://example.com/img.png"></p>)
     with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "secret") do
