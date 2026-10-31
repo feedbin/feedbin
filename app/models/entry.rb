@@ -81,9 +81,9 @@ class Entry < ApplicationRecord
 
   # What api/v2/entries/_entry.json renders; extended mode also reads the
   # preview image row, at up to 100 entries a request.
+  # Every mode reads owned_image_records: micropost? checks the link image.
   scope :for_api, ->(mode = nil) {
-    scope = includes(:feed).preload(:rendering_record)
-    mode.to_s == "extended" ? scope.preload(:owned_image_records) : scope
+    includes(:feed).preload(:rendering_record, :owned_image_records)
   }
 
   def newsletter?

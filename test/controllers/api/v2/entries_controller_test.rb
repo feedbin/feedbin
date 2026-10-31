@@ -26,6 +26,14 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
   end
 
+  test "index loads image records in one query" do
+    login_as @user
+    statements = capture_sql { get :index, format: :json }
+    assert_response :success
+    assert_operator @entries.length, :>, 1
+    assert_equal 1, statements.count { it.include?(%(FROM "images")) }
+  end
+
   test "should get index" do
     login_as @user
     get :index, format: :json
