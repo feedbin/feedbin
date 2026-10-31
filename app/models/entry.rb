@@ -225,6 +225,8 @@ class Entry < ApplicationRecord
   # and returned. An unsaved entry is rendered and not stored. Storing can
   # fail (a timeout, a read-only database); the fresh rendering is served
   # anyway.
+  attr_writer :rendering
+
   def rendering
     @rendering ||= if new_record?
       EntryRendering.build(self)

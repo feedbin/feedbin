@@ -258,7 +258,8 @@ class EntriesController < ApplicationController
     # owned_image_records. The stored rendering is read per entry as well.
     # The preload endpoint renders a client-sized batch of these at once.
     entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS)
-      .preload(:owned_image_records, :rendering_record)
+      .preload(:owned_image_records, :rendering_record).to_a
+    EntryRendering.prepare(entries)
     subscriptions = @user.subscriptions.pluck(:feed_id)
     @title = entries.present? ? "#{entries.first.title} - Feedbin" : "Feedbin"
     entries.each_with_object({}) do |entry, hash|

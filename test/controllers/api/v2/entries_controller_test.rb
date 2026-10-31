@@ -17,6 +17,15 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     assert_equal_ids(entries, parse_json)
   end
 
+  test "index stores missing renderings in one insert" do
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    login_as @user
+    statements = capture_sql { get :index, format: :json }
+    assert_response :success
+    assert_operator @entries.length, :>, 1
+    assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
+  end
+
   test "should get index" do
     login_as @user
     get :index, format: :json

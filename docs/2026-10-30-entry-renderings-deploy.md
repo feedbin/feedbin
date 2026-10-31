@@ -19,7 +19,7 @@ Reads switch to the table the moment the code is live. The table starts empty, s
 
 ## Right after deploy
 
-- [ ] **Expect a short rise in render load.** The API v2 fragment cache key moved from `v2` to `v3`, so cached v2 responses are cold. The first read of each entry also does one extra insert of about 400 bytes.
+- [ ] **Expect a short rise in render load.** The API v2 fragment cache key moved from `v2` to `v3`, so cached v2 responses are cold. The first read of each entry also writes its row, about 400 bytes. The web preload and show pages and the API v2 entry lists write a whole batch's missing rows in one insert.
 - [ ] **Watch error tracking for `Entry#store_rendering` and `Entry#rendering`.** These are failures to store a rendering. Pages still render when they happen.
 - [ ] **Spot-check a few pages:** an article, an edited article's diff view, a newsletter's original view, and an API v2 entry with `include_content_diff=true`.
 - [ ] **Check the table is filling:**

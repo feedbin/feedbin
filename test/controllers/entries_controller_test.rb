@@ -68,6 +68,15 @@ class EntriesControllerTest < ActionController::TestCase
     assert_equal 1, statements.count { _1.include?(%(FROM "entry_renderings")) }
   end
 
+  test "preload stores missing renderings in one insert" do
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    login_as @user
+    statements = capture_sql do
+      get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json
+    end
+    assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
+  end
+
   test "preload renders a settings button, not the settings menu" do
     login_as @user
     get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json

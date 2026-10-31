@@ -114,4 +114,35 @@ class EntryRenderingTest < ActiveSupport::TestCase
     rendering.version = ContentFormatter::VERSION + 1
     refute rendering.current_for?(entry)
   end
+
+  test "prepare stores missing and stale renderings in one insert" do
+    current, missing, stale = 3.times.map { create_entry(@feed) }
+    EntryRendering.render!(current)
+    EntryRendering.where(entry_id: [missing.id, stale.id]).delete_all
+    EntryRendering.render!(stale)
+    EntryRendering.where(entry_id: stale.id).update_all(version: ContentFormatter::VERSION + 1)
+    entries = Entry.where(id: [current.id, missing.id, stale.id]).preload(:rendering_record).to_a
+
+    statements = capture_sql { EntryRendering.prepare(entries) }
+    assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
+
+    statements = capture_sql { entries.each { it.rendering.web } }
+    assert_empty statements.grep(/entry_renderings/)
+    entries.each { assert EntryRendering.find(it.id).current_for?(it) }
+  end
+
+  test "prepare serves the renderings when storing them fails" do
+    entry = create_entry(@feed)
+    EntryRendering.where(entry_id: entry.id).delete_all
+    entries = Entry.where(id: entry.id).preload(:rendering_record).to_a
+    notified = []
+    EntryRendering.stub(:upsert_all, ->(*) { raise ActiveRecord::StatementInvalid, "boom" }) do
+      ErrorService.stub(:notify, ->(options) { notified << options }) do
+        EntryRendering.prepare(entries)
+      end
+    end
+    assert_equal ["EntryRendering.prepare"], notified.map { it[:error_class] }
+    statements = capture_sql { assert entries.first.rendering.web }
+    assert_empty statements.grep(/entry_renderings/)
+  end
 end
