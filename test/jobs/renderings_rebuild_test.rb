@@ -71,3 +71,61 @@ class RenderingsRebuildTest < ActiveSupport::TestCase
     assert args.any? { |_, selector| selector["range"].first <= entry.id && entry.id <= selector["range"].last }
   end
 end
+
+# Swapping renames tables, which a test transaction would roll back from under
+# the assertions, so these run without one and clean up after themselves.
+class RenderingsRebuildSwapTest < ActiveSupport::TestCase
+  self.use_transactional_tests = false
+
+  setup do
+    Sidekiq::Worker.clear_all
+    flush_redis
+    @feed = feeds(:daring_fireball)
+    @created = []
+  end
+
+  teardown do
+    connection = ActiveRecord::Base.connection
+    connection.execute("DROP TABLE IF EXISTS entry_renderings_new")
+    EntryRendering.where(entry_id: @created.map(&:id)).delete_all
+    Entry.where(id: @created.map(&:id)).delete_all
+  end
+
+  def entry
+    create_entry(@feed).tap { @created << it }
+  end
+
+  test "swap refuses while jobs are pending" do
+    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 2) }
+    RenderingsRebuild.prepare_table
+    error = assert_raises(RuntimeError) { RenderingsRebuild.swap }
+    assert_includes error.message, "pending: 2"
+  end
+
+  test "swap refuses without a new table" do
+    assert_raises(RuntimeError) { RenderingsRebuild.swap }
+  end
+
+  test "swap copies rows written during the rebuild and renames the new table into place" do
+    rebuilt, arrived = entry, entry
+    RenderingsRebuild.prepare_table
+    RenderingsRebuild.new.perform("entry_renderings_new", "ids" => [rebuilt.id])
+    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0) }
+    result = RenderingsRebuild.swap
+    assert_equal 1, result[:copied]
+    assert_equal [arrived.id, rebuilt.id].sort, EntryRendering.where(entry_id: @created.map(&:id)).pluck(:entry_id).sort
+    connection = ActiveRecord::Base.connection
+    refute connection.table_exists?("entry_renderings_new")
+    refute connection.table_exists?("entry_renderings_old")
+    assert_equal ["entry_renderings_pkey"], connection.select_values("SELECT indexname FROM pg_indexes WHERE tablename = 'entry_renderings'")
+    assert_equal "e", connection.select_value("SELECT attstorage FROM pg_attribute WHERE attrelid = 'entry_renderings'::regclass AND attname = 'blob'")
+    assert Entry.find(rebuilt.id).rendering.current_for?(rebuilt)
+  end
+
+  test "prepare_table refuses to clobber an existing new table" do
+    RenderingsRebuild.prepare_table
+    assert_raises(RuntimeError) { RenderingsRebuild.prepare_table }
+    RenderingsRebuild.prepare_table(force: true)
+    assert ActiveRecord::Base.connection.table_exists?("entry_renderings_new")
+  end
+end
