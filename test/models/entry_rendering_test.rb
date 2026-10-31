@@ -12,16 +12,17 @@ class EntryRenderingTest < ActiveSupport::TestCase
   test "encode and decode round-trip all four versions" do
     versions = {web: "<p>w</p>", api: "<p>a</p>", full: "<html>f</html>", diff: "<p><ins>d</ins></p>"}
     blob = EntryRendering.encode(versions, content: "<p>w</p>", crc: 7)
-    assert_equal 1, blob.getbyte(0)
+    assert_equal EntryRendering::LAYOUT, blob.getbyte(0)
     assert_equal 7, blob.byteslice(1, 4).unpack1("N")
     assert_equal versions, EntryRendering.decode(blob, content: "<p>w</p>")
   end
 
-  test "decode returns nil for an absent full and diff" do
-    blob = EntryRendering.encode({web: "<p>w</p>", api: "<p>a</p>"}, content: "<p>w</p>", crc: 0)
+  test "decode tells an absent version from an empty one" do
+    blob = EntryRendering.encode({web: "<p>w</p>", api: "", full: nil, diff: ""}, content: "<p>w</p>", crc: 0)
     decoded = EntryRendering.decode(blob, content: "<p>w</p>")
+    assert_equal "", decoded[:api]
     assert_nil decoded[:full]
-    assert_nil decoded[:diff]
+    assert_equal "", decoded[:diff]
     assert_equal Encoding::UTF_8, decoded[:web].encoding
   end
 
@@ -39,7 +40,7 @@ class EntryRenderingTest < ActiveSupport::TestCase
   end
 
   test "decode rejects an unknown layout" do
-    assert_raises(ArgumentError) { EntryRendering.decode("\x02\x00\x00\x00\x00".b, content: "x") }
+    assert_raises(ArgumentError) { EntryRendering.decode([EntryRendering::LAYOUT + 1, 0].pack("CN"), content: "x") }
   end
 
   test "build renders web and api, and full only for newsletters" do
@@ -72,24 +73,6 @@ class EntryRenderingTest < ActiveSupport::TestCase
     assert_equal "", rendering.api
   end
 
-  test "source_html wraps text entries and youtube entries" do
-    entry = create_entry(@feed)
-    entry.data = {"format" => "text"}
-    entry.content = "line one\nline two"
-    assert_equal ContentFormatter.text_email(entry.content), EntryRendering.source_html(entry)
-    entry.data = {"youtube_video_id" => "abc"}
-    assert_includes EntryRendering.source_html(entry), %(<iframe src="https://www.youtube.com/embed/abc?rel=0)
-  end
-
-  test "source_html keeps a youtube description as markup" do
-    entry = create_entry(@feed)
-    entry.data = {"youtube_video_id" => "abc"}
-    entry.content = "line one"
-    html = EntryRendering.source_html(entry)
-    assert_includes html, "<p>line one</p>"
-    refute_kind_of ActiveSupport::SafeBuffer, html
-  end
-
   test "render! upserts and current_for? tracks the inputs" do
     entry = create_entry(@feed)
     rendering = EntryRendering.render!(entry)
@@ -115,15 +98,15 @@ class EntryRenderingTest < ActiveSupport::TestCase
     refute rendering.current_for?(entry)
   end
 
-  test "prepare stores missing and stale renderings in one insert" do
+  test "loading with_renderings stores missing and stale renderings in one insert" do
     current, missing, stale = 3.times.map { create_entry(@feed) }
     EntryRendering.render!(current)
     EntryRendering.where(entry_id: [missing.id, stale.id]).delete_all
     EntryRendering.render!(stale)
     EntryRendering.where(entry_id: stale.id).update_all(version: ContentFormatter::VERSION + 1)
-    entries = Entry.where(id: [current.id, missing.id, stale.id]).preload(:rendering_record).to_a
+    entries = Entry.where(id: [current.id, missing.id, stale.id]).with_renderings
 
-    statements = capture_sql { EntryRendering.prepare(entries) }
+    statements = capture_sql { entries.to_a }
     assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
 
     statements = capture_sql { entries.each { it.rendering.web } }
@@ -131,15 +114,25 @@ class EntryRenderingTest < ActiveSupport::TestCase
     entries.each { assert EntryRendering.find(it.id).current_for?(it) }
   end
 
-  test "prepare leaves out an entry that fails to render and stores the rest" do
+  test "with_renderings renders nothing until the relation loads" do
+    entry = create_entry(@feed)
+    EntryRendering.where(entry_id: entry.id).delete_all
+    entries = Entry.where(id: entry.id).with_renderings
+    statements = capture_sql { [entries.pluck(:id), entries.count, entries.exists?] }
+    assert_empty statements.grep(/entry_renderings/)
+    entries.load
+    assert EntryRendering.exists?(entry.id)
+  end
+
+  test "loading with_renderings leaves out an entry that fails to render and stores the rest" do
     bad, good = 2.times.map { create_entry(@feed) }
     EntryRendering.where(entry_id: [bad.id, good.id]).delete_all
-    entries = Entry.where(id: [bad.id, good.id]).preload(:rendering_record).order(:id).to_a
+    entries = Entry.where(id: [bad.id, good.id]).with_renderings.order(:id)
     original = EntryRendering.method(:build)
     notified = []
     EntryRendering.stub(:build, ->(entry) { (entry.id == bad.id) ? raise("boom") : original.call(entry) }) do
       ErrorService.stub(:notify, ->(options) { notified << options }) do
-        EntryRendering.prepare(entries)
+        entries.load
       end
     end
     assert_equal [{error_class: "EntryRendering.prepare", entry_id: bad.id}], notified.map { {error_class: it[:error_class], entry_id: it[:parameters][:entry_id]} }
@@ -148,14 +141,14 @@ class EntryRenderingTest < ActiveSupport::TestCase
     assert_empty capture_sql { entries.last.rendering.web }.grep(/entry_renderings/)
   end
 
-  test "prepare serves the renderings when storing them fails" do
+  test "loading with_renderings serves the renderings when storing them fails" do
     entry = create_entry(@feed)
     EntryRendering.where(entry_id: entry.id).delete_all
-    entries = Entry.where(id: entry.id).preload(:rendering_record).to_a
+    entries = Entry.where(id: entry.id).with_renderings
     notified = []
     EntryRendering.stub(:upsert_all, ->(*) { raise ActiveRecord::StatementInvalid, "boom" }) do
       ErrorService.stub(:notify, ->(options) { notified << options }) do
-        EntryRendering.prepare(entries)
+        entries.load
       end
     end
     assert_equal ["EntryRendering.prepare"], notified.map { it[:error_class] }
@@ -163,11 +156,11 @@ class EntryRenderingTest < ActiveSupport::TestCase
     assert_empty statements.grep(/entry_renderings/)
   end
 
-  test "prepare writes in entry id order under a short lock timeout" do
+  test "loading with_renderings writes in entry id order under a short lock timeout" do
     entries = 3.times.map { create_entry(@feed) }
     EntryRendering.where(entry_id: entries.map(&:id)).delete_all
-    loaded = Entry.where(id: entries.map(&:id)).preload(:rendering_record).to_a.sort_by { -it.id }
-    statements = capture_sql { EntryRendering.prepare(loaded) }
+    loaded = Entry.where(id: entries.map(&:id)).with_renderings.order(id: :desc)
+    statements = capture_sql { loaded.to_a }
     insert = statements.find { it.start_with?(%(INSERT INTO "entry_renderings")) }
     written = insert.scan(/VALUES \((\d+)|\), \((\d+)/).flatten.compact.map(&:to_i)
     assert_equal entries.map(&:id).sort, written

@@ -6,7 +6,7 @@ Reads switch to the table the moment the code is live. The table starts empty, s
 
 ## Before deploy
 
-- [x] **Preload the rendering on the web entry endpoints.** `EntriesController#entries_by_id` (used by `show` and `preload`) preloads `:rendering_record`, so a preload batch reads its renderings in one query. API v2 preloads it through `Entry.for_api`.
+- [x] **Load entries through `Entry.with_renderings` on the web and API entry endpoints.** `EntriesController#entries_by_id` (used by `show` and `preload`) and `Entry.for_api` do, so a batch reads its stored renderings in one query and writes the missing ones in one insert as it loads.
 - [ ] **Make `CAMO_HOST` and `CAMO_KEY` the same on every web and Sidekiq process.** Both are part of each row's checksum. If two processes disagree, each treats the other's rows as stale and re-renders and rewrites them on every read.
 - [ ] **Confirm a production Sidekiq process consumes the `backfill` queue.** The repo only has `config/sidekiq-development.yml`. Rebuild jobs go to `backfill`, and nothing happens if no process listens there.
 - [ ] **Check that `feedbin/html-pipeline` branch `feedbin` contains `04e2e23`.** `Gemfile.lock` pins that revision; it is pushed.

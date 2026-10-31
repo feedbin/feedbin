@@ -156,6 +156,39 @@ class ContentFormatterTest < ActiveSupport::TestCase
     end
   end
 
+  test "source_html wraps text entries and youtube entries" do
+    entry = @entry.dup
+    entry.data = {"format" => "text"}
+    entry.content = "line one\nline two"
+    assert_equal ContentFormatter.text_email(entry.content), ContentFormatter.source_html(entry)
+    entry.data = {"youtube_video_id" => "abc"}
+    assert_includes ContentFormatter.source_html(entry), %(<iframe src="https://www.youtube.com/embed/abc?rel=0)
+  end
+
+  test "source_html keeps a youtube description as markup" do
+    entry = @entry.dup
+    entry.data = {"youtube_video_id" => "abc"}
+    entry.content = "line one"
+    html = ContentFormatter.source_html(entry)
+    assert_includes html, "<p>line one</p>"
+    refute_kind_of ActiveSupport::SafeBuffer, html
+  end
+
+  test "versions has every stored version, nil where the entry has none" do
+    versions = ContentFormatter.versions(@entry)
+    assert_equal ContentFormatter::VERSIONS, versions.keys
+    assert_equal ContentFormatter.format!(@entry.content, @entry), versions[:web]
+    assert_equal ContentFormatter.api_format(@entry.content, @entry), versions[:api]
+    assert_nil versions[:full]
+    assert_nil versions[:diff]
+  end
+
+  test "diff is nil unless a kept original differs in length" do
+    assert_nil ContentFormatter.diff(@entry)
+    @entry.compressed_original_content = OriginalContent.compress("<p>Old words here.</p>", base: @entry.content)
+    assert_match %r{<del>}, ContentFormatter.diff(@entry)
+  end
+
   test "render matches the named entry points" do
     assert_equal ContentFormatter.format!(@entry.content, @entry), ContentFormatter.render(:web, @entry.content, entry: @entry)
     assert_equal ContentFormatter.api_format(@entry.content, @entry), ContentFormatter.render(:api, @entry.content, entry: @entry)

@@ -346,8 +346,54 @@ class ContentFormatter
     full: Full
   }.freeze
 
+  # The versions EntryRendering stores for every entry, in storage order.
+  # full is only for a newsletter and diff only for an edited entry; for any
+  # other entry those are nil.
+  VERSIONS = %i[web api full diff].freeze
+
   def self.render(format, content, entry: nil, base_url: nil)
     FORMATS.fetch(format).new(entry: entry, base_url: base_url).call(content)
+  end
+
+  # Every stored version of an entry, by name, made from the entry alone.
+  def self.versions(entry)
+    source = source_html(entry)
+    web = render(:web, source, entry: entry)
+    {
+      web: web,
+      api: render(:api, source, entry: entry),
+      full: (render(:full, source, entry: entry) if entry.feed&.newsletter?),
+      diff: diff(entry, web)
+    }
+  end
+
+  # The HTML an entry's web and api versions are formatted from. Text entries
+  # are paragraphed first, and a YouTube entry gets its player ahead of the
+  # description.
+  def self.source_html(entry, html = entry.content)
+    if entry.content_format == "text"
+      text_email(html).to_s
+    elsif entry.data && entry.data["youtube_video_id"].present?
+      player = ActionController::Base.helpers.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true, width: 1280, height: 720)
+      player.to_str + text_email(html).to_s
+    else
+      html.to_s
+    end
+  end
+
+  # The web rendering of an edited entry's original content against its
+  # current one. Only for an entry whose first version was kept and differs
+  # in length, the rule the diff view has always used; a failed diff is no
+  # diff. Pass the entry's web rendering when it is already in hand.
+  def self.diff(entry, web = render(:web, source_html(entry), entry: entry))
+    content = entry.content
+    original = entry.original_content
+    return nil unless content && original.present? && original.length != content.length
+    before = render(:web, source_html(entry, original), entry: entry)
+    HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{web}</div>").inline_html
+  rescue => exception
+    Rails.logger.info { "ContentFormatter.diff failed entry=#{entry.id} #{exception.inspect}" }
+    nil
   end
 
   def self.format!(content, entry = nil, base_url = nil)

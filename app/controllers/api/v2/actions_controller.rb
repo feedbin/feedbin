@@ -47,7 +47,6 @@ module Api
           end
           result = Entry.scoped_search(query, @user)
           @entries = result.records(Entry).for_api(params[:mode])
-          EntryRendering.prepare(@entries)
         else
           @entries = []
         end

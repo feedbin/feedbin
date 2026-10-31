@@ -83,11 +83,17 @@ class Entry < ApplicationRecord
       .with_list_associations
   end
 
+  # Loading these reads the stored renderings in one query and stores any
+  # that are missing or stale in one write, so a page of cold entries costs
+  # one insert instead of one per entry. Reads that don't load the relation
+  # (pluck, count, an ETag check) render nothing.
+  scope :with_renderings, -> { preload(:rendering_record).extending(EntryRendering::PrepareOnLoad) }
+
   # What api/v2/entries/_entry.json renders; extended mode also reads the
   # preview image row, at up to 100 entries a request.
   # Every mode reads owned_image_records: micropost? checks the link image.
   scope :for_api, ->(mode = nil) {
-    includes(:feed).preload(:rendering_record, :owned_image_records)
+    includes(:feed).preload(:owned_image_records).with_renderings
   }
 
   def newsletter?
