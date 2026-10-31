@@ -289,6 +289,31 @@ class ContentFormatter
 
   # The formats an entry can be stored in. Storage decides which of these an
   # entry needs; this is the complete list of what can be built ahead of time.
+  # The version stored renderings are written with. A stored rendering with
+  # another version is re-rendered on read. Bump it with any change that
+  # alters output; the fingerprint test fails until you do.
+  VERSION = 1
+
+  FINGERPRINT_GEMS = %w[html-pipeline html_diff sanitize nokogiri loofah zstd-ruby].freeze
+
+  # A digest of everything that decides what a rendering contains: the
+  # formatter, its filters, the storage format, and the gems they call.
+  def self.fingerprint
+    root = Rails.root
+    files = [root.join("app/models/content_formatter.rb")]
+    files += Dir[root.join("app/models/content_filters/*.rb")].sort.map { Pathname(it) }
+    files << root.join("app/models/entry_rendering.rb")
+    digest = Digest::SHA256.new
+    files.select(&:exist?).each { digest << it.read }
+    specs = Bundler.locked_gems.specs.index_by(&:name)
+    FINGERPRINT_GEMS.each do |name|
+      spec = specs.fetch(name)
+      revision = spec.source.respond_to?(:revision) ? spec.source.revision : ""
+      digest << "#{name} #{spec.version} #{revision}\n"
+    end
+    digest.hexdigest
+  end
+
   FORMATS = {
     web: Web,
     api: Api,

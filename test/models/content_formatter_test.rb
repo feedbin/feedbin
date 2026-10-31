@@ -105,6 +105,16 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_equal "@media (max-width:abcpx) {", ContentFormatter::Full.media_queries("@media (max-width:abcpx) {")
   end
 
+  test "VERSION is bumped when the formatter or its gems change" do
+    stored_version, stored_digest = file_fixture("content_formatter_fingerprint.txt").read.split
+    message = if stored_digest != ContentFormatter.fingerprint && stored_version == ContentFormatter::VERSION.to_s
+      "ContentFormatter's output inputs changed. Bump ContentFormatter::VERSION, then run `rails renderings:fingerprint`."
+    else
+      "Run `rails renderings:fingerprint` to record the current VERSION and fingerprint."
+    end
+    assert_equal [ContentFormatter::VERSION.to_s, ContentFormatter.fingerprint], [stored_version, stored_digest], message
+  end
+
   test "newsletter_format applies camo proxying when configured" do
     content = %(<p><img src="http://example.com/img.png"></p>)
     with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "secret") do
