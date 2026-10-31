@@ -81,6 +81,15 @@ class EntryRenderingTest < ActiveSupport::TestCase
     assert_includes EntryRendering.source_html(entry), %(<iframe src="https://www.youtube.com/embed/abc?rel=0)
   end
 
+  test "source_html keeps a youtube description as markup" do
+    entry = create_entry(@feed)
+    entry.data = {"youtube_video_id" => "abc"}
+    entry.content = "line one"
+    html = EntryRendering.source_html(entry)
+    assert_includes html, "<p>line one</p>"
+    refute_kind_of ActiveSupport::SafeBuffer, html
+  end
+
   test "render! upserts and current_for? tracks the inputs" do
     entry = create_entry(@feed)
     rendering = EntryRendering.render!(entry)

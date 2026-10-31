@@ -81,14 +81,14 @@ class EntryPresenter < BasePresenter
   end
 
   def content
-    ContentFormatter.format!(formatted_content, entry)
+    entry.rendering.web
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
   def newsletter_content
-    output = ContentFormatter.newsletter_format(formatted_content)
+    output = entry.rendering.full
     output = <<-eod
     <style>
     body {
@@ -121,7 +121,7 @@ class EntryPresenter < BasePresenter
   end
 
   def api_content
-    string = ContentFormatter.api_format(formatted_content, entry)
+    string = entry.rendering.api
     if entry.micropost?
       string = ApplicationController.render template: "entries/_micropost_api", formats: :html, locals: {content: string, entry: entry}, layout: nil
     end
@@ -152,25 +152,10 @@ class EntryPresenter < BasePresenter
   # in use. It gets the API rendering; the placeholder-image variant it was
   # written for is retired.
   def app_content
-    ContentFormatter.api_format(formatted_content, entry)
+    entry.rendering.api
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
-  end
-
-  def formatted_content
-    @formatted_content ||= begin
-      if text?
-        ContentFormatter.text_email(entry.content)
-      elsif youtube?
-        @template.capture do
-          @template.concat @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true, width: 1280, height: 720)
-          @template.concat ContentFormatter.text_email(entry.content)&.html_safe
-        end
-      else
-        entry.content
-      end
-    end
   end
 
   def text?

@@ -22,7 +22,7 @@ class EntryRendering < ApplicationRecord
       ContentFormatter.text_email(html).to_s
     elsif entry.data && entry.data["youtube_video_id"].present?
       player = ActionController::Base.helpers.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true, width: 1280, height: 720)
-      player + ContentFormatter.text_email(html).to_s
+      player.to_str + ContentFormatter.text_email(html).to_s
     else
       html.to_s
     end

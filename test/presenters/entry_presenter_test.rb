@@ -39,6 +39,24 @@ class EntryPresenterTest < ActionView::TestCase
     assert_match %r{src="http://[^"]+/img.png"}, presenter.app_content
   end
 
+  test "content serves the stored web rendering" do
+    entry = entry_with(content: "<p>live</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(blob: EntryRendering.encode({web: "<p>stored</p>", api: "<p>stored api</p>"}, content: entry.content, crc: EntryRendering.inputs_crc(entry)))
+    presenter = presenter_for(Entry.find(entry.id))
+    assert_equal "<p>stored</p>", presenter.content
+    assert_equal "<p>stored api</p>", presenter.api_content
+    assert_equal "<p>stored api</p>", presenter.app_content
+  end
+
+  test "newsletter_content wraps the stored full rendering" do
+    @feed.update!(feed_type: :newsletter)
+    entry = entry_with(content: "<html><body><p>n</p></body></html>")
+    EntryRendering.where(entry_id: entry.id).update_all(blob: EntryRendering.encode({web: "", api: "", full: "<p>stored full</p>"}, content: entry.content, crc: EntryRendering.inputs_crc(entry)))
+    presenter = presenter_for(Entry.find(entry.id))
+    assert_includes presenter.newsletter_content, "<p>stored full</p>"
+    assert_includes presenter.newsletter_content, "<style>"
+  end
+
   test "newsletter_from reads the sender from settings" do
     entry = entry_with(newsletter_from: "\"Example News\" <news@example.com>")
 
