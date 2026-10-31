@@ -19,6 +19,22 @@ class RenderingsRebuild
   COUNTERS = %w[pending rendered skipped failed].freeze
   TTL = 30.days.to_i
 
+  # The table a full pass writes into, as a model so writes go through
+  # upsert_all like the live table's.
+  class NewTableRendering < ApplicationRecord
+    self.table_name = "entry_renderings_new"
+    self.primary_key = "entry_id"
+  end
+
+  MODELS = {LIVE_TABLE => EntryRendering, NEW_TABLE => NewTableRendering}.freeze
+
+  CARRY_OVER = <<~SQL
+    INSERT INTO entry_renderings_new (entry_id, version, blob)
+    SELECT live.entry_id, live.version, live.blob FROM entry_renderings live
+    WHERE live.entry_id > :max_id AND live.version = :version
+    AND NOT EXISTS (SELECT 1 FROM entry_renderings_new new WHERE new.entry_id = live.entry_id)
+  SQL
+
   def self.key(name)
     "renderings_rebuild:#{name}"
   end
@@ -56,10 +72,10 @@ class RenderingsRebuild
     connection = ActiveRecord::Base.connection
     if connection.table_exists?(NEW_TABLE)
       raise "#{NEW_TABLE} already exists. Pass force: true to drop it and start over." unless force
-      connection.execute("DROP TABLE #{NEW_TABLE}")
+      connection.execute("DROP TABLE entry_renderings_new")
     end
-    connection.execute("CREATE TABLE #{NEW_TABLE} (LIKE #{LIVE_TABLE} INCLUDING ALL)")
-    connection.execute("ALTER TABLE #{NEW_TABLE} ALTER COLUMN blob SET STORAGE EXTERNAL")
+    connection.execute("CREATE TABLE entry_renderings_new (LIKE entry_renderings INCLUDING ALL)")
+    NewTableRendering.reset_column_information
   end
 
   # Ends a full pass: the new table replaces the live one. The pass covered
@@ -80,25 +96,21 @@ class RenderingsRebuild
     raise "No record of the highest id this pass covered. Start a full pass with rails renderings:rebuild." if max_id.nil?
 
     connection.execute("DROP TABLE IF EXISTS entry_renderings_old")
-    carry_over = <<~SQL
-      INSERT INTO #{NEW_TABLE} (entry_id, version, blob)
-      SELECT live.entry_id, live.version, live.blob FROM #{LIVE_TABLE} live
-      WHERE live.entry_id > #{max_id.to_i} AND live.version = #{ContentFormatter::VERSION.to_i}
-      AND NOT EXISTS (SELECT 1 FROM #{NEW_TABLE} new WHERE new.entry_id = live.entry_id)
-    SQL
+    carry_over = ActiveRecord::Base.sanitize_sql_array([CARRY_OVER, {max_id: Integer(max_id), version: ContentFormatter::VERSION}])
     copied = connection.transaction do
       connection.execute("SET LOCAL statement_timeout = 0")
       connection.exec_update(carry_over)
     end
     connection.transaction do
-      connection.execute("LOCK TABLE #{LIVE_TABLE} IN EXCLUSIVE MODE")
+      connection.execute("LOCK TABLE entry_renderings IN EXCLUSIVE MODE")
       copied += connection.exec_update(carry_over)
-      connection.execute("ALTER TABLE #{LIVE_TABLE} RENAME TO entry_renderings_old")
+      connection.execute("ALTER TABLE entry_renderings RENAME TO entry_renderings_old")
       connection.execute("ALTER INDEX entry_renderings_pkey RENAME TO entry_renderings_old_pkey")
-      connection.execute("ALTER TABLE #{NEW_TABLE} RENAME TO #{LIVE_TABLE}")
+      connection.execute("ALTER TABLE entry_renderings_new RENAME TO entry_renderings")
       connection.execute("ALTER INDEX entry_renderings_new_pkey RENAME TO entry_renderings_pkey")
     end
     EntryRendering.reset_column_information
+    NewTableRendering.reset_column_information
     rows = EntryRendering.count
     begin
       connection.execute("DROP TABLE entry_renderings_old")
@@ -157,18 +169,10 @@ class RenderingsRebuild
     end
   end
 
-  # One statement per batch. Bytea goes in as escaped text: quoting the raw
-  # bytes fails on null bytes.
+  # One upsert per slice of entries.
   def write(table, rows)
     return if rows.empty?
-    connection = ActiveRecord::Base.connection
-    values = rows.map do |row|
-      "(#{row.entry_id.to_i}, #{row.version.to_i}, #{connection.quote(connection.escape_bytea(row.blob))}::bytea)"
-    end
-    connection.execute(<<~SQL)
-      INSERT INTO #{table} (entry_id, version, blob) VALUES #{values.join(",")}
-      ON CONFLICT (entry_id) DO UPDATE SET version = EXCLUDED.version, blob = EXCLUDED.blob
-    SQL
+    MODELS.fetch(table).upsert_all(rows.map { {entry_id: it.entry_id, version: it.version, blob: it.blob} }, unique_by: :entry_id)
   end
 
   def finish(counts)

@@ -35,7 +35,7 @@ class RenderingsRebuildTest < ActiveSupport::TestCase
     entries = 3.times.map { create_entry(@feed) }
     stale!(*entries)
     inserts = 0
-    callback = ->(*, payload) { inserts += 1 if payload[:sql].start_with?("INSERT INTO entry_renderings ") }
+    callback = ->(*, payload) { inserts += 1 if payload[:sql].start_with?(%(INSERT INTO "entry_renderings" )) }
     RenderingsRebuild.stub(:write_slice, 2) do
       ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
         RenderingsRebuild.new.perform("entry_renderings", "ids" => entries.map(&:id))
