@@ -1,7 +1,9 @@
 module ContentFilters
   class GhostCard < HTML::Pipeline::Filter
+    CARDS = "./descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' kg-bookmark-card ')]"
+
     def call
-      doc.search(".kg-bookmark-card").each do |element|
+      doc.xpath(CARDS).each do |element|
         element["class"] = [element["class"], "system-content"].join(" ")
       end
       doc

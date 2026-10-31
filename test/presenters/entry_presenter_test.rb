@@ -18,6 +18,27 @@ class EntryPresenterTest < ActionView::TestCase
     }.merge(attributes))
   end
 
+  # A saved page has no entry of its own, so its URL is the base for links.
+  # Before this, the nil entry raised inside api_format and the rescue handed
+  # back Mercury's HTML untouched.
+  test "extracted_articles sanitizes a saved page and resolves its links" do
+    url = "https://example.com/story"
+    page = {"url" => url, "result" => {"title" => "Story", "domain" => "example.com", "author" => "A", "content" => %(<p><a href="/more">more</a><script>1</script></p>)}}
+    entry = entry_with(data: {"saved_pages" => {url => page}})
+    articles = presenter_for(entry).extracted_articles
+    assert_equal 1, articles.size
+    assert_includes articles.first[:content], %(href="https://example.com/more")
+    refute_includes articles.first[:content], "<script"
+  end
+
+  # Feedbin Notifier still asks for ?private; it gets the API rendering.
+  test "app_content is the api rendering" do
+    entry = entry_with(content: %(<p><a href="/link"><img src="/img.png"></a></p>))
+    presenter = presenter_for(entry)
+    assert_equal presenter.api_content, presenter.app_content
+    assert_match %r{src="http://[^"]+/img.png"}, presenter.app_content
+  end
+
   test "newsletter_from reads the sender from settings" do
     entry = entry_with(newsletter_from: "\"Example News\" <news@example.com>")
 

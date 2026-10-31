@@ -17,13 +17,13 @@ module ContentFilters
 
   class Attributes < HTML::Pipeline::Filter
     def call
-      doc.search("[style]").each do |element|
+      elements_with("style").each do |element|
         element.delete("style")
       end
-      doc.search("[align]").each do |element|
+      elements_with("align").each do |element|
         element.delete("align")
       end
-      doc.search("[class]").each do |element|
+      elements_with("class").each do |element|
         classes = (element["class"] || "").split
         classes = classes & ALLOWED_CLASSES
         if classes.empty?

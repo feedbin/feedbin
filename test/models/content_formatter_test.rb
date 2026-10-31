@@ -55,14 +55,18 @@ class ContentFormatterTest < ActiveSupport::TestCase
     <math>
       <annotation-xml></annotation-xml>
     </math>
+    <svg><foo-bar></foo-bar></svg>
     <custom-element>Hello</custom-element>
+    <div><nested-element>Inner</nested-element></div>
     EOD
 
     expected = <<~EOD
     <math>
       <annotation-xml></annotation-xml>
     </math>
+    <svg></svg>
     <span>Hello</span>
+    <div><span>Inner</span></div>
     EOD
     assert_equal expected, ContentFormatter.format!(content)
   end
@@ -103,25 +107,58 @@ class ContentFormatterTest < ActiveSupport::TestCase
     refute_includes result, "ignore"
   end
 
-  test "format! invokes ImageFallback when entry has archived_images" do
-    @entry.archived_images = {"http://kottke.org/img.png" => "https://archive/x.png"}
-    @entry.save!
-    @entry.reload
-    assert @entry.archived_images?, "expected archived_images? true"
-    invoked = false
-    fallback = ->(html) do
-      invoked = true
-      OpenStruct.new(add_fallbacks: html)
+  test "every stored format renders from the entry alone" do
+    ContentFormatter::FORMATS.each_key do |format|
+      result = ContentFormatter.render(format, @entry.content, entry: @entry)
+      assert_includes result, "img", format.to_s
     end
-    ImageFallback.stub :new, fallback do
-      ContentFormatter.format!(@entry.content, @entry)
+  end
+
+  test "render matches the named entry points" do
+    assert_equal ContentFormatter.format!(@entry.content, @entry), ContentFormatter.render(:web, @entry.content, entry: @entry)
+    assert_equal ContentFormatter.api_format(@entry.content, @entry), ContentFormatter.render(:api, @entry.content, entry: @entry)
+    assert_equal ContentFormatter.newsletter_format(@entry.content), ContentFormatter.render(:full, @entry.content)
+  end
+
+  test "shared sanitize configs are frozen" do
+    assert ContentFormatter::ALLOWLIST_DEFAULT.frozen?
+    assert ContentFormatter::ALLOWLIST_DEFAULT[:elements].frozen?
+    assert ContentFormatter::ALLOWLIST_EVERNOTE[:attributes].frozen?
+  end
+
+  # Scrub#prune replaces doc.scrub!(:prune) for speed, so it has to make the
+  # same decisions as Loofah on everything prune handles.
+  test "Scrub#prune matches Loofah's prune" do
+    [
+      %(<p>a<!-- c -->b</p><!-- top -->),
+      %(<p>keep</p><script>alert(1)</script><style>p{}</style><object><p>inner</p></object>),
+      %(<div><unknown-tag><p>lost</p></unknown-tag>after</div>),
+      %(<a href="javascript:alert(1)">x</a><a href="http://e.com/a b">y</a><img src="data:text/html,x" alt=" ">),
+      %(<svg viewBox="0 0 1 1"><![CDATA[x<y]]><use href="#a" xlink:href="http://e.com"/></svg>),
+      %(<math><![CDATA[a&b]]><mi>x</mi></math>),
+      %(<p id="i" class="c" onclick="x()" data-x="1" title="">t</p>),
+      %(<table><tr><td align="left">c</td></tr></table>)
+    ].each do |html|
+      expected = ContentFormatter.document(html).scrub!(:prune).to_s
+      doc = ContentFormatter.document(html)
+      ContentFilters::Scrub.new(doc, {}).prune
+      assert_equal expected, doc.to_s, html
     end
-    assert invoked, "expected ImageFallback to run"
+  end
+
+  test "format! marks Ghost bookmark cards as system content" do
+    result = ContentFormatter.format!(%(<div class="kg-bookmark-card">c</div><p><a class="kg-bookmark-card other">x</a></p>))
+    assert_equal 2, result.scan("kg-bookmark-card system-content").size
+  end
+
+  test "format! removes the expand control inside a figure" do
+    result = ContentFormatter.format!(%(<figure><a class="image-link-expand"><svg><path></path></svg></a><svg></svg></figure>))
+    assert_equal %(<figure><a></a><svg></svg></figure>), result
   end
 
   test "format! accepts an explicit base_url instead of an entry" do
     content = %(<p><a href="/link"><img src="/img.png"></a></p>)
-    result = ContentFormatter.format!(content, nil, false, "http://override.example/")
+    result = ContentFormatter.format!(content, nil, "http://override.example/")
     assert_includes result, "http://override.example/link"
   end
 
@@ -141,20 +178,18 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_includes result, "Hi"
   end
 
+  test "api_format accepts a base_url instead of an entry" do
+    content = %(<p><a href="/link"><img src="/img.png"></a><script>1</script></p>)
+    result = ContentFormatter.api_format(content, nil, "http://override.example/")
+    assert_includes result, %(href="http://override.example/link")
+    assert_includes result, %(src="http://override.example/img.png")
+    refute_includes result, "<script"
+  end
+
   test "api_format returns original content when an exception is raised" do
     content = %(<p>fine</p>)
     HTML::Pipeline.stub :new, ->(*) { raise "boom" } do
       assert_equal content, ContentFormatter.api_format(content, @entry)
-    end
-  end
-
-  test "app_format produces output and falls back to original content on error" do
-    content = %(<p><a href="/link"><img src="/img.png"></a></p>)
-    result = ContentFormatter.app_format(content, @entry)
-    assert_includes result, "http://kottke.org/link"
-
-    HTML::Pipeline.stub :new, ->(*) { raise "boom" } do
-      assert_equal content, ContentFormatter.app_format(content, @entry)
     end
   end
 
@@ -243,22 +278,6 @@ class ContentFormatterTest < ActiveSupport::TestCase
     result = ContentFormatter.format!(@entry.content, @entry)
 
     assert_includes result, "data-canonical-src"
-  end
-
-  # 019 — every sibling formatter scrubs; this one did not.
-  test "app_format sanitizes" do
-    payload = %(<script>alert(document.cookie)</script><img src="x" onerror="alert(1)">)
-
-    result = ContentFormatter.app_format(payload, @entry)
-
-    refute_includes result, "<script>"
-    refute_includes result, "onerror"
-  end
-
-  test "app_format still moves the image src to the placeholder attribute" do
-    result = ContentFormatter.app_format(%(<img src="http://example.com/a.png">), @entry)
-
-    assert_includes result, "data-feedbin-src"
   end
 
   # 044 — the allowlist admits these attributes but named no protocols for them.

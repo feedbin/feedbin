@@ -175,8 +175,11 @@ class EntryPresenter < BasePresenter
     }
   end
 
+  # Feedbin Notifier (API v2 ?private) is gone from the App Store but still
+  # in use. It gets the API rendering; the placeholder-image variant it was
+  # written for is retired.
   def app_content
-    ContentFormatter.app_format(formatted_content, entry)
+    ContentFormatter.api_format(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
@@ -316,7 +319,7 @@ class EntryPresenter < BasePresenter
       entry.data["saved_pages"].each do |url, page|
         if page["result"]
           parsed = MercuryParser.new(nil, data: page)
-          content = ContentFormatter.api_format(parsed.content, nil)
+          content = ContentFormatter.api_format(parsed.content, nil, url)
           data = {
             url: url,
             title: parsed.title,
@@ -676,7 +679,7 @@ class EntryPresenter < BasePresenter
 
   def page_content(page)
     content = begin
-      ContentFormatter.format!(page.content, nil, true, page.url)
+      ContentFormatter.format!(page.content, nil, page.url)
     rescue
       nil
     end
@@ -684,7 +687,6 @@ class EntryPresenter < BasePresenter
   end
 
   def page_content_api(page)
-    ContentFormatter.absolute_source(page.content, nil, page.url)
     content = begin
       ContentFormatter.absolute_source(page.content, nil, page.url)
     rescue

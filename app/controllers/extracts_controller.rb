@@ -19,7 +19,7 @@ class ExtractsController < ApplicationController
     end
 
     begin
-      @content = ContentFormatter.format!(@content, nil, true, url)
+      @content = ContentFormatter.format!(@content, nil, url)
     rescue
       @content = nil
     end
@@ -31,7 +31,7 @@ class ExtractsController < ApplicationController
 
     begin
       @content_info = MercuryParser.parse(params[:url])
-      @content = ContentFormatter.format!(@content_info.content, nil, true, params[:url])
+      @content = ContentFormatter.format!(@content_info.content, nil, params[:url])
     rescue => exception
       Rails.logger.info { exception }
       @content = nil
