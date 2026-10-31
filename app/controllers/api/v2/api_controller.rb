@@ -46,6 +46,7 @@ module Api
         else
           links_header(@page_query, path_helper, params[:feed_id])
           if stale?(etag: @entries)
+            EntryRendering.prepare(@entries)
             render_json "entries/index"
           end
         end

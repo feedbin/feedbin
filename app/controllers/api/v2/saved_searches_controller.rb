@@ -44,7 +44,9 @@ module Api
           entry_count(page_data)
           links_header(page_data, "api_v2_saved_search_url", saved_search.id)
 
-          if params[:include_entries] != "true"
+          if params[:include_entries] == "true"
+            EntryRendering.prepare(@entries)
+          else
             render json: @entries.map { |entry| entry.id.to_i }.to_json
           end
         else

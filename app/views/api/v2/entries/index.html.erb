@@ -7,7 +7,5 @@ elsif params[:mode] == "extended"
   template = "entry_extended"
   cached = Proc.new { |item| EntriesHelper.api_entries_cache_key(item, params.key?(:include_content_diff)) }
 end
-# One write for every entry rendered here without a current stored rendering.
-EntryRendering.prepare(@entries)
 -%>
 <%= json_array { render partial: "api/v2/entries/#{template}", formats: :json, collection: @entries, as: :entry, spacer_template: "api/v2/shared/comma", cached: cached } -%>

@@ -34,6 +34,17 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     assert_equal 1, statements.count { it.include?(%(FROM "images")) }
   end
 
+  test "index renders nothing when the client's copy is current" do
+    login_as @user
+    get :index, format: :json
+    etag = @response.headers["ETag"]
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    @request.headers["If-None-Match"] = etag
+    statements = capture_sql { get :index, format: :json }
+    assert_response :not_modified
+    assert_empty statements.grep(/INSERT INTO "entry_renderings"/)
+  end
+
   test "should get index" do
     login_as @user
     get :index, format: :json
