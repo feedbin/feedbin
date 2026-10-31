@@ -43,6 +43,7 @@ class RenderingsRebuild
     Sidekiq.redis do |redis|
       COUNTERS.each { |name| redis.set(key(name), 0, ex: TTL) }
       redis.set(key("pending"), selectors.size, ex: TTL)
+      redis.set(key("max_id"), Entry.maximum(:id).to_i, ex: TTL) if table == NEW_TABLE
     end
     selectors.each_slice(1_000) do |slice|
       Sidekiq::Client.push_bulk("class" => self, "args" => slice.map { [table, it] })
@@ -61,25 +62,34 @@ class RenderingsRebuild
     connection.execute("ALTER TABLE #{NEW_TABLE} ALTER COLUMN blob SET STORAGE EXTERNAL")
   end
 
-  # Ends a full pass: the new table replaces the live one. Entries created
-  # while the pass ran were rendered into the live table by their own save,
-  # so those rows are carried over first, once in bulk and once more under a
-  # lock that holds off writes (reads continue) for the moment of the rename.
-  # A row the live table rewrote during the pass keeps the pass's copy; its
-  # CRC no longer matches and the next read re-renders it.
+  # Ends a full pass: the new table replaces the live one. The pass covered
+  # every entry up to the highest id when it started; entries created since
+  # were rendered into the live table by their own save, so rows above that
+  # id are carried over. Once in bulk, with no statement timeout, then once
+  # more under a lock that holds off writes (reads continue) for the moment
+  # of the rename; both are primary-key range scans over a pass's worth of
+  # new entries, not the table. A row the live table rewrote during the pass
+  # keeps the pass's copy; its CRC no longer matches and the next read
+  # re-renders it. Safe to run again after a failure.
   def self.swap
     pending = progress[:pending]
     raise "Jobs are still running (pending: #{pending})." if pending > 0
     connection = ActiveRecord::Base.connection
     raise "#{NEW_TABLE} does not exist. Start a full pass with rails renderings:rebuild." unless connection.table_exists?(NEW_TABLE)
+    max_id = Sidekiq.redis { it.get(key("max_id")) }
+    raise "No record of the highest id this pass covered. Start a full pass with rails renderings:rebuild." if max_id.nil?
 
+    connection.execute("DROP TABLE IF EXISTS entry_renderings_old")
     carry_over = <<~SQL
       INSERT INTO #{NEW_TABLE} (entry_id, version, blob)
       SELECT live.entry_id, live.version, live.blob FROM #{LIVE_TABLE} live
-      WHERE live.version = #{ContentFormatter::VERSION.to_i}
+      WHERE live.entry_id > #{max_id.to_i} AND live.version = #{ContentFormatter::VERSION.to_i}
       AND NOT EXISTS (SELECT 1 FROM #{NEW_TABLE} new WHERE new.entry_id = live.entry_id)
     SQL
-    copied = connection.exec_update(carry_over)
+    copied = connection.transaction do
+      connection.execute("SET LOCAL statement_timeout = 0")
+      connection.exec_update(carry_over)
+    end
     connection.transaction do
       connection.execute("LOCK TABLE #{LIVE_TABLE} IN EXCLUSIVE MODE")
       copied += connection.exec_update(carry_over)
@@ -88,15 +98,35 @@ class RenderingsRebuild
       connection.execute("ALTER TABLE #{NEW_TABLE} RENAME TO #{LIVE_TABLE}")
       connection.execute("ALTER INDEX entry_renderings_new_pkey RENAME TO entry_renderings_pkey")
     end
-    connection.execute("DROP TABLE entry_renderings_old")
     EntryRendering.reset_column_information
-    {copied: copied, rows: EntryRendering.count}
+    rows = EntryRendering.count
+    begin
+      connection.execute("DROP TABLE entry_renderings_old")
+    rescue ActiveRecord::StatementInvalid => exception
+      Rails.logger.warn { "renderings swap: entry_renderings_old left in place (#{exception.message}); the next swap drops it" }
+    end
+    {copied: copied, rows: rows}
+  end
+
+  # Entries per INSERT. A batch of newsletters with four versions each,
+  # hex-escaped, would otherwise be one statement of hundreds of megabytes.
+  def self.write_slice
+    100
   end
 
   def perform(table, selector)
     raise ArgumentError, "not a renderings table: #{table.inspect}" unless TABLES.include?(table)
     counts = {rendered: 0, skipped: 0, failed: 0}
-    rows = entries(selector).filter_map do |entry|
+    entries(table, selector).find_each(batch_size: self.class.write_slice).each_slice(self.class.write_slice) do |slice|
+      write(table, render(table, slice, counts))
+    end
+    finish(counts)
+  end
+
+  private
+
+  def render(table, entries, counts)
+    entries.filter_map do |entry|
       if table == LIVE_TABLE && entry.rendering_record&.current_for?(entry)
         counts[:skipped] += 1
         next
@@ -113,14 +143,12 @@ class RenderingsRebuild
       )
       nil
     end
-    write(table, rows)
-    finish(counts)
   end
 
-  private
-
-  def entries(selector)
-    scope = Entry.includes(:feed).preload(:rendering_record)
+  # Only a pass over the live table reads the stored rows, to skip current ones.
+  def entries(table, selector)
+    scope = Entry.includes(:feed)
+    scope = scope.preload(:rendering_record) if table == LIVE_TABLE
     if selector["range"]
       first, last = selector["range"]
       scope.where(id: first..last)

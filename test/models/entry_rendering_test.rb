@@ -101,6 +101,13 @@ class EntryRenderingTest < ActiveSupport::TestCase
     refute EntryRendering.find(entry.id).current_for?(entry)
   end
 
+  test "a camo key change makes a stored rendering stale" do
+    entry = create_entry(@feed)
+    rendering = with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "one") { EntryRendering.render!(entry) }
+    with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "one") { assert rendering.current_for?(entry) }
+    with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "two") { refute rendering.current_for?(entry) }
+  end
+
   test "current_for? is false for another VERSION" do
     entry = create_entry(@feed)
     rendering = EntryRendering.render!(entry)

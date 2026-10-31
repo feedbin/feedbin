@@ -115,6 +115,12 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_equal [ContentFormatter::VERSION.to_s, ContentFormatter.fingerprint], [stored_version, stored_digest], message
   end
 
+  test "the fingerprint covers the sanitize transformers and the gems text and URLs go through" do
+    assert_includes ContentFormatter.fingerprint_files, Rails.root.join("config/initializers/transformers.rb")
+    assert_includes ContentFormatter::FINGERPRINT_GEMS, "redcarpet"
+    assert_includes ContentFormatter::FINGERPRINT_GEMS, "addressable"
+  end
+
   test "newsletter_format applies camo proxying when configured" do
     content = %(<p><img src="http://example.com/img.png"></p>)
     with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "secret") do

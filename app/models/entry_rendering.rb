@@ -53,9 +53,13 @@ class EntryRendering < ApplicationRecord
   end
 
   # Everything stored that a rendering is derived from. Settings and data
-  # matter too, but change only through saves, which re-render.
+  # matter too, but change only through saves, which re-render. The Camo
+  # host and key are in it because every proxied image URL is signed with
+  # them: a rotated key makes every stored rendering stale.
   def self.inputs_crc(entry)
-    Zlib.crc32(entry.compressed_original_content.to_s, Zlib.crc32(entry.content.to_s))
+    seed = Zlib.crc32("#{ENV["CAMO_HOST"]}\0#{ENV["CAMO_KEY"]}")
+    seed = Zlib.crc32(entry.content.to_s, seed)
+    Zlib.crc32(entry.compressed_original_content.to_s, seed)
   end
 
   def self.encode(versions, content:, crc:)
@@ -80,15 +84,23 @@ class EntryRendering < ApplicationRecord
     content.present? ? {dict: content} : {}
   end
 
+  # Unsaved. The entry is attached without going through the inverse: that
+  # would make the record the entry's loaded rendering_record, which Rails
+  # then autosaves on the entry's next save, inserting a row upsert wrote.
   def self.build(entry)
     versions = versions_for(entry)
-    new(entry: entry, version: ContentFormatter::VERSION, blob: encode(versions, content: entry.content, crc: inputs_crc(entry))).tap do
+    new(entry_id: entry.id, version: ContentFormatter::VERSION, blob: encode(versions, content: entry.content, crc: inputs_crc(entry))).tap do
+      it.association(:entry).target = entry
       it.instance_variable_set(:@versions, versions)
     end
   end
 
   def self.render!(entry)
-    build(entry).tap { upsert({entry_id: it.entry_id, version: it.version, blob: it.blob}, unique_by: :entry_id) }
+    build(entry).tap(&:store!)
+  end
+
+  def store!
+    self.class.upsert({entry_id: entry_id, version: version, blob: blob}, unique_by: :entry_id)
   end
 
   def layout

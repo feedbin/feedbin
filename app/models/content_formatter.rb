@@ -294,17 +294,29 @@ class ContentFormatter
   # alters output; the fingerprint test fails until you do.
   VERSION = 1
 
-  FINGERPRINT_GEMS = %w[html-pipeline html_diff sanitize nokogiri loofah zstd-ruby].freeze
+  # redcarpet paragraphs text entries; addressable normalizes every URL the
+  # filters rewrite.
+  FINGERPRINT_GEMS = %w[html-pipeline html_diff sanitize nokogiri loofah zstd-ruby redcarpet addressable].freeze
+
+  # Not covered, so a change to them needs a VERSION bump by hand: the URL
+  # helpers on Entry and Feed (base_url, fully_qualified_url,
+  # site_relative_url) and Entry#content_format.
+  def self.fingerprint_files
+    root = Rails.root
+    [
+      root.join("app/models/content_formatter.rb"),
+      *Dir[root.join("app/models/content_filters/*.rb")].sort.map { Pathname(it) },
+      root.join("app/models/entry_rendering.rb"),
+      root.join("config/initializers/transformers.rb")
+    ]
+  end
 
   # A digest of everything that decides what a rendering contains: the
-  # formatter, its filters, the storage format, and the gems they call.
+  # formatter, its filters, the sanitizer's transformers, the storage format,
+  # and the gems they call.
   def self.fingerprint
-    root = Rails.root
-    files = [root.join("app/models/content_formatter.rb")]
-    files += Dir[root.join("app/models/content_filters/*.rb")].sort.map { Pathname(it) }
-    files << root.join("app/models/entry_rendering.rb")
     digest = Digest::SHA256.new
-    files.select(&:exist?).each { digest << it.read }
+    fingerprint_files.select(&:exist?).each { digest << it.read }
     specs = Bundler.locked_gems.specs.index_by(&:name)
     FINGERPRINT_GEMS.each do |name|
       spec = specs.fetch(name)

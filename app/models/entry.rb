@@ -211,20 +211,27 @@ class Entry < ApplicationRecord
     OriginalContent.decompress(compressed_original_content, base: content)
   end
 
+  # nil when there is no diff, and when rendering fails: a diff is never
+  # worth failing the page over.
   def content_diff
     rendering.diff&.html_safe
+  rescue => exception
+    Rails.logger.info { "Entry#content_diff failed entry=#{id} #{exception.inspect}" }
+    nil
   end
 
   # Every formatted version of this entry, current with its content and the
   # formatter: the stored row when it matches, otherwise rendered, stored,
-  # and returned. An unsaved entry is rendered and not stored.
+  # and returned. An unsaved entry is rendered and not stored. Storing can
+  # fail (a timeout, a read-only database); the fresh rendering is served
+  # anyway.
   def rendering
     @rendering ||= if new_record?
       EntryRendering.build(self)
     elsif rendering_record&.current_for?(self)
       rendering_record
     else
-      EntryRendering.render!(self)
+      EntryRendering.build(self).tap { store(it) }
     end
   end
 
@@ -381,12 +388,21 @@ class Entry < ApplicationRecord
 
   private
 
+  def store(rendering)
+    rendering.store!
+  rescue => exception
+    ErrorService.notify(
+      error_class: "Entry#rendering",
+      error_message: "storing the rendering failed",
+      parameters: {entry_id: id, exception: exception}
+    )
+  end
+
   # Rendering here keeps reads from paying for it. A failure is reported and
   # the next read renders instead; it must never fail the write.
   def store_rendering
     return unless previously_new_record? || saved_changes.keys.intersect?(RENDERING_INPUTS)
     @rendering = EntryRendering.render!(self)
-    association(:rendering_record).reset
   rescue => exception
     @rendering = nil
     ErrorService.notify(

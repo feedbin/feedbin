@@ -486,6 +486,33 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil EntryRendering.find_by(entry_id: entry.id)
   end
 
+  test "reading a stale rendering and then saving the entry does not insert the rendering twice" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(version: ContentFormatter::VERSION + 1)
+    entry = Entry.find(entry.id)
+    entry.rendering
+    entry.update!(title: "A new title")
+    assert_equal 1, EntryRendering.where(entry_id: entry.id).count
+  end
+
+  test "rendering is served when storing it fails" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(version: ContentFormatter::VERSION + 1)
+    entry = Entry.find(entry.id)
+    EntryRendering.stub(:upsert, ->(*, **) { raise ActiveRecord::StatementInvalid, "canceling statement due to statement timeout" }) do
+      assert_equal "<p>Text.</p>", entry.rendering.web
+    end
+  end
+
+  test "content_diff is nil when rendering fails" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).delete_all
+    entry = Entry.find(entry.id)
+    EntryRendering.stub(:build, ->(*) { raise "boom" }) do
+      assert_nil entry.content_diff
+    end
+  end
+
   test "content_diff is nil without an original" do
     assert_nil saved_entry("<p>Text.</p>").content_diff
   end
