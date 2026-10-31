@@ -444,6 +444,28 @@ class EntryTest < ActiveSupport::TestCase
     refute_equal before, EntryRendering.find(entry.id).blob
   end
 
+  # Jobs rewrite these keys on entries the formatter's output doesn't depend
+  # on, such as every YouTube entry's duration on each channel crawl.
+  test "updating keys the formatter does not read does not re-render" do
+    entry = saved_entry("<p>Text.</p>")
+    statements = capture_sql do
+      entry.update!(embed_duration: 120)
+      entry.update!(archived_images: true)
+      entry.update!(data: entry.data.to_h.merge("saved_pages" => {"http://example.com" => {}}))
+    end
+    assert_empty statements.grep(/INSERT INTO "entry_renderings"/)
+  end
+
+  test "updating the keys the formatter reads re-renders" do
+    entry = saved_entry("<p>Text.</p>")
+    statements = capture_sql do
+      entry.update!(newsletter_from: "News <news@substack.com>")
+      entry.update!(data: {format: "text"})
+    end
+    assert_equal 2, statements.grep(/INSERT INTO "entry_renderings"/).size
+    assert_equal "<p>Text.</p>", Entry.find(entry.id).rendering.web.strip
+  end
+
   test "rendering re-renders when content changed outside callbacks" do
     entry = saved_entry("<p>Text.</p>")
     entry.update_columns(content: "<p>Rewritten without callbacks.</p>")

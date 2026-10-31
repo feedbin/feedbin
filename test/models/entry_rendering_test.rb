@@ -131,6 +131,23 @@ class EntryRenderingTest < ActiveSupport::TestCase
     entries.each { assert EntryRendering.find(it.id).current_for?(it) }
   end
 
+  test "prepare leaves out an entry that fails to render and stores the rest" do
+    bad, good = 2.times.map { create_entry(@feed) }
+    EntryRendering.where(entry_id: [bad.id, good.id]).delete_all
+    entries = Entry.where(id: [bad.id, good.id]).preload(:rendering_record).order(:id).to_a
+    original = EntryRendering.method(:build)
+    notified = []
+    EntryRendering.stub(:build, ->(entry) { (entry.id == bad.id) ? raise("boom") : original.call(entry) }) do
+      ErrorService.stub(:notify, ->(options) { notified << options }) do
+        EntryRendering.prepare(entries)
+      end
+    end
+    assert_equal [{error_class: "EntryRendering.prepare", entry_id: bad.id}], notified.map { {error_class: it[:error_class], entry_id: it[:parameters][:entry_id]} }
+    assert EntryRendering.find(good.id).current_for?(good)
+    assert_nil EntryRendering.find_by(entry_id: bad.id)
+    assert_empty capture_sql { entries.last.rendering.web }.grep(/entry_renderings/)
+  end
+
   test "prepare serves the renderings when storing them fails" do
     entry = create_entry(@feed)
     EntryRendering.where(entry_id: entry.id).delete_all

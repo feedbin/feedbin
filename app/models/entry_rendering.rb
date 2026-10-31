@@ -101,11 +101,21 @@ class EntryRendering < ApplicationRecord
 
   # Renders the entries whose stored row is missing or stale and stores them
   # in one upsert, so a page of cold entries costs one write, not one each.
-  # Callers preload :rendering_record. Each entry keeps its rendering even if
-  # the write fails; the next read renders and tries again.
+  # Callers preload :rendering_record. An entry that fails to render is
+  # reported and left out, and its own read raises as it would have anyway;
+  # the rest of the batch is still stored. Each entry keeps its rendering
+  # even if the write fails; the next read renders and tries again.
   def self.prepare(entries)
-    built = entries.reject { it.new_record? || it.rendering_record&.current_for?(it) }
-      .uniq(&:id).map { |entry| build(entry).tap { entry.rendering = it } }
+    built = entries.reject { it.new_record? || it.rendering_record&.current_for?(it) }.uniq(&:id).filter_map do |entry|
+      build(entry).tap { entry.rendering = it }
+    rescue => exception
+      ErrorService.notify(
+        error_class: "EntryRendering.prepare",
+        error_message: "rendering failed",
+        parameters: {entry_id: entry.id, exception: exception}
+      )
+      nil
+    end
     return if built.empty?
     write(built)
   rescue => exception

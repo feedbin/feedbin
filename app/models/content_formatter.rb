@@ -119,7 +119,7 @@ class ContentFormatter
 
     def call(content)
       result = HTML::Pipeline.new(filters, context).call(ContentFormatter.document(content))
-      result[:output].to_s
+      serialize(result[:output])
     end
 
     def filters
@@ -130,10 +130,22 @@ class ContentFormatter
       {}
     end
 
+    # The finished fragment as a string.
+    def serialize(output)
+      output.to_s
+    end
+
     private
 
     def newsletter?
       entry&.feed&.newsletter? || false
+    end
+
+    # Relative links and image sources resolve against the entry or an
+    # explicit base URL. With neither there is nothing to resolve from, so
+    # the filters that need one are left out rather than failing the render.
+    def resolves_urls?
+      !!(entry || base_url)
     end
 
     # Where relative links and image sources resolve from.
@@ -170,8 +182,8 @@ class ContentFormatter
         HTML::Pipeline::LazyLoadFilter,
         ContentFilters::FigureControls,
         (ContentFilters::Substack if substack?),
-        (HTML::Pipeline::AbsoluteHrefFilter if entry || base_url),
-        (HTML::Pipeline::AbsoluteSourceFilter if entry || base_url),
+        (HTML::Pipeline::AbsoluteHrefFilter if resolves_urls?),
+        (HTML::Pipeline::AbsoluteSourceFilter if resolves_urls?),
         HTML::Pipeline::SmileyFilter,
         ContentFilters::Scrub,
         ContentFilters::Attributes,
@@ -189,7 +201,7 @@ class ContentFormatter
         embed_classes: "iframe-placeholder entry-callout system-content"
       }
       base.merge!(camo_context)
-      base.merge!(url_context) if entry || base_url
+      base.merge!(url_context) if resolves_urls?
       base
     end
 
@@ -205,8 +217,8 @@ class ContentFormatter
   class Api < Format
     def filters
       [
-        HTML::Pipeline::AbsoluteSourceFilter,
-        HTML::Pipeline::AbsoluteHrefFilter,
+        (HTML::Pipeline::AbsoluteSourceFilter if resolves_urls?),
+        (HTML::Pipeline::AbsoluteHrefFilter if resolves_urls?),
         HTML::Pipeline::ProtocolFilter,
         ContentFilters::Scrub,
         ContentFilters::Attributes,
@@ -217,8 +229,10 @@ class ContentFormatter
     # API clients load src as before; data-camo-src is there for the ones
     # that honor the proxy_images preference.
     def context
-      context = url_context.merge(scrub_mode: newsletter? ? :newsletter : :default)
-      camo? ? context.merge(camo_context, asset_keep_src: true) : context
+      context = {scrub_mode: newsletter? ? :newsletter : :default}
+      context.merge!(url_context) if resolves_urls?
+      context.merge!(camo_context, asset_keep_src: true) if camo?
+      context
     end
   end
 
@@ -272,8 +286,8 @@ class ContentFormatter
       url_context.merge(whitelist: ALLOWLIST_EVERNOTE)
     end
 
-    def call(content)
-      HTML::Pipeline.new(filters, context).call(ContentFormatter.document(content))[:output].to_xml
+    def serialize(output)
+      output.to_xml
     end
   end
 
@@ -287,8 +301,6 @@ class ContentFormatter
     end
   end
 
-  # The formats an entry can be stored in. Storage decides which of these an
-  # entry needs; this is the complete list of what can be built ahead of time.
   # The version stored renderings are written with. A stored rendering with
   # another version is re-rendered on read. Bump it with any change that
   # alters output; the fingerprint test fails until you do.
@@ -326,6 +338,8 @@ class ContentFormatter
     digest.hexdigest
   end
 
+  # The formats an entry can be stored in. Storage decides which of these an
+  # entry needs; this is the complete list of what can be built ahead of time.
   FORMATS = {
     web: Web,
     api: Api,

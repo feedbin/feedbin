@@ -6,12 +6,12 @@ module ContentFilters
     NEWSLETTER_ELEMENTS = %w[table thead tbody tfoot tr td center]
     DASHED_ELEMENT_PARENTS = %w[svg math]
 
-    # svg and math are namespaced in an HTML5 parse, so they are matched by
-    # local name. descendant-or-self rather than .// because a fragment's
-    # top-level nodes fall out of a .// query that carries a predicate.
+    # Every query here names the descendant axis rather than .// because a
+    # fragment's top-level nodes fall out of a .// query that carries a
+    # predicate. svg and math are namespaced in an HTML5 parse, so they are
+    # matched by local name.
     CUSTOM_ELEMENTS = "./descendant-or-self::*[contains(local-name(), '-')]" \
       "[not(ancestor::*[#{DASHED_ELEMENT_PARENTS.map { "local-name()='#{it}'" }.join(" or ")}])]"
-    NEWSLETTER_ELEMENTS_XPATH = NEWSLETTER_ELEMENTS.map { ".//#{it}" }.join(" | ")
 
     # Everything Loofah's prune decides on, in document order: elements are
     # kept and sanitized or removed with their contents, comments go, and a
@@ -24,7 +24,7 @@ module ContentFilters
       # Attributes drops every style attribute afterwards, and prune would
       # first run each one through a CSS parser: on newsletters that was most
       # of the formatting time.
-      doc.xpath(".//@style").each(&:unlink)
+      doc.xpath("./descendant::*/@style").each(&:unlink)
       prune
       video
       links
@@ -64,7 +64,7 @@ module ContentFilters
     end
 
     def newsletter_elements
-      doc.xpath(NEWSLETTER_ELEMENTS_XPATH).each do |node|
+      elements(*NEWSLETTER_ELEMENTS).each do |node|
         node.name = "div"
         node.keys.each do |attribute|
           node.delete attribute
@@ -73,19 +73,19 @@ module ContentFilters
     end
 
     def video
-      doc.xpath(".//video").each do |node|
+      elements("video").each do |node|
         node["preload"] = "none"
       end
     end
 
     def iframe
-      doc.xpath(".//iframe").each do |node|
+      elements("iframe").each do |node|
         node["referrerpolicy"] = "strict-origin-when-cross-origin"
       end
     end
 
     def links
-      doc.xpath(".//a").each do |node|
+      elements("a").each do |node|
         next unless node["href"] == node.text
         if shortened = node["href"].gsub(/https?:\/\//, "").truncate(40, omission: "…") rescue nil
           node.content = shortened

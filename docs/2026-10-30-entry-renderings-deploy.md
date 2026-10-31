@@ -46,7 +46,7 @@ rails renderings:swap
 
 `swap` refuses while jobs are still pending. It doesn't carry over rows written during the pass; those entries render again on their next read. The rename waits at most a second for in-flight reads and retries up to five times, so run it off-peak. It is safe to run again if it fails.
 
-- [ ] **Re-render one feed or recent entries in place** after a change that only matters to them:
+- [ ] **Re-render one feed or recent entries in place** after a change that only matters to them. `SINCE` on its own turns the date into an id range by probing the primary key, since nothing indexes `created_at` alone; with `FEED` it narrows that feed's ids.
 
 ```bash
 FEED=123 rails renderings:rebuild

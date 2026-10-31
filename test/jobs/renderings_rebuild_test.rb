@@ -76,6 +76,23 @@ class RenderingsRebuildTest < ActiveSupport::TestCase
     assert_equal 3, RenderingsRebuild.start(ids: ids, force: true)
   end
 
+  test "start from an id covers the ids from there up" do
+    entry = create_entry(@feed)
+    count = RenderingsRebuild.start(from_id: entry.id)
+    assert_equal 1, count
+    assert_equal [[entry.id, entry.id + RenderingsRebuild::BATCH - 1]], RenderingsRebuild.jobs.map { it["args"].last["range"] }
+  end
+
+  test "first_id_created_since finds the boundary by probing ids" do
+    3.times { create_entry(@feed) }
+    Entry.update_all("created_at = timestamp '2020-01-01' + id * interval '1 minute'")
+    target = Entry.order(:id).offset(1).first
+    assert_equal target.id, RenderingsRebuild.first_id_created_since(target.created_at)
+    assert_equal target.id, RenderingsRebuild.first_id_created_since(target.created_at - 30.seconds)
+    assert_equal Entry.minimum(:id), RenderingsRebuild.first_id_created_since(Time.utc(2000))
+    assert_nil RenderingsRebuild.first_id_created_since(Entry.maximum(:created_at) + 1.second)
+  end
+
   test "start without ids covers every id in ranges" do
     entry = create_entry(@feed)
     count = RenderingsRebuild.start(table: RenderingsRebuild::NEW_TABLE)

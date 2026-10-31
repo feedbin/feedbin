@@ -23,9 +23,13 @@ class Entry < ApplicationRecord
   # The stored formatting, which may be stale. Read rendering instead.
   has_one :rendering_record, class_name: "EntryRendering", inverse_of: :entry, dependent: :delete
 
-  # Saves touching these re-render. Data and settings are included because
-  # the formatter reads them (text format, YouTube, newsletter sender).
-  RENDERING_INPUTS = %w[content compressed_original_content url data settings].freeze
+  # What a rendering is made from, besides the feed. A save that changes any
+  # of these re-renders. Data and settings hold other keys the formatter
+  # never reads (saved pages, embed_duration, archived_images), and the jobs
+  # that keep those current would otherwise re-render on every write.
+  RENDERING_COLUMNS = %w[content compressed_original_content url feed_id].freeze
+  RENDERING_DATA_KEYS = %w[format youtube_video_id].freeze
+  RENDERING_SETTINGS_KEYS = %w[newsletter_from].freeze
 
   before_create :ensure_published
   before_create :create_summary
@@ -403,7 +407,7 @@ class Entry < ApplicationRecord
   # Rendering here keeps reads from paying for it. A failure is reported and
   # the next read renders instead; it must never fail the write.
   def store_rendering
-    return unless previously_new_record? || saved_changes.keys.intersect?(RENDERING_INPUTS)
+    return unless previously_new_record? || rendering_inputs_changed?
     @rendering = EntryRendering.render!(self)
   rescue => exception
     @rendering = nil
@@ -412,6 +416,20 @@ class Entry < ApplicationRecord
       error_message: "rendering failed",
       parameters: {entry_id: id, exception: exception}
     )
+  end
+
+  def rendering_inputs_changed?
+    saved_changes.keys.intersect?(RENDERING_COLUMNS) ||
+      keys_changed?(saved_change_to_data, RENDERING_DATA_KEYS) ||
+      keys_changed?(saved_change_to_settings, RENDERING_SETTINGS_KEYS)
+  end
+
+  # Whether a [before, after] change to a hash column differs on the given
+  # keys. The after value is the hash as assigned, so its keys may be symbols.
+  def keys_changed?(change, keys)
+    return false unless change
+    before, after = change.map { it.is_a?(Hash) ? it.stringify_keys.slice(*keys) : {} }
+    before != after
   end
 
   # A stored value only decompresses against the content it was made from, so

@@ -4,6 +4,7 @@
 # entry_renderings_new, which RenderingsRebuild.swap renames into place.
 #
 #   RenderingsRebuild.start(ids: Entry.where(feed_id: 1).pluck(:id))
+#   RenderingsRebuild.start(from_id: RenderingsRebuild.first_id_created_since(1.week.ago))
 #   RenderingsRebuild.start(table: RenderingsRebuild::NEW_TABLE)
 #   RenderingsRebuild.progress  # => {pending: 0, rendered: 123, skipped: 4, failed: 0}
 #
@@ -39,14 +40,14 @@ class RenderingsRebuild
 
   # A second start while jobs are still out would reset the counters under
   # them, and their decrements would end the new pass early.
-  def self.start(ids: nil, table: LIVE_TABLE, force: false)
+  def self.start(ids: nil, from_id: 1, table: LIVE_TABLE, force: false)
     pending = progress[:pending]
     raise "A pass is still running (pending: #{pending}). Pass force: true to start over." if pending > 0 && !force
 
     selectors = if ids
       ids.each_slice(BATCH).map { {"ids" => it} }
     else
-      (1..Entry.maximum(:id).to_i).step(BATCH).map { {"range" => [it, it + BATCH - 1]} }
+      (from_id..Entry.maximum(:id).to_i).step(BATCH).map { {"range" => [it, it + BATCH - 1]} }
     end
 
     Sidekiq.redis do |redis|
@@ -57,6 +58,28 @@ class RenderingsRebuild
       Sidekiq::Client.push_bulk("class" => self, "args" => slice.map { [table, it] })
     end
     selectors.size
+  end
+
+  # The lowest entry id created at or after a time, or nil when none was.
+  # Entries get ids in creation order, and created_at has no index of its
+  # own, so a scan for the date would run into the statement timeout on
+  # 160M rows; this probes the primary key instead, about 30 times.
+  # Concurrent inserts can put neighbouring ids a moment out of order, so
+  # the boundary is close rather than exact, which a rebuild can bear.
+  def self.first_id_created_since(time)
+    low, high = Entry.minimum(:id).to_i, Entry.maximum(:id).to_i
+    return nil if high.zero?
+    while low < high
+      mid = (low + high) / 2
+      created_at = Entry.where(id: mid..).order(:id).limit(1).pick(:created_at)
+      if created_at && created_at >= time
+        high = mid
+      else
+        low = mid + 1
+      end
+    end
+    created_at = Entry.where(id: low..).order(:id).limit(1).pick(:created_at)
+    low if created_at && created_at >= time
   end
 
   # The empty table a full pass writes into.

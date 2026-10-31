@@ -108,7 +108,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   test "VERSION is bumped when the formatter or its gems change" do
     stored_version, stored_digest = file_fixture("content_formatter_fingerprint.txt").read.split
     message = if stored_digest != ContentFormatter.fingerprint && stored_version == ContentFormatter::VERSION.to_s
-      "ContentFormatter's output inputs changed. Bump ContentFormatter::VERSION, then run `rails renderings:fingerprint`."
+      "Something that shapes renderings changed. If the output it produces changed, bump ContentFormatter::VERSION; either way, run `rails renderings:fingerprint`."
     else
       "Run `rails renderings:fingerprint` to record the current VERSION and fingerprint."
     end
@@ -226,6 +226,13 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_includes result, %(href="http://override.example/link")
     assert_includes result, %(src="http://override.example/img.png")
     refute_includes result, "<script"
+  end
+
+  # Nothing calls it this way today, but the rescue below hands back the
+  # input unsanitized, so a nil entry must not be what triggers it.
+  test "api_format without an entry or base_url still sanitizes" do
+    result = ContentFormatter.api_format(%(<p><a href="/link">x</a><script>1</script></p>), nil)
+    assert_equal %(<p><a href="/link">x</a></p>), result
   end
 
   test "api_format returns original content when an exception is raised" do
