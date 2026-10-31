@@ -45,13 +45,6 @@ class RenderingsRebuildTest < ActiveSupport::TestCase
     assert_equal 3, RenderingsRebuild.progress[:rendered]
   end
 
-  test "a full start records the highest id the pass covers" do
-    entry = create_entry(@feed)
-    RenderingsRebuild.start(table: RenderingsRebuild::NEW_TABLE)
-    assert_equal Entry.maximum(:id), Sidekiq.redis { it.get(RenderingsRebuild.key("max_id")) }.to_i
-    assert_operator entry.id, :<=, Entry.maximum(:id)
-  end
-
   test "perform rejects an unknown table" do
     assert_raises(ArgumentError) { RenderingsRebuild.new.perform("entries", "ids" => []) }
   end
@@ -133,41 +126,65 @@ class RenderingsRebuildSwapTest < ActiveSupport::TestCase
     assert_raises(RuntimeError) { RenderingsRebuild.swap }
   end
 
-  test "swap copies rows written during the rebuild and renames the new table into place" do
+  test "swap renames the new table into place without carrying over rows written during the pass" do
     rebuilt = entry
     RenderingsRebuild.prepare_table
     RenderingsRebuild.new.perform("entry_renderings_new", "ids" => [rebuilt.id])
     arrived = entry
-    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0); it.set(RenderingsRebuild.key("max_id"), rebuilt.id) }
-    result = RenderingsRebuild.swap
-    assert_equal 1, result[:copied]
-    assert_equal [arrived.id, rebuilt.id].sort, EntryRendering.where(entry_id: @created.map(&:id)).pluck(:entry_id).sort
+    assert EntryRendering.exists?(arrived.id)
+    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0) }
+    statements = []
+    callback = ->(*, payload) { statements << payload[:sql] }
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") { RenderingsRebuild.swap }
+    assert_equal [rebuilt.id], EntryRendering.where(entry_id: @created.map(&:id)).pluck(:entry_id)
+    refute statements.any? { it.match?(/LOCK TABLE|INSERT INTO entry_renderings_new/) }
+    assert statements.any? { it.match?(/SET LOCAL lock_timeout = '1s'/) }
     connection = ActiveRecord::Base.connection
     refute connection.table_exists?("entry_renderings_new")
     refute connection.table_exists?("entry_renderings_old")
     assert_equal ["entry_renderings_pkey"], connection.select_values("SELECT indexname FROM pg_indexes WHERE tablename = 'entry_renderings'")
     assert_equal "e", connection.select_value("SELECT attstorage FROM pg_attribute WHERE attrelid = 'entry_renderings'::regclass AND attname = 'blob'")
     assert Entry.find(rebuilt.id).rendering.current_for?(rebuilt)
+    assert Entry.find(arrived.id).rendering.current_for?(arrived)
   end
 
-  test "swap only scans rows above the pass's highest id, without a statement timeout" do
-    rebuilt = entry
-    RenderingsRebuild.prepare_table
-    RenderingsRebuild.new.perform("entry_renderings_new", "ids" => [rebuilt.id])
-    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0); it.set(RenderingsRebuild.key("max_id"), rebuilt.id) }
-    statements = []
-    callback = ->(*, payload) { statements << payload[:sql] }
-    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") { RenderingsRebuild.swap }
-    carry_overs = statements.grep(/INSERT INTO entry_renderings_new/)
-    assert_equal 2, carry_overs.size
-    assert carry_overs.all? { it.include?("live.entry_id > #{rebuilt.id}") }
-    assert statements.any? { it.match?(/SET LOCAL statement_timeout = 0/) }
+  # Another connection holds a read lock on the live table, which the rename
+  # has to wait for.
+  def holding_read_lock(seconds)
+    locked = Queue.new
+    thread = Thread.new do
+      ActiveRecord::Base.connection_pool.with_connection do |connection|
+        connection.transaction do
+          connection.execute("LOCK TABLE entry_renderings IN ACCESS SHARE MODE")
+          locked << true
+          sleep seconds
+        end
+      end
+    end
+    locked.pop
+    yield
+  ensure
+    thread&.join
   end
 
-  test "swap refuses without the pass's highest id" do
+  test "swap gives up when the rename cannot get its lock" do
     RenderingsRebuild.prepare_table
     Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0) }
-    assert_raises(RuntimeError) { RenderingsRebuild.swap }
+    RenderingsRebuild.stub(:swap_backoff, 0) do
+      holding_read_lock(3) do
+        assert_raises(ActiveRecord::LockWaitTimeout) { RenderingsRebuild.swap(attempts: 2) }
+      end
+    end
+    assert ActiveRecord::Base.connection.table_exists?("entry_renderings_new")
+  end
+
+  test "swap retries the rename until it gets its lock" do
+    RenderingsRebuild.prepare_table
+    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0) }
+    RenderingsRebuild.stub(:swap_backoff, 0) do
+      holding_read_lock(1.5) { RenderingsRebuild.swap(attempts: 3) }
+    end
+    refute ActiveRecord::Base.connection.table_exists?("entry_renderings_new")
   end
 
   test "swap succeeds when an earlier swap left the old table behind" do
@@ -176,7 +193,7 @@ class RenderingsRebuildSwapTest < ActiveSupport::TestCase
     connection.execute("CREATE TABLE entry_renderings_old (LIKE entry_renderings)")
     RenderingsRebuild.prepare_table
     RenderingsRebuild.new.perform("entry_renderings_new", "ids" => [rebuilt.id])
-    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0); it.set(RenderingsRebuild.key("max_id"), rebuilt.id) }
+    Sidekiq.redis { it.set(RenderingsRebuild.key("pending"), 0) }
     RenderingsRebuild.swap
     refute connection.table_exists?("entry_renderings_old")
     assert_equal [rebuilt.id], EntryRendering.where(entry_id: rebuilt.id).pluck(:entry_id)

@@ -44,7 +44,7 @@ rails renderings:status
 rails renderings:swap
 ```
 
-`swap` refuses while jobs are still pending. It is safe to run again if it fails partway.
+`swap` refuses while jobs are still pending. It doesn't carry over rows written during the pass; those entries render again on their next read. The rename waits at most a second for in-flight reads and retries up to five times, so run it off-peak. It is safe to run again if it fails.
 
 - [ ] **Re-render one feed or recent entries in place** after a change that only matters to them:
 

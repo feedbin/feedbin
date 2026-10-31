@@ -107,7 +107,7 @@ class EntryRendering < ApplicationRecord
     built = entries.reject { it.new_record? || it.rendering_record&.current_for?(it) }
       .uniq(&:id).map { |entry| build(entry).tap { entry.rendering = it } }
     return if built.empty?
-    upsert_all(built.map { {entry_id: it.entry_id, version: it.version, blob: it.blob} }, unique_by: :entry_id)
+    write(built)
   rescue => exception
     ErrorService.notify(
       error_class: "EntryRendering.prepare",
@@ -116,8 +116,20 @@ class EntryRendering < ApplicationRecord
     )
   end
 
+  # Storing is optional: a row that isn't written is rendered again on the
+  # next read. So a write waits half a second for a row another write holds,
+  # not the connection's lock timeout, and rows go in entry id order so two
+  # batches that share entries can't deadlock.
+  def self.write(renderings)
+    transaction do
+      connection.execute("SET LOCAL lock_timeout = '500ms'")
+      rows = renderings.sort_by(&:entry_id).map { {entry_id: it.entry_id, version: it.version, blob: it.blob} }
+      upsert_all(rows, unique_by: :entry_id)
+    end
+  end
+
   def store!
-    self.class.upsert({entry_id: entry_id, version: version, blob: blob}, unique_by: :entry_id)
+    self.class.write([self])
   end
 
   def layout

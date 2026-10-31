@@ -145,4 +145,23 @@ class EntryRenderingTest < ActiveSupport::TestCase
     statements = capture_sql { assert entries.first.rendering.web }
     assert_empty statements.grep(/entry_renderings/)
   end
+
+  test "prepare writes in entry id order under a short lock timeout" do
+    entries = 3.times.map { create_entry(@feed) }
+    EntryRendering.where(entry_id: entries.map(&:id)).delete_all
+    loaded = Entry.where(id: entries.map(&:id)).preload(:rendering_record).to_a.sort_by { -it.id }
+    statements = capture_sql { EntryRendering.prepare(loaded) }
+    insert = statements.find { it.start_with?(%(INSERT INTO "entry_renderings")) }
+    written = insert.scan(/VALUES \((\d+)|\), \((\d+)/).flatten.compact.map(&:to_i)
+    assert_equal entries.map(&:id).sort, written
+    timeout = statements.index { it.match?(/SET LOCAL lock_timeout = '500ms'/) }
+    assert timeout
+    assert_operator timeout, :<, statements.index(insert)
+  end
+
+  test "store! writes under a short lock timeout" do
+    entry = create_entry(@feed)
+    statements = capture_sql { EntryRendering.render!(entry) }
+    assert statements.any? { it.match?(/SET LOCAL lock_timeout = '500ms'/) }
+  end
 end

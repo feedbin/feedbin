@@ -30,7 +30,7 @@ namespace :renderings do
 
   desc "Replace entry_renderings with the table a full rebuild wrote"
   task swap: :environment do
-    result = RenderingsRebuild.swap
-    puts "Carried over #{result[:copied]} rows written during the rebuild. entry_renderings now has #{result[:rows]} rows."
+    attempts = RenderingsRebuild.swap
+    puts "entry_renderings replaced (attempts: #{attempts}). Rows written during the rebuild render again on their next read."
   end
 end

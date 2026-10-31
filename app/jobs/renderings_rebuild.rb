@@ -28,13 +28,6 @@ class RenderingsRebuild
 
   MODELS = {LIVE_TABLE => EntryRendering, NEW_TABLE => NewTableRendering}.freeze
 
-  CARRY_OVER = <<~SQL
-    INSERT INTO entry_renderings_new (entry_id, version, blob)
-    SELECT live.entry_id, live.version, live.blob FROM entry_renderings live
-    WHERE live.entry_id > :max_id AND live.version = :version
-    AND NOT EXISTS (SELECT 1 FROM entry_renderings_new new WHERE new.entry_id = live.entry_id)
-  SQL
-
   def self.key(name)
     "renderings_rebuild:#{name}"
   end
@@ -59,7 +52,6 @@ class RenderingsRebuild
     Sidekiq.redis do |redis|
       COUNTERS.each { |name| redis.set(key(name), 0, ex: TTL) }
       redis.set(key("pending"), selectors.size, ex: TTL)
-      redis.set(key("max_id"), Entry.maximum(:id).to_i, ex: TTL) if table == NEW_TABLE
     end
     selectors.each_slice(1_000) do |slice|
       Sidekiq::Client.push_bulk("class" => self, "args" => slice.map { [table, it] })
@@ -78,46 +70,51 @@ class RenderingsRebuild
     NewTableRendering.reset_column_information
   end
 
-  # Ends a full pass: the new table replaces the live one. The pass covered
-  # every entry up to the highest id when it started; entries created since
-  # were rendered into the live table by their own save, so rows above that
-  # id are carried over. Once in bulk, with no statement timeout, then once
-  # more under a lock that holds off writes (reads continue) for the moment
-  # of the rename; both are primary-key range scans over a pass's worth of
-  # new entries, not the table. A row the live table rewrote during the pass
-  # keeps the pass's copy; its CRC no longer matches and the next read
-  # re-renders it. Safe to run again after a failure.
-  def self.swap
+  SWAP_ATTEMPTS = 5
+
+  # Ends a full pass: the new table replaces the live one. Rows the live table
+  # gained or rewrote during the pass are not carried over: the pass's copy of
+  # a rewritten row no longer matches its entry, an entry created during the
+  # pass has no row, and the next read of either renders and stores it.
+  #
+  # The rename needs a lock that waits for in-flight reads of the live table,
+  # and every new read queues behind it while it waits, so it gives up after a
+  # second and tries again rather than holding up reads. Safe to run again
+  # after a failure.
+  def self.swap(attempts: SWAP_ATTEMPTS)
     pending = progress[:pending]
     raise "Jobs are still running (pending: #{pending})." if pending > 0
     connection = ActiveRecord::Base.connection
     raise "#{NEW_TABLE} does not exist. Start a full pass with rails renderings:rebuild." unless connection.table_exists?(NEW_TABLE)
-    max_id = Sidekiq.redis { it.get(key("max_id")) }
-    raise "No record of the highest id this pass covered. Start a full pass with rails renderings:rebuild." if max_id.nil?
 
     connection.execute("DROP TABLE IF EXISTS entry_renderings_old")
-    carry_over = ActiveRecord::Base.sanitize_sql_array([CARRY_OVER, {max_id: Integer(max_id), version: ContentFormatter::VERSION}])
-    copied = connection.transaction do
-      connection.execute("SET LOCAL statement_timeout = 0")
-      connection.exec_update(carry_over)
-    end
-    connection.transaction do
-      connection.execute("LOCK TABLE entry_renderings IN EXCLUSIVE MODE")
-      copied += connection.exec_update(carry_over)
-      connection.execute("ALTER TABLE entry_renderings RENAME TO entry_renderings_old")
-      connection.execute("ALTER INDEX entry_renderings_pkey RENAME TO entry_renderings_old_pkey")
-      connection.execute("ALTER TABLE entry_renderings_new RENAME TO entry_renderings")
-      connection.execute("ALTER INDEX entry_renderings_new_pkey RENAME TO entry_renderings_pkey")
+    attempt = 0
+    begin
+      attempt += 1
+      connection.transaction do
+        connection.execute("SET LOCAL lock_timeout = '1s'")
+        connection.execute("ALTER TABLE entry_renderings RENAME TO entry_renderings_old")
+        connection.execute("ALTER INDEX entry_renderings_pkey RENAME TO entry_renderings_old_pkey")
+        connection.execute("ALTER TABLE entry_renderings_new RENAME TO entry_renderings")
+        connection.execute("ALTER INDEX entry_renderings_new_pkey RENAME TO entry_renderings_pkey")
+      end
+    rescue ActiveRecord::LockWaitTimeout
+      raise if attempt >= attempts
+      sleep swap_backoff(attempt)
+      retry
     end
     EntryRendering.reset_column_information
     NewTableRendering.reset_column_information
-    rows = EntryRendering.count
     begin
       connection.execute("DROP TABLE entry_renderings_old")
     rescue ActiveRecord::StatementInvalid => exception
       Rails.logger.warn { "renderings swap: entry_renderings_old left in place (#{exception.message}); the next swap drops it" }
     end
-    {copied: copied, rows: rows}
+    attempt
+  end
+
+  def self.swap_backoff(attempt)
+    attempt * 2
   end
 
   # Entries per INSERT. A batch of newsletters with four versions each,
