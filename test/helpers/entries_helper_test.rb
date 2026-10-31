@@ -18,8 +18,8 @@ class EntriesHelperTest < ActiveSupport::TestCase
   end
 
   test "api_entries_cache_key carries the content-diff flag, the entry, and its own version" do
-    assert_equal [true, @entry, "v2"], EntriesHelper.api_entries_cache_key(@entry, true)
-    assert_equal [false, @entry, "v2"], EntriesHelper.api_entries_cache_key(@entry, false)
+    assert_equal [true, @entry, "v3"], EntriesHelper.api_entries_cache_key(@entry, true)
+    assert_equal [false, @entry, "v3"], EntriesHelper.api_entries_cache_key(@entry, false)
   end
 
   test "the entries key digests the entry icon row" do

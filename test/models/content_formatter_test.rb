@@ -18,7 +18,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "should format for api" do
-    expected = %(<p><a href="http://kottke.org/link"><img src="http://kottke.org/img.png"></a></p>)
+    expected = %(<p><a href="http://kottke.org/link"><img src="http://kottke.org/img.png" data-camo-src="https://example.com/e3b56842cc257f75872facfb7febe44968bddf6a/687474703a2f2f6b6f74746b652e6f72672f696d672e706e67"></a></p>)
     assert_equal expected, ContentFormatter.api_format(@entry.content, @entry)
   end
 
@@ -77,6 +77,21 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_includes result, "Hello"
     assert_includes result, "world"
     refute_includes result, "<script"
+  end
+
+  test "api_format keeps src and adds data-camo-src" do
+    with_env("CAMO_HOST" => "https://example.com", "CAMO_KEY" => "secret") do
+      result = ContentFormatter.api_format(%(<img src="http://kottke.org/img.png">), @entry)
+      assert_includes result, %( src="http://kottke.org/img.png")
+      assert_match %r{data-camo-src="https://example.com/\h{40}/\h+"}, result
+      refute_includes result, "data-canonical-src"
+    end
+  end
+
+  test "api_format output is unchanged without camo" do
+    with_env("CAMO_HOST" => nil, "CAMO_KEY" => nil) do
+      assert_equal %(<img src="http://kottke.org/img.png">), ContentFormatter.api_format(%(<img src="http://kottke.org/img.png">), @entry)
+    end
   end
 
   test "newsletter_format applies camo proxying when configured" do

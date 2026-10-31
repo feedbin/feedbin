@@ -10,7 +10,7 @@ module EntriesHelper
   # The extended API fragment carries the same image urls as the list, so it
   # needs the same lever: a version to bump when the read path changes.
   def self.api_entries_cache_key(entry, include_content_diff)
-    [include_content_diff, entry, "v2"]
+    [include_content_diff, entry, "v3"]
   end
 
   # The same sources FaviconComponent renders from, resolved the same way:

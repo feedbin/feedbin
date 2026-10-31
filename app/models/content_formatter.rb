@@ -209,12 +209,16 @@ class ContentFormatter
         HTML::Pipeline::AbsoluteHrefFilter,
         HTML::Pipeline::ProtocolFilter,
         ContentFilters::Scrub,
-        ContentFilters::Attributes
-      ]
+        ContentFilters::Attributes,
+        (HTML::Pipeline::CamoFilter if camo?)
+      ].compact
     end
 
+    # API clients load src as before; data-camo-src is there for the ones
+    # that honor the proxy_images preference.
     def context
-      url_context.merge(scrub_mode: newsletter? ? :newsletter : :default)
+      context = url_context.merge(scrub_mode: newsletter? ? :newsletter : :default)
+      camo? ? context.merge(camo_context, asset_keep_src: true) : context
     end
   end
 
