@@ -52,6 +52,19 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     assert_equal @entries.length, assigns(:entries).length
   end
 
+  # The index used to be an ERB template joining jbuilder partials by hand so
+  # the extended fragments could be collection-cached; now that renderings
+  # are stored it is a plain jbuilder array, and the partial picks the mode.
+  test "index in extended mode renders every entry's extended fields as json" do
+    login_as @user
+    get :index, params: {mode: "extended"}, format: :json
+    assert_response :success
+    assert_equal "application/json; charset=utf-8", @response.content_type
+    result = parse_json
+    assert_equal @entries.length, result.length
+    result.each { assert_has_keys(entry_keys + %w[original images enclosure extracted_articles json_feed], it) }
+  end
+
   test "should show entry" do
     login_as @user
     entry = @entries.first

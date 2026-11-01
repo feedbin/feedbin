@@ -48,13 +48,9 @@ module Api
         else
           links_header(@page_query, path_helper, params[:feed_id])
           if stale?(etag: @entries)
-            render_json "entries/index"
+            render "api/v2/entries/index", formats: :json
           end
         end
-      end
-
-      def render_json(template)
-        render template: "api/v2/#{template}", formats: :html, layout: nil, content_type: "application/json"
       end
 
       def entry_count(collection)

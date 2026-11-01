@@ -17,11 +17,6 @@ class EntriesHelperTest < ActiveSupport::TestCase
     assert_equal 7, key.size
   end
 
-  test "api_entries_cache_key carries the content-diff flag, the entry, and its own version" do
-    assert_equal [true, @entry, "v3", ContentFormatter::VERSION], EntriesHelper.api_entries_cache_key(@entry, true)
-    assert_equal [false, @entry, "v3", ContentFormatter::VERSION], EntriesHelper.api_entries_cache_key(@entry, false)
-  end
-
   test "the entries key digests the entry icon row" do
     entry = create_entry(feeds(:daring_fireball))
     before = EntriesHelper.entries_cache_key(Entry.find(entry.id))

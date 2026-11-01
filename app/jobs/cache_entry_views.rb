@@ -18,16 +18,8 @@ class CacheEntryViews
     favicons = Image.favicons_for_entries(entries)
 
     # The same invocation the entry list renders with, or this warms keys
-    # nothing ever looks up.
+    # nothing ever looks up. The API isn't warmed: its responses come from
+    # stored renderings, not a fragment cache.
     ApplicationController.render(EntriesHelper.entry_collection(entries, favicons).merge(format: :html))
-    ApplicationController.render({
-      layout: nil,
-      template: "api/v2/entries/index",
-      assigns: {entries: entries},
-      format: :html,
-      locals: {
-        params: {mode: "extended"}
-      }
-    })
   end
 end
