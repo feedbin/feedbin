@@ -545,6 +545,18 @@ ALTER SEQUENCE public.entries_id_seq OWNED BY public.entries.id;
 
 
 --
+-- Name: entry_renderings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.entry_renderings (
+    entry_id bigint NOT NULL,
+    version smallint NOT NULL,
+    blob bytea NOT NULL
+);
+ALTER TABLE ONLY public.entry_renderings ALTER COLUMN blob SET STORAGE EXTERNAL;
+
+
+--
 -- Name: feed_stats; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1912,6 +1924,14 @@ ALTER TABLE ONLY public.entries
 
 
 --
+-- Name: entry_renderings entry_renderings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.entry_renderings
+    ADD CONSTRAINT entry_renderings_pkey PRIMARY KEY (entry_id);
+
+
+--
 -- Name: feed_stats feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2982,6 +3002,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261030130000'),
 ('20261003150000'),
 ('20261003140000'),
 ('20261003130000'),

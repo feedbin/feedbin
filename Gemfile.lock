@@ -54,7 +54,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/html-pipeline.git
-  revision: 5a0e1c2cacf187221a47a9d56cc54232b21dad56
+  revision: 04e2e23a1825bc18ab51d3f67fd96df98eb88fff
   branch: feedbin
   specs:
     html-pipeline (2.4.2)

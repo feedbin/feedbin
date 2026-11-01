@@ -41,18 +41,16 @@ module Api
 
         if @page_query.out_of_bounds?
           status_not_found
-        elsif !@entries.present?
+        # ids, not @entries.present?: loading the relation renders its entries,
+        # which a 304 below must not pay for.
+        elsif ids.empty?
           render json: []
         else
           links_header(@page_query, path_helper, params[:feed_id])
           if stale?(etag: @entries)
-            render_json "entries/index"
+            render "api/v2/entries/index", formats: :json
           end
         end
-      end
-
-      def render_json(template)
-        render template: "api/v2/#{template}", formats: :html, layout: nil, content_type: "application/json"
       end
 
       def entry_count(collection)

@@ -48,6 +48,12 @@ class Settings::ImportsController < ApplicationController
     end
   end
 
+  def destroy
+    @user = current_user
+    @user.imports.find(params[:id]).destroy!
+    redirect_to settings_import_export_url, notice: "Import deleted."
+  end
+
   def replace_all
     @user = current_user
     @import = @user.imports.find(params[:id])

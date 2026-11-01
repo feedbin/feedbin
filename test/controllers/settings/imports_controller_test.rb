@@ -6,9 +6,14 @@ class Settings::ImportsControllerTest < ActionController::TestCase
   end
 
   test "should get import_export" do
+    import = @user.imports.new(filename: "subscriptions.opml")
+    import.import_items.new(details: {xml_url: "http://example.com/feed.xml"})
+    import.save!
+
     login_as @user
     get :index
     assert_response :success
+    assert_select "a[data-method=delete][href=?]", settings_import_path(import)
   end
 
   test "should import" do
@@ -68,6 +73,36 @@ class Settings::ImportsControllerTest < ActionController::TestCase
     end
 
     assert item.reload.fixable?
+  end
+
+  test "should destroy import" do
+    login_as @user
+
+    import = @user.imports.new(filename: "subscriptions.opml")
+    import.import_items.new(status: :complete, details: {
+      title: "Example",
+      xml_url: "http://example.com/feed.xml", html_url: "http://example.com/"
+    })
+    import.save!
+
+    assert_difference -> { Import.count } => -1, -> { ImportItem.count } => -1 do
+      delete :destroy, params: {id: import.id}
+    end
+
+    assert_redirected_to settings_import_export_url
+  end
+
+  test "should not destroy another user's import" do
+    login_as @user
+
+    import = users(:new).imports.new(filename: "subscriptions.opml")
+    import.import_items.new(details: {xml_url: "http://example.com/feed.xml"})
+    import.save!
+
+    assert_raises(ActiveRecord::RecordNotFound) do
+      delete :destroy, params: {id: import.id}
+    end
+    assert Import.exists?(import.id)
   end
 
   test "should show import error" do

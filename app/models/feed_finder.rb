@@ -19,6 +19,9 @@ class FeedFinder
 
     existing_feed = Feed.xml.where(feed_url: url).take
 
+    # A known feed the crawler downloaded in the last day is current enough.
+    return [existing_feed] if existing_feed&.recently_downloaded?
+
     if feeds.empty?
       feeds = Source::ExistingFeed.find(response)
     end

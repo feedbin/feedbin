@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+# Screenshots a page of the local development site as a signed-in user, with
+# headless Chrome through Ferrum.
+#
+#   script/screenshot /settings/api
+#   script/screenshot /settings/api tmp/api.png --user 1 --width 1280 --height 1600
+#
+# Signs in through /auto_sign_in, which only exists in development. The site
+# defaults to https://feedbin.resolv.app (puma-dev); set SITE_URL to change it.
+
+require "bundler/setup"
+require "ferrum"
+require "optparse"
+require "uri"
+require "fileutils"
+
+options = {user: nil, width: 1280, height: 1000, full: true}
+OptionParser.new do |opts|
+  opts.banner = "Usage: script/screenshot PATH [OUTPUT] [options]"
+  opts.on("--user ID", "User id to sign in as (default: the first user)") { options[:user] = _1 }
+  opts.on("--width PX", Integer) { options[:width] = _1 }
+  opts.on("--height PX", Integer) { options[:height] = _1 }
+  opts.on("--viewport-only", "Capture the viewport instead of the full page") { options[:full] = false }
+end.parse!
+
+path = ARGV[0] or abort("Usage: script/screenshot PATH [OUTPUT]")
+output = ARGV[1] || File.join("tmp", "screenshots", "#{path.delete_prefix("/").tr("/", "_").then { _1.empty? ? "root" : _1 }}.png")
+site = URI(ENV.fetch("SITE_URL", "https://feedbin.resolv.app"))
+
+sign_in = site.dup.tap do |uri|
+  uri.path = "/auto_sign_in"
+  uri.query = URI.encode_www_form(id: options[:user]) if options[:user]
+end
+page_url = URI.join(site, path)
+
+browser = Ferrum::Browser.new(
+  window_size: [options[:width], options[:height]],
+  timeout: 30,
+  browser_options: {"ignore-certificate-errors" => nil}
+)
+
+begin
+  browser.go_to(sign_in.to_s)
+  browser.go_to(page_url.to_s)
+  browser.network.wait_for_idle(timeout: 10)
+  status = browser.network.status
+  FileUtils.mkdir_p(File.dirname(output))
+  browser.screenshot(path: output, full: options[:full])
+  puts "#{status} #{browser.current_url}"
+  puts output
+ensure
+  browser.quit
+end

@@ -267,11 +267,13 @@ class EntriesController < ApplicationController
     # The full-content render reaches the images rows too: a tweet through
     # Entry#tweet (preview_image_record), a podcast through
     # EntryPresenter#media_image (icon_image_record), both read from
-    # owned_image_records. The preload endpoint renders a client-sized batch
-    # of these at once. The toolbar favicon reads channel_image_record for a
-    # playlist video, and the Pages favicons come from one lookup by host.
+    # owned_image_records. with_renderings reads the stored renderings in one
+    # query and writes the missing ones in one insert. The preload endpoint
+    # renders a client-sized batch of these at once. The toolbar favicon reads
+    # channel_image_record for a playlist video, and the Pages favicons come
+    # from one lookup by host.
     entries = Entry.where(id: entry_ids).includes(feed: Feed::ICON_PRELOADS)
-      .preload(:owned_image_records, :channel_image_record).to_a
+      .preload(:owned_image_records, :channel_image_record).with_renderings.to_a
     subscriptions = @user.subscriptions.pluck(:feed_id)
     favicons = Image.favicons_for_entries(entries)
     template = view_context

@@ -3,7 +3,7 @@ class SubscriptionsController < ApplicationController
     @user = current_user
     if params[:tag] == "all" || params[:tag].blank?
       @tags = @user.feed_tags
-      @feeds = @user.feeds.xml
+      @feeds = @user.feeds.xml.where.not(id: @user.taggings.select(:feed_id))
     else
       @feeds = []
       tag = authorized_tag(params[:tag]) or return

@@ -3,8 +3,10 @@ module FactoryHelper
     flush_redis
     users = [*users]
     feeds = count.times.map {
-      url = Faker::Internet.url
-      host = URI(url).host
+      # Faker draws hosts from a small list, so give each one a random label
+      # to keep host-keyed rows (such as favicons) from colliding.
+      host = "#{Faker::Internet.domain_word}-#{SecureRandom.hex(3)}.test"
+      url = Faker::Internet.url(host: host)
       Feed.create(feed_url: url, host: host, title: Faker::Lorem.sentence).tap do |feed|
         users.map do |user|
           user.subscriptions.where(feed: feed).first_or_create

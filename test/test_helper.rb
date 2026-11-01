@@ -2,39 +2,23 @@ ENV["RAILS_ENV"] ||= "test"
 
 require "minitest"
 require "minitest/mock"
-require "socket"
 require "uri"
 require "connection_pool"
 
-unless ENV["CI"]
-  socket = Socket.new(:INET, :STREAM, 0)
-  socket.bind(Addrinfo.tcp("127.0.0.1", 0))
-  port = socket.local_address.ip_port
-  socket.close
-
-  ENV["REDIS_URL"] = "redis://localhost:%d" % port
-  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no --databases 32" % port)
-
-  redis_parent_pid = Process.pid
-  Minitest.after_run do
-    Process.kill("INT", redis_test_instance.pid) if Process.pid == redis_parent_pid
-  end
-end
-
-REDIS_BASE_URL = URI(ENV["REDIS_URL"] || "redis://localhost:6379").tap { _1.path = "" }.to_s
-
 require File.expand_path("../../config/environment", __FILE__)
 
-# Points every Redis client at ENV["REDIS_URL"]. `rails test:system` boots the
-# app before this file runs, so the initializers already connected to the
-# .env.test URL instead of the redis-server started above; parallel workers
-# call this again for their own database.
+# .env.test points REDIS_URL at the OrbStack Redis, on a database above
+# development's 0. Each parallel worker takes its own database from there.
+REDIS_URL = URI(ENV.fetch("REDIS_URL"))
+REDIS_DATABASE = REDIS_URL.path.delete_prefix("/").to_i
+
+# Points every Redis client at ENV["REDIS_URL"], for a parallel worker's own
+# database.
 def connect_test_redis
   load Rails.root.join("config/initializers/redis.rb")
   Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
   Sidekiq.default_configuration.redis = {url: ENV["REDIS_URL"]}
 end
-connect_test_redis
 
 # MakeEpub's cover renders text with libvips, through Pango. On macOS Pango
 # uses CoreText, which can't be used in a forked parallel test worker: if the
@@ -44,6 +28,13 @@ connect_test_redis
 # uses neither, and it is the only backend on Linux, so this is also what
 # production renders with.
 ENV["PANGOCAIRO_BACKEND"] = "fc"
+
+# The first gettext call in a worker asks libintl for the locale. With no
+# LANG or LC_* in the environment, macOS's libintl reads it from
+# CFPreferences, and objc's fork check aborts the child. A shell without a
+# locale, such as an agent's or a launchd job's, then lost every worker that
+# reached libvips' text rendering.
+ENV["LANG"] = "en_US.UTF-8" if ENV.values_at("LANG", "LC_ALL", "LC_MESSAGES").all?(&:blank?)
 
 require "rails/test_help"
 require "sidekiq/testing"
@@ -59,7 +50,13 @@ require "component_test_case"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
-WebMock.disable_net_connect!(allow_localhost: true, allow: ENV['WEBMOCK_ALLOWED_HOSTS']&.split(","))
+# allow_localhost matches loopback names only, so a local Elasticsearch on any
+# other hostname (such as an OrbStack *.orb.local container) is allowed by
+# name. It's the only HTTP service the tests talk to for real.
+WebMock.disable_net_connect!(
+  allow_localhost: true,
+  allow: [URI(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200")).host, *ENV["WEBMOCK_ALLOWED_HOSTS"]&.split(",")]
+)
 Sidekiq.logger.level = Logger::WARN
 
 # fog-aws 3.33 builds DeleteObjects XML by mutating a string literal
@@ -107,7 +104,7 @@ class ActiveSupport::TestCase
 
   parallelize_setup do |worker|
     ENV["TEST_WORKER"] = worker.to_s
-    ENV["REDIS_URL"] = "#{REDIS_BASE_URL}/#{worker}"
+    ENV["REDIS_URL"] = REDIS_URL.dup.tap { _1.path = "/#{REDIS_DATABASE + worker}" }.to_s
     connect_test_redis
 
     Search.configure!

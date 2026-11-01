@@ -17,11 +17,52 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     assert_equal_ids(entries, parse_json)
   end
 
+  test "index stores missing renderings in one insert" do
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    login_as @user
+    statements = capture_sql { get :index, format: :json }
+    assert_response :success
+    assert_operator @entries.length, :>, 1
+    assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
+  end
+
+  test "index loads image records in one query" do
+    login_as @user
+    statements = capture_sql { get :index, format: :json }
+    assert_response :success
+    assert_operator @entries.length, :>, 1
+    assert_equal 1, statements.count { it.include?(%(FROM "images")) }
+  end
+
+  test "index renders nothing when the client's copy is current" do
+    login_as @user
+    get :index, format: :json
+    etag = @response.headers["ETag"]
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    @request.headers["If-None-Match"] = etag
+    statements = capture_sql { get :index, format: :json }
+    assert_response :not_modified
+    assert_empty statements.grep(/INSERT INTO "entry_renderings"/)
+  end
+
   test "should get index" do
     login_as @user
     get :index, format: :json
     assert_response :success
     assert_equal @entries.length, assigns(:entries).length
+  end
+
+  # The index used to be an ERB template joining jbuilder partials by hand so
+  # the extended fragments could be collection-cached; now that renderings
+  # are stored it is a plain jbuilder array, and the partial picks the mode.
+  test "index in extended mode renders every entry's extended fields as json" do
+    login_as @user
+    get :index, params: {mode: "extended"}, format: :json
+    assert_response :success
+    assert_equal "application/json; charset=utf-8", @response.content_type
+    result = parse_json
+    assert_equal @entries.length, result.length
+    result.each { assert_has_keys(entry_keys + %w[original images enclosure extracted_articles json_feed], it) }
   end
 
   test "should show entry" do

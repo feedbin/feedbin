@@ -67,7 +67,10 @@
           <% row.title { import.created_at.to_formatted_s(:date) } %>
           <% row.description { import.filename } %>
           <% row.control do %>
-            <%= link_to "Details", settings_import_path(import) %>
+            <div class="flex items-center gap-4">
+              <%= link_to "Delete", settings_import_path(import), method: :delete, class: "!text-red-600", data: { confirm: "Are you sure you want to delete this import?" } %>
+              <%= link_to "Details", settings_import_path(import) %>
+            </div>
           <% end %>
         <% end %>
       <% end %>

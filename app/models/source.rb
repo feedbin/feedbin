@@ -49,9 +49,16 @@ class Source
     else
       feed = Feed.create_from_parsed_feed(response.parse)
     end
+    stamp_download(feed)
     feed
   rescue
     raise unless Rails.env.production?
+  end
+
+  def stamp_download(feed)
+    return unless feed&.crawl_data&.error_count == 0
+    feed.crawl_data.log_download
+    feed.update_column(:crawl_data, feed.crawl_data)
   end
 
   def join_url(base, path)

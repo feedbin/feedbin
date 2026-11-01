@@ -27,6 +27,13 @@ class FeedImporterTest < ActiveSupport::TestCase
     end
   end
 
+  test "should skip an item whose import was deleted" do
+    @import_item.import.destroy!
+    assert_no_difference "Subscription.count" do
+      FeedImporter.new.perform(@import_item.id)
+    end
+  end
+
   test "should mark failed" do
     import = @user.imports.new
     details = {xml_url: "http://www.example.com/atom.xml"}

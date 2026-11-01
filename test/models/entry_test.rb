@@ -430,6 +430,111 @@ class EntryTest < ActiveSupport::TestCase
     assert_match %r{<ins>new\s*</ins>}, entry.reload.content_diff
   end
 
+  test "creating an entry stores its rendering" do
+    entry = saved_entry("<p>Text.</p>")
+    assert EntryRendering.find(entry.id).current_for?(entry)
+  end
+
+  test "updating content re-renders, updating the title does not" do
+    entry = saved_entry("<p>Text.</p>")
+    before = EntryRendering.find(entry.id).blob
+    entry.update!(title: "New title")
+    assert_equal before, EntryRendering.find(entry.id).blob
+    entry.update!(content: "<p>Other.</p>")
+    refute_equal before, EntryRendering.find(entry.id).blob
+  end
+
+  # Jobs rewrite these keys on entries the formatter's output doesn't depend
+  # on, such as every YouTube entry's duration on each channel crawl.
+  test "updating keys the formatter does not read does not re-render" do
+    entry = saved_entry("<p>Text.</p>")
+    statements = capture_sql do
+      entry.update!(embed_duration: 120)
+      entry.update!(archived_images: true)
+      entry.update!(data: entry.data.to_h.merge("saved_pages" => {"http://example.com" => {}}))
+    end
+    assert_empty statements.grep(/INSERT INTO "entry_renderings"/)
+  end
+
+  test "updating the keys the formatter reads re-renders" do
+    entry = saved_entry("<p>Text.</p>")
+    statements = capture_sql do
+      entry.update!(newsletter_from: "News <news@substack.com>")
+      entry.update!(data: {format: "text"})
+    end
+    assert_equal 2, statements.grep(/INSERT INTO "entry_renderings"/).size
+    assert_equal "<p>Text.</p>", Entry.find(entry.id).rendering.web.strip
+  end
+
+  test "rendering re-renders when content changed outside callbacks" do
+    entry = saved_entry("<p>Text.</p>")
+    entry.update_columns(content: "<p>Rewritten without callbacks.</p>")
+    entry = Entry.find(entry.id)
+    assert_equal ContentFormatter.format!(entry.content, entry), entry.rendering.web
+    assert EntryRendering.find(entry.id).current_for?(entry)
+  end
+
+  test "rendering re-renders when the stored VERSION differs" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(version: ContentFormatter::VERSION + 1)
+    entry = Entry.find(entry.id)
+    assert_equal "<p>Text.</p>", entry.rendering.web
+    assert_equal ContentFormatter::VERSION, EntryRendering.find(entry.id).version
+  end
+
+  test "rendering serves a current stored row without rendering" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(blob: EntryRendering.encode({web: "<p>stored</p>", api: ""}, content: entry.content, crc: EntryRendering.inputs_crc(entry)))
+    assert_equal "<p>stored</p>", Entry.find(entry.id).rendering.web
+  end
+
+  test "a rendering failure does not fail the entry write" do
+    EntryRendering.stub(:render!, ->(_) { raise "boom" }) do
+      entry = saved_entry("<p>Text.</p>")
+      assert entry.persisted?
+      assert_nil EntryRendering.find_by(entry_id: entry.id)
+    end
+  end
+
+  test "rendering of an unsaved entry is built, not stored" do
+    entry = Entry.new(content: "<p>x</p>", feed: @user.feeds.first)
+    assert_equal "<p>x</p>", entry.rendering.web
+    assert_equal 0, EntryRendering.count
+  end
+
+  test "deleting entries deletes their renderings" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryDeleter.new.delete_entries(entry.feed_id, [entry.id])
+    assert_nil EntryRendering.find_by(entry_id: entry.id)
+  end
+
+  test "reading a stale rendering and then saving the entry does not insert the rendering twice" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(version: ContentFormatter::VERSION + 1)
+    entry = Entry.find(entry.id)
+    entry.rendering
+    entry.update!(title: "A new title")
+    assert_equal 1, EntryRendering.where(entry_id: entry.id).count
+  end
+
+  test "rendering is served when storing it fails" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).update_all(version: ContentFormatter::VERSION + 1)
+    entry = Entry.find(entry.id)
+    EntryRendering.stub(:upsert, ->(*, **) { raise ActiveRecord::StatementInvalid, "canceling statement due to statement timeout" }) do
+      assert_equal "<p>Text.</p>", entry.rendering.web
+    end
+  end
+
+  test "content_diff is nil when rendering fails" do
+    entry = saved_entry("<p>Text.</p>")
+    EntryRendering.where(entry_id: entry.id).delete_all
+    entry = Entry.find(entry.id)
+    EntryRendering.stub(:build, ->(*) { raise "boom" }) do
+      assert_nil entry.content_diff
+    end
+  end
+
   test "content_diff is nil without an original" do
     assert_nil saved_entry("<p>Text.</p>").content_diff
   end
