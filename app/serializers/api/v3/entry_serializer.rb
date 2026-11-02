@@ -39,10 +39,7 @@ module Api
           attachments: attachments,
           origin: origin,
           categories: Array(@entry.categories),
-          urls: {
-            app: Rails.application.routes.url_helpers.entry_url(@entry, **Rails.application.config.action_mailer.default_url_options),
-            extracted_content: @entry.fully_qualified_url && @entry.extracted_content_url
-          },
+          extracted_content_url: @entry.fully_qualified_url && @entry.extracted_content_url,
           content: content,
           extracted: extracted
         }
