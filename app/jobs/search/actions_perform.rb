@@ -5,16 +5,21 @@ module Search
     include Sidekiq::Worker
     sidekiq_options queue: :network_search, retry: false
 
+    PUSHES = %w[send_push_notification send_ios_notification].freeze
+
     def perform(entry_id, action_ids, update = false)
       Sidekiq.logger.info("#{entry_id} actions_ids=#{action_ids}")
       # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
-      actions = Action.where(id: action_ids).pluck(:id, :user_id, :actions)
+      actions = Action.where(id: action_ids).pluck(:id, :user_id, :actions, :action_type)
       @entry = Entry.find(entry_id)
 
       if actions.present?
         queues = {}
         user_actions = {}
-        actions.each do |action_id, user_id, action_names|
+        actions.each do |action_id, user_id, action_names, action_type|
+          # The retired Feedbin Notifier's rule: hidden in v3 and on the web,
+          # so its owner could not stop new pushes. It pushes nothing.
+          action_names -= PUSHES if action_type == "notifier"
           user_actions[user_id] ||= []
           user_actions[user_id] << action_id
           action_names.each do |action_name|
@@ -26,7 +31,7 @@ module Search
         # send_ios_notification is the retired Notifier's value. Both push to
         # every device the user has registered, once per user however many
         # actions matched.
-        pushes = Set.new.merge(queues.delete("send_push_notification") || []).merge(queues.delete("send_ios_notification") || [])
+        pushes = PUSHES.each_with_object(Set.new) { |name, users| users.merge(queues.delete(name) || []) }
         if !update && pushes.any?
           priority_image_crawl
           DevicePushNotificationSend.perform_in(1.minute, pushes.to_a, entry_id, true)

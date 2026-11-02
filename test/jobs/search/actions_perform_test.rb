@@ -75,14 +75,27 @@ module Search
     end
 
     test "one push per user when several push actions match" do
-      notifier = Action.create(user: @user, action_type: :notifier, query: @entry.title, feed_ids: @feeds.map(&:id), actions: ["send_ios_notification"])
+      other = Action.create(user: @user, query: @entry.title, feed_ids: @feeds.map(&:id), actions: ["send_push_notification"])
       Sidekiq::Worker.clear_all
       Throttle.stub :throttle!, true do
-        ActionsPerform.new.perform(@entry.id, [@action.id, notifier.id])
+        ActionsPerform.new.perform(@entry.id, [@action.id, other.id])
       end
 
       assert_equal [[[@user.id], @entry.id, true]], DevicePushNotificationSend.jobs.map { _1["args"] }
       assert_equal [[[@user.id], @entry.id, true]], WebPushNotificationSend.jobs.map { _1["args"] }
+    end
+
+    # The retired Feedbin Notifier's rule is hidden everywhere, so it must not
+    # start pushing to devices it never reached.
+    test "a notifier action pushes nothing" do
+      notifier = Action.create(user: @user, action_type: :notifier, query: @entry.title, feed_ids: @feeds.map(&:id), actions: ["send_ios_notification"])
+      Sidekiq::Worker.clear_all
+      Throttle.stub :throttle!, true do
+        ActionsPerform.new.perform(@entry.id, [notifier.id])
+      end
+
+      assert_empty DevicePushNotificationSend.jobs
+      assert_empty WebPushNotificationSend.jobs
     end
 
     test "should send_ios_notification" do

@@ -8,8 +8,9 @@
 #    active subscriber of FEED_ID, as a new entry makes. NOT read-only: the
 #    insert really runs, then the transaction is rolled back. While it is
 #    open it holds row locks on those users' sync_versions rows (the
-#    trigger's upsert), so pick a quiet moment; statement_timeout caps it at
-#    30 seconds. The rows are for the feed's oldest entry, which few
+#    trigger's upsert), so pick a quiet moment. lock_timeout gives up after
+#    2 seconds rather than wait on another session's lock while holding its
+#    own, and statement_timeout caps the insert at 30 seconds. The rows are for the feed's oldest entry, which few
 #    subscribers still have unread; rows that already exist are skipped, and
 #    EXPLAIN reports how many were inserted.
 #
@@ -46,6 +47,7 @@ oldest = feed.entries.order(:id).first or abort "Feed #{feed.id} has no entries.
 puts
 puts "== 2. Unreads insert for #{subscribers} subscribers of feed #{feed.id} (rolled back)"
 ActiveRecord::Base.transaction do
+  connection.execute("SET LOCAL lock_timeout = '2s'")
   connection.execute("SET LOCAL statement_timeout = '30s'")
   insert = ActiveRecord::Base.sanitize_sql_array([<<~SQL, feed_id: feed.id, entry_id: oldest.id])
     INSERT INTO unreads (user_id, feed_id, entry_id, published, entry_created_at, created_at, updated_at)

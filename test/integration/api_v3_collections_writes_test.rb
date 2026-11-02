@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
   setup do
@@ -312,6 +313,19 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal({"applied" => [@entries.first.id], "skipped" => []}, JSON.parse(response.body))
+  end
+
+  test "an Elasticsearch failure is not an empty id list" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift")
+    swift_entries(1)
+    rejected = Search::Response.new({"error" => {"type" => "es_rejected_execution_exception"}, "status" => 429})
+
+    Search::Connection.stub_any_instance(:search_after, rejected) do
+      assert_raises(Search::Connection::ResponseError) { get "/v3/collections/search_#{search.id}/ids", headers: bearer }
+    end
+    Search::Connection.stub_any_instance(:search_after, ->(*, **) { raise Search::Connection::ResponseError, "502 from the proxy" }) do
+      assert_raises(Search::Connection::ResponseError) { get "/v3/collections/search_#{search.id}/ids", headers: bearer }
+    end
   end
 
   private

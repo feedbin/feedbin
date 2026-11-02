@@ -121,6 +121,7 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
   test "migrated full tokens keep reading and only Feedbin's development app keeps account" do
     development = Api::V3::DevelopmentApplication.ensure!(owner: users(:ann))
     development.update_column(:scopes, "")
+    @third_party.update_column(:scopes, "full")
     old = @third_party.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
     dev = development.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
 
@@ -129,6 +130,9 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
     assert_equal "read write", old.reload.scopes.to_s
     assert_equal "read write account", dev.reload.scopes.to_s
     assert_equal "read write account", development.reload.scopes.to_s
+    assert_equal "", @third_party.reload.scopes.to_s
+    assert_equal "read write", authorize(@third_party)
+    host! "api.example.com"
     get "/v3/subscriptions", headers: bearer(old)
     assert_response :success
   end

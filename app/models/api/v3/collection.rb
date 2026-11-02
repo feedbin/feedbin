@@ -97,7 +97,8 @@ module Api
       # Up to SEARCH_IDS_LIMIT unread matches, the newest published, in id
       # order. Its own query, not the sidebar's badge aggregation, which
       # stops at 50 matches and 50 saved searches. A stored query that no
-      # longer parses matches nothing.
+      # longer parses (Elasticsearch answers 400) matches nothing; any other
+      # error raises, so an outage is not cached as an empty list.
       def search_ids
         unread_ids = @user.unread_entries.pluck(:entry_id)
         return [] if unread_ids.empty?
@@ -105,9 +106,12 @@ module Api
         bool = body[:query][:bool]
         bool[:filter] = [bool[:filter], {ids: {values: unread_ids}}]
         body = body.slice(:query).merge(sort: [{published: "desc"}, {id: "desc"}])
-        Search.client { _1.search_after(Search.index_name(Entry.table_name), query: body, size: SEARCH_IDS_LIMIT) }.ids.sort
-      rescue Search::Connection::ResponseError
-        []
+        response = Search.client { _1.search_after(Search.index_name(Entry.table_name), query: body, size: SEARCH_IDS_LIMIT) }
+        if (error = response.data["error"])
+          return [] if response.data["status"] == 400
+          raise Search::Connection::ResponseError, "Saved search #{@saved_search.id}: #{error}"
+        end
+        response.ids.sort
       end
 
       def membership(row)

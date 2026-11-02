@@ -9,6 +9,9 @@ class SplitFullScope < ActiveRecord::Migration[8.1]
     # Data only: rewrites a string column, no locks beyond the rows.
     safety_assured do
       execute sanitize("UPDATE oauth_applications SET scopes = :first_party WHERE uid = :uid", first_party: "read write account", uid: DEVELOPMENT_UID)
+      # An app's own scopes bound what it may be issued, so one stored as full
+      # could no longer authorize at all. Empty means the server's scopes.
+      execute sanitize("UPDATE oauth_applications SET scopes = '' WHERE scopes = :full", full: "full")
       %w[oauth_access_tokens oauth_access_grants].each do |table|
         execute sanitize(<<~SQL, first_party: "read write account", uid: DEVELOPMENT_UID, full: "full")
           UPDATE #{quote_table_name(table)} SET scopes = :first_party
