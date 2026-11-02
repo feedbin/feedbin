@@ -136,6 +136,9 @@ Rails.application.routes.draw do
         resources :tags, only: [:index, :update, :destroy]
         get "search", to: "search#index"
         resources :saved_searches, only: [:index, :create, :update, :destroy]
+        resources :actions, only: [:index, :create, :update, :destroy] do
+          get :entries, on: :member
+        end
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           post :purchases
         end

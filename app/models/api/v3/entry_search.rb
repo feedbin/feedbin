@@ -13,10 +13,12 @@ module Api
       attr_reader :query
 
       # query: the user's text. feed_ids/tag_ids: arrays folded in as
-      # feed_id:(…)/tag_id:(…). read/starred: booleans folded in as is:
-      # filters. published_after: a Time folded in as published:>.
+      # feed_id:(…)/tag_id:(…); an empty feed_ids matches nothing.
+      # read/starred: booleans folded in as is: filters. published_after: a
+      # Time folded in as published:>.
       def initialize(user, query:, feed_ids: nil, tag_ids: nil, read: nil, starred: nil, published_after: nil)
         @user = user
+        @none = feed_ids&.empty?
         parts = [query.to_s.strip]
         parts << "feed_id:(#{feed_ids.join(" OR ")})" if feed_ids.present?
         parts << "tag_id:(#{tag_ids.join(" OR ")})" if tag_ids.present?
@@ -35,6 +37,7 @@ module Api
 
       # => [entries in search order, next sort values or nil, total]
       def page(limit:, after: nil)
+        return [[], nil, 0] if @none
         body = request_body
         unless Search.client { _1.validate(index, query: {query: body[:query]}) }
           raise QueryInvalid, "The query could not be parsed."
