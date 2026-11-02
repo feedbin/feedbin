@@ -6,7 +6,7 @@ module Api
     module Pagination
       extend ActiveSupport::Concern
 
-      DEFAULT_LIMIT = 100
+      DEFAULT_LIMIT = 1_000
       MAX_LIMIT = 1_000
 
       included do
