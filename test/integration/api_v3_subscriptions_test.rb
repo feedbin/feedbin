@@ -96,6 +96,16 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal @subscriptions.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
   end
 
+  test "a subscription with no kind is listed" do
+    @subscriptions.first.update_column(:kind, nil)
+
+    get "/v3/subscriptions", headers: bearer
+    assert_equal @subscriptions.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
+
+    get "/v3/subscriptions/#{@subscriptions.first.id}", headers: bearer
+    assert_response :success
+  end
+
   test "a generated subscription is not found" do
     feed, _ = pages_feed_with(1)
     id = @user.subscriptions.find_by!(feed: feed).id

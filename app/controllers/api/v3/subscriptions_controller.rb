@@ -113,14 +113,18 @@ module Api
       private
 
       # Generated subscriptions (Pages) aren't subscriptions in v3: Pages is a
-      # collection.
+      # collection. A row with no kind is an ordinary one.
+      def listed_subscriptions
+        @user.subscriptions.where.not(kind: :generated).or(@user.subscriptions.where(kind: nil))
+      end
+
       def subscription
-        @subscription ||= @user.subscriptions.where(kind: :default).find(params[:id])
+        @subscription ||= listed_subscriptions.find(params[:id])
       end
 
       def scope
         expand = expansions(SubscriptionSerializer::EXPANSIONS)
-        scope = @user.subscriptions.where(kind: :default).order(:id)
+        scope = listed_subscriptions.order(:id)
         scope = scope.includes(feed: [*Feed::ICON_PRELOADS, :touch_icon_image_record]) if expand.include?("feed")
         scope
       end
