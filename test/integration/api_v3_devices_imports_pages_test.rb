@@ -1,0 +1,109 @@
+require "test_helper"
+
+class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
+  setup do
+    host! "api.example.com"
+    @user = users(:new)
+    @user.setting_on!(:api_v3)
+    application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+  end
+
+  test "registers a device, re-registers the same token, and unregisters it" do
+    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.feedbin", model: "iPhone17,1", operating_system: "iOS 27.0"}.to_json, headers: json
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal %w[object id platform app_bundle_id model operating_system created_at], body.keys
+    assert_equal ["device", "ios", "com.feedbin.feedbin", "iPhone17,1", "iOS 27.0"], body.values_at("object", "platform", "app_bundle_id", "model", "operating_system")
+    assert Device.find(body["id"]).notifier?
+
+    post "/v3/devices", params: {push_token: "ABC123", platform: "ios", model: "iPhone18,1"}.to_json, headers: json
+    assert_response :success
+    assert_equal body["id"], JSON.parse(response.body)["id"]
+    assert_equal "iPhone18,1", JSON.parse(response.body)["model"]
+
+    post "/v3/devices", params: {push_token: "x", platform: "android"}.to_json, headers: json
+    assert_response :unprocessable_content
+
+    delete "/v3/devices/#{body["id"]}", headers: bearer
+    assert_response :no_content
+    delete "/v3/devices/#{body["id"]}", headers: bearer
+    assert_response :not_found
+  end
+
+  test "imports OPML and reports each item" do
+    opml = <<~XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <opml version="1.0"><head><title>Subs</title></head><body>
+        <outline text="News" title="News">
+          <outline type="rss" text="Daring Fireball" title="Daring Fireball" xmlUrl="https://daringfireball.net/feeds/main" htmlUrl="https://daringfireball.net"/>
+        </outline>
+        <outline type="rss" text="Old Blog" xmlUrl="https://example.com/rss" htmlUrl="https://example.com"/>
+      </body></opml>
+    XML
+
+    post "/v3/imports", params: opml, headers: bearer.merge("Content-Type" => "text/x-opml")
+    assert_response :accepted
+    body = JSON.parse(response.body)
+    assert_equal %w[object id status items created_at], body.keys
+    assert_equal "pending", body["status"]
+    assert_equal [["Daring Fireball", "https://daringfireball.net/feeds/main", "pending", nil, nil], ["Old Blog", "https://example.com/rss", "pending", nil, nil]], body["items"].map { _1.values_at("title", "feed_url", "status", "subscription_id", "message") }
+
+    import = Import.find(body["id"])
+    feed = Feed.create!(feed_url: "https://daringfireball.net/feeds/main", title: "DF")
+    subscription = @user.subscriptions.create!(feed: feed)
+    import.import_items.first.complete!
+    import.import_items.last.update!(status: :failed, error_message: "No feed found.")
+    import.update!(complete: true)
+
+    get "/v3/imports/#{import.id}", headers: bearer
+    body = JSON.parse(response.body)
+    assert_equal "complete", body["status"]
+    assert_equal [["complete", subscription.id, nil], ["failed", nil, "No feed found."]], body["items"].map { _1.values_at("status", "subscription_id", "message") }
+
+    post "/v3/imports", params: "<html></html>", headers: bearer.merge("Content-Type" => "application/xml")
+    assert_response :unsupported_media_type
+  end
+
+  test "saves a page into the Pages feed and deletes it" do
+    entry = nil
+    SavePage.stub(:new, Object.new.tap { |saver|
+      saver.define_singleton_method(:perform) do |user_id, url, title, path = nil|
+        user = User.find(user_id)
+        feed = Feed.create_with(title: "Pages", feed_type: :pages, protected: true).find_or_create_by!(feed_url: "http://pages.test/#{user.id}")
+        user.subscriptions.create_with(kind: :generated).find_or_create_by!(feed: feed)
+        entry = feed.entries.create_with(title: title, url: url, entry_id: SecureRandom.hex).find_or_create_by!(public_id: Digest::SHA1.hexdigest(url))
+      end
+    }) do
+      post "/v3/pages", params: {url: "https://example.com/long-read", title: "A Long Read"}.to_json, headers: json
+      assert_response :created
+      body = JSON.parse(response.body)
+      assert_equal ["entry", entry.id, "page", "A Long Read"], body.values_at("object", "id", "kind", "title")
+
+      post "/v3/pages", params: {url: "https://example.com/long-read"}.to_json, headers: json
+      assert_response :success
+      assert_equal entry.id, JSON.parse(response.body)["id"]
+    end
+
+    post "/v3/pages", params: {url: "not a url"}.to_json, headers: json
+    assert_response :unprocessable_content
+
+    delete "/v3/pages/#{entry.id}", headers: bearer
+    assert_response :no_content
+    refute Entry.exists?(entry.id)
+
+    other = Feed.create!(feed_url: "https://o.example/f").entries.create!(title: "o", url: "https://o.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    delete "/v3/pages/#{other.id}", headers: bearer
+    assert_response :not_found
+  end
+
+  private
+
+  def bearer
+    {"Authorization" => "Bearer #{@token.plaintext_token}"}
+  end
+
+  def json
+    bearer.merge("Content-Type" => "application/json")
+  end
+end
