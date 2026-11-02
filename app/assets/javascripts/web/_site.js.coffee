@@ -650,19 +650,19 @@ $.extend feedbin,
       else if feedbin.panel == 3
         true
 
-  updateEntryContent: (meta, content = "") ->
+  # An empty content clears the entry. The toolbar is not part of content: the
+  # entry-toolbar controller fills the one toolbar in the page.
+  updateEntryContent: (content = "") ->
     feedbin.closeEntryBasement(0)
     feedbin.hideSettingsMenu(null, true)
-    metaTarget = $('[data-behavior~=entry_meta_target]')
     innerContent = $('[data-behavior~=inner_content_target]')
 
-    metaTarget.html(meta)
-
-    if meta == ""
+    if content == ""
       feedbin.previousEntry = null
       feedbin.selectedEntry = null
       $('.entry-column').removeClass("has-content")
       innerContent.html("")
+      window.dispatchEvent(new CustomEvent("entry-toolbar:show", detail: null))
     else
       $('.entry-column').addClass("has-content")
 
@@ -842,8 +842,10 @@ $.extend feedbin,
 
   preloadEntries: (entry_ids, forcePreload = false) ->
     cachedIds = []
-    for key of feedbin.entries
-      cachedIds.push key * 1
+    for key, entry of feedbin.entries
+      # During a deploy a host on the old code answers without toolbar data.
+      # Leave such an entry out, so a later preload fetches it again.
+      cachedIds.push key * 1 if entry.toolbar
     if !forcePreload
       entry_ids = _.difference(entry_ids, cachedIds)
     if entry_ids.length > 0
@@ -861,12 +863,11 @@ $.extend feedbin,
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
-    entryId = feedbin.selectedEntry.id
 
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
-      feedbin.automaticSubmit = true
       feedbin.changeContentView('extract')
-      $('[data-behavior~=toggle_extract]').submit()
+      # automatic: the entry toolbar leaves the sticky setting as it is.
+      window.dispatchEvent(new CustomEvent("entry-toolbar:extract", detail: {automatic: true}))
 
   resetScroll: ->
     $('.entry-content').prop('scrollTop', 0)
@@ -1009,7 +1010,6 @@ $.extend feedbin,
       feedbin.readabilityXHR.abort()
       feedbin.readabilityXHR = null
 
-    feedbin.applyStarred(entryId)
     if resetScroll
       feedbin.resetScroll
     if readability
@@ -1223,8 +1223,17 @@ $.extend feedbin,
     a - b
 
 
+  # Whether the entry toolbar holds an entry. The toolbar stays in the page
+  # when no entry is open, so its share button, share links, and copy-link
+  # field do too; the keyboard shortcuts for them check this first.
+  entryToolbarActive: ->
+    id = $('[data-controller~=entry-toolbar]').attr('data-entry-toolbar-entry-id-value')
+    id? && id != "0"
+
+  # The entry toolbar's extract value. attr, not data: jQuery caches what
+  # data() reads, and this value changes with every entry.
   readabilityActive: ->
-    $('[data-behavior~=toggle_extract]').find('.active').length > 0
+    $('[data-controller~=entry-toolbar]').attr('data-entry-toolbar-extract-value') == "true"
 
   prepareShareForm: ->
     title =$('.entry-header h1').first().text()
@@ -1313,16 +1322,14 @@ $.extend feedbin,
 
     window.dispatchEvent(new CustomEvent("open-entry-basement"))
 
-  applyStarred: (entryId) ->
-    if feedbin.Counts.get().isStarred(entryId)
-      $('[data-behavior~=selected_entry_data]').addClass('starred')
-
-
   showEntry: (entryId) ->
     try
       entry = feedbin.entries[entryId]
       $('body').removeClass('extract-active')
-      feedbin.updateEntryContent(entry.content, entry.inner_content)
+      feedbin.updateEntryContent(entry.inner_content)
+      # Before formatEntryContent: it can start an automatic extract, which
+      # must find the toolbar already on this entry.
+      window.dispatchEvent(new CustomEvent("entry-toolbar:show", detail: entry.toolbar || null))
       feedbin.formatEntryContent(entryId, true)
       window.dispatchEvent(new CustomEvent("show-entry"))
       if feedbin.viewType == 'updated'
@@ -1591,7 +1598,8 @@ $.extend feedbin,
         $('body').addClass('standalone-navigator')
 
     initSingletons: ->
-      new feedbin.CountsBehavior()
+      # The entry-toolbar controller calls its star and read toggles.
+      feedbin.countsBehavior = new feedbin.CountsBehavior()
 
     state: ->
       $(window).on 'popstate', (event) ->
@@ -2084,49 +2092,6 @@ $.extend feedbin,
 
     timeago: ->
       feedbin.timeago()
-
-    updateReadability: ->
-      $(document).on 'ajax:complete', '[data-behavior~=toggle_extract]', (event, xhr) ->
-        feedbin.readabilityXHR = null;
-        $('.button-toggle-content').removeClass('loading')
-
-      $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_extract]', (event, xhr) ->
-        entry = $(@).data('entry-id')
-
-        if feedbin.automaticSubmit != true
-          $.post($(@).data("sticky-url"))
-        feedbin.automaticSubmit = false
-
-        if entry of feedbin.extractCache
-          xhr.abort()
-
-          if feedbin.readabilityActive()
-            feedbin.changeContentView(feedbin.previousContentView)
-          else
-            $("[data-content-option~=extract]").html(feedbin.extractCache["#{entry}"]);
-            feedbin.formatEntryContent(entry, false, false);
-            feedbin.changeContentView('extract')
-
-        else if feedbin.readabilityXHR
-          feedbin.readabilityXHR.abort()
-          xhr.abort()
-
-          feedbin.readabilityXHR = null
-          $('.button-toggle-content').removeClass('loading')
-
-          feedbin.changeContentView('default')
-        else
-          $('.button-toggle-content').addClass('loading')
-          feedbin.readabilityXHR = xhr
-
-        if feedbin.readabilityActive()
-          $('.button-toggle-content').removeClass('active')
-          $("#extract").val("true")
-        else
-          $('.button-toggle-content').addClass('active')
-          $("#extract").val("false")
-
-        true
 
     autoUpdate: ->
       setTimeout feedbin.autoUpdate, 300000

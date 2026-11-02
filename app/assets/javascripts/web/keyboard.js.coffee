@@ -166,17 +166,17 @@ class feedbin.Keyboard
 
     # Star
     Mousetrap.bind 's', (event, combo) =>
-      $('[data-behavior~=toggle_starred]').submit()
+      window.dispatchEvent(new CustomEvent("entry-toolbar:star"))
       event.preventDefault()
 
     # Read/Unread
     Mousetrap.bind 'm', (event, combo) =>
-      $('[data-behavior~=toggle_read]').submit()
+      window.dispatchEvent(new CustomEvent("entry-toolbar:read"))
       event.preventDefault()
 
     # Content View
     Mousetrap.bind 'c', (event, combo) =>
-      $('[data-behavior~=toggle_extract]').submit()
+      window.dispatchEvent(new CustomEvent("entry-toolbar:extract"))
       event.preventDefault()
 
     # Go to unread
@@ -249,14 +249,14 @@ class feedbin.Keyboard
     # share menu
     Mousetrap.bind 'f', (event, combo) =>
       shareButton = $("[data-behavior~=toggle_share_menu]")
-      if shareButton.length > 0
+      if feedbin.entryToolbarActive() && shareButton.length > 0
         shareButton[0]?.click()
         event.preventDefault()
 
     # sharing hotkeys
     Mousetrap.bind ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], (event, combo) =>
       shareMenu = $('[data-behavior~=share_options]')
-      if shareMenu.length > 0
+      if feedbin.entryToolbarActive() && shareMenu.length > 0
         item = $("[data-keyboard-shortcut=#{combo}]", shareMenu)
         $("[data-keyboard-shortcut=#{combo}]", shareMenu)[0].click()
         event.preventDefault()
@@ -296,7 +296,7 @@ class feedbin.Keyboard
 
     Mousetrap.bind 'C', (event, combo) =>
       link = $('#source_link_field')
-      if link.length > 0
+      if feedbin.entryToolbarActive() && link.length > 0
         link.select()
         try
           document.execCommand('copy');

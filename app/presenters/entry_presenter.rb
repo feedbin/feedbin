@@ -81,41 +81,14 @@ class EntryPresenter < BasePresenter
   end
 
   def content
-    ContentFormatter.format!(formatted_content, entry)
+    entry.rendering.web
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
-  def is_numeric?(string)
-    string = string.strip
-    begin
-      string.to_i.to_s == string
-    rescue
-      false
-    end
-  end
-
-  def update_media_queries(html)
-    regex = /@media(.*?)\(max-width:(.*?)px\)(.*?){/
-    html.gsub(regex) do |string|
-      matches = string.match(regex)
-      if matches[2] && is_numeric?(matches[2])
-        number = matches[2].to_i
-        if number >= 400
-          number = 10_000
-        end
-        string = "@media#{matches[1]}(max-width:#{number}px)#{matches[3]}{"
-      end
-      string
-    end
-  rescue
-    html
-  end
-
   def newsletter_content
-    output = update_media_queries(formatted_content)
-    output = ContentFormatter.newsletter_format(output)
+    output = entry.rendering.full
     output = <<-eod
     <style>
     body {
@@ -148,7 +121,7 @@ class EntryPresenter < BasePresenter
   end
 
   def api_content
-    string = ContentFormatter.api_format(formatted_content, entry)
+    string = entry.rendering.api
     if entry.micropost?
       string = ApplicationController.render template: "entries/_micropost_api", formats: :html, locals: {content: string, entry: entry}, layout: nil
     end
@@ -175,26 +148,14 @@ class EntryPresenter < BasePresenter
     }
   end
 
+  # Feedbin Notifier (API v2 ?private) is gone from the App Store but still
+  # in use. It gets the API rendering; the placeholder-image variant it was
+  # written for is retired.
   def app_content
-    ContentFormatter.app_format(formatted_content, entry)
+    entry.rendering.api
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
-  end
-
-  def formatted_content
-    @formatted_content ||= begin
-      if text?
-        ContentFormatter.text_email(entry.content)
-      elsif youtube?
-        @template.capture do
-          @template.concat @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true, width: 1280, height: 720)
-          @template.concat ContentFormatter.text_email(entry.content)&.html_safe
-        end
-      else
-        entry.content
-      end
-    end
   end
 
   def text?
@@ -538,6 +499,33 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  # What the one entry toolbar in the page needs to show this entry. The
+  # first six keys are the old feedbin.selectedEntryData, which the share
+  # menu and the mute form still read. The favicon stays server-rendered:
+  # FaviconComponent resolves it from image rows the client never sees.
+  def toolbar_data(subscriptions)
+    pages = entry.feed.pages?
+    {
+      id: entry.id,
+      feed_id: entry.feed_id,
+      url: entry.fully_qualified_url,
+      title: entry.title,
+      feed_title: entry.feed.title,
+      twitter_id: entry.twitter_id || "",
+      header_title: pages ? entry.hostname.to_s : toolbar_header_title,
+      pages: pages,
+      subscribed: !pages && subscriptions.include?(entry.feed_id),
+      favicon: favicon(entry.feed, entry).to_s
+    }
+  end
+
+  # Plain text, because the toolbar sets it as textContent. strip_tags
+  # returns escaped HTML ("AT&amp;T"), which the old toolbar inserted as HTML;
+  # decode it so the header still reads "AT&T".
+  def toolbar_header_title
+    Nokogiri::HTML5.fragment(@template.strip_tags(entry.feed.title).to_s).text
+  end
+
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
     parent = @locals[:parent] || entry.tweet.main_tweet
@@ -676,7 +664,7 @@ class EntryPresenter < BasePresenter
 
   def page_content(page)
     content = begin
-      ContentFormatter.format!(page.content, nil, true, page.url)
+      ContentFormatter.format!(page.content, nil, page.url)
     rescue
       nil
     end
@@ -684,7 +672,6 @@ class EntryPresenter < BasePresenter
   end
 
   def page_content_api(page)
-    ContentFormatter.absolute_source(page.content, nil, page.url)
     content = begin
       ContentFormatter.absolute_source(page.content, nil, page.url)
     rescue

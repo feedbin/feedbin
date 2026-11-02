@@ -37,6 +37,27 @@ class ExtractsControllerTest < ActionController::TestCase
     end
   end
 
+  test "entry renders the extract partial as html" do
+    login_as @user
+    content = "<p>#{Faker::Lorem.paragraph}</p>"
+    MercuryParser.stub :parse, OpenStruct.new(content: content) do
+      @request.accept = "text/html"
+      get :entry, params: {id: @entries.first, extract: "true"}, xhr: true
+    end
+    assert_response :success
+    assert_equal "text/html", @response.media_type
+    assert_includes @response.body, "entry-final-content"
+    refute_includes @response.body, "feedbin.extractCache"
+  end
+
+  test "entry keeps the js response for old tabs" do
+    login_as @user
+    MercuryParser.stub :parse, OpenStruct.new(content: "<p>x</p>") do
+      get :entry, params: {id: @entries.first, extract: "true"}, xhr: true
+    end
+    assert_includes @response.body, "feedbin.extractCache"
+  end
+
   test "entry returns the entry's own content when extract is not requested" do
     login_as @user
     entry = @entries.first

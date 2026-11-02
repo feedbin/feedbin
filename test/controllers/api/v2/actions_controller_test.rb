@@ -58,6 +58,17 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
     assert_includes assigns(:entries).to_a, @entry
   end
 
+  test "results stores missing renderings in one insert" do
+    login_as @user
+    action = Action.create(user: @user, feed_ids: @feeds.map(&:id), actions: ["mark_read"])
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    statements = capture_sql { get :results, params: {id: action.id}, format: :json }
+    assert_response :success
+    assert_operator parse_json.length, :>, 1
+    assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
+    assert EntryRendering.exists?(@entry.id)
+  end
+
   # The endpoint returns 200 with a plausible list either way, so asserting on
   # what reaches the search is the only thing that catches an unconstrained one.
   test "results searches on the action's own criteria" do

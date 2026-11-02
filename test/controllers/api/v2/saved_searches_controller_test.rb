@@ -28,6 +28,17 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
     assert_equal_ids [@entry], parse_json
   end
 
+  test "show with entries stores missing renderings in one insert" do
+    login_as @user
+    saved_search = @user.saved_searches.create(query: "*", name: "everything")
+    EntryRendering.where(entry_id: @entries.map(&:id)).delete_all
+    statements = capture_sql { get :show, params: {id: saved_search, include_entries: "true"}, format: :json }
+    assert_response :success
+    assert_operator parse_json.length, :>, 1
+    assert_equal 1, statements.count { it.start_with?(%(INSERT INTO "entry_renderings")) }
+    assert EntryRendering.exists?(@entry.id)
+  end
+
   test "should create saved search" do
     api_content_type
     login_as @user

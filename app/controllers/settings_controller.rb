@@ -85,9 +85,16 @@ class SettingsController < ApplicationController
   def sticky
     @user = current_user
     @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first
-    return head :ok if @subscription.nil?
+    return head :no_content if @subscription.nil?
 
     @subscription.update(view_inline: !@subscription.view_inline)
+
+    # JS first: an old tab posts with $.post, whose Accept is */*, and Rails
+    # answers */* with the first format listed.
+    respond_to do |format|
+      format.js
+      format.json { render json: {view_inline: @subscription.view_inline} }
+    end
   end
 
   def subscription_view_mode

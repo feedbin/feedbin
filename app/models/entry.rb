@@ -20,6 +20,16 @@ class Entry < ApplicationRecord
   # The avatar of this video's own channel -- a playlist feed mixes videos
   # from many channels, keyed by provider_parent_id (UC-form).
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
+  # The stored formatting, which may be stale. Read rendering instead.
+  has_one :rendering_record, class_name: "EntryRendering", inverse_of: :entry, dependent: :delete
+
+  # What a rendering is made from, besides the feed. A save that changes any
+  # of these re-renders. Data and settings hold other keys the formatter
+  # never reads (saved pages, embed_duration, archived_images), and the jobs
+  # that keep those current would otherwise re-render on every write.
+  RENDERING_COLUMNS = %w[content compressed_original_content url feed_id].freeze
+  RENDERING_DATA_KEYS = %w[format youtube_video_id].freeze
+  RENDERING_SETTINGS_KEYS = %w[newsletter_from].freeze
 
   before_create :ensure_published
   before_create :create_summary
@@ -30,6 +40,7 @@ class Entry < ApplicationRecord
   before_save :recompress_original_content
 
   after_commit :cache_public_id, on: [:create, :update]
+  after_commit :store_rendering, on: [:create, :update]
   after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
@@ -72,10 +83,17 @@ class Entry < ApplicationRecord
       .with_list_associations
   end
 
+  # Loading these reads the stored renderings in one query and stores any
+  # that are missing or stale in one write, so a page of cold entries costs
+  # one insert instead of one per entry. Reads that don't load the relation
+  # (pluck, count, an ETag check) render nothing.
+  scope :with_renderings, -> { preload(:rendering_record).extending(EntryRendering::PrepareOnLoad) }
+
   # What api/v2/entries/_entry.json renders; extended mode also reads the
   # preview image row, at up to 100 entries a request.
+  # Every mode reads owned_image_records: micropost? checks the link image.
   scope :for_api, ->(mode = nil) {
-    mode.to_s == "extended" ? includes(:feed).preload(:owned_image_records) : includes(:feed)
+    includes(:feed).preload(:owned_image_records).with_renderings
   }
 
   def newsletter?
@@ -203,21 +221,35 @@ class Entry < ApplicationRecord
     OriginalContent.decompress(compressed_original_content, base: content)
   end
 
+  # nil when there is no diff, and when rendering fails: a diff is never
+  # worth failing the page over.
   def content_diff
-    @content_diff ||= begin
-      result = nil
-      original = original_content
-      if content && original.present? && original.length != content.length
-        begin
-          before = ContentFormatter.format!(original, self)
-          after = ContentFormatter.format!(content, self)
-          result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
-          result = result.html_safe
-        rescue
-        end
-      end
-      result
+    rendering.diff&.html_safe
+  rescue => exception
+    Rails.logger.info { "Entry#content_diff failed entry=#{id} #{exception.inspect}" }
+    nil
+  end
+
+  # Every formatted version of this entry, current with its content and the
+  # formatter: the stored row when it matches, otherwise rendered, stored,
+  # and returned. An unsaved entry is rendered and not stored. Storing can
+  # fail (a timeout, a read-only database); the fresh rendering is served
+  # anyway.
+  attr_writer :rendering
+
+  def rendering
+    @rendering ||= if new_record?
+      EntryRendering.build(self)
+    elsif rendering_record&.current_for?(self)
+      rendering_record
+    else
+      EntryRendering.build(self).tap { store(it) }
     end
+  end
+
+  def reload(*)
+    @rendering = nil
+    super
   end
 
   # nil, not 0, when the feed gave no itunes:duration -- 0 renders as
@@ -367,6 +399,44 @@ class Entry < ApplicationRecord
   end
 
   private
+
+  def store(rendering)
+    rendering.store!
+  rescue => exception
+    ErrorService.notify(
+      error_class: "Entry#rendering",
+      error_message: "storing the rendering failed",
+      parameters: {entry_id: id, exception: exception}
+    )
+  end
+
+  # Rendering here keeps reads from paying for it. A failure is reported and
+  # the next read renders instead; it must never fail the write.
+  def store_rendering
+    return unless previously_new_record? || rendering_inputs_changed?
+    @rendering = EntryRendering.render!(self)
+  rescue => exception
+    @rendering = nil
+    ErrorService.notify(
+      error_class: "Entry#store_rendering",
+      error_message: "rendering failed",
+      parameters: {entry_id: id, exception: exception}
+    )
+  end
+
+  def rendering_inputs_changed?
+    saved_changes.keys.intersect?(RENDERING_COLUMNS) ||
+      keys_changed?(saved_change_to_data, RENDERING_DATA_KEYS) ||
+      keys_changed?(saved_change_to_settings, RENDERING_SETTINGS_KEYS)
+  end
+
+  # Whether a [before, after] change to a hash column differs on the given
+  # keys. The after value is the hash as assigned, so its keys may be symbols.
+  def keys_changed?(change, keys)
+    return false unless change
+    before, after = change.map { it.is_a?(Hash) ? it.stringify_keys.slice(*keys) : {} }
+    before != after
+  end
 
   # A stored value only decompresses against the content it was made from, so
   # every content change must re-encode it. Skip when this save also sets the

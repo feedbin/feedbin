@@ -137,6 +137,40 @@ class SidebarQueryCountTest < ActionController::TestCase
   end
 end
 
+# Its own class for the same reason SidebarQueryCountTest is. A Pages entry
+# keys its favicon on its own host, so no feed preload reaches it; the
+# preload batch must resolve every host in one lookup.
+class PreloadQueryCountTest < ActionController::TestCase
+  tests EntriesController
+  include QueryCounting
+
+  setup do
+    @user = users(:ben)
+    @feed = Feed.create!(feed_url: "https://pages.example/x", host: "pages.example", title: "P", feed_type: :pages)
+    @user.subscriptions.create!(feed: @feed)
+  end
+
+  test "preload does not query favicons once per pages entry" do
+    login_as @user
+
+    one = pages_entries(1)
+    with_one = capture_sql { get :preload, params: {ids: one.map(&:id).join(","), v: "2"}, format: :json }
+    five = pages_entries(5)
+    with_five = capture_sql { get :preload, params: {ids: five.map(&:id).join(","), v: "2"}, format: :json }
+
+    assert_response :success
+    pattern = /FROM "images"/i
+    assert_equal matching(with_one, pattern).count, matching(with_five, pattern).count,
+      "the Pages favicon lookup scales with the entry count"
+  end
+
+  def pages_entries(count)
+    count.times.map do
+      @feed.entries.create!(content: "<p>x</p>", title: "T", url: "https://#{SecureRandom.hex(4)}.example/a", public_id: SecureRandom.hex)
+    end
+  end
+end
+
 # Its own class for the same reason SidebarQueryCountTest is: ActionController::TestCase
 # binds one controller per class via `tests`.
 #

@@ -2728,7 +2728,8 @@ $feed-title-width: 115px;
     .icon-unread * {
       fill: $color-accent-blue-600;
     }
-    .read & {
+    // The entry-toolbar controller's values; see App::EntryToolbarComponent.
+    [data-entry-toolbar-read-value="true"] & {
       .icon-read {
         display: block;
       }
@@ -2741,7 +2742,7 @@ $feed-title-width: 115px;
     .icon-star-on {
       display: none;
     }
-    .starred & {
+    [data-entry-toolbar-starred-value="true"] & {
       .icon-star-on {
         display: block;
         * {
@@ -2761,7 +2762,7 @@ $feed-title-width: 115px;
       display: none;
     }
     width: 46px;
-    &.loading {
+    [data-entry-toolbar-loading-value="true"] & {
       @keyframes flip {
         50% {
           transform: scaleX(-1);
@@ -2792,7 +2793,7 @@ $feed-title-width: 115px;
   }
 }
 
-.button-toggle-content.active {
+[data-entry-toolbar-extract-value="true"] .button-toggle-content {
   .icon-full-content-on {
     display: block;
 

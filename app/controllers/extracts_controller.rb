@@ -19,9 +19,16 @@ class ExtractsController < ApplicationController
     end
 
     begin
-      @content = ContentFormatter.format!(@content, nil, true, url)
+      @content = ContentFormatter.format!(@content, nil, url)
     rescue
       @content = nil
+    end
+
+    # JS for tabs from before the entry toolbar was rendered once; the toolbar
+    # controller asks for HTML and does the DOM work itself.
+    respond_to do |format|
+      format.js
+      format.html { render partial: "extracts/entry", locals: {content: @content, content_info: @content_info, entry: @entry, user: @user} }
     end
   end
 
@@ -31,7 +38,7 @@ class ExtractsController < ApplicationController
 
     begin
       @content_info = MercuryParser.parse(params[:url])
-      @content = ContentFormatter.format!(@content_info.content, nil, true, params[:url])
+      @content = ContentFormatter.format!(@content_info.content, nil, params[:url])
     rescue => exception
       Rails.logger.info { exception }
       @content = nil

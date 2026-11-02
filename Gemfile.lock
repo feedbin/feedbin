@@ -54,7 +54,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/html-pipeline.git
-  revision: 5a0e1c2cacf187221a47a9d56cc54232b21dad56
+  revision: 04e2e23a1825bc18ab51d3f67fd96df98eb88fff
   branch: feedbin
   specs:
     html-pipeline (2.4.2)
@@ -574,6 +574,8 @@ GEM
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
+    requestjs-rails (0.0.14)
+      railties (>= 7.1.0)
     reverse_markdown (3.0.2)
       nokogiri
     rexml (3.4.4)
@@ -771,6 +773,7 @@ DEPENDENCIES
   rails-controller-testing
   redcarpet
   redis (< 5)
+  requestjs-rails
   reverse_markdown
   ruby-prof
   ruby-vips
