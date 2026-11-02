@@ -1,8 +1,8 @@
 module Api
   module V3
     # The entry object, with every field and its feed embedded. Load entries
-    # with Entry.with_list_associations so the image rows and feed come
-    # preloaded. feed is the feed's serialized hash, built once per feed.
+    # with Entry.with_list_associations.with_renderings so the image rows,
+    # feed, and stored rendering come preloaded. feed is the feed's serialized hash, built once per feed.
     class EntrySerializer
       def initialize(entry, feed:)
         @entry = entry
@@ -142,7 +142,7 @@ module Api
       end
 
       def content_html
-        ContentFormatter.api_format(@entry.content, @entry)
+        @entry.rendering.api
       rescue => exception
         ErrorService.notify(exception, context: {entry_id: @entry.id})
         @entry.content

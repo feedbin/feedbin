@@ -58,7 +58,7 @@ module Api
       end
 
       def with_associations
-        Entry.with_list_associations.preload(feed: :touch_icon_image_record)
+        Entry.with_list_associations.with_renderings.preload(feed: :touch_icon_image_record)
       end
 
       # Each feed is serialized once per response, however many of its
