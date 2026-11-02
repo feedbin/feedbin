@@ -87,4 +87,69 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
 
     assert_equal ["token#{@users.last.id}"], pool.topics.keys
   end
+
+  test "a suspended account gets nothing" do
+    @users.first.update!(suspended: true)
+    pool = PushServerMock.new("200")
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+    end
+
+    assert_equal ["token#{@users.last.id}"], pool.topics.keys
+  end
+
+  test "with no devices it opens no connection" do
+    Device.delete_all
+    closed = Object.new.tap { |pool| pool.define_singleton_method(:with) { |*| raise "opened a connection" } }
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, closed) do
+      DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, true)
+    end
+  end
+
+  test "a device without a bundle id gets nothing" do
+    @devices.first.update!(application: nil)
+    pool = PushServerMock.new("200")
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+    end
+
+    assert_equal ["token#{@users.last.id}"], pool.topics.keys
+  end
+
+  test "a token registered under the wrong bundle id is removed" do
+    pool = PushServerMock.new("400", reason: "DeviceTokenNotForTopic")
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      assert_difference "Device.count", -2 do
+        DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+      end
+    end
+  end
+
+  test "a bundle id the key cannot sign for is reported and the device kept" do
+    reported = []
+    pool = PushServerMock.new("400", reason: "TopicDisallowed")
+    ErrorService.stub(:notify, ->(*args, **kwargs) { reported << (args.first || kwargs) }) do
+      DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+        assert_no_difference "Device.count" do
+          DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+        end
+      end
+    end
+
+    assert_equal 2, reported.size
+  end
+
+  test "a development build's device goes through the sandbox" do
+    @devices.first.update!(data: @devices.first.data.merge("apns_environment" => "development"))
+    production = PushServerMock.new("200")
+    sandbox = PushServerMock.new("200")
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, production) do
+      DevicePushNotificationSend.stub_const(:SANDBOX_POOL, sandbox) do
+        DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+      end
+    end
+
+    assert_equal ["token#{@users.first.id}"], sandbox.topics.keys
+    assert_equal ["token#{@users.last.id}"], production.topics.keys
+  end
 end

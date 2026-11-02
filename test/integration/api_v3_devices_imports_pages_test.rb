@@ -146,6 +146,26 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "Airshow registers for podcast pushes" do
+    ENV["APPLE_PUSH_TOPIC_PODCAST"] = "com.feedbin.airshow"
+    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.airshow"}.to_json, headers: json
+
+    assert_response :created
+    assert_equal "ios", JSON.parse(response.body)["platform"]
+    assert Device.find(JSON.parse(response.body)["id"]).podcast?
+  ensure
+    ENV.delete("APPLE_PUSH_TOPIC_PODCAST")
+  end
+
+  test "a development build says which push environment it uses" do
+    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: "development"}.to_json, headers: json
+    assert_equal "development", Device.find(JSON.parse(response.body)["id"]).data["apns_environment"]
+
+    post "/v3/devices", params: {push_token: "def456", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: "staging"}.to_json, headers: json
+    assert_response :unprocessable_content
+    assert_equal "/apns_environment", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
   private
 
   def bearer

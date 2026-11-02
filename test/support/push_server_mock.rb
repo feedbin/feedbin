@@ -1,8 +1,9 @@
 class PushServerMock
   attr_reader :status, :count, :delivered, :topics
 
-  def initialize(status)
+  def initialize(status, reason: "BadDeviceToken")
     @status = status
+    @reason = reason
     @count = 0
     # token => alert title, so a test can check what each recipient was sent
     @delivered = {}
@@ -17,7 +18,7 @@ class PushServerMock
   def prepare_push(notification)
     @delivered[notification.token] = notification.alert[:title]
     @topics[notification.token] = notification.topic
-    ResponseMock.new(@status, notification)
+    ResponseMock.new(@status, notification, @reason)
   end
 
   def join
@@ -30,15 +31,16 @@ class PushServerMock
   end
 
   class ResponseMock
-    def initialize(status, notification)
+    def initialize(status, notification, reason)
       @status = status
       @notification = notification
+      @reason = reason
     end
 
     attr_reader :status
 
     def body
-      {"reason" => "BadDeviceToken"}
+      {"reason" => @reason}
     end
 
     def headers

@@ -6,7 +6,7 @@ class Device < ApplicationRecord
   # iOS apps that registered through v3, each with its own bundle id. The
   # retired Feedbin Notifier registered notifier devices through v2; those
   # get no pushes.
-  scope :v3_ios, -> { notifier.where("data->>'registered_with' = 'v3'") }
+  scope :v3_ios, -> { notifier.where("data->>'registered_with' = 'v3'").where.not(application: [nil, ""]) }
 
   # index_devices_on_lower_tokens covers lower(token) alone, with no user_id,
   # so a token identifies one physical device rather than one device per

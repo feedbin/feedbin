@@ -14,8 +14,19 @@ class DevicePushNotificationSend
     connection.on(:error) { |exception| ErrorService.notify(exception) }
   }
 
+  # A development build's token belongs to APNs's sandbox.
+  SANDBOX_POOL = Apnotic::ConnectionPool.development(apnotic_options, size: 2) { |connection|
+    connection.on(:error) { |exception| ErrorService.notify(exception) }
+  }
+
+  # Reasons that mean the token will never work for its app.
+  GONE = %w[BadDeviceToken DeviceTokenNotForTopic].freeze
+
   def perform(user_ids, entry_id, skip_read)
     ErrorService.context(user_ids: user_ids, entry_id: entry_id)
+
+    devices = Device.v3_ios.where(user_id: User.where(id: user_ids, suspended: false).select(:id))
+    return unless devices.exists?
 
     entry = Entry.find(entry_id)
 
@@ -23,29 +34,43 @@ class DevicePushNotificationSend
       user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
     end
 
-    tokens = Device.v3_ios.where(user_id: user_ids).pluck(:user_id, :token, :operating_system, :application)
+    tokens = devices.where(user_id: user_ids).pluck(:user_id, :token, :operating_system, :application, Arel.sql("devices.data->>'apns_environment'"))
+    return if tokens.empty?
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
     default_title = format_text(feed.title)
 
-    notifications = tokens.each_with_object({}) { |(user_id, token, operating_system, application), hash|
+    sandbox = {}
+    production = {}
+    tokens.each do |user_id, token, operating_system, application, environment|
       # Per iteration. Reassigning feed_title carried one subscriber's private
       # rename into every later recipient's notification.
       feed_title = feed_titles[user_id] || default_title
       notification = build_notification(token, feed_title, entry, operating_system, application)
-      hash[notification.apns_id] = notification
-    }
+      ((environment == "development") ? sandbox : production)[notification.apns_id] = notification
+    end
 
-    APNOTIC_POOL.with do |connection|
+    deliver(APNOTIC_POOL, production) if production.any?
+    deliver(SANDBOX_POOL, sandbox) if sandbox.any?
+  end
+
+  private
+
+  def deliver(pool, notifications)
+    pool.with do |connection|
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
           Librato.increment("apns.ios.sent", source: response.status)
-          if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
-            apns_id = response.headers["apns-id"]
-            token = notifications[apns_id].token
-            Device.where("lower(token) = ?", token.downcase).take&.destroy
+          reason = response.body["reason"] if response.status == "400"
+          notification = notifications[response.headers["apns-id"]]
+          if response.status == "410" || GONE.include?(reason)
+            Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
+          elsif reason
+            # TopicDisallowed, MissingTopic and the like: our setup, not the
+            # device, so say so instead of failing quietly on every push.
+            ErrorService.notify(error_class: "DevicePushNotificationSend##{reason}", error_message: "APNs refused a push: #{reason}", parameters: {topic: notification.topic})
           end
         end
         connection.push_async(push)
@@ -53,8 +78,6 @@ class DevicePushNotificationSend
       connection.join
     end
   end
-
-  private
 
   def subscription_titles(user_ids, feed)
     titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title)

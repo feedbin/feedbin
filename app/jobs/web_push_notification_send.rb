@@ -22,6 +22,7 @@ class WebPushNotificationSend
   }
 
   def perform(user_ids, entry_id, skip_read)
+    user_ids = User.where(id: user_ids, suspended: false).pluck(:id)
     entry = Entry.find(entry_id)
     feed = entry.feed
 
@@ -149,6 +150,8 @@ class WebPushNotificationSend
 
   def build_notification(device_token, title, body, entry_id, user_id)
     Apnotic::Notification.new(device_token).tap do |notification|
+      # Safari pushes go out under the website push id.
+      notification.topic = ENV["APPLE_PUSH_WEBSITE_ID"]
       notification.alert = {
         title: title,
         body: body

@@ -4,6 +4,9 @@ module Api
     # as a notifier.
     class DeviceSerializer
       PLATFORMS = {"notifier" => "ios", "safari" => "safari"}.freeze
+      # How each device type reads back: Airshow registers as ios and is
+      # stored as a podcast device.
+      SHOWN = PLATFORMS.merge("podcast" => "ios").freeze
 
       def initialize(device)
         @device = device
@@ -13,7 +16,7 @@ module Api
         {
           object: "device",
           id: @device.id,
-          platform: PLATFORMS.fetch(@device.device_type, @device.device_type),
+          platform: SHOWN.fetch(@device.device_type, @device.device_type),
           app_bundle_id: @device.application,
           model: @device.model,
           operating_system: @device.operating_system,

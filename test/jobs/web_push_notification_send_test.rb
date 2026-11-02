@@ -106,4 +106,28 @@ class WebPushNotificationSendTest < ActiveSupport::TestCase
       WebPushNotificationSend.new.perform(user_ids, @entries.first.id, false)
     end
   end
+
+  test "safari pushes go out under the website push id" do
+    @users.each { |user| user.devices.create!(token: "token#{user.id}", device_type: :safari) }
+    pool = PushServerMock.new("200")
+    ENV["APPLE_PUSH_WEBSITE_ID"] = "web.com.feedbin.test"
+    WebPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      WebPushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+    end
+
+    assert_equal ["web.com.feedbin.test"], pool.topics.values.uniq
+  ensure
+    ENV.delete("APPLE_PUSH_WEBSITE_ID")
+  end
+
+  test "a suspended account gets no web push" do
+    @users.each { |user| user.devices.create!(token: "token#{user.id}", device_type: :safari) }
+    @users.first.update!(suspended: true)
+    pool = PushServerMock.new("200")
+    WebPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      WebPushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+    end
+
+    assert_equal ["token#{@users.last.id}"], pool.topics.keys
+  end
 end
