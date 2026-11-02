@@ -38,4 +38,8 @@ class UnreadEntryTest < ActiveSupport::TestCase
   test "unread pages have an index on their sort key" do
     assert ActiveRecord::Base.connection.index_exists?(:unreads, [:user_id, :entry_created_at, :entry_id])
   end
+
+  test "the user_id index the composite indexes cover is gone" do
+    refute ActiveRecord::Base.connection.index_name_exists?(:unreads, "index_unreads_on_user_id")
+  end
 end

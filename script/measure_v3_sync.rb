@@ -35,7 +35,7 @@ ActiveRecord::Base.transaction do
   base = Entry.where(feed_id: user.subscriptions.select(:feed_id))
   newest = base.order(created_at: :desc, id: :desc).first
   if newest
-    page = base.where("(entries.created_at, entries.id) > (?, ?)", newest.created_at, newest.id).order(created_at: :asc, id: :asc).limit(101)
+    page = Api::V3::Timeline.page(base, :created_at, :asc, limit: 101, after: [newest.created_at, newest.id])
     explain(connection, page.to_sql)
   else
     puts "  The user's feeds have no entries."

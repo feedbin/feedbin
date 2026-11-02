@@ -65,7 +65,7 @@ module Api
 
       def updated_at(body, field)
         stamp = body[field] or raise invalid(field, "missing", "#{field} is required with #{field.delete_suffix("_updated_at")}.")
-        Params.time(stamp) or raise invalid(field, "invalid_value", "#{field} must be an RFC 3339 timestamp with a UTC offset.")
+        Timestamp.parse(stamp) or raise invalid(field, "invalid_value", "#{field} must be an RFC 3339 timestamp with a UTC offset.")
       end
 
       def taken

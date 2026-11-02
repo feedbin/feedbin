@@ -22,6 +22,16 @@ module Api
       }.freeze
       STREAMS = %w[received_asc edited_asc].freeze
 
+      # One keyset page: entries after a (time, id) position in the order,
+      # with the id as tiebreak. script/measure_v3_sync.rb runs it too.
+      def self.page(scope, column, direction, limit:, after: nil)
+        if after
+          operator = (direction == :asc) ? ">" : "<"
+          scope = scope.where("(entries.#{column}, entries.id) #{operator} (?, ?)", *after)
+        end
+        scope.order(column => direction, :id => direction).limit(limit)
+      end
+
       private
 
       # The entries the timeline draws from. Overridden for one feed.
@@ -42,11 +52,7 @@ module Api
 
         column, direction = ORDERS.fetch(order)
         scope = scope.where.not(edited_at: nil) if order == "edited_asc"
-        scope = after_cursor(scope, column, direction)
-        entries = scope.merge(with_associations)
-          .order(column => direction, :id => direction)
-          .limit(limit + 1)
-          .to_a
+        entries = Timeline.page(scope.merge(with_associations), column, direction, limit: limit + 1, after: cursor_position).to_a
 
         more = entries.size > limit
         entries.pop if more
@@ -143,13 +149,13 @@ module Api
 
       # A cursor with fields that don't parse is invalid rather than silently
       # restarting.
-      def after_cursor(scope, column, direction)
-        fields = cursor_fields or return scope
+      # The cursor's (time, id), or nil on a first page.
+      def cursor_position
+        fields = cursor_fields or return nil
         timestamp, id = fields.values_at("timestamp", "id")
         raise Cursor::Invalid unless timestamp.is_a?(Integer) && id.is_a?(Integer)
 
-        operator = (direction == :asc) ? ">" : "<"
-        scope.where("(entries.#{column}, entries.id) #{operator} (?, ?)", Time.at(Rational(timestamp, 1_000_000)).utc, id)
+        [Time.at(Rational(timestamp, 1_000_000)).utc, id]
       end
 
       def microseconds(time)

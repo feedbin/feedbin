@@ -1,19 +1,9 @@
 module Api
   module V3
-    # Query-string parameters shared across v3: booleans, times and id lists.
-    # A time must carry its UTC offset; without one Ruby reads it in the
-    # server's zone, so the same string would mean different instants.
+    # Query-string parameters shared across v3: booleans, times (see
+    # Timestamp) and id lists.
     module Params
-      TIME_FORMAT = /\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(Z|[+-]\d\d:\d\d)\z/
       MAX_IDS = 1_000
-
-      # nil when the value is not an RFC 3339 timestamp with an offset.
-      def self.time(value)
-        string = value.to_s
-        Time.iso8601(string) if TIME_FORMAT.match?(string)
-      rescue ArgumentError
-        nil
-      end
 
       private
 
@@ -28,7 +18,7 @@ module Api
 
       def time_param(name)
         return nil unless params.key?(name)
-        Params.time(params[name]) or raise Problems::InvalidParameter.new("#{name} must be an RFC 3339 timestamp with a UTC offset.", pointer: name.to_s, code: "invalid_value")
+        Timestamp.parse(params[name]) or raise Problems::InvalidParameter.new("#{name} must be an RFC 3339 timestamp with a UTC offset.", pointer: name.to_s, code: "invalid_value")
       end
 
       # Comma-separated ids, at most MAX_IDS.

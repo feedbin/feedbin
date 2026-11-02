@@ -28,7 +28,7 @@ module Api
           raise invalid(field, "invalid_value", "#{field} cannot be null.") if value.nil? && field != "playlist_id"
           raise invalid(field, "invalid_value", "playlist_id must be one of the user's playlists.") if field == "playlist_id" && value && !playlist_ids.include?(value)
           stamp = @body["#{field}_updated_at"] or raise invalid("#{field}_updated_at", "missing", "#{field}_updated_at is required with #{field}.")
-          proposed = Params.time(stamp) or raise invalid("#{field}_updated_at", "invalid_value", "#{field}_updated_at must be an RFC 3339 timestamp with a UTC offset.")
+          proposed = Timestamp.parse(stamp) or raise invalid("#{field}_updated_at", "invalid_value", "#{field}_updated_at must be an RFC 3339 timestamp with a UTC offset.")
           # Client stamps carry whole seconds; the stored time has microseconds.
           # Compare at the client's precision so a same-second write is a tie.
           if proposed < @row.public_send("#{column}_updated_at").floor
