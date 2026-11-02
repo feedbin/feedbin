@@ -12,11 +12,11 @@ class EntryRendering < ApplicationRecord
 
   belongs_to :entry, inverse_of: :rendering_record
 
-  LAYOUT = 2
+  LAYOUT = 3
   VERSIONS = ContentFormatter::VERSIONS
   # Each version is a 4-byte length and its bytes, in VERSIONS order. A
   # version the entry doesn't have (full for an article, diff for an unedited
-  # entry) is stored as ABSENT with no bytes, so nil survives the round trip.
+  # entry, extracted for one without saved pages) is stored as ABSENT with no bytes, so nil survives the round trip.
   PACKING = "Na*" * VERSIONS.size
   ABSENT = 0xFFFFFFFF
 
@@ -143,6 +143,11 @@ class EntryRendering < ApplicationRecord
 
   VERSIONS.each do |name|
     define_method(name) { versions[name] }
+  end
+
+  # The extracted version as URL => HTML, empty when there are no pages.
+  def extracted_pages
+    @extracted_pages ||= extracted ? JSON.parse(extracted) : {}
   end
 
   private

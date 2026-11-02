@@ -9,8 +9,8 @@ class EntryRenderingTest < ActiveSupport::TestCase
     feeds(:kottke).tap { it.update!(feed_type: :newsletter) }
   end
 
-  test "encode and decode round-trip all four versions" do
-    versions = {web: "<p>w</p>", api: "<p>a</p>", full: "<html>f</html>", diff: "<p><ins>d</ins></p>"}
+  test "encode and decode round-trip every version" do
+    versions = {web: "<p>w</p>", api: "<p>a</p>", full: "<html>f</html>", diff: "<p><ins>d</ins></p>", extracted: %({"https://example.com/":"<p>e</p>"})}
     blob = EntryRendering.encode(versions, content: "<p>w</p>", crc: 7)
     assert_equal EntryRendering::LAYOUT, blob.getbyte(0)
     assert_equal 7, blob.byteslice(1, 4).unpack1("N")
@@ -29,7 +29,7 @@ class EntryRenderingTest < ActiveSupport::TestCase
   test "encode and decode keep non-ASCII text" do
     versions = {web: "<p>café — ünïcode 😀</p>", api: "<p>日本語</p>"}
     blob = EntryRendering.encode(versions, content: "<p>café</p>", crc: 0)
-    assert_equal versions.merge(full: nil, diff: nil), EntryRendering.decode(blob, content: "<p>café</p>")
+    assert_equal versions.merge(full: nil, diff: nil, extracted: nil), EntryRendering.decode(blob, content: "<p>café</p>")
   end
 
   test "encode works without a dictionary when content is blank" do
@@ -57,6 +57,25 @@ class EntryRenderingTest < ActiveSupport::TestCase
     entry = create_entry(@feed)
     entry.update!(content: "<p>This is the new text.</p>", compressed_original_content: OriginalContent.compress("<p>This is the text.</p>", base: "<p>This is the new text.</p>"))
     assert_match %r{<ins>new\s*</ins>}, EntryRendering.build(entry).diff
+  end
+
+  test "build renders each saved page against its own URL and skips failed ones" do
+    url = "https://example.com/story"
+    page = {"url" => url, "result" => {"content" => %(<p><a href="/more">more</a><script>1</script></p>)}}
+    entry = create_entry(@feed)
+    entry.update!(data: {"saved_pages" => {url => page, "https://example.com/failed" => {"result" => nil}}})
+
+    pages = EntryRendering.build(entry).extracted_pages
+
+    assert_equal [url], pages.keys
+    assert_includes pages[url], %(href="https://example.com/more")
+    refute_includes pages[url], "<script"
+  end
+
+  test "build stores no extracted version without saved pages" do
+    rendering = EntryRendering.build(create_entry(@feed))
+    assert_nil rendering.extracted
+    assert_equal({}, rendering.extracted_pages)
   end
 
   test "build renders full for a newsletter entry" do

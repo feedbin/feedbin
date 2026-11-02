@@ -451,7 +451,6 @@ class EntryTest < ActiveSupport::TestCase
     statements = capture_sql do
       entry.update!(embed_duration: 120)
       entry.update!(archived_images: true)
-      entry.update!(data: entry.data.to_h.merge("saved_pages" => {"http://example.com" => {}}))
     end
     assert_empty statements.grep(/INSERT INTO "entry_renderings"/)
   end
@@ -464,6 +463,17 @@ class EntryTest < ActiveSupport::TestCase
     end
     assert_equal 2, statements.grep(/INSERT INTO "entry_renderings"/).size
     assert_equal "<p>Text.</p>", Entry.find(entry.id).rendering.web.strip
+  end
+
+  # HarvestLinks assigns into data and saves.
+  test "saving new saved pages re-renders" do
+    entry = saved_entry("<p>Text.</p>")
+    url = "https://example.com/story"
+    entry.update!(data: {"urls" => []})
+    entry.data["saved_pages"] = {url => {"result" => {"content" => "<p>Linked.</p>"}}}
+    statements = capture_sql { entry.save! }
+    assert_equal 1, statements.grep(/INSERT INTO "entry_renderings"/).size
+    assert_equal [url], Entry.find(entry.id).rendering.extracted_pages.keys
   end
 
   test "rendering re-renders when content changed outside callbacks" do

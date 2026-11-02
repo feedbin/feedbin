@@ -274,10 +274,10 @@ class EntryPresenter < BasePresenter
   def extracted_articles
     articles = []
     if entry.data && entry.data["saved_pages"]
+      rendered = entry.rendering.extracted_pages
       entry.data["saved_pages"].each do |url, page|
-        if page["result"]
+        if page["result"] && (content = rendered[url])
           parsed = MercuryParser.new(nil, data: page)
-          content = ContentFormatter.api_format(parsed.content, nil, url)
           data = {
             url: url,
             title: parsed.title,

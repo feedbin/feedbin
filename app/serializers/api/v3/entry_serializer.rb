@@ -154,24 +154,25 @@ module Api
         content && {content: content}
       end
 
-      # A micropost's linked articles, as HarvestLinks saved them.
+      # A micropost's linked articles, as HarvestLinks saved them, with the
+      # stored api rendering of each.
       def extracted
-        pages = @entry.data&.dig("saved_pages")
-        return [] unless pages.respond_to?(:filter_map)
-
-        pages.filter_map do |url, data|
-          next unless data.respond_to?(:dig) && data["result"]
-          page = MercuryParser.new(nil, data: data)
+        rendered = @entry.rendering.extracted_pages
+        rendered.filter_map do |url, html|
+          page = saved_page(url) or next
           {
             url: url,
             title: page.title,
             hostname: Addressable::URI.parse(url).host,
             author: page.author,
-            content: ContentFormatter.api_format(page.content, nil, url)
+            content: html
           }
         rescue
           nil
         end
+      rescue => exception
+        ErrorService.notify(exception, context: {entry_id: @entry.id})
+        []
       end
 
       def saved_page(url)

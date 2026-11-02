@@ -304,7 +304,7 @@ class ContentFormatter
   # The version stored renderings are written with. A stored rendering with
   # another version is re-rendered on read. Bump it with any change that
   # alters output; the fingerprint test fails until you do.
-  VERSION = 1
+  VERSION = 2
 
   # redcarpet paragraphs text entries; addressable normalizes every URL the
   # filters rewrite.
@@ -347,9 +347,10 @@ class ContentFormatter
   }.freeze
 
   # The versions EntryRendering stores for every entry, in storage order.
-  # full is only for a newsletter and diff only for an edited entry; for any
-  # other entry those are nil.
-  VERSIONS = %i[web api full diff].freeze
+  # full is only for a newsletter, diff only for an edited entry, and
+  # extracted only for an entry with saved pages; for any other entry those
+  # are nil.
+  VERSIONS = %i[web api full diff extracted].freeze
 
   def self.render(format, content, entry: nil, base_url: nil)
     FORMATS.fetch(format).new(entry: entry, base_url: base_url).call(content)
@@ -363,8 +364,25 @@ class ContentFormatter
       web: web,
       api: render(:api, source, entry: entry),
       full: (render(:full, source, entry: entry) if entry.feed&.newsletter?),
-      diff: diff(entry, web)
+      diff: diff(entry, web),
+      extracted: extracted(entry)
     }
+  end
+
+  # The api rendering of each page HarvestLinks saved for the entry, as a
+  # JSON object of URL to HTML. A saved page has no entry of its own, so its
+  # URL is the base for its links. Pages that failed to extract or format
+  # are left out; nil when none are left.
+  def self.extracted(entry)
+    pages = entry.data&.dig("saved_pages")
+    return nil unless pages.respond_to?(:each)
+    rendered = pages.each_with_object({}) do |(url, data), hash|
+      next unless data.respond_to?(:dig) && data["result"]
+      hash[url] = render(:api, MercuryParser.new(nil, data: data).content, base_url: url)
+    rescue => exception
+      Rails.logger.info { "ContentFormatter.extracted failed entry=#{entry.id} url=#{url} #{exception.inspect}" }
+    end
+    JSON.generate(rendered) if rendered.any?
   end
 
   # The HTML an entry's web and api versions are formatted from. Text entries

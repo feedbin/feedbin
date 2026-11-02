@@ -25,10 +25,10 @@ class Entry < ApplicationRecord
 
   # What a rendering is made from, besides the feed. A save that changes any
   # of these re-renders. Data and settings hold other keys the formatter
-  # never reads (saved pages, embed_duration, archived_images), and the jobs
+  # never reads (embed_duration, archived_images), and the jobs
   # that keep those current would otherwise re-render on every write.
   RENDERING_COLUMNS = %w[content compressed_original_content url feed_id].freeze
-  RENDERING_DATA_KEYS = %w[format youtube_video_id].freeze
+  RENDERING_DATA_KEYS = %w[format youtube_video_id saved_pages].freeze
   RENDERING_SETTINGS_KEYS = %w[newsletter_from].freeze
 
   before_create :ensure_published
