@@ -63,7 +63,7 @@ module Api
       def readable_feed
         @feed ||= begin
           feed = Feed.find(params[:id])
-          unless @user.can_read_feed?(feed)
+          unless listed_feeds.exists?(id: feed.id)
             render_problem :forbidden, "not_readable",
               title: "Not readable",
               detail: "The feed exists but this account cannot read it."
@@ -81,23 +81,32 @@ module Api
         false
       end
 
-      # Every feed the user can read: the ones they subscribe to and the ones
-      # they have starred entries from, the same rule as readable_feed. One
-      # relation, so the ETag and the list share it. The ids are a single
+      # Every feed the user can read: the ones they subscribe to, have starred
+      # entries from, or have entries from in Airshow's queue, Recently Read or
+      # Recently Played. readable_feed uses the same set. One relation, so the
+      # ETag and the list share it. The ids are a single
       # UNION subquery because Postgres cannot turn two OR'd IN subqueries
       # into joins: it scans every row of feeds, on the 304 path too.
       def listed_feeds
-        ids = @user.subscriptions.select(:feed_id).arel.union(@user.starred_entries.select(:feed_id).arel)
+        sources = [
+          @user.subscriptions.select(:feed_id),
+          @user.starred_entries.select(:feed_id),
+          @user.queued_entries.select(:feed_id),
+          Entry.where(id: @user.recently_read_entries.select(:entry_id)).select(:feed_id),
+          Entry.where(id: @user.recently_played_entries.select(:entry_id)).select(:feed_id)
+        ]
+        ids = sources.map(&:arel).reduce { |union, query| Arel::Nodes::Union.new(union, query) }
         Feed.where(Feed.arel_table[:id].in(ids))
       end
 
-      # The set of feeds changes with the subscriptions list and the starred
-      # list, and a feed's row changes whenever the crawler saves it, so the
-      # two versions and the newest updated_at together move on every change a
-      # client sees.
+      # A digest of the listed ids, not the lists' versions: Recently Read
+      # changes on nearly every read, and a version-based ETag would resend
+      # every feed each poll. The newest updated_at covers the crawler saving
+      # a feed's row.
       def feeds_etag(feeds)
         newest = feeds.maximum(:updated_at)
-        etag_for("feeds", versions.fetch("subscriptions"), versions.fetch("starred"), newest ? (newest.to_r * 1_000_000).to_i : 0)
+        digest = Digest::SHA256.hexdigest(feeds.order(:id).pluck(:id).join(","))[0, 32]
+        etag_for("feeds", digest, newest ? (newest.to_r * 1_000_000).to_i : 0)
       end
 
       def lookup_ids
