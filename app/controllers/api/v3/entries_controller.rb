@@ -5,10 +5,12 @@ module Api
     class EntriesController < ApiController
       MAX_IDS = 500
 
-      # Each sort's column and direction. edited_after= has its own: edits in
-      # the order they happened, so a client catches up from where it was.
+      # Each sort's column and direction. received_asc is how a client fetches
+      # arrivals from the cursor it saved (see GET /sync). edited_after= has
+      # its own: edits in the order they happened.
       SORTS = {
         "received_desc" => [:created_at, :desc],
+        "received_asc" => [:created_at, :asc],
         "published_desc" => [:published, :desc],
         "edited_asc" => [:edited_at, :asc]
       }.freeze
@@ -97,8 +99,8 @@ module Api
           "edited_asc"
         else
           value = params.fetch(:sort, "received_desc")
-          unless %w[received_desc published_desc].include?(value)
-            raise Problems::InvalidParameter.new("sort must be received_desc or published_desc.", pointer: "sort", code: "invalid_value")
+          unless %w[received_desc received_asc published_desc].include?(value)
+            raise Problems::InvalidParameter.new("sort must be received_desc, received_asc or published_desc.", pointer: "sort", code: "invalid_value")
           end
           value
         end

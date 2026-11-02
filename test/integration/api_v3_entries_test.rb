@@ -71,6 +71,21 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_nil second["page"]["next_cursor"]
   end
 
+  test "pages oldest received first with received_asc" do
+    get "/v3/entries", params: {limit: 2, sort: "received_asc"}, headers: bearer
+    first = JSON.parse(response.body)
+    assert_equal @entries.first(2).map(&:id), first["data"].map { _1["id"] }
+
+    get first["page"]["next_url"].delete_prefix("http://api.example.com"), headers: bearer
+    second = JSON.parse(response.body)
+    assert_equal [@entries.last.id], second["data"].map { _1["id"] }
+    assert_nil second["page"]["next_cursor"]
+
+    get "/v3/entries", params: {cursor: first["page"]["next_cursor"]}, headers: bearer
+    assert_response :bad_request
+    assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
+  end
+
   test "keeps pages stable when new entries arrive" do
     get "/v3/entries", params: {limit: 2}, headers: bearer
     cursor = JSON.parse(response.body)["page"]["next_cursor"]
