@@ -63,6 +63,31 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal @subscriptions.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
   end
 
+  test "a subscription with NULL preferences and no title still sends booleans and a title" do
+    feed = @feeds.last
+    feed.update_columns(title: nil, host: "example1.com")
+    @subscriptions.last.update_columns(title: nil, muted: nil, media_only: nil, show_updates: nil)
+
+    get "/v3/subscriptions", params: {expand: "feed"}, headers: bearer
+
+    row = JSON.parse(response.body)["data"].last
+    assert_equal({"muted" => false, "media_only" => false, "show_updates" => true}, row["preferences"])
+    assert_equal "example1.com", row["title"]
+    assert_nil row["custom_title"]
+    assert_nil row["feed"]["title"]
+  end
+
+  test "a tag with no name sends an empty string in the embedded tags" do
+    nameless = Tag.new.tap { _1.save!(validate: false) }
+    @feeds.last.taggings.create!(user: @user, tag: nameless)
+
+    get "/v3/subscriptions", params: {expand: "tags"}, headers: bearer
+
+    assert_response :success
+    tags = JSON.parse(response.body)["data"].last["tags"]
+    assert_equal [{"object" => "tag", "id" => nameless.id, "name" => ""}], tags
+  end
+
   private
 
   def bearer

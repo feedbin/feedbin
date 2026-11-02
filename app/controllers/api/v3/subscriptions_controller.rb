@@ -140,7 +140,7 @@ module Api
       def tags_by_feed_id
         @user.taggings.joins(:tag).pluck(:feed_id, :tag_id, "tags.name")
           .group_by(&:first)
-          .transform_values { |rows| rows.map { _1.drop(1) }.uniq.sort_by { _1.last.downcase } }
+          .transform_values { |rows| rows.map { _1.drop(1) }.uniq.sort_by { _1.last.to_s.downcase } }
       end
 
       # A URL is fetched and its feeds discovered; words are searched against

@@ -122,6 +122,24 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert(subscription.media_only, "Subscription should be media only")
   end
 
+  test "create_multiple stores false, not NULL, when the form sends no media_only" do
+    user = users(:ben)
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex)
+
+    Subscription.create_multiple({feed.id.to_s => {"subscribe" => "1", "title" => "title"}}, user, [feed.id])
+
+    assert_equal false, user.subscriptions.find_by!(feed: feed).read_attribute(:media_only)
+  end
+
+  test "create_multiple stores false for a blank media_only" do
+    user = users(:ben)
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex)
+
+    Subscription.create_multiple({feed.id.to_s => {"subscribe" => "1", "media_only" => ""}}, user, [feed.id])
+
+    assert_equal false, user.subscriptions.find_by!(feed: feed).read_attribute(:media_only)
+  end
+
   test "should not media only" do
     user = users(:ben)
     feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex)

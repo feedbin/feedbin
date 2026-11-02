@@ -16,7 +16,7 @@ module Api
           kind: kind,
           feed_url: @feed.feed_url,
           site_url: @feed.site_url.presence,
-          hostname: @feed.host || hostname(@feed.site_url) || hostname(@feed.feed_url),
+          hostname: @feed.hostname,
           images: {
             favicon: image(@feed.favicon_image_record),
             touch_icon: image(@feed.touch_icon_image_record),
@@ -50,12 +50,6 @@ module Api
 
       def image(record)
         record && ImageSerializer.new(record).to_h
-      end
-
-      def hostname(url)
-        url.presence && Addressable::URI.parse(url).host
-      rescue Addressable::URI::InvalidURIError
-        nil
       end
     end
   end

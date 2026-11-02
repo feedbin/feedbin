@@ -75,6 +75,18 @@ class ApiV3TagsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "a tag with no name lists with an empty string" do
+    nameless = Tag.new.tap { _1.save!(validate: false) }
+    @feeds.last.taggings.create!(user: @user, tag: nameless)
+
+    get "/v3/tags", headers: bearer
+
+    assert_response :success
+    row = JSON.parse(response.body)["data"].find { _1["id"] == nameless.id }
+    assert_equal "", row["name"]
+    assert_equal [@subscriptions.last.id], row["subscription_ids"]
+  end
+
   private
 
   def bearer

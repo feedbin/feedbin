@@ -158,6 +158,13 @@ class Feed < ApplicationRecord
     Rails.logger.info { "Failed to set host for feed: %s" % site_url }
   end
 
+  # Where the feed lives, for naming it when nothing else does: the stored
+  # host, else the host of its site URL, else of its feed URL. nil when none
+  # of them parses.
+  def hostname
+    host.presence || host_of(site_url) || host_of(feed_url)
+  end
+
   def override_title(title)
     @original_title = self.title
     self.title = title
@@ -316,6 +323,12 @@ class Feed < ApplicationRecord
   end
 
   private
+
+  def host_of(url)
+    url.presence && Addressable::URI.parse(url).host.presence
+  rescue Addressable::URI::InvalidURIError
+    nil
+  end
 
   def refresh_favicon
     FaviconCrawler::Finder.perform_async(host)
