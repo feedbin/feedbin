@@ -14,7 +14,7 @@ module Api
           object: "action",
           id: @action.id,
           title: @action.title,
-          kind: @action.action_type,
+          kind: @action.action_type || "standard",
           query: @action.query,
           feed_ids: @action.all_feeds ? [] : @action.feed_ids.reject(&:blank?).map(&:to_i),
           tag_ids: @action.all_feeds ? [] : @action.tag_ids,

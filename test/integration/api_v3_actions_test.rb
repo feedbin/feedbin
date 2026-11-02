@@ -130,6 +130,15 @@ class ApiV3ActionsTest < ActionDispatch::IntegrationTest
     assert_equal [], JSON.parse(response.body)["data"]
   end
 
+  test "an action with no kind stored reads as standard" do
+    action = @user.actions.create!(title: "Old", action_type: :standard, actions: ["star"], all_feeds: true)
+    action.update_column(:action_type, nil)
+
+    get "/v3/actions", headers: bearer
+
+    assert_equal "standard", JSON.parse(response.body)["data"].find { _1["id"] == action.id }&.dig("kind")
+  end
+
   private
 
   def bearer

@@ -43,8 +43,9 @@ module Api
 
       private
 
+      # NULL is an old row from before the column had a default: standard.
       def actions
-        @user.actions.where.not(action_type: :notifier)
+        @user.actions.where(action_type: [nil, *KINDS])
       end
 
       def assign(action, body, required:)

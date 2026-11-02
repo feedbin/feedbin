@@ -8,10 +8,13 @@ module Api
       TRACKED = {"progress_in_seconds" => :progress, "sort_order" => :order, "playlist_id" => :playlist_id}.freeze
       PLAIN = {"duration_in_seconds" => :duration, "skipped_chapters" => :skipped_chapters}.freeze
 
-      def initialize(row, body, pointer: "")
+      # playlist_ids: the user's playlist ids, when a caller writing many rows
+      # has them; otherwise looked up.
+      def initialize(row, body, pointer: "", playlist_ids: nil)
         @row = row
         @body = body
         @pointer = pointer
+        @playlist_ids = playlist_ids
       end
 
       # => [written attribute names, stale attribute names]
@@ -23,7 +26,7 @@ module Api
           value = @body[field]
           raise invalid(field, "invalid_value", "#{field} must be an integer.") unless value.nil? || value.is_a?(Integer)
           raise invalid(field, "invalid_value", "#{field} cannot be null.") if value.nil? && field != "playlist_id"
-          raise invalid(field, "invalid_value", "playlist_id must be one of the user's playlists.") if field == "playlist_id" && value && !@row.user.playlists.exists?(id: value)
+          raise invalid(field, "invalid_value", "playlist_id must be one of the user's playlists.") if field == "playlist_id" && value && !playlist_ids.include?(value)
           stamp = @body["#{field}_updated_at"] or raise invalid("#{field}_updated_at", "missing", "#{field}_updated_at is required with #{field}.")
           proposed = Params.time(stamp) or raise invalid("#{field}_updated_at", "invalid_value", "#{field}_updated_at must be an RFC 3339 timestamp with a UTC offset.")
           # Client stamps carry whole seconds; the stored time has microseconds.
@@ -46,6 +49,10 @@ module Api
       end
 
       private
+
+      def playlist_ids
+        @playlist_ids ||= Playlist.where(user_id: @row.user_id).pluck(:id).to_set
+      end
 
       def invalid(field, code, detail)
         Problems::InvalidParameter.new(detail, pointer: "#{@pointer}/#{field}", code: code)

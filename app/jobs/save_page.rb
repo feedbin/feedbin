@@ -76,11 +76,21 @@ class SavePage
   end
 
   def feed_url
+    self.class.feed_url_for(user)
+  end
+
+  def self.feed_url_for(user)
     hash = Digest::SHA1.hexdigest(user.page_token + user.id.to_s)
     URI::HTTP.build(
       host: ENV["PAGES_DOMAIN"],
       path: "/#{hash}"
     ).to_s
+  end
+
+  # The key a saved page's entry is found by, so callers can tell whether a
+  # URL is already saved.
+  def self.public_id_for(user, url)
+    Digest::SHA1.hexdigest(feed_url_for(user) + url)
   end
 
   def parsed_result
@@ -104,7 +114,7 @@ class SavePage
   end
 
   def public_id
-    Digest::SHA1.hexdigest(feed_url + url)
+    self.class.public_id_for(user, url)
   end
 
   def pages_feed

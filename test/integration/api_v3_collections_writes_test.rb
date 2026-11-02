@@ -358,6 +358,22 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     assert_equal 1, reads
   end
 
+  test "a bulk update checks playlists with one query" do
+    @user.podcast_subscriptions.create!(feed: @feed, status: :subscribed)
+    playlist = @user.playlists.create!(title: "Commute")
+    @entries.each_with_index { |entry, i| QueuedEntry.create!(user_id: @user.id, entry_id: entry.id, feed_id: @feed.id, order: i) }
+    rows = @entries.map { {id: _1.id, playlist_id: playlist.id, playlist_id_updated_at: Time.now.iso8601} }
+
+    reads = 0
+    counter = ->(*, payload) { reads += 1 if payload[:sql].match?(/FROM "playlists"/) }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+      patch "/v3/collections/queue/entries", params: {entries: rows}.to_json, headers: json
+    end
+
+    assert_equal @entries.map(&:id), JSON.parse(response.body)["applied"]
+    assert_equal 1, reads
+  end
+
   private
 
   # Unread entries titled Swift, published oldest first, indexed for search.

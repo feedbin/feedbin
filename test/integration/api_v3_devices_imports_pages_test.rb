@@ -92,7 +92,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
         user = User.find(user_id)
         feed = Feed.create_with(title: "Pages", feed_type: :pages, protected: true).find_or_create_by!(feed_url: "http://pages.test/#{user.id}")
         user.subscriptions.create_with(kind: :generated).find_or_create_by!(feed: feed)
-        entry = feed.entries.create_with(title: title, url: url, entry_id: SecureRandom.hex).find_or_create_by!(public_id: Digest::SHA1.hexdigest(url))
+        entry = feed.entries.create_with(title: title, url: url, entry_id: SecureRandom.hex).find_or_create_by!(public_id: SavePage.public_id_for(user, url))
       end
     }) do
       post "/v3/pages", params: {url: "https://example.com/long-read", title: "A Long Read"}.to_json, headers: json
@@ -133,7 +133,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
         user = User.find(user_id)
         feed = Feed.create_with(title: "Pages", feed_type: :pages, protected: true).find_or_create_by!(feed_url: "http://pages.test/#{user.id}")
         user.subscriptions.create_with(kind: :generated).find_or_create_by!(feed: feed)
-        entry = feed.entries.create_with(title: title, url: url, entry_id: SecureRandom.hex).find_or_create_by!(public_id: Digest::SHA1.hexdigest(url))
+        entry = feed.entries.create_with(title: title, url: url, entry_id: SecureRandom.hex).find_or_create_by!(public_id: SavePage.public_id_for(user, url))
         entry.update!(title: "From the embed")
         entry
       end
@@ -164,6 +164,19 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     post "/v3/devices", params: {push_token: "def456", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: "staging"}.to_json, headers: json
     assert_response :unprocessable_content
     assert_equal "/apns_environment", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
+  test "a page already in an unsubscribed Pages feed answers 200" do
+    url = "https://example.com/again"
+    feed = Feed.create!(title: "Pages", feed_type: :pages, protected: true, feed_url: "http://pages.test/#{@user.id}")
+    existing = feed.entries.create!(title: "Again", url: url, entry_id: SecureRandom.hex, public_id: SavePage.public_id_for(@user, url))
+
+    SavePage.stub(:new, Object.new.tap { |saver| saver.define_singleton_method(:perform) { |*| existing } }) do
+      post "/v3/pages", params: {url: url}.to_json, headers: json
+    end
+
+    assert_response :success
+    assert_equal existing.id, JSON.parse(response.body)["id"]
   end
 
   private

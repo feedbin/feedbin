@@ -80,6 +80,7 @@ module Api
         raise Problems::InvalidParameter.new("entries takes at most #{MAX_IDS} rows.", pointer: "/entries", code: "too_many") if rows.size > MAX_IDS
 
         queued = @user.queued_entries.where(entry_id: rows.map { _1["id"] }).index_by(&:entry_id)
+        playlist_ids = @user.playlists.pluck(:id).to_set
         applied = []
         skipped = []
         ActiveRecord::Base.transaction do
@@ -88,7 +89,7 @@ module Api
             next skipped << {id: body["id"], reason: "not_found"} unless row
             # A row whose every sent field was stale is skipped; one that sent
             # nothing to change has nothing stale and is applied.
-            written, stale = QueueMembershipWrite.new(row, body, pointer: "/entries/#{index}").apply
+            written, stale = QueueMembershipWrite.new(row, body, pointer: "/entries/#{index}", playlist_ids: playlist_ids).apply
             (written.empty? && stale.any?) ? skipped << {id: body["id"], reason: "stale_write"} : applied << body["id"]
           end
         end
