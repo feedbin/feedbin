@@ -103,6 +103,17 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :unsupported_media_type
   end
 
+  test "takes the token as a query parameter only outside production" do
+    get "/v3/subscriptions", params: {access_token: @token.plaintext_token}
+
+    assert_response :success
+
+    Rails.env.stub(:local?, false) do
+      get "/v3/subscriptions", params: {access_token: @token.plaintext_token}
+    end
+    assert_response :unauthorized
+  end
+
   test "serves the v3 root" do
     get "/v3", headers: bearer(@token.plaintext_token)
 

@@ -1,6 +1,8 @@
 # Bearer tokens issued by Doorkeeper, and nothing else: v3 never takes the
 # account password, not even as HTTP Basic auth. Sets @user and @token, then
-# checks the account may use v3 at all.
+# checks the account may use v3 at all. In development and test only, the
+# token may also arrive as ?access_token= (RFC 6750 §2.3) so a response can
+# be looked at in a browser tab; production ignores it.
 module Api
   module V3
     module Authentication
@@ -18,6 +20,7 @@ module Api
 
       def authenticate
         @user = authenticate_with_http_token { |token, _options| user_for_token(token) }
+        @user ||= user_for_token(params[:access_token]) if params[:access_token].present? && Rails.env.local?
         status_unauthorized unless @user
       end
 
