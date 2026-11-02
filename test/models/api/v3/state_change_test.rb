@@ -38,6 +38,16 @@ class Api::V3::StateChangeTest < ActiveSupport::TestCase
     assert_equal [], starred_ids
   end
 
+  test "mark_read clears an unread row whose feed is no longer subscribed" do
+    UnreadEntry.create_from_owners(@user, @other)
+
+    result = change("mark_read" => [@other.id], "star" => [@other.id])
+
+    assert_equal({"mark_read" => [@other.id], "star" => []}, result[:applied])
+    assert_equal [{id: @other.id, reason: "not_subscribed"}], result[:skipped]
+    assert_equal [], UnreadEntry.where(user_id: @user.id, entry_id: @other.id).pluck(:entry_id)
+  end
+
   test "a starred entry from an unsubscribed feed can be unstarred" do
     StarredEntry.create_from_owners(@user, @other)
 

@@ -11,9 +11,12 @@ module Api
         @versions ||= SyncVersion.for(@user)
       end
 
-      # The ETag a list sends: "<list>:<version>", quoted and strong.
+      # The ETag a list sends: "<list>:<user id>:<version>", quoted and strong.
+      # The user id is there because a URL-keyed client cache survives an
+      # account switch on the same device, and two accounts at the same
+      # version must not match.
       def list_etag(list)
-        %("#{list}:#{versions.fetch(list)}")
+        %("#{list}:#{@user.id}:#{versions.fetch(list)}")
       end
 
       # Sets the ETag and answers 304 when the client already has this

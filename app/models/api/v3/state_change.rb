@@ -9,7 +9,8 @@ module Api
       OPPOSITES = {"mark_unread" => "mark_read", "unstar" => "star"}.freeze
       MAX_IDS = 1_000
 
-      Permission = Struct.new(:entry, :reason)
+      # unread: the user has an unread row, which mark_read may always clear.
+      Permission = Struct.new(:entry, :reason, :unread)
 
       def initialize(user, body)
         @user = user
@@ -25,7 +26,7 @@ module Api
         skipped = {}
         ActiveRecord::Base.transaction do
           verbs.each do |verb, ids|
-            allowed, denied = ids.partition { permissions[_1].reason.nil? }
+            allowed, denied = ids.partition { allowed?(verb, permissions[_1]) }
             denied.each { skipped[_1] ||= permissions[_1].reason }
             apply(verb, allowed.map { permissions[_1].entry })
             applied[verb] = allowed
@@ -69,17 +70,25 @@ module Api
         entries = Entry.where(id: ids).select(:id, :feed_id, :published, :created_at).index_by(&:id)
         subscribed = @user.subscriptions.where(feed_id: entries.values.map(&:feed_id).uniq).pluck(:feed_id).to_set
         starred = @user.starred_entries.where(entry_id: ids).pluck(:entry_id).to_set
+        unread = @user.unread_entries.where(entry_id: ids).pluck(:entry_id).to_set
 
         ids.index_with do |id|
           entry = entries[id]
           if entry.nil?
-            Permission.new(nil, "not_found")
+            Permission.new(nil, "not_found", false)
           elsif subscribed.include?(entry.feed_id) || starred.include?(id)
-            Permission.new(entry, nil)
+            Permission.new(entry, nil, unread.include?(id))
           else
-            Permission.new(entry, "not_subscribed")
+            Permission.new(entry, "not_subscribed", unread.include?(id))
           end
         end
+      end
+
+      # mark_read may clear any unread row the user has, as v2 did: an unread
+      # row can outlive its subscription (FeedReplacer moves subscriptions),
+      # and a client must be able to clear what the unread list shows.
+      def allowed?(verb, permission)
+        permission.reason.nil? || (verb == "mark_read" && permission.unread)
       end
 
       def apply(verb, entries)

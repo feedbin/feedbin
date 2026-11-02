@@ -62,7 +62,7 @@ module Api
         meta = total ? {total: total} : {}
         render_list(
           serialize(entries),
-          page: page_object(limit: limit, next_cursor: next_cursor),
+          page: page_object(limit: limit, next_cursor: next_cursor, more: more),
           meta: meta
         )
       end

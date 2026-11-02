@@ -81,12 +81,15 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_equal [@entries.last.id], second["data"].map { _1["id"] }
     tail = second["page"]["next_cursor"]
     assert tail.present?
+    assert_nil second["page"]["next_url"]
+    assert first["page"]["next_url"].present?
     assert_equal @entries.last.id, Api::V3::Cursor.decode(tail)["id"]
 
     get "/v3/entries", params: {sort: "received_asc", cursor: tail}, headers: bearer
     empty = JSON.parse(response.body)
     assert_equal [], empty["data"]
     assert_equal tail, empty["page"]["next_cursor"]
+    assert_nil empty["page"]["next_url"]
 
     arrival = @feed.entries.create!(title: "New", url: "https://example.com/new", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
     get "/v3/entries", params: {sort: "received_asc", cursor: tail}, headers: bearer

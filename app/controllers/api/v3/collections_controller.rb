@@ -13,7 +13,8 @@ module Api
         association = COLLECTIONS[params[:id]] or return status_not_found
         return if not_modified?(list_etag(params[:id]))
 
-        render_list(@user.public_send(association).order(:entry_id).pluck(:entry_id))
+        # starred_entries.entry_id is nullable; an id list holds integers only.
+        render_list(@user.public_send(association).where.not(entry_id: nil).order(:entry_id).pluck(:entry_id))
       end
     end
   end

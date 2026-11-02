@@ -26,11 +26,14 @@ module Api
         render json: body
       end
 
-      def page_object(limit:, next_cursor:)
+      # next_url is the page to follow now and is null at the end. next_cursor
+      # is where to resume; for a sort that follows arrivals it outlives
+      # next_url (more: false), so the two are passed separately.
+      def page_object(limit:, next_cursor:, more: next_cursor.present?)
         {
           limit: limit,
           next_cursor: next_cursor,
-          next_url: next_cursor && next_page_url(next_cursor)
+          next_url: more ? next_page_url(next_cursor) : nil
         }
       end
 

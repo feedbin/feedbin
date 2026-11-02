@@ -23,7 +23,7 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal @feeds.map(&:id), body["data"].map { _1["feed"]["id"] }
     assert_equal ["Apple", "News"], body["data"].first["tags"].map { _1["name"] }
     assert_equal [], body["data"].last["tags"]
-    assert_equal %("subscriptions:#{SyncVersion.for(@user)["subscriptions"]}"), response.headers["ETag"]
+    assert_equal %("subscriptions:#{@user.id}:#{SyncVersion.for(@user)["subscriptions"]}"), response.headers["ETag"]
   end
 
   test "returns 304 until a subscription changes" do
