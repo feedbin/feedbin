@@ -34,9 +34,14 @@ module Api
           attributes[column] = value unless updated_at(body, "#{field}_updated_at") < playlist.public_send("#{column}_updated_at").floor
         end
         if attributes.key?(:title) && @user.playlists.where.not(id: playlist.id).exists?(title: attributes[:title])
-          raise invalid("title", "taken", "A playlist with that title already exists.")
+          raise taken
         end
-        playlist.update!(attributes) if attributes.any?
+        begin
+          playlist.update!(attributes) if attributes.any?
+        rescue ActiveRecord::RecordNotUnique
+          # Another request took the title between the check and the write.
+          raise taken
+        end
         render json: PlaylistSerializer.new(playlist).to_h
       end
 
@@ -61,6 +66,10 @@ module Api
       def updated_at(body, field)
         stamp = body[field] or raise invalid(field, "missing", "#{field} is required with #{field.delete_suffix("_updated_at")}.")
         Params.time(stamp) or raise invalid(field, "invalid_value", "#{field} must be an RFC 3339 timestamp with a UTC offset.")
+      end
+
+      def taken
+        invalid("title", "taken", "A playlist with that title already exists.")
       end
 
       def invalid(field, code, detail)

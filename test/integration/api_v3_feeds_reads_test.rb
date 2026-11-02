@@ -89,6 +89,14 @@ class ApiV3FeedsReadsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "a lookup whose discovery fails is not found" do
+    FeedFinder.stub(:feeds, ->(*) { raise OpenSSL::SSL::SSLError }) do
+      get "/v3/feeds/lookup", params: {url: "https://broken.example"}
+    end
+
+    assert_response :not_found
+  end
+
   private
 
   def bearer

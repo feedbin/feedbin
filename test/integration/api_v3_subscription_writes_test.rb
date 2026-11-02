@@ -196,6 +196,20 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_equal ["Arts, Culture"], Tag.where(id: JSON.parse(response.body)["tag_ids"]).pluck(:name)
   end
 
+  test "a discovery failure is not found" do
+    [OpenSSL::SSL::SSLError, Errno::ECONNREFUSED, Timeout::Error].each do |error|
+      FeedFinder.stub(:feeds, ->(*) { raise error }) do
+        post "/v3/subscriptions", params: {url: "https://broken.example"}.to_json, headers: json
+      end
+      assert_response :not_found, error.name
+    end
+
+    Feed.stub(:search, ->(*) { raise Search::Connection::ResponseError, "down" }) do
+      post "/v3/subscriptions", params: {url: "daring fireball"}.to_json, headers: json
+    end
+    assert_response :not_found
+  end
+
   private
 
   def bearer

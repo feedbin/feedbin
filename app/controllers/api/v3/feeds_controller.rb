@@ -119,6 +119,9 @@ module Api
         FeedFinder.feeds(url).first
       rescue Feedkit::Error, HTTP::Error, Addressable::URI::InvalidURIError
         nil
+      rescue => exception
+        ErrorService.notify(exception)
+        nil
       end
 
       def throttle_lookup

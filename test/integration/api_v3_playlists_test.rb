@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class ApiV3PlaylistsTest < ActionDispatch::IntegrationTest
   setup do
@@ -52,6 +53,18 @@ class ApiV3PlaylistsTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_content
     assert_equal "/title_updated_at", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
+  test "a rename that loses a race for the title is taken" do
+    playlist = @user.playlists.create!(title: "Commute")
+
+    Playlist.stub_any_instance(:update!, ->(*) { raise ActiveRecord::RecordNotUnique, "duplicate key" }) do
+      patch "/v3/playlists/#{playlist.id}", params: {title: "Drive", title_updated_at: Time.now.iso8601}.to_json, headers: json
+    end
+
+    assert_response :unprocessable_content
+    error = JSON.parse(response.body)["errors"].first
+    assert_equal ["/title", "taken"], error.values_at("pointer", "code")
   end
 
   private

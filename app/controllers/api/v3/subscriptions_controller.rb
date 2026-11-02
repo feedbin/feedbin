@@ -144,7 +144,9 @@ module Api
       end
 
       # A URL is fetched and its feeds discovered; words are searched against
-      # known feeds. Discovery failures are "no feed found".
+      # known feeds (three at most). Any failure is "no feed found": a fetch
+      # of someone else's site fails in more ways than can be listed. The
+      # unexpected ones are reported.
       def discover(query)
         if query.start_with?("http") || (query.include?(".") && !query.include?(" "))
           FeedFinder.feeds(query).to_a
@@ -152,6 +154,9 @@ module Api
           Feed.search(query).to_a
         end
       rescue Feedkit::Error, HTTP::Error, Addressable::URI::InvalidURIError
+        []
+      rescue => exception
+        ErrorService.notify(exception)
         []
       end
 
