@@ -125,7 +125,10 @@ Rails.application.routes.draw do
           post :state, on: :collection
         end
         resources :tokens, only: [:index, :destroy]
-        resources :subscriptions, only: [:index]
+        get "subscriptions.opml", to: "subscriptions#export", format: false
+        resources :subscriptions, only: [:index, :show, :create, :update, :destroy] do
+          put :tags, on: :member
+        end
         resources :feeds, only: [:index]
         resources :tags, only: [:index, :update, :destroy]
         get "collections/:id/ids", to: "collections#ids"
