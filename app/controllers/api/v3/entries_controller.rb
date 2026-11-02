@@ -3,21 +3,9 @@ module Api
     # GET /entries: the timeline, the entries whose content changed, or a
     # set of entries by id. There is no GET /entries/{id}; ids= covers it.
     class EntriesController < ApiController
-      MAX_IDS = 500
+      include Timeline
 
-      # There is no sort parameter. The timeline is newest received first, and
-      # a cursor carries its own order: a timeline page continues the
-      # timeline, and the two stream cursors a timeline page hands out
-      # (meta.arrivals_cursor, meta.edits_cursor) follow arrivals and edits
-      # oldest first. A stream's last page still ends with a cursor
-      # (tail_cursor).
-      TIMELINE = "received_desc"
-      ORDERS = {
-        "received_desc" => [:created_at, :desc],
-        "received_asc" => [:created_at, :asc],
-        "edited_asc" => [:edited_at, :asc]
-      }.freeze
-      STREAMS = %w[received_asc edited_asc].freeze
+      MAX_IDS = 500
 
       def index
         params.key?(:ids) ? render_ids : render_timeline
@@ -43,123 +31,6 @@ module Api
         )
       end
 
-      def render_timeline
-        limit = page_limit
-        scope = filtered_entries
-        total = scope.count if boolean_param(:total)
-
-        column, direction = ORDERS.fetch(order)
-        scope = scope.where.not(edited_at: nil) if order == "edited_asc"
-        scope = after_cursor(scope, column, direction)
-        entries = scope.merge(with_associations)
-          .order(column => direction, :id => direction)
-          .limit(limit + 1)
-          .to_a
-
-        more = entries.size > limit
-        entries.pop if more
-        next_cursor = if more
-          cursor_at(entries.last, column)
-        elsif STREAMS.include?(order)
-          tail_cursor(entries, column)
-        end
-
-        meta = {as_of: as_of}
-        meta.merge!(stream_cursors(entries)) if order == TIMELINE && params[:cursor].blank?
-        meta[:total] = total if total
-        render_list(
-          serialize(entries),
-          page: page_object(limit: limit, next_cursor: next_cursor, more: more),
-          meta: meta
-        )
-      end
-
-      def cursor_at(entry, column)
-        Cursor.encode(sort: order, timestamp: microseconds(entry.public_send(column)), id: entry.id)
-      end
-
-      # The default timeline page hands a client its two stream positions, so
-      # it can show the newest entries and start following arrivals and edits
-      # from there without paging through history. Arrivals resume after the
-      # newest entry on the page; edits from the response time, since the
-      # page already carries every edit made before it.
-      def stream_cursors(entries)
-        now = Time.at(Rational(microseconds(Time.now), 1_000_000)).utc
-        arrivals = if entries.any?
-          Cursor.encode(sort: "received_asc", timestamp: microseconds(entries.first.created_at), id: entries.first.id)
-        else
-          Cursor.encode(sort: "received_asc", timestamp: microseconds(now), id: 0)
-        end
-        {
-          arrivals_cursor: arrivals,
-          edits_cursor: Cursor.encode(sort: "edited_asc", timestamp: microseconds(now), id: 0)
-        }
-      end
-
-      # A stream's last page still ends with a cursor to resume from: after
-      # the last entry, or the cursor the client sent when nothing is new. A
-      # stream is only ever entered through a cursor, so one is always there.
-      def tail_cursor(entries, column)
-        entries.any? ? cursor_at(entries.last, column) : params[:cursor]
-      end
-
-      def with_associations
-        Entry.with_list_associations.with_renderings.preload(feed: :touch_icon_image_record)
-      end
-
-      # With expand=feed, each feed is serialized once per response, however
-      # many of its entries are on the page.
-      def serialize(entries)
-        expand = expansions(EntrySerializer::EXPANSIONS)
-        feed_hashes = if expand.include?("feed")
-          entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
-        else
-          {}
-        end
-        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id], expand: expand).to_h }
-      end
-
-      def filtered_entries
-        scope = Entry.where(feed_id: @user.subscriptions.select(:feed_id))
-
-        case boolean_param(:read)
-        when true then scope = scope.where.not(id: @user.unread_entries.select(:entry_id))
-        when false then scope = scope.where(id: @user.unread_entries.select(:entry_id))
-        end
-
-        case boolean_param(:starred)
-        when true then scope = scope.where(id: @user.starred_entries.select(:entry_id))
-        when false then scope = scope.where.not(id: @user.starred_entries.select(:entry_id))
-        end
-
-        if (time = time_param(:received_after))
-          scope = scope.where("entries.created_at > ?", time)
-        end
-
-        scope
-      end
-
-      # The order comes from the cursor; without one, the timeline.
-      def order
-        @order ||= begin
-          fields = cursor_fields
-          value = fields ? fields["sort"] : TIMELINE
-          raise Cursor::Invalid unless ORDERS.key?(value)
-          value
-        end
-      end
-
-      # A cursor with fields that don't parse is invalid rather than silently
-      # restarting.
-      def after_cursor(scope, column, direction)
-        fields = cursor_fields or return scope
-        timestamp, id = fields.values_at("timestamp", "id")
-        raise Cursor::Invalid unless timestamp.is_a?(Integer) && id.is_a?(Integer)
-
-        operator = (direction == :asc) ? ">" : "<"
-        scope.where("(entries.#{column}, entries.id) #{operator} (?, ?)", Time.at(Rational(timestamp, 1_000_000)).utc, id)
-      end
-
       def requested_ids
         ids = params[:ids].to_s.split(",").map { Integer(_1.strip, exception: false) }
         if ids.empty? || ids.any? { _1.nil? || _1 <= 0 }
@@ -171,25 +42,6 @@ module Api
         ids.uniq
       end
 
-      def boolean_param(name)
-        return nil unless params.key?(name)
-        case params[name]
-        when "true" then true
-        when "false" then false
-        else raise Problems::InvalidParameter.new("#{name} must be true or false.", pointer: name.to_s, code: "invalid_value")
-        end
-      end
-
-      def time_param(name)
-        return nil unless params.key?(name)
-        Time.iso8601(params[name].to_s)
-      rescue ArgumentError
-        raise Problems::InvalidParameter.new("#{name} must be an RFC 3339 timestamp.", pointer: name.to_s, code: "invalid_value")
-      end
-
-      def microseconds(time)
-        (time.to_r * 1_000_000).to_i
-      end
     end
   end
 end

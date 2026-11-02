@@ -129,7 +129,10 @@ Rails.application.routes.draw do
         resources :subscriptions, only: [:index, :show, :create, :update, :destroy] do
           put :tags, on: :member
         end
-        resources :feeds, only: [:index]
+        get "feeds/lookup", to: "feeds#lookup"
+        resources :feeds, only: [:index, :show] do
+          get :entries, on: :member
+        end
         resources :tags, only: [:index, :update, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           post :purchases
