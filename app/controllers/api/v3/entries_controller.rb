@@ -5,16 +5,19 @@ module Api
     class EntriesController < ApiController
       MAX_IDS = 500
 
-      # Each sort's column and direction. The two ascending sorts follow a
-      # stream from a saved cursor: received_asc for arrivals, edited_asc for
-      # edits. Their last page still ends with a cursor (tail_cursor).
-      SORTS = {
+      # There is no sort parameter. The timeline is newest received first, and
+      # a cursor carries its own order: a timeline page continues the
+      # timeline, and the two stream cursors a timeline page hands out
+      # (meta.arrivals_cursor, meta.edits_cursor) follow arrivals and edits
+      # oldest first. A stream's last page still ends with a cursor
+      # (tail_cursor).
+      TIMELINE = "received_desc"
+      ORDERS = {
         "received_desc" => [:created_at, :desc],
         "received_asc" => [:created_at, :asc],
-        "published_desc" => [:published, :desc],
         "edited_asc" => [:edited_at, :asc]
       }.freeze
-      TAIL_SORTS = {"received_asc" => :received_after, "edited_asc" => :edited_after}.freeze
+      STREAMS = %w[received_asc edited_asc].freeze
 
       def index
         params.key?(:ids) ? render_ids : render_timeline
@@ -45,8 +48,8 @@ module Api
         scope = filtered_entries
         total = scope.count if boolean_param(:total)
 
-        column, direction = SORTS.fetch(sort)
-        scope = scope.where.not(edited_at: nil) if sort == "edited_asc"
+        column, direction = ORDERS.fetch(order)
+        scope = scope.where.not(edited_at: nil) if order == "edited_asc"
         scope = after_cursor(scope, column, direction)
         entries = scope.merge(with_associations)
           .order(column => direction, :id => direction)
@@ -57,12 +60,12 @@ module Api
         entries.pop if more
         next_cursor = if more
           cursor_at(entries.last, column)
-        elsif TAIL_SORTS.key?(sort)
+        elsif STREAMS.include?(order)
           tail_cursor(entries, column)
         end
 
         meta = {as_of: as_of}
-        meta.merge!(stream_cursors(entries)) if sort == "received_desc"
+        meta.merge!(stream_cursors(entries)) if order == TIMELINE && params[:cursor].blank?
         meta[:total] = total if total
         render_list(
           serialize(entries),
@@ -72,7 +75,7 @@ module Api
       end
 
       def cursor_at(entry, column)
-        Cursor.encode(sort: sort, timestamp: microseconds(entry.public_send(column)), id: entry.id)
+        Cursor.encode(sort: order, timestamp: microseconds(entry.public_send(column)), id: entry.id)
       end
 
       # The default timeline page hands a client its two stream positions, so
@@ -93,15 +96,11 @@ module Api
         }
       end
 
-      # A stream sort's last page still ends with a cursor to resume from:
-      # after the last entry, or the cursor the client sent, or one at the
-      # sort's time filter (no later than now) for a first poll.
+      # A stream's last page still ends with a cursor to resume from: after
+      # the last entry, or the cursor the client sent when nothing is new. A
+      # stream is only ever entered through a cursor, so one is always there.
       def tail_cursor(entries, column)
-        return cursor_at(entries.last, column) if entries.any?
-        return params[:cursor] if params[:cursor].present?
-
-        start = [time_param(TAIL_SORTS.fetch(sort)), Time.now].compact.min
-        Cursor.encode(sort: sort, timestamp: microseconds(start), id: 0)
+        entries.any? ? cursor_at(entries.last, column) : params[:cursor]
       end
 
       def with_associations
@@ -137,33 +136,25 @@ module Api
           scope = scope.where("entries.created_at > ?", time)
         end
 
-        if (time = time_param(:edited_after))
-          scope = scope.where("entries.edited_at > ?", time)
-        end
-
         scope
       end
 
-      def sort
-        @sort ||= if params.key?(:edited_after)
-          "edited_asc"
-        else
-          value = params.fetch(:sort, "received_desc")
-          unless SORTS.key?(value)
-            raise Problems::InvalidParameter.new("sort must be one of #{SORTS.keys.join(", ")}.", pointer: "sort", code: "invalid_value")
-          end
+      # The order comes from the cursor; without one, the timeline.
+      def order
+        @order ||= begin
+          fields = cursor_fields
+          value = fields ? fields["sort"] : TIMELINE
+          raise Cursor::Invalid unless ORDERS.key?(value)
           value
         end
       end
 
-      # A cursor from a different sort, or with fields that don't parse, is
-      # invalid rather than silently restarting.
+      # A cursor with fields that don't parse is invalid rather than silently
+      # restarting.
       def after_cursor(scope, column, direction)
         fields = cursor_fields or return scope
         timestamp, id = fields.values_at("timestamp", "id")
-        unless fields["sort"] == sort && timestamp.is_a?(Integer) && id.is_a?(Integer)
-          raise Cursor::Invalid
-        end
+        raise Cursor::Invalid unless timestamp.is_a?(Integer) && id.is_a?(Integer)
 
         operator = (direction == :asc) ? ">" : "<"
         scope.where("(entries.#{column}, entries.id) #{operator} (?, ?)", Time.at(Rational(timestamp, 1_000_000)).utc, id)

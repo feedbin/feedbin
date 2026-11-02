@@ -78,7 +78,8 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
 
   test "the first timeline page hands out the stream cursors" do
     get "/v3/entries", params: {limit: 2}, headers: bearer
-    meta = JSON.parse(response.body)["meta"]
+    body = JSON.parse(response.body)
+    meta = body["meta"]
     assert_equal %w[as_of arrivals_cursor edits_cursor], meta.keys
 
     arrivals = Api::V3::Cursor.decode(meta["arrivals_cursor"])
@@ -90,12 +91,12 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     arrival = @feed.entries.create!(title: "New", url: "https://example.com/new", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
     @entries.first.update!(revision: 2, edited_at: Time.now)
 
-    get "/v3/entries", params: {sort: "received_asc", cursor: meta["arrivals_cursor"]}, headers: bearer
+    get "/v3/entries", params: {cursor: meta["arrivals_cursor"]}, headers: bearer
     assert_equal [arrival.id], JSON.parse(response.body)["data"].map { _1["id"] }
-    get "/v3/entries", params: {sort: "edited_asc", cursor: meta["edits_cursor"]}, headers: bearer
+    get "/v3/entries", params: {cursor: meta["edits_cursor"]}, headers: bearer
     assert_equal [@entries.first.id], JSON.parse(response.body)["data"].map { _1["id"] }
 
-    get "/v3/entries", params: {sort: "published_desc"}, headers: bearer
+    get "/v3/entries", params: {cursor: body["page"]["next_cursor"]}, headers: bearer
     assert_equal %w[as_of], JSON.parse(response.body)["meta"].keys
   end
 
@@ -120,50 +121,33 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_nil second["page"]["next_cursor"]
   end
 
-  test "pages oldest received first with received_asc and always leaves a cursor to resume from" do
-    get "/v3/entries", params: {limit: 2, sort: "received_asc"}, headers: bearer
+  test "an arrivals cursor pages new entries oldest first and always leaves a cursor to resume from" do
+    get "/v3/entries", params: {limit: 1}, headers: bearer
+    saved = JSON.parse(response.body)["meta"]["arrivals_cursor"]
+    new_entries = 2.times.map { |i| @feed.entries.create!(title: "New #{i}", url: "https://example.com/new/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, created_at: (i + 1).minutes.from_now) }
+
+    get "/v3/entries", params: {limit: 1, cursor: saved}, headers: bearer
     first = JSON.parse(response.body)
-    assert_equal @entries.first(2).map(&:id), first["data"].map { _1["id"] }
+    assert_equal [new_entries.first.id], first["data"].map { _1["id"] }
+    assert first["page"]["next_url"].present?
 
     get first["page"]["next_url"].delete_prefix("http://api.example.com"), headers: bearer
     second = JSON.parse(response.body)
-    assert_equal [@entries.last.id], second["data"].map { _1["id"] }
+    assert_equal [new_entries.last.id], second["data"].map { _1["id"] }
     tail = second["page"]["next_cursor"]
-    assert tail.present?
+    assert_equal new_entries.last.id, Api::V3::Cursor.decode(tail)["id"]
     assert_nil second["page"]["next_url"]
-    assert first["page"]["next_url"].present?
-    assert_equal @entries.last.id, Api::V3::Cursor.decode(tail)["id"]
 
-    get "/v3/entries", params: {sort: "received_asc", cursor: tail}, headers: bearer
+    get "/v3/entries", params: {cursor: tail}, headers: bearer
     empty = JSON.parse(response.body)
     assert_equal [], empty["data"]
     assert_equal tail, empty["page"]["next_cursor"]
     assert_nil empty["page"]["next_url"]
+    assert_equal %w[as_of], empty["meta"].keys
 
-    arrival = @feed.entries.create!(title: "New", url: "https://example.com/new", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
-    get "/v3/entries", params: {sort: "received_asc", cursor: tail}, headers: bearer
+    arrival = @feed.entries.create!(title: "Newer", url: "https://example.com/newer", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, created_at: 3.minutes.from_now)
+    get "/v3/entries", params: {cursor: tail}, headers: bearer
     assert_equal [arrival.id], JSON.parse(response.body)["data"].map { _1["id"] }
-
-    get "/v3/entries", params: {cursor: first["page"]["next_cursor"]}, headers: bearer
-    assert_response :bad_request
-    assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
-  end
-
-  test "bootstraps an arrivals cursor from received_after or the request time" do
-    get "/v3/entries", params: {sort: "received_asc", received_after: 1.minute.ago.iso8601}, headers: bearer
-    body = JSON.parse(response.body)
-    assert_equal [], body["data"]
-    cursor = Api::V3::Cursor.decode(body["page"]["next_cursor"])
-    assert_equal ["received_asc", 0], [cursor["sort"], cursor["id"]]
-    assert_in_delta 1.minute.ago.to_f, cursor["timestamp"] / 1_000_000.0, 5
-
-    get "/v3/entries", params: {sort: "received_asc", received_after: 1.day.from_now.iso8601}, headers: bearer
-    body = JSON.parse(response.body)
-    assert_equal [], body["data"]
-    assert_in_delta Time.now.to_f, Api::V3::Cursor.decode(body["page"]["next_cursor"])["timestamp"] / 1_000_000.0, 5
-
-    get "/v3/entries", params: {sort: "received_desc"}, headers: bearer
-    assert_nil JSON.parse(response.body)["page"]["next_cursor"]
   end
 
   test "keeps pages stable when new entries arrive" do
@@ -176,20 +160,16 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_equal [@entries.first.id], JSON.parse(response.body)["data"].map { _1["id"] }
   end
 
-  test "sorts by published date" do
-    get "/v3/entries", params: {sort: "published_desc"}, headers: bearer
-
-    assert_equal @entries.reverse.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
-  end
-
-  test "rejects a cursor from another sort" do
-    get "/v3/entries", params: {limit: 1}, headers: bearer
-    cursor = JSON.parse(response.body)["page"]["next_cursor"]
-
-    get "/v3/entries", params: {limit: 1, sort: "published_desc", cursor: cursor}, headers: bearer
-
-    assert_response :bad_request
-    assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
+  test "rejects a cursor that is not one of ours" do
+    [
+      "zz",
+      Api::V3::Cursor.encode(sort: "published_desc", timestamp: 1, id: 1),
+      Api::V3::Cursor.encode(sort: "received_asc", timestamp: "1", id: 1)
+    ].each do |cursor|
+      get "/v3/entries", params: {cursor: cursor}, headers: bearer
+      assert_response :bad_request, cursor
+      assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
+    end
   end
 
   test "filters by read and starred" do
@@ -213,39 +193,22 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_equal [@entries.last.id], JSON.parse(response.body)["data"].map { _1["id"] }
   end
 
-  test "lists edits in the order they happened" do
-    @entries.first.update!(revision: 2, edited_at: 1.minute.ago)
-    @entries.last.update!(revision: 3, edited_at: 5.minutes.ago)
+  test "an edits cursor pages edited entries oldest edit first and leaves a cursor to resume from" do
+    get "/v3/entries", headers: bearer
+    saved = JSON.parse(response.body)["meta"]["edits_cursor"]
+    @entries.first.update!(revision: 2, edited_at: 1.minute.from_now)
+    @entries.last.update!(revision: 3, edited_at: 30.seconds.from_now)
 
-    get "/v3/entries", params: {edited_after: 1.hour.ago.iso8601}, headers: bearer
-
-    data = JSON.parse(response.body)["data"]
-    assert_equal [@entries.last.id, @entries.first.id], data.map { _1["id"] }
-    assert_equal [3, 2], data.map { _1["revision"] }
-  end
-
-  test "edited_asc lists only edited entries and leaves a cursor to resume from" do
-    @entries.first.update!(revision: 2, edited_at: 5.minutes.ago)
-
-    get "/v3/entries", params: {sort: "edited_asc"}, headers: bearer
+    get "/v3/entries", params: {cursor: saved}, headers: bearer
     body = JSON.parse(response.body)
-    assert_equal [@entries.first.id], body["data"].map { _1["id"] }
+    assert_equal [@entries.last.id, @entries.first.id], body["data"].map { _1["id"] }
     tail = body["page"]["next_cursor"]
     assert_equal "edited_asc", Api::V3::Cursor.decode(tail)["sort"]
     assert_nil body["page"]["next_url"]
 
-    @entries.last.update!(revision: 2, edited_at: 1.minute.ago)
-    get "/v3/entries", params: {sort: "edited_asc", cursor: tail}, headers: bearer
-    assert_equal [@entries.last.id], JSON.parse(response.body)["data"].map { _1["id"] }
-  end
-
-  test "bootstraps an edits cursor from edited_after" do
-    get "/v3/entries", params: {sort: "edited_asc", edited_after: 1.minute.ago.iso8601}, headers: bearer
-    body = JSON.parse(response.body)
-    assert_equal [], body["data"]
-    cursor = Api::V3::Cursor.decode(body["page"]["next_cursor"])
-    assert_equal ["edited_asc", 0], [cursor["sort"], cursor["id"]]
-    assert_in_delta 1.minute.ago.to_f, cursor["timestamp"] / 1_000_000.0, 5
+    @entries[1].update!(revision: 2, edited_at: 2.minutes.from_now)
+    get "/v3/entries", params: {cursor: tail}, headers: bearer
+    assert_equal [@entries[1].id], JSON.parse(response.body)["data"].map { _1["id"] }
   end
 
   test "counts the whole list with total=true" do
@@ -282,7 +245,6 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
       {ids: "1,abc"} => "ids",
       {ids: (1..501).to_a.join(",")} => "ids",
       {read: "yes"} => "read",
-      {sort: "oldest"} => "sort",
       {received_after: "yesterday"} => "received_after",
       {limit: "0"} => "limit"
     }.each do |params, pointer|
