@@ -1,6 +1,6 @@
-# Receipt verification against Apple's verifyReceipt service, shared by the
-# v2 and v3 purchase endpoints. Returns Apple's parsed JSON; status 0 is a
-# verified receipt and 21007 means "try the sandbox".
+# Receipt verification against Apple's verifyReceipt service, for the v3
+# purchase endpoint (POST /v3/account/purchases). Returns Apple's parsed
+# JSON; status 0 is a verified receipt and 21007 means "try the sandbox".
 class AppStoreReceipt
   def self.verify(receipt_data)
     endpoints = Feedbin::Application.config.iap_endpoint

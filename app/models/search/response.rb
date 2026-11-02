@@ -1,5 +1,8 @@
 module Search
   class Response
+    # The parsed Elasticsearch response.
+    attr_reader :data
+
     def initialize(data, page: 1, per_page: WillPaginate.per_page)
       @data     = data
       @page     = page

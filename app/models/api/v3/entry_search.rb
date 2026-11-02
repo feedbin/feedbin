@@ -96,7 +96,7 @@ module Api
       # The sort values of the limit-th hit (the page's last), from the raw
       # hits; search_after fetched one more to learn whether more exist.
       def sort_values(response, limit)
-        hits = response.instance_variable_get(:@data).safe_dig("hits", "hits")
+        hits = response.data.safe_dig("hits", "hits")
         hits[limit - 1]["sort"]
       end
     end

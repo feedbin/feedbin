@@ -14,6 +14,10 @@ module Api
         raise invalid("title", "invalid_value", "title must be a string.") unless title.nil? || title.is_a?(String)
         return rate_limited unless Throttle.throttle!("v3:pages:#{@user.id}", PAGES_PER_DAY, 1.day)
 
+        # Decided before saving: SavePage can save a new entry twice (a
+        # YouTube page is filled from its embed), which clears
+        # previously_new_record?. A URL is one entry in the Pages feed.
+        existed = Entry.where(feed_id: @user.feeds.pages.select(:id), url: url).exists?
         entry = begin
           SavePage.new.perform(@user.id, url, title)
         rescue SavePage::MissingPage => exception
@@ -22,7 +26,7 @@ module Api
         end
         expand = expansions(EntrySerializer::EXPANSIONS)
         feed = expand.include?("feed") ? FeedSerializer.new(entry.feed).to_h : nil
-        render json: EntrySerializer.new(entry, feed: feed, expand: expand).to_h, status: entry.previously_new_record? ? :created : :ok
+        render json: EntrySerializer.new(entry, feed: feed, expand: expand).to_h, status: existed ? :ok : :created
       end
 
       # Only an entry in the user's own Pages feed: the one SavePage gave

@@ -125,6 +125,27 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     assert Entry.exists?(theirs.id)
   end
 
+  # SavePage fills a YouTube page from its embed with a second save, which
+  # clears previously_new_record?.
+  test "a new page filled in after it is created is still 201" do
+    SavePage.stub(:new, Object.new.tap { |saver|
+      saver.define_singleton_method(:perform) do |user_id, url, title, path = nil|
+        user = User.find(user_id)
+        feed = Feed.create_with(title: "Pages", feed_type: :pages, protected: true).find_or_create_by!(feed_url: "http://pages.test/#{user.id}")
+        user.subscriptions.create_with(kind: :generated).find_or_create_by!(feed: feed)
+        entry = feed.entries.create_with(title: title, url: url, entry_id: SecureRandom.hex).find_or_create_by!(public_id: Digest::SHA1.hexdigest(url))
+        entry.update!(title: "From the embed")
+        entry
+      end
+    }) do
+      post "/v3/pages", params: {url: "https://www.youtube.com/watch?v=abc"}.to_json, headers: json
+      assert_response :created
+
+      post "/v3/pages", params: {url: "https://www.youtube.com/watch?v=abc"}.to_json, headers: json
+      assert_response :success
+    end
+  end
+
   private
 
   def bearer
