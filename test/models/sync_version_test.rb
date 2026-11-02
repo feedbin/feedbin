@@ -8,7 +8,45 @@ class SyncVersionTest < ActiveSupport::TestCase
   end
 
   test "every list starts at zero" do
-    assert_equal({"unread" => 0, "starred" => 0, "subscriptions" => 0}, SyncVersion.for(@user))
+    assert_equal SyncVersion::LISTS.index_with(0), SyncVersion.for(@user)
+    assert_equal %w[unread starred subscriptions updated recently_read recently_played queue saved_searches playlists actions], SyncVersion::LISTS
+  end
+
+  test "the other per-user lists bump their own versions" do
+    entry = @entries.first
+    UpdatedEntry.create!(user_id: @user.id, entry_id: entry.id, feed_id: @feed.id, published: entry.published, updated: Time.now)
+    @user.updated_entries.delete_all
+    assert_equal 2, SyncVersion.for(@user)["updated"]
+
+    RecentlyReadEntry.create_from_owners(@user, entry.id)
+    assert_equal 1, SyncVersion.for(@user)["recently_read"]
+
+    RecentlyPlayedEntry.create!(user_id: @user.id, entry_id: entry.id, progress: 10, duration: 100)
+    assert_equal 1, SyncVersion.for(@user)["recently_played"]
+
+    queued = QueuedEntry.create!(user_id: @user.id, entry_id: entry.id, feed_id: @feed.id)
+    queued.update!(progress: 5)
+    queued.destroy
+    assert_equal 3, SyncVersion.for(@user)["queue"]
+
+    search = @user.saved_searches.create!(name: "Swift", query: "swift")
+    search.update!(name: "Swift!")
+    search.destroy
+    assert_equal 3, SyncVersion.for(@user)["saved_searches"]
+
+    playlist = @user.playlists.create!(title: "Commute")
+    playlist.update!(sort_order: :newest_first)
+    playlist.destroy
+    assert_equal 3, SyncVersion.for(@user)["playlists"]
+  end
+
+  test "actions bump their version" do
+    @user.subscriptions.create!(feed: @feed)
+    action = @user.actions.new(title: "Star", query: "", feed_ids: [@feed.id.to_s], actions: ["star"], automatic_modification: true)
+    action.save!
+    action.update!(title: "Star!")
+    action.destroy
+    assert_equal 3, SyncVersion.for(@user)["actions"]
   end
 
   test "an unread insert and a bulk delete each bump unread once" do

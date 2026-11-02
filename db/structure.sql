@@ -3219,6 +3219,125 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: actions actions_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER actions_delete_bump_sync_version AFTER DELETE ON public.actions REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('actions');
+
+
+--
+-- Name: actions actions_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER actions_insert_bump_sync_version AFTER INSERT ON public.actions REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('actions');
+
+
+--
+-- Name: actions actions_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER actions_update_bump_sync_version AFTER UPDATE ON public.actions REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('actions');
+
+
+--
+-- Name: playlists playlists_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER playlists_delete_bump_sync_version AFTER DELETE ON public.playlists REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('playlists');
+
+
+--
+-- Name: playlists playlists_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER playlists_insert_bump_sync_version AFTER INSERT ON public.playlists REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('playlists');
+
+
+--
+-- Name: playlists playlists_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER playlists_update_bump_sync_version AFTER UPDATE ON public.playlists REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('playlists');
+
+
+--
+-- Name: queued_entries queued_entries_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER queued_entries_delete_bump_sync_version AFTER DELETE ON public.queued_entries REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('queue');
+
+
+--
+-- Name: queued_entries queued_entries_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER queued_entries_insert_bump_sync_version AFTER INSERT ON public.queued_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('queue');
+
+
+--
+-- Name: queued_entries queued_entries_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER queued_entries_update_bump_sync_version AFTER UPDATE ON public.queued_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('queue');
+
+
+--
+-- Name: recently_played_entries recently_played_entries_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER recently_played_entries_delete_bump_sync_version AFTER DELETE ON public.recently_played_entries REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('recently_played');
+
+
+--
+-- Name: recently_played_entries recently_played_entries_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER recently_played_entries_insert_bump_sync_version AFTER INSERT ON public.recently_played_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('recently_played');
+
+
+--
+-- Name: recently_played_entries recently_played_entries_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER recently_played_entries_update_bump_sync_version AFTER UPDATE ON public.recently_played_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('recently_played');
+
+
+--
+-- Name: recently_read_entries recently_read_entries_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER recently_read_entries_delete_bump_sync_version AFTER DELETE ON public.recently_read_entries REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('recently_read');
+
+
+--
+-- Name: recently_read_entries recently_read_entries_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER recently_read_entries_insert_bump_sync_version AFTER INSERT ON public.recently_read_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('recently_read');
+
+
+--
+-- Name: saved_searches saved_searches_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER saved_searches_delete_bump_sync_version AFTER DELETE ON public.saved_searches REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('saved_searches');
+
+
+--
+-- Name: saved_searches saved_searches_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER saved_searches_insert_bump_sync_version AFTER INSERT ON public.saved_searches REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('saved_searches');
+
+
+--
+-- Name: saved_searches saved_searches_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER saved_searches_update_bump_sync_version AFTER UPDATE ON public.saved_searches REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('saved_searches');
+
+
+--
 -- Name: starred_entries starred_entries_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3286,6 +3405,20 @@ CREATE TRIGGER unreads_delete_bump_sync_version AFTER DELETE ON public.unreads R
 --
 
 CREATE TRIGGER unreads_insert_bump_sync_version AFTER INSERT ON public.unreads REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('unread');
+
+
+--
+-- Name: updated_entries updated_entries_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER updated_entries_delete_bump_sync_version AFTER DELETE ON public.updated_entries REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('updated');
+
+
+--
+-- Name: updated_entries updated_entries_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER updated_entries_insert_bump_sync_version AFTER INSERT ON public.updated_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('updated');
 
 
 --
@@ -3376,6 +3509,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261102120000'),
 ('20261101120000'),
 ('20261030130000'),
 ('20261030120000'),

@@ -4,7 +4,7 @@
 class SyncVersion < ApplicationRecord
   belongs_to :user
 
-  LISTS = %w[unread starred subscriptions].freeze
+  LISTS = %w[unread starred subscriptions updated recently_read recently_played queue saved_searches playlists actions].freeze
 
   def self.for(user)
     LISTS.index_with(0).merge(where(user_id: user.id, list: LISTS).pluck(:list, :version).to_h)
