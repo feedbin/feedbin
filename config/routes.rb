@@ -131,7 +131,14 @@ Rails.application.routes.draw do
         end
         resources :feeds, only: [:index]
         resources :tags, only: [:index, :update, :destroy]
+        get "collections", to: "collections#index"
         get "collections/:id/ids", to: "collections#ids"
+        get "collections/:id/entries", to: "collections#entries"
+        post "collections/:id/entries", to: "collections#add"
+        patch "collections/:id/entries", to: "collections#bulk"
+        delete "collections/:id/entries", to: "collections#clear"
+        patch "collections/:id/entries/:entry_id", to: "collections#update"
+        delete "collections/:id/entries/:entry_id", to: "collections#remove"
 
         match "/", to: "api#not_found", via: :all
         match "*path", to: "api#not_found", via: :all

@@ -74,7 +74,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
   end
 
   test "unknown collections are not found" do
-    get "/v3/collections/queue/ids", headers: bearer
+    get "/v3/collections/nope/ids", headers: bearer
 
     assert_response :not_found
     assert_equal "not_found", JSON.parse(response.body)["code"]

@@ -10,10 +10,13 @@ module Api
     class EntrySerializer
       EXPANSIONS = %w[feed changes original_newsletter].freeze
 
-      def initialize(entry, feed: nil, expand: [])
+      # membership is what a collection knows about the entry, serialized;
+      # present only on collection reads.
+      def initialize(entry, feed: nil, expand: [], membership: nil)
         @entry = entry
         @feed = feed
         @expand = expand
+        @membership = membership
       end
 
       def to_h
@@ -44,6 +47,7 @@ module Api
           extracted: extracted
         }
         hash[:feed] = @feed if @expand.include?("feed")
+        hash[:membership] = @membership if @membership
         hash
       end
 
