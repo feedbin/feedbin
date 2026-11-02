@@ -5,6 +5,8 @@ module Api
     # (Recently Read, Recently Played, Airshow). Unread, Starred and Updated
     # are written with the state verbs instead.
     class CollectionsController < ApiController
+      include SearchPage
+
       MAX_IDS = 1_000
       ADDABLE = {
         "recently_read" => :add_recently_read,
@@ -25,9 +27,7 @@ module Api
       end
 
       def entries
-        if collection.search?
-          return render_problem :not_found, "not_found", title: "Not found", detail: "Saved search entries are served by GET /search."
-        end
+        return render_search_page(EntrySearch.new(@user, query: collection.query)) if collection.search?
         limit = page_limit
         if collection.timeline?
           render_timeline_page(limit)

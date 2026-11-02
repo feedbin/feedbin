@@ -14,6 +14,11 @@ module Search
       @data.safe_dig("hits", "hits")&.map {|hit| hit["_id"].to_i } || []
     end
 
+    # The sort values of the last hit, for search_after. nil with no hits.
+    def last_sort
+      @data.safe_dig("hits", "hits")&.last&.dig("sort")
+    end
+
     def records(klass)
       klass.in_order_of(:id, ids)
     end
