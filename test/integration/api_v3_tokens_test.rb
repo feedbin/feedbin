@@ -16,7 +16,7 @@ class ApiV3TokensTest < ActionDispatch::IntegrationTest
     assert_response :success
     body = JSON.parse(response.body)
     assert_equal "list", body["object"]
-    assert body["meta"]["as_of"].present?
+    assert_nil body["meta"]
 
     current, other = body["data"].partition { _1["current"] }.map(&:first)
     assert_equal({"object" => "token", "id" => @token.id, "device_name" => "Unread on Ben’s iPhone", "created_at" => @token.created_at.utc.iso8601, "last_used_at" => @token.reload.last_used_at.utc.iso8601, "current" => true}, current)

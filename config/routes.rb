@@ -126,6 +126,7 @@ Rails.application.routes.draw do
         end
         resources :tokens, only: [:index, :destroy]
         resources :subscriptions, only: [:index]
+        resources :feeds, only: [:index]
         get "collections/:id/ids", to: "collections#ids"
 
         match "/", to: "api#not_found", via: :all

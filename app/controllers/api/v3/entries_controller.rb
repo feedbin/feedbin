@@ -5,15 +5,16 @@ module Api
     class EntriesController < ApiController
       MAX_IDS = 500
 
-      # Each sort's column and direction. received_asc is how a client fetches
-      # arrivals from the cursor it saved (see GET /sync). edited_after= has
-      # its own: edits in the order they happened.
+      # Each sort's column and direction. The two ascending sorts follow a
+      # stream from a saved cursor: received_asc for arrivals, edited_asc for
+      # edits. Their last page still ends with a cursor (tail_cursor).
       SORTS = {
         "received_desc" => [:created_at, :desc],
         "received_asc" => [:created_at, :asc],
         "published_desc" => [:published, :desc],
         "edited_asc" => [:edited_at, :asc]
       }.freeze
+      TAIL_SORTS = {"received_asc" => :received_after, "edited_asc" => :edited_after}.freeze
 
       def index
         params.key?(:ids) ? render_ids : render_timeline
@@ -35,7 +36,7 @@ module Api
         entries = Entry.where(id: readable).merge(with_associations).index_by(&:id)
         render_list(
           serialize(ids.filter_map { entries[_1] }),
-          meta: {missing: ids - entries.keys}
+          meta: {as_of: as_of, missing: ids - entries.keys}
         )
       end
 
@@ -45,6 +46,7 @@ module Api
         total = scope.count if boolean_param(:total)
 
         column, direction = SORTS.fetch(sort)
+        scope = scope.where.not(edited_at: nil) if sort == "edited_asc"
         scope = after_cursor(scope, column, direction)
         entries = scope.merge(with_associations)
           .order(column => direction, :id => direction)
@@ -55,11 +57,12 @@ module Api
         entries.pop if more
         next_cursor = if more
           cursor_at(entries.last, column)
-        elsif sort == "received_asc"
+        elsif TAIL_SORTS.key?(sort)
           tail_cursor(entries, column)
         end
 
-        meta = total ? {total: total} : {}
+        meta = {as_of: as_of}
+        meta[:total] = total if total
         render_list(
           serialize(entries),
           page: page_object(limit: limit, next_cursor: next_cursor, more: more),
@@ -71,14 +74,14 @@ module Api
         Cursor.encode(sort: sort, timestamp: microseconds(entry.public_send(column)), id: entry.id)
       end
 
-      # received_asc follows arrivals, so its last page still ends with a
-      # cursor to resume from: after the last entry, or the cursor the client
-      # sent, or one at received_after (no later than now) for a first poll.
+      # A stream sort's last page still ends with a cursor to resume from:
+      # after the last entry, or the cursor the client sent, or one at the
+      # sort's time filter (no later than now) for a first poll.
       def tail_cursor(entries, column)
         return cursor_at(entries.last, column) if entries.any?
         return params[:cursor] if params[:cursor].present?
 
-        start = [time_param(:received_after), Time.now].compact.min
+        start = [time_param(TAIL_SORTS.fetch(sort)), Time.now].compact.min
         Cursor.encode(sort: sort, timestamp: microseconds(start), id: 0)
       end
 
@@ -86,23 +89,16 @@ module Api
         Entry.with_list_associations.with_renderings.preload(feed: :touch_icon_image_record)
       end
 
-      # Each feed is serialized once per response, however many of its
-      # entries are on the page.
+      # With expand=feed, each feed is serialized once per response, however
+      # many of its entries are on the page.
       def serialize(entries)
-        feed_hashes = entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
-        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id], include: includes).to_h }
-      end
-
-      # include=changes,original_newsletter: the optional bodies under content.
-      def includes
-        @includes ||= begin
-          names = params[:include].to_s.split(",").map(&:strip).reject(&:empty?).uniq
-          unknown = names - EntrySerializer::INCLUDES
-          if unknown.any?
-            raise Problems::InvalidParameter.new("include must be a comma-separated list of #{EntrySerializer::INCLUDES.join(", ")}.", pointer: "include", code: "invalid_value")
-          end
-          names
+        expand = expansions(EntrySerializer::EXPANSIONS)
+        feed_hashes = if expand.include?("feed")
+          entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
+        else
+          {}
         end
+        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id], expand: expand).to_h }
       end
 
       def filtered_entries
@@ -134,8 +130,8 @@ module Api
           "edited_asc"
         else
           value = params.fetch(:sort, "received_desc")
-          unless %w[received_desc received_asc published_desc].include?(value)
-            raise Problems::InvalidParameter.new("sort must be received_desc, received_asc or published_desc.", pointer: "sort", code: "invalid_value")
+          unless SORTS.key?(value)
+            raise Problems::InvalidParameter.new("sort must be one of #{SORTS.keys.join(", ")}.", pointer: "sort", code: "invalid_value")
           end
           value
         end

@@ -9,6 +9,7 @@ module Api
       include Authentication
       include Pagination
       include Conditional
+      include Expansion
 
       # A v3 body is the resource itself, never wrapped in a root key.
       wrap_parameters false

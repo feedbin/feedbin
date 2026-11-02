@@ -19,10 +19,13 @@ module Api
 
       private
 
-      def render_list(data, page: nil, meta: {})
+      # meta is present only on lists that carry one: entries lists, whose
+      # as_of is the time bound a client bootstraps its cursors from. A list
+      # that needs no cursor (ids, subscriptions, feeds, tokens) has none.
+      def render_list(data, page: nil, meta: nil)
         body = {object: "list", data: data}
         body[:page] = page if page
-        body[:meta] = {as_of: as_of}.merge(meta)
+        body[:meta] = meta if meta
         render json: body
       end
 

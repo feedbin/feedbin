@@ -1,22 +1,23 @@
 module Api
   module V3
-    # The entry object, with every field and its feed embedded. Load entries
-    # with Entry.with_list_associations.with_renderings so the image rows,
-    # feed, and stored rendering come preloaded. feed is the feed's serialized
-    # hash, built once per feed. include lists the optional bodies under
-    # content (INCLUDES); a body not asked for is left out, one asked for that
-    # the entry does not have is null.
+    # The entry object. Load entries with
+    # Entry.with_list_associations.with_renderings so the image rows, feed,
+    # and stored rendering come preloaded. The default shape carries feed_id;
+    # expand names what to add (EXPANSIONS): the feed (feed is its serialized
+    # hash, built once per feed) and the optional bodies under content. A
+    # body not asked for is left out, one asked for that the entry does not
+    # have is null.
     class EntrySerializer
-      INCLUDES = %w[changes original_newsletter].freeze
+      EXPANSIONS = %w[feed changes original_newsletter].freeze
 
-      def initialize(entry, feed:, include: [])
+      def initialize(entry, feed: nil, expand: [])
         @entry = entry
         @feed = feed
-        @include = include
+        @expand = expand
       end
 
       def to_h
-        {
+        hash = {
           object: "entry",
           id: @entry.id,
           feed_id: @entry.feed_id,
@@ -43,9 +44,10 @@ module Api
             extracted_content: @entry.fully_qualified_url && @entry.extracted_content_url
           },
           content: content,
-          extracted: extracted,
-          feed: @feed
+          extracted: extracted
         }
+        hash[:feed] = @feed if @expand.include?("feed")
+        hash
       end
 
       private
@@ -148,8 +150,8 @@ module Api
       # The body object: html always, then each optional body in INCLUDES order.
       def content
         body = {html: content_html}
-        body[:changes] = changes if @include.include?("changes")
-        body[:original_newsletter] = original_newsletter if @include.include?("original_newsletter")
+        body[:changes] = changes if @expand.include?("changes")
+        body[:original_newsletter] = original_newsletter if @expand.include?("original_newsletter")
         body
       end
 
@@ -174,25 +176,21 @@ module Api
         {html: ContentFormatter.newsletter_format(@entry.content).to_s}
       end
 
-      # A micropost's linked articles, as HarvestLinks saved them, with the
-      # stored api rendering of each.
+      # The article a micropost links to, as HarvestLinks saved it (it saves
+      # the first link only), with the stored api rendering. nil otherwise.
       def extracted
-        rendered = @entry.rendering.extracted_pages
-        rendered.filter_map do |url, html|
-          page = saved_page(url) or next
-          {
-            url: url,
-            title: page.title,
-            hostname: Addressable::URI.parse(url).host,
-            author: page.author,
-            content: {html: html}
-          }
-        rescue
-          nil
-        end
+        url, html = @entry.rendering.extracted_pages.first
+        page = url && saved_page(url) or return nil
+        {
+          url: url,
+          title: page.title,
+          hostname: Addressable::URI.parse(url).host,
+          author: page.author,
+          content: {html: html}
+        }
       rescue => exception
         ErrorService.notify(exception, context: {entry_id: @entry.id})
-        []
+        nil
       end
 
       def saved_page(url)

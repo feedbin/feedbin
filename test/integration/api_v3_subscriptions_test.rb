@@ -12,18 +12,33 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
   end
 
-  test "lists subscriptions ascending by id with feeds and tags embedded" do
+  test "lists subscriptions ascending by id with feed and tag ids" do
     get "/v3/subscriptions", headers: bearer
 
     assert_response :success
     body = JSON.parse(response.body)
     assert_equal "list", body["object"]
     assert_nil body["page"]
+    assert_nil body["meta"]
     assert_equal @subscriptions.map(&:id), body["data"].map { _1["id"] }
+    assert_equal %w[object id created_at title custom_title feed_id tag_ids preferences], body["data"].first.keys
+    assert_equal @feeds.map(&:id), body["data"].map { _1["feed_id"] }
+    assert_equal Tag.where(name: %w[Apple News]).order(:name).pluck(:id), body["data"].first["tag_ids"]
+    assert_equal [], body["data"].last["tag_ids"]
+    assert_equal %("subscriptions:#{@user.id}:#{SyncVersion.for(@user)["subscriptions"]}"), response.headers["ETag"]
+  end
+
+  test "expand=feed,tags embeds the feed and tag objects" do
+    get "/v3/subscriptions", params: {expand: "feed,tags"}, headers: bearer
+
+    body = JSON.parse(response.body)
+    assert_equal %w[object id created_at title custom_title feed_id tag_ids preferences feed tags], body["data"].first.keys
     assert_equal @feeds.map(&:id), body["data"].map { _1["feed"]["id"] }
     assert_equal ["Apple", "News"], body["data"].first["tags"].map { _1["name"] }
     assert_equal [], body["data"].last["tags"]
-    assert_equal %("subscriptions:#{@user.id}:#{SyncVersion.for(@user)["subscriptions"]}"), response.headers["ETag"]
+
+    get "/v3/subscriptions", params: {expand: "feed,changes"}, headers: bearer
+    assert_response :unprocessable_content
   end
 
   test "returns 304 until a subscription changes" do

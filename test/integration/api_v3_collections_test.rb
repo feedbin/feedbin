@@ -25,7 +25,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_equal "list", body["object"]
     assert_equal @entries.map(&:id).sort, body["data"]
     assert_nil body["page"]
-    assert body["meta"]["as_of"].present?
+    assert_nil body["meta"]
     assert_equal %("unread:#{@user.id}:#{SyncVersion.for(@user)["unread"]}"), response.headers["ETag"]
   end
 
