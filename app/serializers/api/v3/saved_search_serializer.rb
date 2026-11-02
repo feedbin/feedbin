@@ -15,7 +15,7 @@ module Api
           query: @saved_search.query,
           collection_id: "search_#{@saved_search.id}",
           created_at: @saved_search.created_at.utc.iso8601,
-          updated_at: @saved_search.updated_at.utc.iso8601
+          updated_at: (@saved_search.updated_at || @saved_search.created_at).utc.iso8601
         }
       end
     end

@@ -111,7 +111,10 @@ module Api
 
       def ids_etag
         if collection.search?
-          etag_for(collection.id, versions.fetch("unread"), (collection.saved_search.updated_at.to_r * 1_000_000).to_i)
+          # Matches follow the unread list, stars (is:starred), the feeds
+          # subscribed to, and the query.
+          search = collection.saved_search
+          etag_for(collection.id, versions.fetch("unread"), versions.fetch("starred"), versions.fetch("subscriptions"), ((search.updated_at || search.created_at).to_r * 1_000_000).to_i)
         else
           list_etag(collection.id)
         end

@@ -60,17 +60,68 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "a saved search's ids are its unread matches" do
+  test "a saved search's ids are its newest unread matches, ascending" do
     search = @user.saved_searches.create!(name: "Swift", query: "swift")
-    Entry.stub(:saved_search_count, {search.id => [@entries.last.id, @entries.first.id]}) do
+    matches = swift_entries(4)
+    UnreadEntry.where(user_id: @user.id, entry_id: matches.first.id).delete_all
+
+    Api::V3::Collection.stub_const(:SEARCH_IDS_LIMIT, 2) do
       get "/v3/collections/search_#{search.id}/ids", headers: bearer
     end
+
     assert_response :success
-    assert_equal [@entries.first.id, @entries.last.id], JSON.parse(response.body)["data"]
+    assert_equal matches.last(2).map(&:id).sort, JSON.parse(response.body)["data"]
     assert response.headers["ETag"].start_with?(%("search_#{search.id}:#{@user.id}:))
 
     get "/v3/collections/search_999999/ids", headers: bearer
     assert_response :not_found
+  end
+
+  test "every saved search has ids, not only the first 50" do
+    matches = swift_entries(1)
+    searches = 51.times.map { @user.saved_searches.create!(name: "Swift #{_1}", query: "swift") }
+
+    get "/v3/collections/search_#{searches.last.id}/ids", headers: bearer
+
+    assert_equal [matches.first.id], JSON.parse(response.body)["data"]
+  end
+
+  test "a saved search's ids etag moves with stars and subscriptions" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift is:starred")
+    matches = swift_entries(1)
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer
+    etag = response.headers["ETag"]
+
+    StarredEntry.create_from_owners(@user, matches.first)
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+    etag = response.headers["ETag"]
+
+    @user.subscriptions.find_by!(feed: @feed).destroy
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+  end
+
+  test "a saved search with no updated_at still lists" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift")
+    search.update_column(:updated_at, nil)
+
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer
+    assert_response :success
+
+    get "/v3/saved_searches", headers: bearer
+    assert_response :success
+  end
+
+  test "a saved search whose query no longer parses has no ids" do
+    swift_entries(1)
+    search = @user.saved_searches.create!(name: "Broken", query: "swift")
+    search.update_column(:query, "title:(")
+
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer
+
+    assert_response :success
+    assert_equal [], JSON.parse(response.body)["data"]
   end
 
   test "lists a collection's entries in its order with membership, paginated" do
@@ -216,6 +267,16 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  # Unread entries titled Swift, published oldest first, indexed for search.
+  def swift_entries(count)
+    entries = count.times.map do |i|
+      @feed.entries.create!(title: "Swift #{i}", url: "https://example.com/swift/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: (count - i).days.ago)
+    end
+    entries.each { UnreadEntry.create_from_owners(@user, _1) }
+    index_entries(entries)
+    entries
+  end
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}
