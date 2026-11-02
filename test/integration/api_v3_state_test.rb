@@ -10,7 +10,7 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
     @a, @b = 2.times.map { |i| @feed.entries.create!(title: "E#{i}", url: "https://example.com/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex) }
     @other = Feed.create!(feed_url: "https://other.example/feed").entries.create!(title: "x", url: "https://other.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "applies verbs and reports them by verb" do

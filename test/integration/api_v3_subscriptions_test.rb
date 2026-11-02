@@ -9,7 +9,7 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     @subscriptions = @feeds.map { @user.subscriptions.create!(feed: _1) }
     @feeds.first.tag("Apple, News", @user)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "lists subscriptions ascending by id with feed and tag ids" do

@@ -6,7 +6,7 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
     @user = users(:new)
     @user.setting_on!(:api_v3)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "shows the account with plan, settings, newsletter address and page token" do
@@ -69,7 +69,7 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
   test "records an App Store purchase and returns the account" do
     @user = users(:timed)
     @user.setting_on!(:api_v3)
-    @token = @user.oauth_applications.create!(name: "Reader", redirect_uri: "").access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = @user.oauth_applications.create!(name: "Reader", redirect_uri: "").access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
     product_id, product = Feedbin::Application.config.iap.to_a.first
     receipt = {transaction_id: SecureRandom.hex, purchase_date_ms: Time.now.to_i * 1_000, product_id: product_id}
     stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).to_return(body: {status: 0, receipt: {in_app: [receipt]}}.to_json, status: 200)

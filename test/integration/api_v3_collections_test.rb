@@ -11,7 +11,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
       @feed.entries.create!(title: "Entry #{index}", url: "https://example.com/#{index}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
     end
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "lists unread ids ascending with an etag" do
@@ -34,7 +34,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     etag = response.headers["ETag"]
     other = users(:ben)
     other.setting_on!(:api_v3)
-    other_token = other.oauth_applications.create!(name: "Reader", redirect_uri: "").access_tokens.create!(resource_owner_id: other.id, scopes: "full")
+    other_token = other.oauth_applications.create!(name: "Reader", redirect_uri: "").access_tokens.create!(resource_owner_id: other.id, scopes: "read write account")
     # This account's tag at the other account's version: what a URL-keyed
     # cache would send after an account switch if the tag held no account.
     etag_at_other_version = etag.sub(/:\d+"\z/, %(:#{SyncVersion.for(other)["unread"]}"))

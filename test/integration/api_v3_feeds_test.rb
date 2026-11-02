@@ -8,7 +8,7 @@ class ApiV3FeedsTest < ActionDispatch::IntegrationTest
     @feeds = 2.times.map { |i| Feed.create!(feed_url: "https://example#{i}.com/feed", host: "example#{i}.com", title: "Example #{i}") }
     @feeds.each { @user.subscriptions.create!(feed: _1) }
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "lists the user's feeds ascending by id with an etag and no meta" do

@@ -6,7 +6,7 @@ class ApiV3PlaylistsTest < ActionDispatch::IntegrationTest
     @user = users(:new)
     @user.setting_on!(:api_v3)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "creates, lists, finds by title, updates with timestamps and deletes" do

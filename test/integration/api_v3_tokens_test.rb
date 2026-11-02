@@ -6,8 +6,8 @@ class ApiV3TokensTest < ActionDispatch::IntegrationTest
     @user = users(:ben)
     @user.setting_on!(:api_v3)
     @application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
-    @token = @application.access_tokens.create!(resource_owner_id: @user.id, device_name: "Unread on Ben’s iPhone", scopes: "full")
-    @other = @application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = @application.access_tokens.create!(resource_owner_id: @user.id, device_name: "Unread on Ben’s iPhone", scopes: "read write account")
+    @other = @application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "lists the user's tokens" do
@@ -27,7 +27,7 @@ class ApiV3TokensTest < ActionDispatch::IntegrationTest
 
   test "leaves out revoked tokens and other users' tokens" do
     @other.revoke
-    @application.access_tokens.create!(resource_owner_id: users(:ann).id, scopes: "full")
+    @application.access_tokens.create!(resource_owner_id: users(:ann).id, scopes: "read write account")
 
     get "/v3/tokens", headers: bearer
 
@@ -50,7 +50,7 @@ class ApiV3TokensTest < ActionDispatch::IntegrationTest
   end
 
   test "does not revoke another user's token" do
-    theirs = @application.access_tokens.create!(resource_owner_id: users(:ann).id, scopes: "full")
+    theirs = @application.access_tokens.create!(resource_owner_id: users(:ann).id, scopes: "read write account")
 
     delete "/v3/tokens/#{theirs.id}", headers: bearer
 

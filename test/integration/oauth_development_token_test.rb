@@ -9,7 +9,7 @@ class OauthDevelopmentTokenTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert body["access_token"].start_with?("fbn_v3_")
     assert_equal "Bearer", body["token_type"]
-    assert_equal "full", body["scope"]
+    assert_equal "read write account", body["scope"]
     assert_kind_of Integer, body["created_at"]
     assert @user.reload.api_v3_enabled?
 

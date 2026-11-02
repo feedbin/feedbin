@@ -15,9 +15,12 @@ Doorkeeper.configure do
 
   enable_application_owner confirmation: true
 
-  # One scope for now: full access to the account. Narrower scopes, such as
-  # read-only, can be added later as optional scopes without breaking clients.
-  default_scopes :full
+  # read and write for every token; account only for Feedbin's own apps,
+  # whose registered scopes include it. Whatever a client asks for is
+  # replaced (see Api::V3::Scopes and the authorizations filter below).
+  default_scopes :read, :write
+  optional_scopes :account
+  enforce_configured_scopes
 
   grant_flows %w[authorization_code]
   force_pkce
@@ -47,4 +50,16 @@ Rails.application.config.to_prepare do
   # The authorization views render inside layouts/form_page themselves, the
   # same way the sign-in form does.
   Doorkeeper::AuthorizationsController.layout false
+
+  Doorkeeper::AuthorizationsController.class_eval do
+    before_action :assign_v3_scopes, only: [:new, :create]
+
+    private
+
+    # A third party cannot choose its scopes, and Feedbin's apps need not ask.
+    def assign_v3_scopes
+      application = Doorkeeper::Application.by_uid(params[:client_id].to_s)
+      params[:scope] = Api::V3::Scopes.for(application) if application
+    end
+  end
 end

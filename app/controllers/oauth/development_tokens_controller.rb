@@ -13,7 +13,7 @@ class Oauth::DevelopmentTokensController < ActionController::API
     token = application.access_tokens.create!(
       resource_owner_id: user.id,
       device_name: "Development",
-      scopes: Doorkeeper.config.default_scopes.to_s
+      scopes: Api::V3::Scopes.for(application)
     )
 
     render json: {

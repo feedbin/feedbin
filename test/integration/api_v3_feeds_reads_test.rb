@@ -13,7 +13,7 @@ class ApiV3FeedsReadsTest < ActionDispatch::IntegrationTest
     @other = Feed.create!(feed_url: "https://other.example/feed", title: "Other")
     @other_entry = @other.entries.create!(title: "x", url: "https://other.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "shows a readable feed, 403 for an unreadable one, 404 for none" do

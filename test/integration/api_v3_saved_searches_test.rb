@@ -10,7 +10,7 @@ class ApiV3SavedSearchesTest < ActionDispatch::IntegrationTest
     @user.subscriptions.create!(feed: Feed.create!(feed_url: "https://example.com/feed", title: "Example"))
     @search = @user.saved_searches.create!(name: "Swift", query: "swift")
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "lists saved searches by name with an etag" do

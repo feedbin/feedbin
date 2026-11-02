@@ -14,7 +14,7 @@ class ApiV3SearchTest < ActionDispatch::IntegrationTest
     clear_search
     index_entries(@entries + [@unrelated])
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "searches newest published first with a cursor and the query it ran" do

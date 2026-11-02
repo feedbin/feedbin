@@ -6,6 +6,8 @@ module Api
       # suspended account must still see why, buy its way back, or leave.
       LAPSED_ACTIONS = %w[show purchases destroy].freeze
 
+      before_action -> { require_scope("account") }, only: [:destroy, :purchases]
+
       def show
         render json: AccountSerializer.new(@user).to_h
       end

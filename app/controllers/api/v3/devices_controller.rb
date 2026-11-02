@@ -4,6 +4,7 @@ module Api
     # (see Device.register), so registering it again updates that device and
     # moves it to this account.
     class DevicesController < ApiController
+      before_action -> { require_scope("account") }
       PLATFORMS = DeviceSerializer::PLATFORMS.invert.freeze
       OPTIONAL = {"app_bundle_id" => :application, "model" => :model, "operating_system" => :operating_system}.freeze
 

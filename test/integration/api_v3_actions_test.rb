@@ -13,7 +13,7 @@ class ApiV3ActionsTest < ActionDispatch::IntegrationTest
     @entries = 2.times.map { |i| @feed.entries.create!(title: "Swift #{i}", content: "<p>Swift</p>", url: "https://example.com/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: (2 - i).days.ago) }
     index_entries(@entries)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "creates, lists, updates, previews and deletes an action" do

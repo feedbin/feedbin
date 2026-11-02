@@ -15,6 +15,7 @@ module Api
             name: NAME,
             redirect_uri: REDIRECT_URI,
             confidential: false,
+            scopes: Scopes::FIRST_PARTY,
             owner: owner
           )
       end

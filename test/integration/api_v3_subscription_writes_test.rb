@@ -10,7 +10,7 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     @pages = Feed.create!(feed_url: "http://pages.test/abc", title: "Pages", feed_type: :pages)
     @generated = @user.subscriptions.create!(feed: @pages, kind: :generated)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "shows one subscription and 404s for another user's" do

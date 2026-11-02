@@ -8,7 +8,7 @@ class Settings::ApiTokensController < ApplicationController
     token = application.access_tokens.create!(
       resource_owner_id: @user.id,
       device_name: params.dig(:token, :device_name).presence,
-      scopes: Doorkeeper.config.default_scopes.to_s
+      scopes: Api::V3::Scopes::DEFAULT
     )
     flash[:plaintext_token] = token.plaintext_token
     redirect_to settings_api_application_path(application), notice: "Token created."

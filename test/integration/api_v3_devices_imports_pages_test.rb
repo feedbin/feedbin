@@ -6,7 +6,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     @user = users(:new)
     @user.setting_on!(:api_v3)
     application = @user.oauth_applications.create!(name: "Reader", redirect_uri: "")
-    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
   test "registers a device, re-registers the same token, and unregisters it" do
