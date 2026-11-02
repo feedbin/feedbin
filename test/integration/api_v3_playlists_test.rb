@@ -45,6 +45,15 @@ class ApiV3PlaylistsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "a field stamp without a UTC offset is rejected" do
+    playlist = @user.playlists.create!(title: "Commute")
+
+    patch "/v3/playlists/#{playlist.id}", params: {title: "Drive", title_updated_at: "2026-11-02T10:00:00"}.to_json, headers: json
+
+    assert_response :unprocessable_content
+    assert_equal "/title_updated_at", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
   private
 
   def bearer

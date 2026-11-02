@@ -83,6 +83,23 @@ class ApiV3SearchTest < ActionDispatch::IntegrationTest
     refute body["data"].first.key?("membership")
   end
 
+  test "caps feed_ids and tag_ids at 1,000" do
+    ids = (1..1_001).to_a.join(",")
+    %w[feed_ids tag_ids].each do |name|
+      get "/v3/search", params: {query: "swift", name => ids}, headers: bearer
+      assert_response :unprocessable_content, name
+      error = JSON.parse(response.body)["errors"].first
+      assert_equal [name, "too_many"], error.values_at("pointer", "code")
+    end
+  end
+
+  test "a time without a UTC offset is rejected" do
+    get "/v3/search", params: {query: "swift", published_after: "2026-11-02T10:00:00"}, headers: bearer
+
+    assert_response :unprocessable_content
+    assert_equal "published_after", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
   private
 
   def bearer

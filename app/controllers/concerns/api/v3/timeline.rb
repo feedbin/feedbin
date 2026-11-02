@@ -152,22 +152,6 @@ module Api
         scope.where("(entries.#{column}, entries.id) #{operator} (?, ?)", Time.at(Rational(timestamp, 1_000_000)).utc, id)
       end
 
-      def boolean_param(name)
-        return nil unless params.key?(name)
-        case params[name]
-        when "true" then true
-        when "false" then false
-        else raise Problems::InvalidParameter.new("#{name} must be true or false.", pointer: name.to_s, code: "invalid_value")
-        end
-      end
-
-      def time_param(name)
-        return nil unless params.key?(name)
-        Time.iso8601(params[name].to_s)
-      rescue ArgumentError
-        raise Problems::InvalidParameter.new("#{name} must be an RFC 3339 timestamp.", pointer: name.to_s, code: "invalid_value")
-      end
-
       def microseconds(time)
         (time.to_r * 1_000_000).to_i
       end

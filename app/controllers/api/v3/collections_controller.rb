@@ -40,6 +40,7 @@ module Api
       def add
         return rejects("add") unless collection.accepts?("add")
         ids = ids_param(request.request_parameters["ids"])
+        queue_playlist_id if collection.id == "queue"
         permissions = EntryAccess.new(@user).permissions_for(ids)
         applied = []
         skipped = []
@@ -150,11 +151,19 @@ module Api
       # Queueing needs the podcast subscription Airshow keeps, not the reader's.
       def add_queued(entry)
         return false unless @user.podcast_subscriptions.where(feed_id: entry.feed_id).exists?
-        playlist_id = request.request_parameters["playlist_id"]
-        raise Problems::InvalidParameter.new("playlist_id must be an integer.", pointer: "/playlist_id", code: "invalid_value") unless playlist_id.nil? || playlist_id.is_a?(Integer)
+        playlist_id = queue_playlist_id
         row = @user.queued_entries.create_with(feed_id: entry.feed_id, playlist_id: playlist_id).create_or_find_by(entry_id: entry.id)
         row.update!(playlist_id: playlist_id) if playlist_id && row.playlist_id != playlist_id
         true
+      end
+
+      # Checked before any id is added, so a bad playlist writes nothing.
+      def queue_playlist_id
+        return @queue_playlist_id if defined?(@queue_playlist_id)
+        playlist_id = request.request_parameters["playlist_id"]
+        raise Problems::InvalidParameter.new("playlist_id must be an integer.", pointer: "/playlist_id", code: "invalid_value") unless playlist_id.nil? || playlist_id.is_a?(Integer)
+        raise Problems::InvalidParameter.new("playlist_id must be one of the user's playlists.", pointer: "/playlist_id", code: "invalid_value") unless playlist_id.nil? || @user.playlists.exists?(id: playlist_id)
+        @queue_playlist_id = playlist_id
       end
 
       def writable?(entry)

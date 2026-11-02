@@ -101,10 +101,8 @@ module Api
         # from an entry's received_at must still include that entry: the
         # bound covers its whole last unit at the precision sent.
         def bound(key, value)
-          time = Time.iso8601(value.to_s)
+          time = Params.time(value) or raise invalid(key, "invalid_value", "#{key} must be an RFC 3339 timestamp with a UTC offset.")
           time + Rational(1, 10**value.to_s[/\.(\d+)/, 1].to_s.length)
-        rescue ArgumentError
-          raise invalid(key, "invalid_value", "#{key} must be an RFC 3339 timestamp.")
         end
 
         def invalid(key, code, detail)

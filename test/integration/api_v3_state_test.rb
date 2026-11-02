@@ -134,6 +134,13 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
     assert_equal [], @user.updated_entries.pluck(:entry_id)
   end
 
+  test "a scope bound without a UTC offset is rejected" do
+    post "/v3/entries/state", params: {mark_read: {published_before: "2026-11-02T10:00:00"}}.to_json, headers: json
+
+    assert_response :unprocessable_content
+    assert_equal "/mark_read/published_before", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
   private
 
   def bearer

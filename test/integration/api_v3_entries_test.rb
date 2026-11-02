@@ -258,6 +258,13 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a received_after without a UTC offset is rejected" do
+    get "/v3/entries", params: {received_after: "2026-11-02T10:00:00"}, headers: bearer
+
+    assert_response :unprocessable_content
+    assert_equal "received_after", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
   private
 
   def bearer

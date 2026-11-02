@@ -266,6 +266,31 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     assert_equal [queued_episode.id], JSON.parse(response.body)["applied"]
   end
 
+  test "queues only into the user's own playlists" do
+    @user.podcast_subscriptions.create!(feed: @feed, status: :subscribed)
+    foreign = users(:ben).playlists.create!(title: "Theirs")
+
+    post "/v3/collections/queue/entries", params: {ids: [@entries.first.id], playlist_id: foreign.id}.to_json, headers: json
+    assert_response :unprocessable_content
+    assert_equal "/playlist_id", JSON.parse(response.body)["errors"].first["pointer"]
+    refute @user.queued_entries.exists?(entry_id: @entries.first.id)
+
+    QueuedEntry.create!(user_id: @user.id, entry_id: @entries.first.id, feed_id: @feed.id, order: 1)
+    patch "/v3/collections/queue/entries/#{@entries.first.id}", params: {playlist_id: foreign.id, playlist_id_updated_at: Time.now.iso8601}.to_json, headers: json
+    assert_response :unprocessable_content
+    assert_equal "/playlist_id", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
+  test "a queue field stamp without a UTC offset is rejected" do
+    @user.podcast_subscriptions.create!(feed: @feed, status: :subscribed)
+    QueuedEntry.create!(user_id: @user.id, entry_id: @entries.first.id, feed_id: @feed.id, order: 1)
+
+    patch "/v3/collections/queue/entries/#{@entries.first.id}", params: {sort_order: 3, sort_order_updated_at: "2026-11-02T10:00:00"}.to_json, headers: json
+
+    assert_response :unprocessable_content
+    assert_equal "/sort_order_updated_at", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
   private
 
   # Unread entries titled Swift, published oldest first, indexed for search.
