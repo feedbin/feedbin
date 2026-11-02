@@ -8,6 +8,7 @@ module Api
       include Problems
       include Authentication
       include Pagination
+      include Conditional
 
       before_action :validate_content_type
 
