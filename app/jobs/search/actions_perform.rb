@@ -23,6 +23,16 @@ module Search
           end
         end
 
+        # send_ios_notification is the retired Notifier's value. Both push to
+        # every device the user has registered, once per user however many
+        # actions matched.
+        pushes = Set.new.merge(queues.delete("send_push_notification") || []).merge(queues.delete("send_ios_notification") || [])
+        if !update && pushes.any?
+          priority_image_crawl
+          DevicePushNotificationSend.perform_in(1.minute, pushes.to_a, entry_id, true)
+          WebPushNotificationSend.perform_in(1.minute, pushes.to_a, entry_id, true)
+        end
+
         queues.each do |action_name, user_ids|
           user_ids = user_ids.to_a
           if !update && action_name == "star"
@@ -32,12 +42,6 @@ module Search
             if update
               UpdatedEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
             end
-          elsif !update && action_name == "send_ios_notification"
-            priority_image_crawl
-            DevicePushNotificationSend.perform_in(1.minute, user_ids, entry_id, true)
-          elsif !update && action_name == "send_push_notification"
-            priority_image_crawl
-            WebPushNotificationSend.perform_in(1.minute, user_ids, entry_id, true)
           end
         end
         Librato.increment "actions_performed", by: 1

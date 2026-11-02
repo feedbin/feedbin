@@ -13,12 +13,15 @@ module Api
         token = body["push_token"]
         raise invalid("push_token", "missing", "push_token is required.") unless token.is_a?(String) && token.strip.present?
         device_type = PLATFORMS.fetch(body["platform"]) { raise invalid("platform", "invalid_value", "platform must be one of #{PLATFORMS.keys.join(", ")}.") }
-        attributes = {token: token.strip, device_type: device_type, active: true}
+        # registered_with marks a device action pushes may reach (Device.v3_ios).
+        attributes = {token: token.strip, device_type: device_type, active: true, data: {"registered_with" => "v3"}}
         OPTIONAL.each do |field, column|
           value = body[field]
           raise invalid(field, "invalid_value", "#{field} must be a string.") unless value.nil? || value.is_a?(String)
           attributes[column] = value
         end
+        # Pushes go out under the app's bundle id.
+        raise invalid("app_bundle_id", "missing", "app_bundle_id is required for ios.") if device_type == "notifier" && attributes[:application].blank?
 
         registered = @user.devices.where_lower(token: attributes[:token]).exists?
         device = Device.register(@user, attributes[:token], attributes)

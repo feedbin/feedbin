@@ -69,17 +69,49 @@ class ApiV3ActionsTest < ActionDispatch::IntegrationTest
     assert_equal "/kind", JSON.parse(response.body)["errors"].first["pointer"]
   end
 
-  test "mute and notifier set their own actions, and there is one notifier" do
+  test "a mute sets its own actions" do
     post "/v3/actions", params: {title: "Mute", kind: "mute", query: "swift", actions: ["star"]}.to_json, headers: json
     assert_equal ["mark_read"], JSON.parse(response.body)["actions"]
+  end
 
-    post "/v3/actions", params: {title: "Notify", kind: "notifier", actions: ["star"]}.to_json, headers: json
-    assert_response :created
-    assert_equal ["send_ios_notification"], JSON.parse(response.body)["actions"]
+  test "notifier is not a kind" do
+    post "/v3/actions", params: {title: "Notify", kind: "notifier"}.to_json, headers: json
 
-    post "/v3/actions", params: {title: "Notify again", kind: "notifier"}.to_json, headers: json
     assert_response :unprocessable_content
-    assert_equal "/kind", JSON.parse(response.body)["errors"].first["pointer"]
+    error = JSON.parse(response.body)["errors"].first
+    assert_equal ["/kind", "invalid_value"], error.values_at("pointer", "code")
+  end
+
+  test "notifier actions are hidden" do
+    notifier = @user.actions.create!(title: "Notify", action_type: :notifier, actions: ["send_ios_notification"], all_feeds: true)
+
+    get "/v3/actions", headers: bearer
+    refute_includes JSON.parse(response.body)["data"].map { _1["id"] }, notifier.id
+
+    patch "/v3/actions/#{notifier.id}", params: {title: "Renamed"}.to_json, headers: json
+    assert_response :not_found
+    get "/v3/actions/#{notifier.id}/entries", headers: bearer
+    assert_response :not_found
+    delete "/v3/actions/#{notifier.id}", headers: bearer
+    assert_response :not_found
+    assert Action.exists?(notifier.id)
+  end
+
+  test "send_ios_notification shows as send_push_notification" do
+    action = @user.actions.create!(title: "Push", action_type: :standard, actions: ["send_ios_notification", "star", "send_push_notification"], all_feeds: true)
+
+    get "/v3/actions", headers: bearer
+
+    assert_equal ["send_push_notification", "star"], JSON.parse(response.body)["data"].find { _1["id"] == action.id }["actions"]
+  end
+
+  test "an update without actions keeps the stored actions" do
+    action = @user.actions.create!(title: "Push", action_type: :standard, actions: ["star", "send_ios_notification"], all_feeds: true)
+
+    patch "/v3/actions/#{action.id}", params: {title: "Renamed"}.to_json, headers: json
+
+    assert_response :success
+    assert_equal ["star", "send_ios_notification"], action.reload.actions
   end
 
   test "a scope of only foreign ids does not widen to every feed" do

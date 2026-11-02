@@ -3,6 +3,11 @@ class Device < ApplicationRecord
 
   enum :device_type, {notifier: 0, safari: 1, podcast: 2, browser: 3}
 
+  # iOS apps that registered through v3, each with its own bundle id. The
+  # retired Feedbin Notifier registered notifier devices through v2; those
+  # get no pushes.
+  scope :v3_ios, -> { notifier.where("data->>'registered_with' = 'v3'") }
+
   # index_devices_on_lower_tokens covers lower(token) alone, with no user_id,
   # so a token identifies one physical device rather than one device per
   # account. Look it up globally — two accounts signed in to the same browser

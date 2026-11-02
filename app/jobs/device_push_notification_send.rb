@@ -23,17 +23,17 @@ class DevicePushNotificationSend
       user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
     end
 
-    tokens = Device.where(user_id: user_ids).notifier.pluck(:user_id, :token, :operating_system)
+    tokens = Device.v3_ios.where(user_id: user_ids).pluck(:user_id, :token, :operating_system, :application)
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
     default_title = format_text(feed.title)
 
-    notifications = tokens.each_with_object({}) { |(user_id, token, operating_system), hash|
+    notifications = tokens.each_with_object({}) { |(user_id, token, operating_system, application), hash|
       # Per iteration. Reassigning feed_title carried one subscriber's private
       # rename into every later recipient's notification.
       feed_title = feed_titles[user_id] || default_title
-      notification = build_notification(token, feed_title, entry, operating_system)
+      notification = build_notification(token, feed_title, entry, operating_system, application)
       hash[notification.apns_id] = notification
     }
 
@@ -74,7 +74,8 @@ class DevicePushNotificationSend
     text
   end
 
-  def build_notification(device_token, feed_title, entry, operating_system)
+  # application is the app's bundle id, the APNs topic it registered under.
+  def build_notification(device_token, feed_title, entry, operating_system, application)
     alert_title = feed_title
     if entry.tweet?
       alert_title = entry.title
@@ -112,7 +113,7 @@ class DevicePushNotificationSend
       notification.content_available = 1
       notification.sound = "default"
       notification.priority = 10
-      notification.topic = ENV["APPLE_PUSH_TOPIC"]
+      notification.topic = application
       notification.apns_id = SecureRandom.uuid
       notification.mutable_content = 1
     end

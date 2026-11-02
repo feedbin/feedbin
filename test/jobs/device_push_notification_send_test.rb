@@ -7,7 +7,7 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
     @entries = @users.first.entries
 
     @devices = @users.map { |user|
-      user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:notifier])
+      user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:notifier], application: "com.feedbin.app", data: {"registered_with" => "v3"})
     }
   end
 
@@ -66,5 +66,25 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
         DevicePushNotificationSend.new.perform(user_ids, @entries.first.id, true)
       end
     end
+  end
+
+  test "pushes under each device's own bundle id" do
+    @devices.last.update!(application: "com.feedbin.other")
+    pool = PushServerMock.new("200")
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+    end
+
+    assert_equal({"token#{@users.first.id}" => "com.feedbin.app", "token#{@users.last.id}" => "com.feedbin.other"}, pool.topics)
+  end
+
+  test "a device the retired Notifier registered gets nothing" do
+    @devices.first.update!(data: {})
+    pool = PushServerMock.new("200")
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+    end
+
+    assert_equal ["token#{@users.last.id}"], pool.topics.keys
   end
 end

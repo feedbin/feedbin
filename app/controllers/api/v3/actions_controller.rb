@@ -1,19 +1,20 @@
 module Api
   module V3
     # Actions: the list with an ETag, create, update and delete, and a
-    # preview of what the rule matches now. A mute always marks read and the
-    # notifier always pushes to iOS, so their actions are set here rather
-    # than taken from the body.
+    # preview of what the rule matches now. A mute always marks read, so its
+    # actions are set here rather than taken from the body. The notifier
+    # belonged to the retired Feedbin Notifier: v3 neither shows nor accepts
+    # one.
     class ActionsController < ApiController
       include SearchPage
 
-      KINDS = Action.action_types.keys.freeze
+      KINDS = %w[standard mute].freeze
       ACTIONS = %w[mark_read star send_push_notification].freeze
-      FIXED_ACTIONS = {"mute" => ["mark_read"], "notifier" => ["send_ios_notification"]}.freeze
+      FIXED_ACTIONS = {"mute" => ["mark_read"]}.freeze
 
       def index
         return if not_modified?(list_etag("actions"))
-        render_list(@user.actions.order(Arel.sql("lower(title)"), :id).map { ActionSerializer.new(_1).to_h })
+        render_list(actions.order(Arel.sql("lower(title)"), :id).map { ActionSerializer.new(_1).to_h })
       end
 
       def create
@@ -23,24 +24,28 @@ module Api
       end
 
       def update
-        action = @user.actions.find(params[:id])
+        action = actions.find(params[:id])
         assign(action, request.request_parameters, required: false)
         save(action, status: :ok)
       end
 
       def destroy
-        @user.actions.find(params[:id]).destroy
+        actions.find(params[:id]).destroy
         head :no_content
       end
 
       # The rule's stored scope, so the preview matches what the percolator
       # runs. A scope that lost every feed matches nothing.
       def entries
-        action = @user.actions.find(params[:id])
+        action = actions.find(params[:id])
         render_search_page(EntrySearch.new(@user, query: action.query.to_s, feed_ids: action.computed_feed_ids))
       end
 
       private
+
+      def actions
+        @user.actions.where.not(action_type: :notifier)
+      end
 
       def assign(action, body, required:)
         if body.key?("title") || required
@@ -67,11 +72,7 @@ module Api
           raise invalid("actions", "invalid_value", "actions must be an array of #{ACTIONS.join(", ")}.") unless values.is_a?(Array) && values.all? { ACTIONS.include?(_1) }
           action.actions = values.uniq
         end
-        action.actions = FIXED_ACTIONS.fetch(action.action_type) { action.actions & ACTIONS }
-
-        if action.notifier? && @user.actions.notifier.where.not(id: action.id).exists?
-          raise invalid("kind", "taken", "The account already has a notifier action.")
-        end
+        action.actions = FIXED_ACTIONS[action.action_type] if FIXED_ACTIONS.key?(action.action_type)
       end
 
       # Both lists empty as sent means every feed. Ids the user cannot use are

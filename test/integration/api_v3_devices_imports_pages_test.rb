@@ -17,7 +17,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     assert_equal ["device", "ios", "com.feedbin.feedbin", "iPhone17,1", "iOS 27.0"], body.values_at("object", "platform", "app_bundle_id", "model", "operating_system")
     assert Device.find(body["id"]).notifier?
 
-    post "/v3/devices", params: {push_token: "ABC123", platform: "ios", model: "iPhone18,1"}.to_json, headers: json
+    post "/v3/devices", params: {push_token: "ABC123", platform: "ios", app_bundle_id: "com.feedbin.feedbin", model: "iPhone18,1"}.to_json, headers: json
     assert_response :success
     assert_equal body["id"], JSON.parse(response.body)["id"]
     assert_equal "iPhone18,1", JSON.parse(response.body)["model"]
@@ -29,6 +29,20 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     assert_response :no_content
     delete "/v3/devices/#{body["id"]}", headers: bearer
     assert_response :not_found
+  end
+
+  test "an ios device needs its bundle id" do
+    post "/v3/devices", params: {push_token: "abc123", platform: "ios"}.to_json, headers: json
+
+    assert_response :unprocessable_content
+    error = JSON.parse(response.body)["errors"].first
+    assert_equal ["/app_bundle_id", "missing"], error.values_at("pointer", "code")
+  end
+
+  test "a device registered through v3 says so" do
+    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.app"}.to_json, headers: json
+
+    assert_equal "v3", Device.find(JSON.parse(response.body)["id"]).data["registered_with"]
   end
 
   test "imports OPML and reports each item" do
