@@ -123,6 +123,7 @@ Rails.application.routes.draw do
       namespace :v3 do
         resources :entries, only: [:index]
         resources :tokens, only: [:index, :destroy]
+        resources :subscriptions, only: [:index]
         get "collections/:id/ids", to: "collections#ids"
 
         match "/", to: "api#not_found", via: :all
