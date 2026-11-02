@@ -35,7 +35,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
 
     host! "api.example.com"
     get "/v3/subscriptions", headers: {"Authorization" => "Bearer #{body["access_token"]}"}
-    assert_response :not_found
+    assert_response :success
   end
 
   test "rejects a code exchange with the wrong verifier" do

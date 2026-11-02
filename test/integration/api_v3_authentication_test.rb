@@ -28,10 +28,8 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
 
     get "/v3/subscriptions", headers: bearer(@token.plaintext_token)
 
-    # No v3 endpoints exist yet, so an authenticated request reaches the
-    # catch-all.
-    assert_response :not_found
-    assert_equal "not_found", JSON.parse(response.body)["code"]
+    assert_response :success
+    assert_equal "list", JSON.parse(response.body)["object"]
     assert_not_nil @token.reload.last_used_at
   end
 
