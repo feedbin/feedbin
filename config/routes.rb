@@ -131,6 +131,9 @@ Rails.application.routes.draw do
         end
         resources :feeds, only: [:index]
         resources :tags, only: [:index, :update, :destroy]
+        resource :account, only: [:show, :update, :destroy], controller: "account" do
+          post :purchases
+        end
         get "collections", to: "collections#index"
         get "collections/:id/ids", to: "collections#ids"
         get "collections/:id/entries", to: "collections#entries"
