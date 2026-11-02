@@ -121,7 +121,9 @@ Rails.application.routes.draw do
       end
 
       namespace :v3 do
-        resources :entries, only: [:index]
+        resources :entries, only: [:index] do
+          post :state, on: :collection
+        end
         resources :tokens, only: [:index, :destroy]
         resources :subscriptions, only: [:index]
         get "collections/:id/ids", to: "collections#ids"

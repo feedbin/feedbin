@@ -19,6 +19,12 @@ module Api
         params.key?(:ids) ? render_ids : render_timeline
       end
 
+      # POST /entries/state: the verbs, from the raw body so a verb's array
+      # arrives as JSON gave it rather than filtered through params.
+      def state
+        render json: StateChange.new(@user, request.request_parameters).call
+      end
+
       private
 
       # Not paginated. Ids that don't exist or the user can't read come back

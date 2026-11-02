@@ -10,6 +10,9 @@ module Api
       include Pagination
       include Conditional
 
+      # A v3 body is the resource itself, never wrapped in a root key.
+      wrap_parameters false
+
       before_action :validate_content_type
 
       # Unmatched v3 paths land here, after authentication, so an unknown
