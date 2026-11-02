@@ -62,6 +62,7 @@ module Api
         end
 
         meta = {as_of: as_of}
+        meta.merge!(stream_cursors(entries)) if sort == "received_desc"
         meta[:total] = total if total
         render_list(
           serialize(entries),
@@ -72,6 +73,24 @@ module Api
 
       def cursor_at(entry, column)
         Cursor.encode(sort: sort, timestamp: microseconds(entry.public_send(column)), id: entry.id)
+      end
+
+      # The default timeline page hands a client its two stream positions, so
+      # it can show the newest entries and start following arrivals and edits
+      # from there without paging through history. Arrivals resume after the
+      # newest entry on the page; edits from the response time, since the
+      # page already carries every edit made before it.
+      def stream_cursors(entries)
+        now = Time.at(Rational(microseconds(Time.now), 1_000_000)).utc
+        arrivals = if entries.any?
+          Cursor.encode(sort: "received_asc", timestamp: microseconds(entries.first.created_at), id: entries.first.id)
+        else
+          Cursor.encode(sort: "received_asc", timestamp: microseconds(now), id: 0)
+        end
+        {
+          arrivals_cursor: arrivals,
+          edits_cursor: Cursor.encode(sort: "edited_asc", timestamp: microseconds(now), id: 0)
+        }
       end
 
       # A stream sort's last page still ends with a cursor to resume from:

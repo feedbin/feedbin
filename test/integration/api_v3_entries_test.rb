@@ -76,6 +76,37 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert JSON.parse(response.body)["meta"]["as_of"].present?
   end
 
+  test "the first timeline page hands out the stream cursors" do
+    get "/v3/entries", params: {limit: 2}, headers: bearer
+    meta = JSON.parse(response.body)["meta"]
+    assert_equal %w[as_of arrivals_cursor edits_cursor], meta.keys
+
+    arrivals = Api::V3::Cursor.decode(meta["arrivals_cursor"])
+    assert_equal ["received_asc", @entries.last.id], [arrivals["sort"], arrivals["id"]]
+    edits = Api::V3::Cursor.decode(meta["edits_cursor"])
+    assert_equal ["edited_asc", 0], [edits["sort"], edits["id"]]
+    assert_in_delta Time.now.to_f, edits["timestamp"] / 1_000_000.0, 5
+
+    arrival = @feed.entries.create!(title: "New", url: "https://example.com/new", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    @entries.first.update!(revision: 2, edited_at: Time.now)
+
+    get "/v3/entries", params: {sort: "received_asc", cursor: meta["arrivals_cursor"]}, headers: bearer
+    assert_equal [arrival.id], JSON.parse(response.body)["data"].map { _1["id"] }
+    get "/v3/entries", params: {sort: "edited_asc", cursor: meta["edits_cursor"]}, headers: bearer
+    assert_equal [@entries.first.id], JSON.parse(response.body)["data"].map { _1["id"] }
+
+    get "/v3/entries", params: {sort: "published_desc"}, headers: bearer
+    assert_equal %w[as_of], JSON.parse(response.body)["meta"].keys
+  end
+
+  test "an empty timeline hands out stream cursors at the response time" do
+    @user.subscriptions.destroy_all
+    get "/v3/entries", headers: bearer
+    meta = JSON.parse(response.body)["meta"]
+    assert_equal [], JSON.parse(response.body)["data"]
+    assert_in_delta Time.now.to_f, Api::V3::Cursor.decode(meta["arrivals_cursor"])["timestamp"] / 1_000_000.0, 5
+  end
+
   test "pages with a cursor" do
     get "/v3/entries", params: {limit: 2}, headers: bearer
     first = JSON.parse(response.body)
