@@ -59,9 +59,12 @@ CREATE FUNCTION public.bump_sync_version_deleted() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  INSERT INTO sync_versions (user_id, list, version)
-  SELECT DISTINCT user_id, TG_ARGV[0], 1 FROM old_rows WHERE user_id IS NOT NULL
-  ON CONFLICT (user_id, list) DO UPDATE SET version = sync_versions.version + 1;
+  -- ORDER BY so two statements that touch overlapping users lock the
+  -- same rows in the same order and cannot deadlock. Schema-qualified
+  -- so a session with an empty search_path (pg_restore) still writes.
+  INSERT INTO public.sync_versions (user_id, list, version)
+  SELECT user_id, TG_ARGV[0], 1 FROM (SELECT DISTINCT user_id FROM old_rows WHERE user_id IS NOT NULL ORDER BY user_id) changed
+  ON CONFLICT (user_id, list) DO UPDATE SET version = public.sync_versions.version + 1;
   RETURN NULL;
 END $$;
 
@@ -74,9 +77,12 @@ CREATE FUNCTION public.bump_sync_version_inserted() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  INSERT INTO sync_versions (user_id, list, version)
-  SELECT DISTINCT user_id, TG_ARGV[0], 1 FROM new_rows WHERE user_id IS NOT NULL
-  ON CONFLICT (user_id, list) DO UPDATE SET version = sync_versions.version + 1;
+  -- ORDER BY so two statements that touch overlapping users lock the
+  -- same rows in the same order and cannot deadlock. Schema-qualified
+  -- so a session with an empty search_path (pg_restore) still writes.
+  INSERT INTO public.sync_versions (user_id, list, version)
+  SELECT user_id, TG_ARGV[0], 1 FROM (SELECT DISTINCT user_id FROM new_rows WHERE user_id IS NOT NULL ORDER BY user_id) changed
+  ON CONFLICT (user_id, list) DO UPDATE SET version = public.sync_versions.version + 1;
   RETURN NULL;
 END $$;
 
@@ -3259,6 +3265,13 @@ CREATE TRIGGER taggings_delete_bump_sync_version AFTER DELETE ON public.taggings
 --
 
 CREATE TRIGGER taggings_insert_bump_sync_version AFTER INSERT ON public.taggings REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('subscriptions');
+
+
+--
+-- Name: taggings taggings_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER taggings_update_bump_sync_version AFTER UPDATE ON public.taggings REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('subscriptions');
 
 
 --

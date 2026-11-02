@@ -9,7 +9,8 @@ class CreateSyncVersions < ActiveRecord::Migration[8.1]
     "unreads" => ["unread", %w[INSERT DELETE]],
     "starred_entries" => ["starred", %w[INSERT DELETE]],
     "subscriptions" => ["subscriptions", %w[INSERT UPDATE DELETE]],
-    "taggings" => ["subscriptions", %w[INSERT DELETE]]
+    # Tag.rename moves taggings with update_all, so taggings also need UPDATE.
+    "taggings" => ["subscriptions", %w[INSERT UPDATE DELETE]]
   }.freeze
 
   def up
@@ -27,9 +28,12 @@ class CreateSyncVersions < ActiveRecord::Migration[8.1]
         execute <<~SQL
           CREATE FUNCTION bump_sync_version_#{suffix}() RETURNS trigger LANGUAGE plpgsql AS $$
           BEGIN
-            INSERT INTO sync_versions (user_id, list, version)
-            SELECT DISTINCT user_id, TG_ARGV[0], 1 FROM #{rows} WHERE user_id IS NOT NULL
-            ON CONFLICT (user_id, list) DO UPDATE SET version = sync_versions.version + 1;
+            -- ORDER BY so two statements that touch overlapping users lock the
+            -- same rows in the same order and cannot deadlock. Schema-qualified
+            -- so a session with an empty search_path (pg_restore) still writes.
+            INSERT INTO public.sync_versions (user_id, list, version)
+            SELECT user_id, TG_ARGV[0], 1 FROM (SELECT DISTINCT user_id FROM #{rows} WHERE user_id IS NOT NULL ORDER BY user_id) changed
+            ON CONFLICT (user_id, list) DO UPDATE SET version = public.sync_versions.version + 1;
             RETURN NULL;
           END $$;
         SQL

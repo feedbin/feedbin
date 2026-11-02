@@ -40,6 +40,16 @@ class SyncVersionTest < ActiveSupport::TestCase
     assert_equal 5, SyncVersion.for(@user)["subscriptions"]
   end
 
+  test "renaming a tag bumps subscriptions" do
+    @user.subscriptions.create!(feed: @feed)
+    tag = @feed.tag("Apple", @user).first.tag
+    before = SyncVersion.for(@user)["subscriptions"]
+
+    Tag.rename(@user, tag, "Fruit")
+
+    assert_equal before + 1, SyncVersion.for(@user)["subscriptions"]
+  end
+
   test "other users' rows do not bump this user" do
     UnreadEntry.create_from_owners(users(:ben), @entries.first)
     assert_equal 0, SyncVersion.for(@user)["unread"]
