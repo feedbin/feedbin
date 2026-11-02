@@ -34,4 +34,8 @@ class UnreadEntryTest < ActiveSupport::TestCase
     assert_equal original.id, result.id
     assert_equal 1, UnreadEntry.where(user: @user, entry: @entry).count
   end
+
+  test "unread pages have an index on their sort key" do
+    assert ActiveRecord::Base.connection.index_exists?(:unreads, [:user_id, :entry_created_at, :entry_id])
+  end
 end

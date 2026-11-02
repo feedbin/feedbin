@@ -6,14 +6,6 @@ module Api
     module SearchPage
       extend ActiveSupport::Concern
 
-      included do
-        rescue_from EntrySearch::QueryInvalid do |exception|
-          render_problem :unprocessable_content, "query_invalid",
-            title: "Query invalid",
-            detail: exception.message
-        end
-      end
-
       private
 
       def render_search_page(search, total: false)

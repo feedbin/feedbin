@@ -34,7 +34,7 @@ module Api
         ActiveRecord::Base.transaction do
           verbs.each do |verb, target|
             if target.is_a?(Scope)
-              applied[verb] = {count: target.relation.delete_all}
+              applied[verb] = {count: target.delete_all}
               next
             end
             allowed, denied = target.partition { allowed?(verb, permissions[_1], updated.include?(_1)) }
@@ -51,12 +51,20 @@ module Api
       # combine with AND; no keys selects every row.
       class Scope
         attr_reader :relation
+        SLICE = 10_000
 
         def initialize(user, verb, scope)
           @user = user
           @verb = verb
           @relation = (verb == "mark_read") ? user.unread_entries : user.updated_entries
           scope.each { |key, value| narrow(key, value) }
+        end
+
+        # A saved search's matches are deleted a slice at a time, so no
+        # statement carries more than SLICE ids.
+        def delete_all
+          return @relation.delete_all unless @search_ids
+          @search_ids.each_slice(SLICE).sum { @relation.where(entry_id: _1).delete_all }
         end
 
         private
@@ -79,7 +87,11 @@ module Api
           raise invalid("collection", "invalid_value", "collection must be #{SCOPE_COLLECTIONS.join(", ")}, or a saved search's collection id.") unless collection
           # A table sweeps itself whole; the timeline is every row.
           return if collection.timeline? || (@verb == "mark_read" && id == "unread") || (@verb == "clear_updated" && id == "updated")
-          @relation = @relation.where(entry_id: collection.search? ? search_matches(collection) : collection.rows.reorder(nil).select(:entry_id))
+          if collection.search?
+            @search_ids = search_matches(collection)
+          else
+            @relation = @relation.where(entry_id: collection.rows.reorder(nil).select(:entry_id))
+          end
         end
 
         # Every match, not the 50 a saved search's id list carries. The id
@@ -87,7 +99,9 @@ module Api
         # the sweep is not in it.
         def search_matches(collection)
           query = Entry.build_query(user: @user, query: collection.query)
-          Search.client { _1.all_matches(Search.index_name(Entry.table_name), query: query) }
+          index = Search.index_name(Entry.table_name)
+          raise EntrySearch::QueryInvalid, "The saved search's query could not be parsed." unless Search.client { _1.validate(index, query: {query: query[:query]}) }
+          Search.client { _1.all_matches(index, query: query) }
         end
 
         def id_list(key, value)

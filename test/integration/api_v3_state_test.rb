@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class ApiV3StateTest < ActionDispatch::IntegrationTest
   setup do
@@ -139,6 +140,29 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_content
     assert_equal "/mark_read/published_before", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
+  test "a saved-search scope whose query no longer parses is query_invalid" do
+    search = @user.saved_searches.create!(name: "Broken", query: "E0")
+    search.update_column(:query, "title:(")
+
+    post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
+
+    assert_response :unprocessable_content
+    assert_equal "query_invalid", JSON.parse(response.body)["code"]
+    assert_equal 2, @user.unread_entries.count
+  end
+
+  test "a saved-search sweep over many matches deletes only the user's unread rows" do
+    search = @user.saved_searches.create!(name: "E", query: "E0")
+    matches = (1..25_000).to_a - [@a.id, @b.id] + [@a.id, @b.id]
+
+    Search::Connection.stub_any_instance(:all_matches, matches) do
+      post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
+    end
+
+    assert_equal({"count" => 2}, JSON.parse(response.body)["applied"]["mark_read"])
+    assert_equal 0, @user.unread_entries.count
   end
 
   private

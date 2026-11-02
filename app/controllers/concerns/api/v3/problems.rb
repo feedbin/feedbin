@@ -45,6 +45,14 @@ module Api
         rescue_from ActionController::ParameterMissing do |exception|
           status_validation_failed([{pointer: "/#{exception.param}", code: "missing", detail: "#{exception.param} is required."}])
         end
+
+        # A search, an action preview, or a saved-search scope whose query
+        # Elasticsearch cannot parse.
+        rescue_from EntrySearch::QueryInvalid do |exception|
+          render_problem :unprocessable_content, "query_invalid",
+            title: "Query invalid",
+            detail: exception.message
+        end
       end
 
       private

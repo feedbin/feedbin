@@ -46,7 +46,7 @@ module Api
         skipped = []
         ids.each do |id|
           permission = permissions[id]
-          reason = permission.found? ? (send(ADDABLE.fetch(collection.id), permission.entry) ? nil : "not_subscribed") : "not_found"
+          reason = permission.found? ? (send(ADDABLE.fetch(collection.id), permission) ? nil : "not_subscribed") : "not_found"
           reason ? skipped << {id: id, reason: reason} : applied << id
         end
         render json: {applied: applied, skipped: skipped}
@@ -83,8 +83,10 @@ module Api
           rows.each_with_index do |body, index|
             row = queued[body["id"]]
             next skipped << {id: body["id"], reason: "not_found"} unless row
-            written, _stale = QueueMembershipWrite.new(row, body, pointer: "/entries/#{index}").apply
-            written.any? ? applied << body["id"] : skipped << {id: body["id"], reason: "stale_write"}
+            # A row whose every sent field was stale is skipped; one that sent
+            # nothing to change has nothing stale and is applied.
+            written, stale = QueueMembershipWrite.new(row, body, pointer: "/entries/#{index}").apply
+            (written.empty? && stale.any?) ? skipped << {id: body["id"], reason: "stale_write"} : applied << body["id"]
           end
         end
         render json: {applied: applied, skipped: skipped}
@@ -133,24 +135,28 @@ module Api
         value.uniq
       end
 
-      def add_recently_read(entry)
-        return false unless writable?(entry)
-        RecentlyReadEntry.create_from_owners(@user, entry.id)
+      # Each takes the EntryAccess permission add already looked up for every
+      # id at once.
+      def add_recently_read(permission)
+        return false unless permission.writable?
+        RecentlyReadEntry.create_from_owners(@user, permission.entry.id)
         true
       end
 
       # Airshow plays episodes of podcasts the reader may not subscribe to,
       # so a podcast subscription or a queued episode is enough, as the web's
       # can_read_entry? allows the queue.
-      def add_recently_played(entry)
-        return false unless writable?(entry) || @user.podcast_subscriptions.where(feed_id: entry.feed_id).exists? || @user.queued_entries.exists?(entry_id: entry.id)
-        RecentlyPlayedEntry.create_or_find_by(user_id: @user.id, entry_id: entry.id)
+      def add_recently_played(permission)
+        @queued_ids ||= @user.queued_entries.pluck(:entry_id).to_set
+        return false unless permission.writable? || permission.queueable || @queued_ids.include?(permission.entry.id)
+        RecentlyPlayedEntry.create_or_find_by(user_id: @user.id, entry_id: permission.entry.id)
         true
       end
 
       # Queueing needs the podcast subscription Airshow keeps, not the reader's.
-      def add_queued(entry)
-        return false unless @user.podcast_subscriptions.where(feed_id: entry.feed_id).exists?
+      def add_queued(permission)
+        return false unless permission.queueable
+        entry = permission.entry
         playlist_id = queue_playlist_id
         row = @user.queued_entries.create_with(feed_id: entry.feed_id, playlist_id: playlist_id).create_or_find_by(entry_id: entry.id)
         row.update!(playlist_id: playlist_id) if playlist_id && row.playlist_id != playlist_id
@@ -164,11 +170,6 @@ module Api
         raise Problems::InvalidParameter.new("playlist_id must be an integer.", pointer: "/playlist_id", code: "invalid_value") unless playlist_id.nil? || playlist_id.is_a?(Integer)
         raise Problems::InvalidParameter.new("playlist_id must be one of the user's playlists.", pointer: "/playlist_id", code: "invalid_value") unless playlist_id.nil? || @user.playlists.exists?(id: playlist_id)
         @queue_playlist_id = playlist_id
-      end
-
-      def writable?(entry)
-        @writable ||= {}
-        @writable.fetch(entry.id) { @writable[entry.id] = EntryAccess.new(@user).permissions_for([entry.id])[entry.id].writable? }
       end
 
       # A page of membership rows, keyed on the collection's sort column and

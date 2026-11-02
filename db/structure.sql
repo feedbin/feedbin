@@ -3100,6 +3100,13 @@ CREATE INDEX index_unreads_on_user_id_and_created_at ON public.unreads USING btr
 
 
 --
+-- Name: index_unreads_on_user_id_and_entry_created_at_and_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_user_id_and_entry_created_at_and_entry_id ON public.unreads USING btree (user_id, entry_created_at, entry_id);
+
+
+--
 -- Name: index_unreads_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3509,6 +3516,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261102140000'),
 ('20261102130000'),
 ('20261102120000'),
 ('20261101120000'),

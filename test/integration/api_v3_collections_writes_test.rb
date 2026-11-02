@@ -291,6 +291,29 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     assert_equal "/sort_order_updated_at", JSON.parse(response.body)["errors"].first["pointer"]
   end
 
+  test "adding entries costs a fixed number of queries per id, not a permission lookup each" do
+    entries = 55.times.map { |i| @feed.entries.create!(title: "R#{i}", url: "https://example.com/r/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex) }
+
+    few = count_queries { post "/v3/collections/recently_read/entries", params: {ids: entries.first(5).map(&:id)}.to_json, headers: json }
+    many = count_queries { post "/v3/collections/recently_read/entries", params: {ids: entries.last(50).map(&:id)}.to_json, headers: json }
+
+    assert_equal 50, JSON.parse(response.body)["applied"].size
+    # Per id, only RecentlyReadEntry.create_from_owners: savepoint, the
+    # uniqueness validation, the insert, release. A permission lookup per id
+    # made it nine.
+    assert_operator (many - few) / 45.0, :<=, 4, "#{few} queries for 5 ids, #{many} for 50"
+  end
+
+  test "a bulk row with only an id is applied" do
+    @user.podcast_subscriptions.create!(feed: @feed, status: :subscribed)
+    QueuedEntry.create!(user_id: @user.id, entry_id: @entries.first.id, feed_id: @feed.id, order: 1)
+
+    patch "/v3/collections/queue/entries", params: {entries: [{id: @entries.first.id}]}.to_json, headers: json
+
+    assert_response :success
+    assert_equal({"applied" => [@entries.first.id], "skipped" => []}, JSON.parse(response.body))
+  end
+
   private
 
   # Unread entries titled Swift, published oldest first, indexed for search.
@@ -301,6 +324,13 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     entries.each { UnreadEntry.create_from_owners(@user, _1) }
     index_entries(entries)
     entries
+  end
+
+  def count_queries(&block)
+    count = 0
+    counter = ->(*, payload) { count += 1 unless payload[:name] == "SCHEMA" }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record", &block)
+    count
   end
 
   def bearer
