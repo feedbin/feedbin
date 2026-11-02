@@ -51,10 +51,12 @@ module Api
           .limit(limit + 1)
           .to_a
 
-        next_cursor = if entries.size > limit
-          entries.pop
-          last = entries.last
-          Cursor.encode(sort: sort, timestamp: microseconds(last.public_send(column)), id: last.id)
+        more = entries.size > limit
+        entries.pop if more
+        next_cursor = if more
+          cursor_at(entries.last, column)
+        elsif sort == "received_asc"
+          tail_cursor(entries, column)
         end
 
         meta = total ? {total: total} : {}
@@ -63,6 +65,21 @@ module Api
           page: page_object(limit: limit, next_cursor: next_cursor),
           meta: meta
         )
+      end
+
+      def cursor_at(entry, column)
+        Cursor.encode(sort: sort, timestamp: microseconds(entry.public_send(column)), id: entry.id)
+      end
+
+      # received_asc follows arrivals, so its last page still ends with a
+      # cursor to resume from: after the last entry, or the cursor the client
+      # sent, or one at received_after (no later than now) for a first poll.
+      def tail_cursor(entries, column)
+        return cursor_at(entries.last, column) if entries.any?
+        return params[:cursor] if params[:cursor].present?
+
+        start = [time_param(:received_after), Time.now].compact.min
+        Cursor.encode(sort: sort, timestamp: microseconds(start), id: 0)
       end
 
       def with_associations

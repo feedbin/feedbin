@@ -71,7 +71,7 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_nil second["page"]["next_cursor"]
   end
 
-  test "pages oldest received first with received_asc" do
+  test "pages oldest received first with received_asc and always leaves a cursor to resume from" do
     get "/v3/entries", params: {limit: 2, sort: "received_asc"}, headers: bearer
     first = JSON.parse(response.body)
     assert_equal @entries.first(2).map(&:id), first["data"].map { _1["id"] }
@@ -79,11 +79,39 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     get first["page"]["next_url"].delete_prefix("http://api.example.com"), headers: bearer
     second = JSON.parse(response.body)
     assert_equal [@entries.last.id], second["data"].map { _1["id"] }
-    assert_nil second["page"]["next_cursor"]
+    tail = second["page"]["next_cursor"]
+    assert tail.present?
+    assert_equal @entries.last.id, Api::V3::Cursor.decode(tail)["id"]
+
+    get "/v3/entries", params: {sort: "received_asc", cursor: tail}, headers: bearer
+    empty = JSON.parse(response.body)
+    assert_equal [], empty["data"]
+    assert_equal tail, empty["page"]["next_cursor"]
+
+    arrival = @feed.entries.create!(title: "New", url: "https://example.com/new", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    get "/v3/entries", params: {sort: "received_asc", cursor: tail}, headers: bearer
+    assert_equal [arrival.id], JSON.parse(response.body)["data"].map { _1["id"] }
 
     get "/v3/entries", params: {cursor: first["page"]["next_cursor"]}, headers: bearer
     assert_response :bad_request
     assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
+  end
+
+  test "bootstraps an arrivals cursor from received_after or the request time" do
+    get "/v3/entries", params: {sort: "received_asc", received_after: 1.minute.ago.iso8601}, headers: bearer
+    body = JSON.parse(response.body)
+    assert_equal [], body["data"]
+    cursor = Api::V3::Cursor.decode(body["page"]["next_cursor"])
+    assert_equal ["received_asc", 0], [cursor["sort"], cursor["id"]]
+    assert_in_delta 1.minute.ago.to_f, cursor["timestamp"] / 1_000_000.0, 5
+
+    get "/v3/entries", params: {sort: "received_asc", received_after: 1.day.from_now.iso8601}, headers: bearer
+    body = JSON.parse(response.body)
+    assert_equal [], body["data"]
+    assert_in_delta Time.now.to_f, Api::V3::Cursor.decode(body["page"]["next_cursor"])["timestamp"] / 1_000_000.0, 5
+
+    get "/v3/entries", params: {sort: "received_desc"}, headers: bearer
+    assert_nil JSON.parse(response.body)["page"]["next_cursor"]
   end
 
   test "keeps pages stable when new entries arrive" do
