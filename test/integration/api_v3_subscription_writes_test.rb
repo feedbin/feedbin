@@ -25,8 +25,13 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "subscribes by feed id with tags, and finds the existing subscription" do
+  test "subscribes by a feed id it offered in a 300, with tags, and finds the existing subscription" do
     feed = Feed.create!(feed_url: "https://new.example/feed", title: "New")
+    other = Feed.create!(feed_url: "https://new.example/podcast", title: "New Podcast")
+    FeedFinder.stub(:feeds, [feed, other]) do
+      post "/v3/subscriptions", params: {url: "https://new.example"}.to_json, headers: json
+    end
+    assert_response :multiple_choices
 
     post "/v3/subscriptions", params: {feed_id: feed.id, tag_names: ["Apple", "News"]}.to_json, headers: json
     assert_response :created
@@ -40,6 +45,25 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
 
     post "/v3/subscriptions", params: {feed_id: 0}.to_json, headers: json
     assert_response :not_found
+  end
+
+  test "a feed id that was not offered and is not readable is not found" do
+    ben = users(:ben)
+    private_feed = Feed.create!(feed_url: "https://private.example/feed?token=secret", title: "Private")
+    ben.subscriptions.create!(feed: private_feed)
+    their_pages = Feed.create!(feed_url: "http://pages.test/theirs", title: "Pages", feed_type: :pages, protected: true)
+    ben.subscriptions.create!(feed: their_pages, kind: :generated)
+
+    [private_feed, their_pages].each do |feed|
+      post "/v3/subscriptions", params: {feed_id: feed.id}.to_json, headers: json
+      assert_response :not_found
+    end
+    refute @user.subscriptions.exists?(feed_id: [private_feed.id, their_pages.id])
+
+    starred_from = Feed.create!(feed_url: "https://starred.example/feed", title: "Starred")
+    StarredEntry.create_from_owners(@user, starred_from.entries.create!(title: "s", url: "https://starred.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex))
+    post "/v3/subscriptions", params: {feed_id: starred_from.id}.to_json, headers: json
+    assert_response :created
   end
 
   test "subscribes by url when discovery finds one feed, 300 when it finds several" do
@@ -159,6 +183,17 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     apple = xml.at("/opml/body/outline[@text='Apple']")
     assert_equal ["https://example.com/feed"], apple.xpath("outline").map { _1["xmlUrl"] }
     assert_empty xml.xpath("//outline[@xmlUrl='#{@pages.feed_url}']")
+  end
+
+  test "a tag name with a comma stays one tag" do
+    put "/v3/subscriptions/#{@subscription.id}/tags", params: {tag_names: ["News, Sports"]}.to_json, headers: json
+    assert_response :success
+    assert_equal ["News, Sports"], JSON.parse(response.body)["data"].map { _1["name"] }
+
+    feed = Feed.create!(feed_url: "https://comma.example/feed", title: "Comma")
+    StarredEntry.create_from_owners(@user, feed.entries.create!(title: "c", url: "https://comma.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex))
+    post "/v3/subscriptions", params: {feed_id: feed.id, tag_names: ["Arts, Culture"]}.to_json, headers: json
+    assert_equal ["Arts, Culture"], Tag.where(id: JSON.parse(response.body)["tag_ids"]).pluck(:name)
   end
 
   private

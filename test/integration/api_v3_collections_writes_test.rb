@@ -200,6 +200,21 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test "records a play of an Airshow episode the reader does not subscribe to" do
+    podcast = Feed.create!(feed_url: "https://podcast.example/feed", title: "Podcast")
+    episode, queued_episode, stranger = 3.times.map { |i| podcast.entries.create!(title: "Ep #{i}", url: "https://podcast.example/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex) }
+    unrelated = Feed.create!(feed_url: "https://unrelated.example/feed").entries.create!(title: "u", url: "https://unrelated.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    @user.podcast_subscriptions.create!(feed: podcast, status: :subscribed)
+
+    post "/v3/collections/recently_played/entries", params: {ids: [episode.id, unrelated.id]}.to_json, headers: json
+    assert_equal [episode.id], JSON.parse(response.body)["applied"]
+
+    @user.podcast_subscriptions.destroy_all
+    QueuedEntry.create!(user_id: @user.id, entry_id: queued_episode.id, feed_id: podcast.id)
+    post "/v3/collections/recently_played/entries", params: {ids: [queued_episode.id, stranger.id]}.to_json, headers: json
+    assert_equal [queued_episode.id], JSON.parse(response.body)["applied"]
+  end
+
   private
 
   def bearer

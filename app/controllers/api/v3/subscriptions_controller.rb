@@ -8,6 +8,7 @@ module Api
     # tag set; unsubscribe; export OPML.
     class SubscriptionsController < ApiController
       PREFERENCES = %w[muted media_only show_updates].freeze
+      OFFER_LIFETIME = 1.day
 
       def index
         return if not_modified?(list_etag("subscriptions"))
@@ -20,23 +21,27 @@ module Api
 
       # Exactly one feed subscribes (201, or 200 when already subscribed);
       # several are a 300 with the candidates; none is a 404. tag_names apply
-      # to a new subscription only.
+      # to a new subscription only. A feed_id must be one this endpoint
+      # offered the user in a 300, or a feed the user can already read: feed
+      # ids are sequential, and Pages, newsletter and secret-URL feeds are
+      # ordinary rows.
       def create
         body = request.request_parameters
         unless body.key?("url") ^ body.key?("feed_id")
           raise Problems::InvalidParameter.new("Send url or feed_id, not both.", pointer: "", code: "invalid_value")
         end
 
-        feeds = body.key?("feed_id") ? [Feed.find(body["feed_id"])] : discover(body["url"].to_s.strip)
+        feeds = body.key?("feed_id") ? offered_or_readable(body["feed_id"]) : discover(body["url"].to_s.strip)
         return status_not_found if feeds.empty?
         if feeds.size > 1
+          Rails.cache.write_multi(feeds.to_h { [offered_key(_1.id), true] }, expires_in: OFFER_LIFETIME)
           return render json: {object: "list", data: feeds.map { FeedSerializer.new(_1).to_h }}, status: :multiple_choices
         end
 
         subscription = @user.subscriptions.find_or_initialize_by(feed: feeds.first)
         created = subscription.new_record?
         subscription.save!
-        feeds.first.tag(tag_names(body["tag_names"]).join(","), @user) if created && body["tag_names"].present?
+        feeds.first.tag(tag_names(body["tag_names"]), @user) if created && body["tag_names"].present?
         render json: serialize([subscription.reload]).first, status: created ? :created : :ok
       end
 
@@ -67,7 +72,7 @@ module Api
         names = request.request_parameters["tag_names"]
         raise Problems::InvalidParameter.new("tag_names must be an array of strings.", pointer: "/tag_names", code: "invalid_value") unless names.is_a?(Array) && names.all? { _1.is_a?(String) }
         record = subscription
-        record.feed.tag(tag_names(names).join(","), @user)
+        record.feed.tag(tag_names(names), @user)
         list = TagList.new(@user)
         tags = list.each_with_subscription_ids.select { |_tag, ids| ids.include?(record.id) }
         render_list(tags.map { |tag, ids| TagSerializer.new(tag, subscription_ids: ids).to_h })
@@ -150,6 +155,18 @@ module Api
         []
       end
 
+      def offered_or_readable(id)
+        feed = Feed.find_by(id: id) if id.is_a?(Integer)
+        return [] unless feed && (Rails.cache.exist?(offered_key(feed.id)) || @user.can_read_feed?(feed))
+        [feed]
+      end
+
+      def offered_key(feed_id)
+        "v3:subscriptions:offered:#{@user.id}:#{feed_id}"
+      end
+
+      # An array, never joined: Feed#tag splits a string on commas, and a
+      # folder name may contain one.
       def tag_names(names)
         Array(names).select { _1.is_a?(String) }.map(&:strip).reject(&:empty?)
       end

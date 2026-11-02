@@ -25,10 +25,11 @@ module Api
         render json: EntrySerializer.new(entry, feed: feed, expand: expand).to_h, status: entry.previously_new_record? ? :created : :ok
       end
 
-      # Only an entry in the user's own Pages feed.
+      # Only an entry in the user's own Pages feed: the one SavePage gave
+      # them a generated subscription to.
       def destroy
         entry = @user.entries.find(params[:id])
-        raise ActiveRecord::RecordNotFound unless entry.feed.pages?
+        raise ActiveRecord::RecordNotFound unless entry.feed.pages? && @user.subscriptions.generated.exists?(feed_id: entry.feed_id)
         EntryDeleter.new.delete_entries(entry.feed_id, entry.id)
         head :no_content
       end

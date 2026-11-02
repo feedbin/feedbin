@@ -27,6 +27,9 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
   test "an expired account reports its plan as expired" do
     @user.update!(suspended: true)
     get "/v3/account", headers: bearer
+    assert_response :success
+    assert_equal "expired", JSON.parse(response.body)["plan"]["status"]
+    get "/v3/subscriptions", headers: bearer
     assert_response :forbidden
 
     @user.update_columns(suspended: false, expires_at: 1.day.ago, plan_id: Plan.find_by!(stripe_id: "timed").id)
@@ -71,6 +74,8 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
     receipt = {transaction_id: SecureRandom.hex, purchase_date_ms: Time.now.to_i * 1_000, product_id: product_id}
     stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).to_return(body: {status: 0, receipt: {in_app: [receipt]}}.to_json, status: 200)
 
+    # TrialExpiration suspends a lapsed account; buying is how it comes back.
+    @user.update!(suspended: true)
     time = Time.now
     Time.stub(:now, time) do
       post "/v3/account/purchases", params: {receipt_data: "base64=="}.to_json, headers: json

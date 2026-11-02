@@ -2,6 +2,10 @@ module Api
   module V3
     # GET, PATCH and DELETE /account, and POST /account/purchases.
     class AccountController < ApiController
+      # TrialExpiration suspends every lapsed trial and timed plan, so a
+      # suspended account must still see why, buy its way back, or leave.
+      LAPSED_ACTIONS = %w[show purchases destroy].freeze
+
       def show
         render json: AccountSerializer.new(@user).to_h
       end
@@ -54,6 +58,12 @@ module Api
         end
         Array(result.dig("receipt", "in_app")).each { InAppPurchase.create_from_receipt_json(@user, _1, result) }
         render json: AccountSerializer.new(@user.reload).to_h
+      end
+
+      private
+
+      def lapsed_account_allowed?
+        LAPSED_ACTIONS.include?(action_name)
       end
     end
   end

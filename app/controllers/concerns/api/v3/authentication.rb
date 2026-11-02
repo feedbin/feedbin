@@ -36,11 +36,16 @@ module Api
       def authorize_account
         ErrorService.context(user_id: @user.id)
 
-        if !@user.api_v3_enabled? || @user.suspended || @user.plan.restricted?
+        if !@user.api_v3_enabled? || (!lapsed_account_allowed? && (@user.suspended || @user.plan.restricted?))
           render_problem :forbidden, "restricted",
             title: "Restricted",
             detail: "This account does not have access to the API."
         end
+      end
+
+      # Overridden where a suspended or restricted account may still act.
+      def lapsed_account_allowed?
+        false
       end
 
       def status_unauthorized

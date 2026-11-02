@@ -135,8 +135,11 @@ module Api
         true
       end
 
+      # Airshow plays episodes of podcasts the reader may not subscribe to,
+      # so a podcast subscription or a queued episode is enough, as the web's
+      # can_read_entry? allows the queue.
       def add_recently_played(entry)
-        return false unless writable?(entry)
+        return false unless writable?(entry) || @user.podcast_subscriptions.where(feed_id: entry.feed_id).exists? || @user.queued_entries.exists?(entry_id: entry.id)
         RecentlyPlayedEntry.create_or_find_by(user_id: @user.id, entry_id: entry.id)
         true
       end

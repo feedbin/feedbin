@@ -13,12 +13,10 @@ module Api
 
       def create
         xml = request.raw_post
-        unless MEDIA_TYPES.include?(request.media_type) && opml?(xml)
-          return render_problem :unsupported_media_type, "unsupported_media_type",
-            title: "Unsupported media type",
-            detail: "Send an OPML document as #{MEDIA_TYPES.join(" or ")}."
-        end
+        # Cheapest first: nothing is parsed until the size is known.
+        return not_opml unless MEDIA_TYPES.include?(request.media_type)
         raise Problems::InvalidParameter.new("The OPML must be smaller than 500 KB.", pointer: "", code: "too_large") if xml.bytesize > MAX_BYTES
+        return not_opml unless opml?(xml)
         return rate_limited unless Throttle.throttle!("v3:imports:#{@user.id}", UPLOADS, UPLOAD_PERIOD)
 
         # A filename puts the import on the web's Import & Export page, where
@@ -36,6 +34,12 @@ module Api
       end
 
       private
+
+      def not_opml
+        render_problem :unsupported_media_type, "unsupported_media_type",
+          title: "Unsupported media type",
+          detail: "Send an OPML document as #{MEDIA_TYPES.join(" or ")}."
+      end
 
       def opml?(xml)
         Nokogiri::XML(xml).root&.name&.casecmp?("opml")

@@ -123,6 +123,17 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
     assert_response :unsupported_media_type
   end
 
+  test "clear_updated clears a row whose entry is gone" do
+    UpdatedEntry.new_from_owners(@user.id, @a).save!
+    gone = @a.id
+    Entry.where(id: gone).delete_all
+
+    post "/v3/entries/state", params: {clear_updated: [gone]}.to_json, headers: json
+    assert_response :success
+    assert_equal({"clear_updated" => [gone]}, JSON.parse(response.body)["applied"])
+    assert_equal [], @user.updated_entries.pluck(:entry_id)
+  end
+
   private
 
   def bearer

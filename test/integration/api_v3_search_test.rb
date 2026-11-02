@@ -50,6 +50,19 @@ class ApiV3SearchTest < ActionDispatch::IntegrationTest
     refute_includes JSON.parse(response.body)["meta"]["query"], "tag_id"
   end
 
+  test "an OR in the query does not loosen the structured parameters" do
+    other = Feed.create!(feed_url: "https://other.example/feed", host: "other.example", title: "Other")
+    @user.subscriptions.create!(feed: other)
+    elsewhere = other.entries.create!(title: "Swift elsewhere", content: "<p>Swift</p>", url: "https://other.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: 1.day.ago)
+    index_entries([elsewhere])
+
+    get "/v3/search", params: {query: "swift OR tomatoes", feed_ids: other.id.to_s}, headers: bearer
+    assert_equal [elsewhere.id], JSON.parse(response.body)["data"].map { _1["id"] }
+
+    get "/v3/search", params: {query: "gardening OR tomatoes", published_after: 4.days.ago.iso8601}, headers: bearer
+    assert_equal [], JSON.parse(response.body)["data"]
+  end
+
   test "rejects a query that does not parse and a missing query" do
     get "/v3/search", params: {query: "title:("}, headers: bearer
     assert_response :unprocessable_content

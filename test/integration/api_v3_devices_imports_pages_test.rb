@@ -63,6 +63,12 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
 
     post "/v3/imports", params: "<html></html>", headers: bearer.merge("Content-Type" => "application/xml")
     assert_response :unsupported_media_type
+
+    Nokogiri.stub(:XML, ->(*) { raise "parsed an oversized body" }) do
+      post "/v3/imports", params: "x" * (500.kilobytes + 1), headers: bearer.merge("Content-Type" => "text/x-opml")
+    end
+    assert_response :unprocessable_content
+    assert_equal "too_large", JSON.parse(response.body)["errors"].first["code"]
   end
 
   test "saves a page into the Pages feed and deletes it" do
@@ -95,6 +101,14 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     other = Feed.create!(feed_url: "https://o.example/f").entries.create!(title: "o", url: "https://o.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
     delete "/v3/pages/#{other.id}", headers: bearer
     assert_response :not_found
+
+    their_pages = Feed.create!(feed_url: "http://pages.test/theirs", title: "Pages", feed_type: :pages, protected: true)
+    users(:ben).subscriptions.create!(feed: their_pages, kind: :generated)
+    @user.subscriptions.create!(feed: their_pages)
+    theirs = their_pages.entries.create!(title: "t", url: "https://t.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    delete "/v3/pages/#{theirs.id}", headers: bearer
+    assert_response :not_found
+    assert Entry.exists?(theirs.id)
   end
 
   private

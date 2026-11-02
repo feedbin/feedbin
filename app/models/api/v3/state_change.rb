@@ -39,7 +39,7 @@ module Api
             end
             allowed, denied = target.partition { allowed?(verb, permissions[_1], updated.include?(_1)) }
             denied.each { skipped[_1] ||= permissions[_1].reason }
-            apply(verb, allowed.map { permissions[_1].entry })
+            apply(verb, allowed, allowed.filter_map { permissions[_1].entry })
             applied[verb] = allowed
           end
         end
@@ -157,9 +157,10 @@ module Api
         permission.reason.nil? || (verb == "mark_read" && permission.unread) || (verb == "clear_updated" && updated)
       end
 
-      def apply(verb, entries)
-        return if entries.empty?
-        ids = entries.map(&:id)
+      # ids, and the entries that still exist for them: an Updated row has
+      # no foreign key, so clear_updated can name an entry that is gone.
+      def apply(verb, ids, entries)
+        return if ids.empty?
 
         case verb
         when "mark_read"

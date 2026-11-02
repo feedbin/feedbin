@@ -1,8 +1,9 @@
 module Api
   module V3
-    # A search over the user's entries, paged with search_after: the query
-    # string with the structured parameters folded in, validated with
-    # Elasticsearch before it runs, and one page of entries in search order.
+    # A search over the user's entries, paged with search_after: the user's
+    # query with the structured parameters applied as filters, validated
+    # with Elasticsearch before it runs, and one page of entries in search
+    # order.
     class EntrySearch
       class QueryInvalid < StandardError; end
 
@@ -12,25 +13,25 @@ module Api
 
       attr_reader :query
 
-      # query: the user's text. feed_ids/tag_ids: arrays folded in as
-      # feed_id:(…)/tag_id:(…); an empty feed_ids matches nothing.
-      # read/starred: booleans folded in as is: filters. published_after: a
-      # Time folded in as published:>.
+      # query: the user's text. feed_ids/tag_ids: arrays of ids to keep to; an
+      # empty feed_ids matches nothing. read/starred: booleans.
+      # published_after: a Time. They are filters beside the text rather than
+      # tokens appended to it: the query string's default AND does not bind
+      # across an OR, so "a OR b feed_id:1" would make the text optional.
       def initialize(user, query:, feed_ids: nil, tag_ids: nil, read: nil, starred: nil, published_after: nil)
         @user = user
+        @text = query.to_s.strip
+        @feed_ids = feed_ids
+        @tag_ids = tag_ids
+        @read = read
+        @starred = starred
+        @published_after = published_after
         @none = feed_ids&.empty?
-        parts = [query.to_s.strip]
-        parts << "feed_id:(#{feed_ids.join(" OR ")})" if feed_ids.present?
-        parts << "tag_id:(#{tag_ids.join(" OR ")})" if tag_ids.present?
-        parts << (read ? "is:read" : "is:unread") unless read.nil?
-        parts << (starred ? "is:starred" : "is:unstarred") unless starred.nil?
-        # The search syntax keeps a range token verbatim, so the time's colons
-        # are escaped or they would end the token early.
-        parts << "published:>#{published_after.utc.iso8601.gsub(":", "\\:")}" if published_after
-        @query = parts.reject(&:empty?).join(" ")
+        @query = display_query
       end
 
-      # The query as it ran: tag ids expanded to feed ids.
+      # The search as one string in the search syntax, tag ids expanded to
+      # feed ids. It means what ran; the filters are applied separately.
       def expanded_query
         Entry.replace_tag_ids(@query, @user)
       end
@@ -58,12 +59,38 @@ module Api
       end
 
       # build_query's sort, or relevance, with the entry id as a tiebreak so
-      # search_after never skips or repeats a hit.
+      # search_after never skips or repeats a hit; the structured parameters
+      # as filters.
       def request_body
-        body = Entry.build_query(user: @user, query: @query)
+        body = Entry.build_query(user: @user, query: @text)
         direction = body[:sort]&.first&.values&.first || "desc"
         body[:sort] = body[:sort] ? [*body[:sort], {id: direction}] : [{_score: "desc"}, {id: "desc"}]
+        bool = body[:query][:bool]
+        filters = [bool[:filter]]
+        filters << {terms: {feed_id: @feed_ids}} if @feed_ids.present?
+        filters << {terms: {feed_id: @user.taggings.where(tag_id: @tag_ids).distinct.pluck(:feed_id)}} if @tag_ids.present?
+        filters << {range: {published: {gt: @published_after.utc.iso8601(6)}}} if @published_after
+        unless @read.nil?
+          (@read ? bool[:must_not] : filters) << {ids: {values: @user.unread_entries.pluck(:entry_id)}}
+        end
+        unless @starred.nil?
+          (@starred ? filters : bool[:must_not]) << {ids: {values: @user.starred_entries.pluck(:entry_id)}}
+        end
+        bool[:filter] = filters
         body.except(:from, :size)
+      end
+
+      def display_query
+        parts = []
+        parts << "feed_id:(#{@feed_ids.join(" OR ")})" if @feed_ids.present?
+        parts << "tag_id:(#{@tag_ids.join(" OR ")})" if @tag_ids.present?
+        parts << (@read ? "is:read" : "is:unread") unless @read.nil?
+        parts << (@starred ? "is:starred" : "is:unstarred") unless @starred.nil?
+        # The search syntax keeps a range token verbatim, so the time's colons
+        # are escaped or they would end the token early.
+        parts << "published:>#{@published_after.utc.iso8601.gsub(":", "\\:")}" if @published_after
+        text = (parts.any? && @text.match?(/\bOR\b/)) ? "(#{@text})" : @text
+        [text, *parts].reject(&:empty?).join(" ")
       end
 
       # The sort values of the limit-th hit (the page's last), from the raw
