@@ -2,11 +2,17 @@ module Api
   module V3
     # The entry object, with every field and its feed embedded. Load entries
     # with Entry.with_list_associations.with_renderings so the image rows,
-    # feed, and stored rendering come preloaded. feed is the feed's serialized hash, built once per feed.
+    # feed, and stored rendering come preloaded. feed is the feed's serialized
+    # hash, built once per feed. include lists the optional bodies under
+    # content (INCLUDES); a body not asked for is left out, one asked for that
+    # the entry does not have is null.
     class EntrySerializer
-      def initialize(entry, feed:)
+      INCLUDES = %w[changes original_newsletter].freeze
+
+      def initialize(entry, feed:, include: [])
         @entry = entry
         @feed = feed
+        @include = include
       end
 
       def to_h
@@ -36,9 +42,7 @@ module Api
             app: Rails.application.routes.url_helpers.entry_url(@entry, **Rails.application.config.action_mailer.default_url_options),
             extracted_content: @entry.fully_qualified_url && @entry.extracted_content_url
           },
-          content: {html: content_html},
-          original: original,
-          diff: @entry.content_diff&.then { {html: _1.to_s} },
+          content: content,
           extracted: extracted,
           feed: @feed
         }
@@ -141,6 +145,14 @@ module Api
         {provider: "youtube", id: @entry.provider_id, channel_id: @entry.provider_parent_id}
       end
 
+      # The body object: html always, then each optional body in INCLUDES order.
+      def content
+        body = {html: content_html}
+        body[:changes] = changes if @include.include?("changes")
+        body[:original_newsletter] = original_newsletter if @include.include?("original_newsletter")
+        body
+      end
+
       def content_html
         @entry.rendering.api
       rescue => exception
@@ -148,10 +160,18 @@ module Api
         @entry.content
       end
 
-      # Only the content from before the first significant edit is kept.
-      def original
-        content = @entry.original_content
-        content && {content: content}
+      # The current body with the edit since the original marked as
+      # insertions and deletions. Stored with the rendering; nil until an edit.
+      def changes
+        @entry.content_diff&.then { {html: _1.to_s} }
+      end
+
+      # The email as it was sent, lightly formatted: relaxed sanitization,
+      # proxied images, and layout breakpoints pushed out of a reader pane's
+      # reach. Rendered on request; nil for anything but a newsletter.
+      def original_newsletter
+        return nil unless kind == "newsletter"
+        {html: ContentFormatter.newsletter_format(@entry.content).to_s}
       end
 
       # A micropost's linked articles, as HarvestLinks saved them, with the
@@ -165,7 +185,7 @@ module Api
             title: page.title,
             hostname: Addressable::URI.parse(url).host,
             author: page.author,
-            content: html
+            content: {html: html}
           }
         rescue
           nil

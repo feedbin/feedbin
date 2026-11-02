@@ -49,8 +49,8 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     extracted = serialize(entry)[:extracted]
 
     assert_equal 1, extracted.size
-    assert_includes extracted.first[:content], %(href="https://example.com/more")
-    refute_includes extracted.first[:content], "<script"
+    assert_includes extracted.first[:content][:html], %(href="https://example.com/more")
+    refute_includes extracted.first[:content][:html], "<script"
   end
 
   test "serializes the preview image row" do
@@ -70,20 +70,47 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     end
   end
 
-  test "a revised entry carries its original content and diff" do
+  test "content is a body object with nothing else unless asked" do
+    json = serialize(create_entry(@feed))
+
+    assert_equal [:html], json[:content].keys
+    refute json.key?(:original)
+    refute json.key?(:diff)
+  end
+
+  test "include=changes adds the rendered edit, null for an unedited entry" do
     entry = create_entry(@feed)
+    assert_nil serialize(entry, include: %w[changes])[:content][:changes]
+
     original = entry.content
     entry.update!(content: original + "<p>A whole new paragraph.</p>", compressed_original_content: OriginalContent.compress(original, base: original + "<p>A whole new paragraph.</p>"))
 
-    json = serialize(entry)
+    json = serialize(entry, include: %w[changes])
 
-    assert_equal({content: original}, json[:original])
-    assert_includes json[:diff][:html], "<ins>paragraph</ins>"
+    assert_equal [:html, :changes], json[:content].keys
+    assert_includes json[:content][:changes][:html], "<ins>paragraph</ins>"
+  end
+
+  test "include=original_newsletter adds the email as sent, null for other kinds" do
+    article = create_entry(@feed)
+    assert_nil serialize(article, include: %w[original_newsletter])[:content][:original_newsletter]
+
+    @feed.update!(feed_type: :newsletter)
+    newsletter = create_entry(@feed)
+    newsletter.update!(content: %(<style>@media (max-width: 600px) { .col { width: 100% } }</style><table><tr><td style="color: red">Hi</td></tr></table><script>alert(1)</script>))
+
+    json = serialize(newsletter, include: %w[original_newsletter changes])
+
+    assert_equal [:html, :changes, :original_newsletter], json[:content].keys
+    html = json[:content][:original_newsletter][:html]
+    assert_includes html, %(<td style="color: red">Hi</td>)
+    assert_includes html, "max-width:10000px"
+    refute_includes html, "<script"
   end
 
   private
 
-  def serialize(entry)
-    Api::V3::EntrySerializer.new(Entry.with_list_associations.find(entry.id), feed: {}).to_h
+  def serialize(entry, include: [])
+    Api::V3::EntrySerializer.new(Entry.with_list_associations.find(entry.id), feed: {}, include: include).to_h
   end
 end

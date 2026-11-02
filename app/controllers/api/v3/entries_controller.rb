@@ -90,7 +90,19 @@ module Api
       # entries are on the page.
       def serialize(entries)
         feed_hashes = entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
-        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id]).to_h }
+        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id], include: includes).to_h }
+      end
+
+      # include=changes,original_newsletter: the optional bodies under content.
+      def includes
+        @includes ||= begin
+          names = params[:include].to_s.split(",").map(&:strip).reject(&:empty?).uniq
+          unknown = names - EntrySerializer::INCLUDES
+          if unknown.any?
+            raise Problems::InvalidParameter.new("include must be a comma-separated list of #{EntrySerializer::INCLUDES.join(", ")}.", pointer: "include", code: "invalid_value")
+          end
+          names
+        end
       end
 
       def filtered_entries
