@@ -76,6 +76,7 @@ class User < ApplicationRecord
   has_many :supported_sharing_services, dependent: :delete_all
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries, dependent: :delete_all
+  has_many :sync_versions, dependent: :delete_all
   has_many :saved_searches, dependent: :delete_all
   has_many :actions, dependent: :destroy
   has_many :recently_read_entries, dependent: :delete_all

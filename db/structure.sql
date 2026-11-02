@@ -51,7 +51,38 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
+--
+-- Name: bump_sync_version_deleted(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bump_sync_version_deleted() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO sync_versions (user_id, list, version)
+  SELECT DISTINCT user_id, TG_ARGV[0], 1 FROM old_rows WHERE user_id IS NOT NULL
+  ON CONFLICT (user_id, list) DO UPDATE SET version = sync_versions.version + 1;
+  RETURN NULL;
+END $$;
+
+
+--
+-- Name: bump_sync_version_inserted(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bump_sync_version_inserted() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO sync_versions (user_id, list, version)
+  SELECT DISTINCT user_id, TG_ARGV[0], 1 FROM new_rows WHERE user_id IS NOT NULL
+  ON CONFLICT (user_id, list) DO UPDATE SET version = sync_versions.version + 1;
+  RETURN NULL;
+END $$;
+
+
 SET default_tablespace = '';
+
 
 --
 -- Name: account_migration_items; Type: TABLE; Schema: public; Owner: -
@@ -1434,6 +1465,17 @@ ALTER SEQUENCE public.supported_sharing_services_id_seq OWNED BY public.supporte
 
 
 --
+-- Name: sync_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sync_versions (
+    user_id bigint NOT NULL,
+    list text NOT NULL,
+    version bigint DEFAULT 0 NOT NULL
+);
+
+
+--
 -- Name: taggings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2258,6 +2300,14 @@ ALTER TABLE ONLY public.suggested_feeds
 
 ALTER TABLE ONLY public.supported_sharing_services
     ADD CONSTRAINT supported_sharing_services_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sync_versions sync_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sync_versions
+    ADD CONSTRAINT sync_versions_pkey PRIMARY KEY (user_id, list);
 
 
 --
@@ -3163,6 +3213,69 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: starred_entries starred_entries_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER starred_entries_delete_bump_sync_version AFTER DELETE ON public.starred_entries REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('starred');
+
+
+--
+-- Name: starred_entries starred_entries_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER starred_entries_insert_bump_sync_version AFTER INSERT ON public.starred_entries REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('starred');
+
+
+--
+-- Name: subscriptions subscriptions_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER subscriptions_delete_bump_sync_version AFTER DELETE ON public.subscriptions REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('subscriptions');
+
+
+--
+-- Name: subscriptions subscriptions_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER subscriptions_insert_bump_sync_version AFTER INSERT ON public.subscriptions REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('subscriptions');
+
+
+--
+-- Name: subscriptions subscriptions_update_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER subscriptions_update_bump_sync_version AFTER UPDATE ON public.subscriptions REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('subscriptions');
+
+
+--
+-- Name: taggings taggings_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER taggings_delete_bump_sync_version AFTER DELETE ON public.taggings REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('subscriptions');
+
+
+--
+-- Name: taggings taggings_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER taggings_insert_bump_sync_version AFTER INSERT ON public.taggings REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('subscriptions');
+
+
+--
+-- Name: unreads unreads_delete_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER unreads_delete_bump_sync_version AFTER DELETE ON public.unreads REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_deleted('unread');
+
+
+--
+-- Name: unreads unreads_insert_bump_sync_version; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER unreads_insert_bump_sync_version AFTER INSERT ON public.unreads REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE PROCEDURE public.bump_sync_version_inserted('unread');
+
+
+--
 -- Name: podcast_subscriptions fk_rails_146c1d2d35; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3246,9 +3359,11 @@ ALTER TABLE ONLY public.playlists
 -- PostgreSQL database dump complete
 --
 
+
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261101120000'),
 ('20261030130000'),
 ('20261030120000'),
 ('20261029120000'),
