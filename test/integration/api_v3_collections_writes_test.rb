@@ -328,6 +328,36 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # Elasticsearch indexes after the unread row exists, so an ETag made from
+  # versions alone could cache a list missing the entry.
+  test "a saved search's ids etag moves when a match is indexed late" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift")
+    late = @feed.entries.create!(title: "Swift late", url: "https://example.com/late", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: Time.now)
+    UnreadEntry.create_from_owners(@user, late)
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer
+    assert_equal [], JSON.parse(response.body)["data"]
+    etag = response.headers["ETag"]
+
+    index_entries([late])
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer.merge("If-None-Match" => etag)
+
+    assert_response :success
+    assert_equal [late.id], JSON.parse(response.body)["data"]
+  end
+
+  test "a saved search's ids read the unread list once" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift is:unread")
+    swift_entries(1)
+
+    reads = 0
+    counter = ->(*, payload) { reads += 1 if payload[:sql].match?(/FROM "unreads"/) }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+      get "/v3/collections/search_#{search.id}/ids", headers: bearer
+    end
+
+    assert_equal 1, reads
+  end
+
   private
 
   # Unread entries titled Swift, published oldest first, indexed for search.

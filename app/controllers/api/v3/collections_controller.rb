@@ -22,8 +22,11 @@ module Api
 
       def ids
         return status_not_found if collection.timeline?
-        return if not_modified?(ids_etag)
-        render_list(collection.ids)
+        # A saved search's matches change when Elasticsearch indexes an entry,
+        # which no version records, so its ETag is the list itself.
+        ids = collection.ids if collection.search?
+        return if not_modified?(collection.search? ? etag_for(collection.id, Digest::SHA256.hexdigest(ids.join(","))[0, 32]) : list_etag(collection.id))
+        render_list(ids || collection.ids)
       end
 
       def entries
@@ -110,17 +113,6 @@ module Api
 
       def collection
         @collection ||= Collection.find(@user, params[:id]) || raise(ActiveRecord::RecordNotFound)
-      end
-
-      def ids_etag
-        if collection.search?
-          # Matches follow the unread list, stars (is:starred), the feeds
-          # subscribed to, and the query.
-          search = collection.saved_search
-          etag_for(collection.id, versions.fetch("unread"), versions.fetch("starred"), versions.fetch("subscriptions"), ((search.updated_at || search.created_at).to_r * 1_000_000).to_i)
-        else
-          list_etag(collection.id)
-        end
       end
 
       def rejects(write)

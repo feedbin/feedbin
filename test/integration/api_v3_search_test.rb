@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class ApiV3SearchTest < ActionDispatch::IntegrationTest
   setup do
@@ -98,6 +99,12 @@ class ApiV3SearchTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_content
     assert_equal "published_after", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
+  test "a search Elasticsearch could not check is an error, not query_invalid" do
+    Search::Connection.stub_any_instance(:validate, nil) do
+      assert_raises(Search::Connection::ResponseError) { get "/v3/search", params: {query: "swift"}, headers: bearer }
+    end
   end
 
   private

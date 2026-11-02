@@ -102,7 +102,7 @@ module Api
       def search_ids
         unread_ids = @user.unread_entries.pluck(:entry_id)
         return [] if unread_ids.empty?
-        body = Entry.build_query(user: @user, query: @query)
+        body = Entry.build_query(user: @user, query: @query, unread_ids: unread_ids)
         bool = body[:query][:bool]
         bool[:filter] = [bool[:filter], {ids: {values: unread_ids}}]
         body = body.slice(:query).merge(sort: [{published: "desc"}, {id: "desc"}])

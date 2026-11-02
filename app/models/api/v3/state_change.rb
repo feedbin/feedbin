@@ -50,7 +50,6 @@ module Api
       # The user's rows in one state table that a scope object selects. Keys
       # combine with AND; no keys selects every row.
       class Scope
-        attr_reader :relation
         SLICE = 10_000
 
         def initialize(user, verb, scope)
@@ -97,10 +96,17 @@ module Api
         # Every match, not the 50 a saved search's id list carries. The id
         # list is fixed before the delete, so an entry that arrives during
         # the sweep is not in it.
+        # Only the entries the sweep can touch are walked: the user's unread
+        # (or Updated) rows, which bound the walk however broad the query.
         def search_matches(collection)
           query = Entry.build_query(user: @user, query: collection.query)
           index = Search.index_name(Entry.table_name)
-          raise EntrySearch::QueryInvalid, "The saved search's query could not be parsed." unless Search.client { _1.validate(index, query: {query: query[:query]}) }
+          case Search.client { _1.validate(index, query: {query: query[:query]}) }
+          when false then raise EntrySearch::QueryInvalid, "The saved search's query could not be parsed."
+          when nil then raise Search::Connection::ResponseError, "Elasticsearch did not validate the saved search's query."
+          end
+          bool = query[:query][:bool]
+          bool[:filter] = [bool[:filter], {ids: {values: @relation.pluck(:entry_id)}}]
           Search.client { _1.all_matches(index, query: query) }
         end
 

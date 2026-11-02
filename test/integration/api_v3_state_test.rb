@@ -165,6 +165,28 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
     assert_equal 0, @user.unread_entries.count
   end
 
+  test "a saved-search sweep only walks the user's unread entries" do
+    search = @user.saved_searches.create!(name: "E", query: "E0")
+    walked = nil
+    capture = ->(_index, query:) { walked = query; [] }
+
+    Search::Connection.stub_any_instance(:all_matches, capture) do
+      post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
+    end
+
+    assert_includes walked[:query][:bool][:filter], {ids: {values: @user.unread_entries.pluck(:entry_id)}}
+  end
+
+  test "a sweep whose query Elasticsearch could not check is an error, not query_invalid" do
+    search = @user.saved_searches.create!(name: "E", query: "E0")
+
+    Search::Connection.stub_any_instance(:validate, nil) do
+      assert_raises(Search::Connection::ResponseError) do
+        post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
+      end
+    end
+  end
+
   private
 
   def bearer

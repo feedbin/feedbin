@@ -40,8 +40,10 @@ module Api
       def page(limit:, after: nil)
         return [[], nil, 0] if @none
         body = request_body
-        unless Search.client { _1.validate(index, query: {query: body[:query]}) }
-          raise QueryInvalid, "The query could not be parsed."
+        # false is a query Elasticsearch could not parse; nil is no answer.
+        case Search.client { _1.validate(index, query: {query: body[:query]}) }
+        when false then raise QueryInvalid, "The query could not be parsed."
+        when nil then raise Search::Connection::ResponseError, "Elasticsearch did not validate the query."
         end
         response = Search.client { _1.search_after(index, query: body, size: limit + 1, after: after) }
         ids = response.ids
