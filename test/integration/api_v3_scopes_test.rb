@@ -137,6 +137,38 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "the migration marks the first-party apps named in the environment" do
+    production = users(:ann).oauth_applications.create!(name: "Feedbin", redirect_uri: REDIRECT_URI)
+    token = production.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    ENV["API_V3_FIRST_PARTY_UIDS"] = "#{production.uid}, unknown-uid"
+
+    ActiveRecord::Migration.suppress_messages { SplitFullScope.new.up }
+
+    assert_equal "read write account", production.reload.scopes.to_s
+    assert_equal "read write account", token.reload.scopes.to_s
+  ensure
+    ENV.delete("API_V3_FIRST_PARTY_UIDS")
+  end
+
+  # A token minted by a process still running the old code after the
+  # migration has run.
+  test "a leftover full token has the scopes of its app" do
+    leftover_feedbin = @first_party.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    leftover_reader = @third_party.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+
+    get "/v3/tokens", headers: bearer(leftover_feedbin)
+    assert_response :success
+
+    get "/v3/tokens", headers: bearer(leftover_reader)
+    assert_insufficient_scope
+  end
+
+  test "revoking another token is a scope error whether or not the id exists" do
+    delete "/v3/tokens/0", headers: bearer(@reader)
+
+    assert_insufficient_scope
+  end
+
   private
 
   def bearer(token)

@@ -22,6 +22,17 @@ class Settings::ApiTokensControllerTest < ActionController::TestCase
     assert_equal token, Doorkeeper::AccessToken.by_token(flash[:plaintext_token])
   end
 
+  test "does not create a token for one of Feedbin's own apps" do
+    @application.update!(scopes: "read write account")
+    login_as @user
+
+    assert_no_difference -> { @user.oauth_access_tokens.count } do
+      post :create, params: {api_application_id: @application, token: {device_name: "curl"}}
+    end
+    assert_redirected_to settings_api_application_path(@application)
+    assert flash[:alert].present?
+  end
+
   test "does not create a token for another user's application" do
     application = users(:ann).oauth_applications.create!(name: "Not Yours", redirect_uri: "")
     login_as @user

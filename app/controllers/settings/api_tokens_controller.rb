@@ -5,6 +5,11 @@ class Settings::ApiTokensController < ApplicationController
   # pasting into a client or a script.
   def create
     application = @user.oauth_applications.find(params[:api_application_id])
+    # Feedbin's own apps sign in through OAuth; a pasted token for one would
+    # carry the account scope.
+    if application.scopes.include?("account")
+      return redirect_to settings_api_application_path(application), alert: "Tokens for Feedbin's own apps come from signing in to the app."
+    end
     token = application.access_tokens.create!(
       resource_owner_id: @user.id,
       device_name: params.dig(:token, :device_name).presence,

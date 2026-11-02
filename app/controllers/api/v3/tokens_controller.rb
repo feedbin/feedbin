@@ -8,11 +8,11 @@ module Api
         render_list(tokens.map { TokenSerializer.new(_1, current_token: @token).to_h })
       end
 
-      # A token can revoke itself; revoking another needs account.
+      # A token can revoke itself; revoking another needs account, checked
+      # before the lookup so the answer doesn't say which ids exist.
       def destroy
-        token = active_tokens.find(params[:id])
-        return require_scope("account") unless token.id == @token.id || @token.scopes.include?("account")
-        token.revoke
+        return require_scope("account") unless params[:id].to_s == @token.id.to_s || Scopes.granted(@token).include?("account")
+        active_tokens.find(params[:id]).revoke
         head :no_content
       end
 
