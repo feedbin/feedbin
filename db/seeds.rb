@@ -29,6 +29,7 @@ if Rails.env.development?
   u.plan = plan
   u.update_auth_token = true
   u.save
+  Api::V3::DevelopmentApplication.ensure!(owner: u)
 
   feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")
   feed2 = Feed.create!(title: "Example 2", feed_url: "https://example.com/index.xml?2", site_url: "https://example.com/")

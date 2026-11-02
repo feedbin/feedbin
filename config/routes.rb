@@ -181,6 +181,7 @@ Rails.application.routes.draw do
   constraints lambda { |request| Rails.env.development? || Rails.env.test? } do
     get :auto_sign_in, to: "site#auto_sign_in"
     get :onboarding, to: "onboarding#show"
+    post "oauth/development_token", to: "oauth/development_tokens#create"
   end
 
   get :health_check, to: proc { |env| [200, {}, ["OK"]] }
