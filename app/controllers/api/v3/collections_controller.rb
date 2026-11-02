@@ -8,6 +8,8 @@ module Api
       include SearchPage
 
       MAX_IDS = 1_000
+      # How long an arrival can take to reach Elasticsearch.
+      INDEX_LAG = 5.minutes
       ADDABLE = {
         "recently_read" => :add_recently_read,
         "recently_played" => :add_recently_played,
@@ -22,11 +24,8 @@ module Api
 
       def ids
         return status_not_found if collection.timeline?
-        # A saved search's matches change when Elasticsearch indexes an entry,
-        # which no version records, so its ETag is the list itself.
-        ids = collection.ids if collection.search?
-        return if not_modified?(collection.search? ? etag_for(collection.id, Digest::SHA256.hexdigest(ids.join(","))[0, 32]) : list_etag(collection.id))
-        render_list(ids || collection.ids)
+        return if not_modified?(collection.search? ? search_ids_etag : list_etag(collection.id))
+        render_list(@search_ids || collection.ids)
       end
 
       def entries
@@ -114,6 +113,21 @@ module Api
 
       def collection
         @collection ||= Collection.find(@user, params[:id]) || raise(ActiveRecord::RecordNotFound)
+      end
+
+      # A saved search's matches follow the unread list, stars (is:starred),
+      # the feeds subscribed to, and the query: a quiet poll is answered from
+      # those. While the newest unread row may still be waiting for
+      # Elasticsearch, the ids themselves are part of the ETag too, so the list
+      # changes when indexing catches up even though no version moves.
+      def search_ids_etag
+        search = collection.saved_search
+        parts = [versions.fetch("unread"), versions.fetch("starred"), versions.fetch("subscriptions"), ((search.updated_at || search.created_at).to_r * 1_000_000).to_i]
+        if @user.unread_entries.where(created_at: INDEX_LAG.ago..).exists?
+          @search_ids = collection.ids
+          parts << Digest::SHA256.hexdigest(@search_ids.join(","))[0, 32]
+        end
+        etag_for(collection.id, *parts)
       end
 
       def rejects(write)

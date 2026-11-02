@@ -350,7 +350,7 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     swift_entries(1)
 
     reads = 0
-    counter = ->(*, payload) { reads += 1 if payload[:sql].match?(/FROM "unreads"/) }
+    counter = ->(*, payload) { reads += 1 if payload[:sql].match?(/SELECT "unreads"."entry_id" FROM "unreads"/) }
     ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
       get "/v3/collections/search_#{search.id}/ids", headers: bearer
     end
@@ -372,6 +372,33 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
 
     assert_equal @entries.map(&:id), JSON.parse(response.body)["applied"]
     assert_equal 1, reads
+  end
+
+  test "an unchanged saved-search list is a 304" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift")
+    swift_entries(2)
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer
+    etag = response.headers["ETag"]
+
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer.merge("If-None-Match" => etag)
+
+    assert_response :not_modified
+  end
+
+  # Once the newest unread row is old enough to be indexed, a quiet poll is
+  # answered from versions, without asking Elasticsearch.
+  test "a settled saved-search list answers a quiet poll without searching" do
+    search = @user.saved_searches.create!(name: "Swift", query: "swift")
+    swift_entries(2)
+    UnreadEntry.where(user_id: @user.id).update_all(created_at: 10.minutes.ago)
+    get "/v3/collections/search_#{search.id}/ids", headers: bearer
+    etag = response.headers["ETag"]
+
+    Search::Connection.stub_any_instance(:search_after, ->(*, **) { raise "searched" }) do
+      get "/v3/collections/search_#{search.id}/ids", headers: bearer.merge("If-None-Match" => etag)
+    end
+
+    assert_response :not_modified
   end
 
   private
