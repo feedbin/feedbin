@@ -82,11 +82,13 @@ module Api
       end
 
       # Every feed the user can read: the ones they subscribe to and the ones
-      # they have starred entries from, the same rule as readable_feed. A
-      # relation over two subqueries, so the ETag and the list share it.
+      # they have starred entries from, the same rule as readable_feed. One
+      # relation, so the ETag and the list share it. The ids are a single
+      # UNION subquery because Postgres cannot turn two OR'd IN subqueries
+      # into joins: it scans every row of feeds, on the 304 path too.
       def listed_feeds
-        Feed.where(id: @user.subscriptions.select(:feed_id))
-          .or(Feed.where(id: @user.starred_entries.select(:feed_id)))
+        ids = @user.subscriptions.select(:feed_id).arel.union(@user.starred_entries.select(:feed_id).arel)
+        Feed.where(Feed.arel_table[:id].in(ids))
       end
 
       # The set of feeds changes with the subscriptions list and the starred
