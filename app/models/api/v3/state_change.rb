@@ -12,9 +12,9 @@ module Api
       OPPOSITES = {"mark_unread" => "mark_read", "unstar" => "star"}.freeze
       SCOPE_KEYS = %w[feed_ids tag_ids collection published_before received_before].freeze
       # The collections a scope can name: those whose entries take state
-      # writes, plus Recently Read and saved searches. Not Airshow or Recently
+      # writes, plus Recently Read, Pages and saved searches. Not Airshow or Recently
       # Played.
-      SCOPE_COLLECTIONS = %w[unread all starred updated recently_read].freeze
+      SCOPE_COLLECTIONS = %w[unread all starred updated recently_read pages].freeze
       MAX_IDS = 1_000
 
       def initialize(user, body)
@@ -90,6 +90,8 @@ module Api
           return if collection.timeline? || (@verb == "mark_read" && id == "unread") || (@verb == "clear_updated" && id == "updated")
           if collection.search?
             @search_ids = search_matches(collection)
+          elsif collection.pages?
+            @relation = @relation.where(entry_id: collection.pages.select(:id))
           else
             @relation = @relation.where(entry_id: collection.rows.reorder(nil).select(:entry_id))
           end

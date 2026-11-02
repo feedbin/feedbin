@@ -123,16 +123,12 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_equal "/preferences/muted", JSON.parse(response.body)["errors"].first["pointer"]
   end
 
-  test "the Pages subscription cannot be retitled or deleted" do
+  test "the Pages subscription is not a v3 subscription" do
     patch "/v3/subscriptions/#{@generated.id}", params: {custom_title: "Nope"}.to_json, headers: json
-    assert_response :forbidden
-    assert_equal "generated_subscription", JSON.parse(response.body)["code"]
-
-    patch "/v3/subscriptions/#{@generated.id}", params: {preferences: {muted: true}}.to_json, headers: json
-    assert_response :success
+    assert_response :not_found
 
     delete "/v3/subscriptions/#{@generated.id}", headers: bearer
-    assert_response :forbidden
+    assert_response :not_found
     assert @generated.reload.persisted?
   end
 

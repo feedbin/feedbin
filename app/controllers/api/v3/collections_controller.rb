@@ -24,14 +24,20 @@ module Api
 
       def ids
         return status_not_found if collection.timeline?
-        return if not_modified?(collection.search? ? search_ids_etag : list_etag(collection.id))
+        etag = if collection.search? then search_ids_etag
+        elsif collection.pages? then pages_etag
+        else list_etag(collection.id)
+        end
+        return if not_modified?(etag)
         render_list(@search_ids || collection.ids)
       end
 
       def entries
         return render_search_page(EntrySearch.new(@user, query: collection.query)) if collection.search?
         limit = page_limit
-        if collection.timeline?
+        if collection.pages?
+          render_pages_page(limit)
+        elsif collection.timeline?
           render_timeline_page(limit)
         else
           render_membership_page(limit)
@@ -130,6 +136,14 @@ module Api
         etag_for(collection.id, *parts)
       end
 
+      # Pages has no sync version: its entries are rows of entries, so the
+      # count, the newest id and the newest save move on every add, edit and
+      # delete.
+      def pages_etag
+        count, newest_id, updated = collection.pages.pick(Arel.sql("count(*)"), Arel.sql("max(id)"), Arel.sql("max(updated_at)"))
+        etag_for("pages", count, newest_id || 0, updated ? (updated.to_r * 1_000_000).to_i : 0)
+      end
+
       def rejects(write)
         raise Problems::InvalidParameter.new("The #{collection.id} collection does not accept #{write}.", pointer: "id", code: "invalid_value")
       end
@@ -220,6 +234,23 @@ module Api
         expand = expansions(EntrySerializer::EXPANSIONS)
         feeds = expand.include?("feed") ? entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] } : {}
         data = entries.map { EntrySerializer.new(_1, feed: feeds[_1.feed_id], expand: expand).to_h }
+        render_list(data, page: page_object(limit: limit, next_cursor: next_cursor || nil, more: more), meta: {as_of: as_of})
+      end
+
+      # Pages, newest published first, each page its own membership.
+      def render_pages_page(limit)
+        scope = collection.pages
+        if (fields = cursor_fields)
+          raise Cursor::Invalid unless fields["sort"] == "collection:pages" && fields["key"].is_a?(Integer) && fields["id"].is_a?(Integer)
+          scope = scope.where("(entries.published, entries.id) < (?, ?)", Time.at(Rational(fields["key"], 1_000_000)).utc, fields["id"])
+        end
+        entries = scope.merge(entry_associations).order(published: :desc, id: :desc).limit(limit + 1).to_a
+        more = entries.size > limit
+        entries.pop if more
+        next_cursor = more && Cursor.encode(sort: "collection:pages", key: (entries.last.published.to_r * 1_000_000).to_i, id: entries.last.id)
+        expand = expansions(EntrySerializer::EXPANSIONS)
+        feeds = expand.include?("feed") ? entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] } : {}
+        data = entries.map { EntrySerializer.new(_1, feed: feeds[_1.feed_id], expand: expand, membership: collection.membership(_1)).to_h }
         render_list(data, page: page_object(limit: limit, next_cursor: next_cursor || nil, more: more), meta: {as_of: as_of})
       end
 

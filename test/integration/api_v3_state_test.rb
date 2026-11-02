@@ -216,6 +216,19 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
     assert_equal({"count" => 0}, JSON.parse(response.body)["applied"]["mark_read"])
   end
 
+  test "mark_read scoped to pages marks only page entries" do
+    feed = Feed.create!(feed_url: "https://pages.example/feed", title: "Pages", feed_type: :pages)
+    @user.subscriptions.create!(feed: feed, kind: :generated)
+    page = feed.entries.create!(title: "Page", url: "https://page.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    assert_includes @user.unread_entries.pluck(:entry_id), page.id
+
+    post "/v3/entries/state", params: {mark_read: {collection: "pages"}}.to_json, headers: json
+
+    assert_response :success
+    assert_equal({"count" => 1}, JSON.parse(response.body)["applied"]["mark_read"])
+    assert_equal [@a.id, @b.id].sort, @user.unread_entries.pluck(:entry_id).sort
+  end
+
   private
 
   def bearer

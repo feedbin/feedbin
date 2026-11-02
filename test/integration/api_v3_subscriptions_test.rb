@@ -88,7 +88,37 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal [{"object" => "tag", "id" => nameless.id, "name" => ""}], tags
   end
 
+  test "leaves out the generated pages subscription" do
+    pages_feed_with(1)
+
+    get "/v3/subscriptions", headers: bearer
+
+    assert_equal @subscriptions.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
+  end
+
+  test "a generated subscription is not found" do
+    feed, _ = pages_feed_with(1)
+    id = @user.subscriptions.find_by!(feed: feed).id
+    json = bearer.merge("Content-Type" => "application/json")
+
+    get "/v3/subscriptions/#{id}", headers: bearer
+    assert_response :not_found
+    delete "/v3/subscriptions/#{id}", headers: bearer
+    assert_response :not_found
+    put "/v3/subscriptions/#{id}/tags", params: {tag_names: ["A"]}.to_json, headers: json
+    assert_response :not_found
+    patch "/v3/subscriptions/#{id}", params: {custom_title: "X"}.to_json, headers: json
+    assert_response :not_found
+  end
+
   private
+
+  def pages_feed_with(count)
+    feed = Feed.create!(feed_url: "https://pages.example/#{SecureRandom.hex}", title: "Pages", feed_type: :pages)
+    @user.subscriptions.create!(feed: feed, kind: :generated)
+    entries = count.times.map { |i| feed.entries.create!(title: "Page #{i}", url: "https://page.example/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: i.days.ago) }
+    [feed, entries]
+  end
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}

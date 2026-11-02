@@ -27,7 +27,7 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_nil body["meta"]
     rows = body["data"].index_by { _1["id"] }
-    assert_equal %W[unread all starred queue recently_read updated recently_played search_#{search.id}], body["data"].map { _1["id"] }
+    assert_equal %W[unread all starred queue recently_read updated recently_played pages search_#{search.id}], body["data"].map { _1["id"] }
     assert_equal({"object" => "collection", "id" => "unread", "kind" => "system", "title" => "Unread", "sort" => "received_desc", "hidden" => false, "writes" => ["state"], "query" => nil}, rows["unread"])
     assert_equal [true, true, true], [rows["queue"]["hidden"], rows["recently_played"]["hidden"], rows["updated"]["hidden"]]
     assert_equal %w[add remove update clear], rows["queue"]["writes"]

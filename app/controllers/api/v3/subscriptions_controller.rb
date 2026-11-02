@@ -50,7 +50,6 @@ module Api
         body = request.request_parameters
         record = subscription
         if body.key?("custom_title")
-          return generated_subscription if record.generated?
           title = body["custom_title"]
           raise Problems::InvalidParameter.new("custom_title must be a string or null.", pointer: "/custom_title", code: "invalid_value") unless title.nil? || title.is_a?(String)
           record.title = title.presence
@@ -80,7 +79,6 @@ module Api
 
       def destroy
         record = subscription
-        return generated_subscription if record.generated?
         record.destroy
         head :no_content
       end
@@ -114,13 +112,15 @@ module Api
 
       private
 
+      # Generated subscriptions (Pages) aren't subscriptions in v3: Pages is a
+      # collection.
       def subscription
-        @subscription ||= @user.subscriptions.find(params[:id])
+        @subscription ||= @user.subscriptions.where(kind: :default).find(params[:id])
       end
 
       def scope
         expand = expansions(SubscriptionSerializer::EXPANSIONS)
-        scope = @user.subscriptions.order(:id)
+        scope = @user.subscriptions.where(kind: :default).order(:id)
         scope = scope.includes(feed: [*Feed::ICON_PRELOADS, :touch_icon_image_record]) if expand.include?("feed")
         scope
       end
@@ -174,12 +174,6 @@ module Api
       # folder name may contain one.
       def tag_names(names)
         Array(names).select { _1.is_a?(String) }.map(&:strip).reject(&:empty?)
-      end
-
-      def generated_subscription
-        render_problem :forbidden, "generated_subscription",
-          title: "Generated subscription",
-          detail: "Feedbin owns the Pages subscription; it cannot be retitled or deleted."
       end
     end
   end

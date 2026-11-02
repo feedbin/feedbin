@@ -80,7 +80,69 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_equal "not_found", JSON.parse(response.body)["code"]
   end
 
+  test "lists pages after recently played" do
+    pages_feed_with(1)
+
+    get "/v3/collections", headers: bearer
+
+    ids = JSON.parse(response.body)["data"].map { _1["id"] }
+    assert_equal %w[unread all starred queue recently_read updated recently_played pages], ids
+    pages = JSON.parse(response.body)["data"].find { _1["id"] == "pages" }
+    assert_equal({"kind" => "system", "title" => "Pages", "sort" => "published_desc", "hidden" => false, "writes" => ["state"]}, pages.slice("kind", "title", "sort", "hidden", "writes"))
+  end
+
+  test "pages is hidden with no pages" do
+    get "/v3/collections", headers: bearer
+    assert JSON.parse(response.body)["data"].find { _1["id"] == "pages" }["hidden"]
+
+    pages_feed_with(0)
+    get "/v3/collections", headers: bearer
+    assert JSON.parse(response.body)["data"].find { _1["id"] == "pages" }["hidden"]
+  end
+
+  test "pages ids are the pages feed's entries with an etag that moves when a page is added" do
+    feed, pages = pages_feed_with(2)
+
+    get "/v3/collections/pages/ids", headers: bearer
+    assert_response :success
+    assert_equal pages.map(&:id).sort, JSON.parse(response.body)["data"]
+    etag = response.headers["ETag"]
+
+    get "/v3/collections/pages/ids", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :not_modified
+
+    added = feed.entries.create!(title: "Page 9", url: "https://page.example/9", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    get "/v3/collections/pages/ids", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+    assert_includes JSON.parse(response.body)["data"], added.id
+    etag = response.headers["ETag"]
+
+    added.destroy!
+    get "/v3/collections/pages/ids", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+  end
+
+  test "pages entries are newest published first and carry added_at" do
+    _, pages = pages_feed_with(3)
+
+    get "/v3/collections/pages/entries", params: {limit: 2}, headers: bearer
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal pages.first(2).map(&:id), body["data"].map { _1["id"] }
+    assert body["data"].all? { _1.dig("membership", "added_at") }
+
+    get body["page"]["next_url"].delete_prefix("http://api.example.com"), headers: bearer
+    assert_equal [pages.last.id], JSON.parse(response.body)["data"].map { _1["id"] }
+  end
+
   private
+
+  def pages_feed_with(count)
+    feed = Feed.create!(feed_url: "https://pages.example/#{SecureRandom.hex}", title: "Pages", feed_type: :pages)
+    @user.subscriptions.create!(feed: feed, kind: :generated)
+    entries = count.times.map { |i| feed.entries.create!(title: "Page #{i}", url: "https://page.example/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: i.days.ago) }
+    [feed, entries]
+  end
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}

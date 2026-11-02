@@ -13,7 +13,8 @@ module Api
         {id: "queue", title: "Airshow", sort: "manual", writes: %w[add remove update clear]},
         {id: "recently_read", title: "Recently Read", sort: "added_desc", writes: %w[add clear]},
         {id: "updated", title: "Updated", sort: "edited_desc", writes: %w[state]},
-        {id: "recently_played", title: "Recently Played", sort: "added_desc", writes: %w[add clear]}
+        {id: "recently_played", title: "Recently Played", sort: "added_desc", writes: %w[add clear]},
+        {id: "pages", title: "Pages", sort: "published_desc", writes: %w[state]}
       ].freeze
 
       RECENTLY_READ_LIMIT = 100
@@ -47,6 +48,7 @@ module Api
       end
 
       def search? = !@saved_search.nil?
+      def pages? = @id == "pages"
       def timeline? = @id == "all"
       def accepts?(write) = @writes.include?(write)
 
@@ -56,12 +58,19 @@ module Api
         when "recently_read" then @user.setting_on?(:hide_recently_read)
         when "updated" then @user.setting_on?(:hide_updated)
         when "recently_played" then @user.setting_on?(:hide_recently_played) || !@user.recently_played_entries.exists?
+        when "pages" then !pages.exists?
         else false
         end
       end
 
+      # Pages' entries: the user's Pages feed's, none without one. Its
+      # entries are its rows, so it has no membership table.
+      def pages
+        Entry.where(feed_id: @user.feeds.pages.select(:id))
+      end
+
       # The membership rows, ordered as the collection's sort says, newest or
-      # first position first. nil for the timeline and searches.
+      # first position first. nil for the timeline, searches and Pages.
       def rows
         case @id
         when "unread" then @user.unread_entries.order(entry_created_at: :desc, entry_id: :desc)
@@ -89,6 +98,8 @@ module Api
       def ids
         if search?
           search_ids
+        elsif pages?
+          pages.order(:id).pluck(:id)
         else
           rows.reorder(nil).order(:entry_id).pluck(:entry_id)
         end
@@ -114,6 +125,7 @@ module Api
         response.ids.sort
       end
 
+      # A page's row is its entry, added when it was saved.
       def membership(row)
         hash = {added_at: row.created_at.utc.iso8601}
         if @id == "queue"
