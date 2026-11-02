@@ -57,11 +57,12 @@ class Api::V3::StateChangeTest < ActiveSupport::TestCase
     assert_equal [], starred_ids
   end
 
-  test "rejects an empty body, unknown verbs, scopes, too many ids, non-integers, and conflicts" do
+  test "rejects an empty body, unknown verbs, scopes on id-only verbs, bad scope keys, too many ids, non-integers, and conflicts" do
     before = unread_ids
     assert_problem("", "missing") { change({}) }
     assert_problem("/read", "unknown") { change("read" => [1]) }
-    assert_problem("/mark_read", "invalid_value") { change("mark_read" => {"feed_ids" => [1]}) }
+    assert_problem("/unstar", "invalid_value") { change("unstar" => {"feed_ids" => [1]}) }
+    assert_problem("/mark_read/feed_ids", "invalid_value") { change("mark_read" => {"feed_ids" => "1"}) }
     assert_problem("/mark_read", "too_many") { change("mark_read" => (1..1001).to_a) }
     assert_problem("/star", "invalid_value") { change("star" => ["a"]) }
     assert_problem("/star", "invalid_value") { change("star" => [0]) }

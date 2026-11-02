@@ -37,13 +37,84 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
     assert_equal [{"id" => @other.id, "reason" => "not_subscribed"}, {"id" => 999_999_999, "reason" => "not_found"}], body["skipped"]
   end
 
-  test "rejects a scope object with a pointer to the verb" do
-    post "/v3/entries/state", params: {mark_read: {feed_ids: [@feed.id]}}.to_json, headers: bearer.merge("Content-Type" => "application/json")
+  test "a scope on a verb that takes only ids is rejected" do
+    post "/v3/entries/state", params: {star: {feed_ids: [@feed.id]}}.to_json, headers: json
 
     assert_response :unprocessable_content
     body = JSON.parse(response.body)
     assert_equal "validation_failed", body["code"]
-    assert_equal({"pointer" => "/mark_read", "code" => "invalid_value"}, body["errors"].first.slice("pointer", "code"))
+    assert_equal({"pointer" => "/star", "code" => "invalid_value"}, body["errors"].first.slice("pointer", "code"))
+  end
+
+  test "mark_read takes a feed scope with an inclusive published bound" do
+    @a.update_columns(published: 3.days.ago)
+    @b.update_columns(published: 1.hour.ago)
+    UnreadEntry.where(entry_id: [@a.id, @b.id]).each { _1.update_columns(published: Entry.find(_1.entry_id).published) }
+
+    post "/v3/entries/state", params: {mark_read: {feed_ids: [@feed.id], published_before: @a.reload.published.utc.iso8601(6)}}.to_json, headers: json
+
+    assert_response :success
+    assert_equal({"applied" => {"mark_read" => {"count" => 1}}, "skipped" => []}, JSON.parse(response.body))
+    assert_equal [@b.id], @user.unread_entries.pluck(:entry_id)
+  end
+
+  test "mark_read takes a tag scope with a received bound, and an empty scope marks everything" do
+    @feed.tag("News", @user)
+    tag = Tag.find_by!(name: "News")
+    @user.unread_entries.where(entry_id: @b.id).update_all(entry_created_at: 1.minute.from_now)
+
+    post "/v3/entries/state", params: {mark_read: {tag_ids: [tag.id], received_before: Time.now.utc.iso8601}}.to_json, headers: json
+    assert_equal({"count" => 1}, JSON.parse(response.body)["applied"]["mark_read"])
+    assert_equal [@b.id], @user.unread_entries.pluck(:entry_id)
+
+    post "/v3/entries/state", params: {mark_read: {}}.to_json, headers: json
+    assert_equal({"count" => 1}, JSON.parse(response.body)["applied"]["mark_read"])
+    assert_equal [], @user.unread_entries.pluck(:entry_id)
+  end
+
+  test "mark_read takes a collection scope" do
+    StarredEntry.create_from_owners(@user, @a)
+
+    post "/v3/entries/state", params: {mark_read: {collection: "starred"}}.to_json, headers: json
+    assert_equal({"count" => 1}, JSON.parse(response.body)["applied"]["mark_read"])
+    assert_equal [@b.id], @user.unread_entries.pluck(:entry_id)
+  end
+
+  test "mark_read takes a saved search as a collection" do
+    clear_search
+    index_entries([@a, @b])
+    search = @user.saved_searches.create!(name: "E0", query: "title:E0")
+
+    post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
+    assert_equal({"count" => 1}, JSON.parse(response.body)["applied"]["mark_read"])
+    assert_equal [@b.id], @user.unread_entries.pluck(:entry_id)
+  end
+
+  test "a scope is validated key by key" do
+    {{"collection" => "queue"} => "/mark_read/collection",
+     {"collection" => "search_0"} => "/mark_read/collection",
+     {"bogus" => 1} => "/mark_read/bogus",
+     {"feed_ids" => ["1"]} => "/mark_read/feed_ids",
+     {"published_before" => "yesterday"} => "/mark_read/published_before"}.each do |scope, pointer|
+      post "/v3/entries/state", params: {mark_read: scope}.to_json, headers: json
+      assert_response :unprocessable_content
+      assert_equal pointer, JSON.parse(response.body)["errors"].first["pointer"], scope.inspect
+    end
+    assert_equal 2, @user.unread_entries.count
+  end
+
+  test "clear_updated takes ids or a scope" do
+    [@a, @b].each { UpdatedEntry.new_from_owners(@user.id, _1).save! }
+
+    post "/v3/entries/state", params: {clear_updated: [@a.id, @other.id]}.to_json, headers: json
+    assert_response :success
+    assert_equal({"applied" => {"clear_updated" => [@a.id]}, "skipped" => [{"id" => @other.id, "reason" => "not_subscribed"}]}, JSON.parse(response.body))
+    assert_equal [@b.id], @user.updated_entries.pluck(:entry_id)
+
+    post "/v3/entries/state", params: {clear_updated: {feed_ids: [@feed.id]}}.to_json, headers: json
+    assert_equal({"count" => 1}, JSON.parse(response.body)["applied"]["clear_updated"])
+    assert_equal [], @user.updated_entries.pluck(:entry_id)
+    assert_equal 2, @user.unread_entries.count
   end
 
   test "rejects a non-JSON body" do
@@ -56,5 +127,9 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}
+  end
+
+  def json
+    bearer.merge("Content-Type" => "application/json")
   end
 end
