@@ -63,21 +63,24 @@ class WebPushNotificationSend
 
     return unless safari_notifications.present?
 
+    refused = Hash.new(0)
     APNOTIC_POOL.with do |connection|
       safari_notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
           Librato.increment("apns.safari.sent", source: response.status)
-          if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
-            apns_id = response.headers["apns-id"]
-            token = safari_notifications[apns_id].token
-            Device.where_lower(token: token).take&.destroy
+          reason = response.body["reason"] if %w[400 403].include?(response.status)
+          if response.status == "410" || reason == "BadDeviceToken"
+            Device.where_lower(token: notification.token).take&.destroy
+          elsif reason
+            refused[[reason, notification.topic]] += 1
           end
         end
         connection.push_async(push)
       end
       connection.join
     end
+    DevicePushNotificationSend.report_refusals(refused, job: self.class.name)
 
   end
 

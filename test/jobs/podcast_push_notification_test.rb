@@ -97,6 +97,42 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
     end
   end
 
+  test "a development build's device goes through the sandbox" do
+    @device.update!(data: {"apns_environment" => "development"})
+    production = SyncPushPool.new(status: "200")
+    sandbox = SyncPushPool.new(status: "200")
+
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, production) do
+      DevicePushNotificationSend.stub_const(:SANDBOX_POOL, sandbox) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+
+    assert_equal ["podcast-token"], sandbox.pushed.map(&:token)
+    assert_empty production.pushed
+  end
+
+  test "a suspended account gets no podcast push" do
+    @user.update!(suspended: true)
+    pool = SyncPushPool.new(status: "200")
+
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      PodcastPushNotification.new.perform(@user.id, @entry.id)
+    end
+
+    assert_empty pool.pushed
+  end
+
+  test "removes the device when its token belongs to another app" do
+    pool = SyncPushPool.new(status: "400", body: {"reason" => "DeviceTokenNotForTopic"})
+
+    assert_difference "Device.count", -1 do
+      DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+  end
+
   test "uses entry summary when itunes_subtitle and itunes_summary are missing" do
     @entry.update!(data: {})
     pool = SyncPushPool.new(status: "200")

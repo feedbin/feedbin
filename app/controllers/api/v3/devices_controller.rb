@@ -16,7 +16,7 @@ module Api
         device_type = PLATFORMS.fetch(body["platform"]) { raise invalid("platform", "invalid_value", "platform must be one of #{PLATFORMS.keys.join(", ")}.") }
         # registered_with marks a device action pushes may reach (Device.v3_ios).
         attributes = {token: token.strip, device_type: device_type, active: true, data: {"registered_with" => "v3"}}
-        environment = body.fetch("apns_environment", "production")
+        environment = body["apns_environment"] || "production"
         raise invalid("apns_environment", "invalid_value", "apns_environment must be production or development.") unless APNS_ENVIRONMENTS.include?(environment)
         attributes[:data]["apns_environment"] = environment
         OPTIONAL.each do |field, column|

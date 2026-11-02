@@ -18,11 +18,6 @@ module Api
       def self.granted(token)
         token.scopes.include?("full") ? self.for(token.application).split : token.scopes.to_a
       end
-
-      # The apps the deploy environment names as Feedbin's own.
-      def self.first_party_uids
-        ENV.fetch("API_V3_FIRST_PARTY_UIDS", "").split(",").map(&:strip).reject(&:empty?)
-      end
     end
   end
 end

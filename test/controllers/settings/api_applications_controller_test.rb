@@ -56,6 +56,16 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_nil flash[:plaintext_secret]
   end
 
+  test "offers no token form for one of Feedbin's own apps" do
+    application = @user.oauth_applications.create!(name: "Feedbin", redirect_uri: "", scopes: "read write account")
+    login_as @user
+
+    get :show, params: {id: application}
+
+    assert_response :success
+    refute_includes response.body, "Token name"
+  end
+
   test "shows a confidential application's secret once" do
     login_as @user
 

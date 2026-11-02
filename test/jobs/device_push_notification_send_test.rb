@@ -136,7 +136,8 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
       end
     end
 
-    assert_equal 2, reported.size
+    assert_equal 1, reported.size, "one report per reason and topic, not per device"
+    assert_equal 2, reported.first[:parameters][:count]
   end
 
   test "a development build's device goes through the sandbox" do
@@ -151,5 +152,30 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
 
     assert_equal ["token#{@users.first.id}"], sandbox.topics.keys
     assert_equal ["token#{@users.last.id}"], production.topics.keys
+  end
+
+  test "a token for another app is removed and reported once" do
+    reported = []
+    pool = PushServerMock.new("400", reason: "DeviceTokenNotForTopic")
+    ErrorService.stub(:notify, ->(*args, **kwargs) { reported << (args.first || kwargs) }) do
+      DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+        DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+      end
+    end
+
+    assert_equal 0, Device.count
+    assert_equal ["DevicePushNotificationSend#DeviceTokenNotForTopic"], reported.map { _1[:error_class] }
+  end
+
+  test "a provider token APNs refuses is reported" do
+    reported = []
+    pool = PushServerMock.new("403", reason: "InvalidProviderToken")
+    ErrorService.stub(:notify, ->(*args, **kwargs) { reported << (args.first || kwargs) }) do
+      DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+        DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+      end
+    end
+
+    assert_equal ["DevicePushNotificationSend#InvalidProviderToken"], reported.map { _1[:error_class] }
   end
 end

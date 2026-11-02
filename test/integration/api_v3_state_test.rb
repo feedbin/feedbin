@@ -174,7 +174,8 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
       post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
     end
 
-    assert_includes walked[:query][:bool][:filter], {ids: {values: @user.unread_entries.pluck(:entry_id)}}
+    walked_ids = walked[:query][:bool][:filter].find { _1.is_a?(Hash) && _1.key?(:ids) }[:ids][:values]
+    assert_equal @user.unread_entries.pluck(:entry_id).to_set, walked_ids.to_set
   end
 
   test "a sweep whose query Elasticsearch could not check is an error, not query_invalid" do
@@ -185,6 +186,34 @@ class ApiV3StateTest < ActionDispatch::IntegrationTest
         post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
       end
     end
+  end
+
+  test "a saved-search sweep walks only what the other keys leave" do
+    search = @user.saved_searches.create!(name: "E", query: "E0")
+    elsewhere = Feed.create!(feed_url: "https://elsewhere.example/feed")
+    @user.subscriptions.create!(feed: elsewhere)
+    other = elsewhere.entries.create!(title: "E0", url: "https://elsewhere.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+    UnreadEntry.create_from_owners(@user, other)
+    walked = nil
+    capture = ->(_index, query:) { walked = query; [] }
+
+    Search::Connection.stub_any_instance(:all_matches, capture) do
+      post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}", feed_ids: [@feed.id]}}.to_json, headers: json
+    end
+
+    walked_ids = walked[:query][:bool][:filter].find { _1.is_a?(Hash) && _1.key?(:ids) }[:ids][:values]
+    assert_equal [@a.id, @b.id].to_set, walked_ids.to_set
+  end
+
+  test "a saved-search sweep with nothing left to mark does not search" do
+    search = @user.saved_searches.create!(name: "E", query: "E0")
+    UnreadEntry.where(user_id: @user.id).delete_all
+
+    Search::Connection.stub_any_instance(:all_matches, ->(*, **) { raise "searched" }) do
+      post "/v3/entries/state", params: {mark_read: {collection: "search_#{search.id}"}}.to_json, headers: json
+    end
+
+    assert_equal({"count" => 0}, JSON.parse(response.body)["applied"]["mark_read"])
   end
 
   private

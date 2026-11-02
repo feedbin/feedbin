@@ -56,7 +56,9 @@ module Api
           @user = user
           @verb = verb
           @relation = (verb == "mark_read") ? user.unread_entries : user.updated_entries
-          scope.each { |key, value| narrow(key, value) }
+          # collection last: a saved search's walk is filtered by the rows the
+          # other keys leave.
+          scope.sort_by { |key, _| (key == "collection") ? 1 : 0 }.each { |key, value| narrow(key, value) }
         end
 
         # A saved search's matches are deleted a slice at a time, so no
@@ -105,8 +107,10 @@ module Api
           when false then raise EntrySearch::QueryInvalid, "The saved search's query could not be parsed."
           when nil then raise Search::Connection::ResponseError, "Elasticsearch did not validate the saved search's query."
           end
+          candidates = @relation.pluck(:entry_id)
+          return [] if candidates.empty?
           bool = query[:query][:bool]
-          bool[:filter] = [bool[:filter], {ids: {values: @relation.pluck(:entry_id)}}]
+          bool[:filter] = [bool[:filter], {ids: {values: candidates}}]
           Search.client { _1.all_matches(index, query: query) }
         end
 

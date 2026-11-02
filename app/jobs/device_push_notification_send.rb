@@ -58,24 +58,31 @@ class DevicePushNotificationSend
   private
 
   def deliver(pool, notifications)
+    refused = Hash.new(0)
     pool.with do |connection|
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
           Librato.increment("apns.ios.sent", source: response.status)
-          reason = response.body["reason"] if response.status == "400"
-          notification = notifications[response.headers["apns-id"]]
+          reason = response.body["reason"] if %w[400 403].include?(response.status)
           if response.status == "410" || GONE.include?(reason)
             Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
-          elsif reason
-            # TopicDisallowed, MissingTopic and the like: our setup, not the
-            # device, so say so instead of failing quietly on every push.
-            ErrorService.notify(error_class: "DevicePushNotificationSend##{reason}", error_message: "APNs refused a push: #{reason}", parameters: {topic: notification.topic})
           end
+          refused[[reason, notification.topic]] += 1 if reason && reason != "BadDeviceToken"
         end
         connection.push_async(push)
       end
       connection.join
+    end
+    self.class.report_refusals(refused)
+  end
+
+  # Reasons that are our setup or the app's registration, not a device
+  # gone away (TopicDisallowed, DeviceTokenNotForTopic, InvalidProviderToken),
+  # once per reason and topic rather than once per device.
+  def self.report_refusals(refused, job: name)
+    refused.each do |(reason, topic), count|
+      ErrorService.notify(error_class: "#{job}##{reason}", error_message: "APNs refused #{count} pushes: #{reason}", parameters: {topic: topic, count: count})
     end
   end
 

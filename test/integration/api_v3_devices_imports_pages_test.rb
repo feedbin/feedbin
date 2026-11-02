@@ -147,6 +147,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
   end
 
   test "Airshow registers for podcast pushes" do
+    original = ENV["APPLE_PUSH_TOPIC_PODCAST"]
     ENV["APPLE_PUSH_TOPIC_PODCAST"] = "com.feedbin.airshow"
     post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.airshow"}.to_json, headers: json
 
@@ -154,7 +155,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     assert_equal "ios", JSON.parse(response.body)["platform"]
     assert Device.find(JSON.parse(response.body)["id"]).podcast?
   ensure
-    ENV.delete("APPLE_PUSH_TOPIC_PODCAST")
+    ENV["APPLE_PUSH_TOPIC_PODCAST"] = original
   end
 
   test "a development build says which push environment it uses" do
@@ -177,6 +178,13 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal existing.id, JSON.parse(response.body)["id"]
+  end
+
+  test "a null push environment is production" do
+    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: nil}.to_json, headers: json
+
+    assert_response :created
+    assert_equal "production", Device.find(JSON.parse(response.body)["id"]).data["apns_environment"]
   end
 
   private

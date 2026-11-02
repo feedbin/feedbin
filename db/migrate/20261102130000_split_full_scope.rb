@@ -6,7 +6,7 @@ class SplitFullScope < ActiveRecord::Migration[8.1]
   DEVELOPMENT_UID = "feedbin-next-development"
 
   def up
-    uids = [DEVELOPMENT_UID, *Api::V3::Scopes.first_party_uids]
+    uids = [DEVELOPMENT_UID, *ENV.fetch("API_V3_FIRST_PARTY_UIDS", "").split(",").map(&:strip).reject(&:empty?)]
     # Data only: rewrites a string column, no locks beyond the rows.
     safety_assured do
       execute sanitize("UPDATE oauth_applications SET scopes = :first_party WHERE uid IN (:uids)", first_party: "read write account", uids: uids)

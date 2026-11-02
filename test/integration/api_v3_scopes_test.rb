@@ -140,6 +140,7 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
   test "the migration marks the first-party apps named in the environment" do
     production = users(:ann).oauth_applications.create!(name: "Feedbin", redirect_uri: REDIRECT_URI)
     token = production.access_tokens.create!(resource_owner_id: @user.id, scopes: "full")
+    original = ENV["API_V3_FIRST_PARTY_UIDS"]
     ENV["API_V3_FIRST_PARTY_UIDS"] = "#{production.uid}, unknown-uid"
 
     ActiveRecord::Migration.suppress_messages { SplitFullScope.new.up }
@@ -147,7 +148,7 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
     assert_equal "read write account", production.reload.scopes.to_s
     assert_equal "read write account", token.reload.scopes.to_s
   ensure
-    ENV.delete("API_V3_FIRST_PARTY_UIDS")
+    ENV["API_V3_FIRST_PARTY_UIDS"] = original
   end
 
   # A token minted by a process still running the old code after the

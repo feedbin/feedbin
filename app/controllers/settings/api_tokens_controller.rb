@@ -5,8 +5,9 @@ class Settings::ApiTokensController < ApplicationController
   # pasting into a client or a script.
   def create
     application = @user.oauth_applications.find(params[:api_application_id])
-    # Feedbin's own apps sign in through OAuth; a pasted token for one would
-    # carry the account scope.
+    # Feedbin's own apps sign in through OAuth, which is what gives them the
+    # account scope; a settings token would have only read write and still
+    # fail on push, purchases and the account.
     if application.scopes.include?("account")
       return redirect_to settings_api_application_path(application), alert: "Tokens for Feedbin's own apps come from signing in to the app."
     end

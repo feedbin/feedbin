@@ -96,16 +96,19 @@ module Settings
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
           group.header { "Your Tokens" }
 
-          group.item do
-            form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
-              div class: "grow" do
-                render Form::TextInputComponent.new do |text|
-                  text.input do
-                    form.text_field :device_name, placeholder: "Token name, like “curl on my Mac”", class: "peer text-input", autocomplete: "off"
+          # Feedbin's own apps get their tokens by signing in.
+          unless @application.scopes.include?("account")
+            group.item do
+              form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
+                div class: "grow" do
+                  render Form::TextInputComponent.new do |text|
+                    text.input do
+                      form.text_field :device_name, placeholder: "Token name, like “curl on my Mac”", class: "peer text-input", autocomplete: "off"
+                    end
                   end
                 end
+                button(class: "button button-secondary", type: "submit") { "Create Token" }
               end
-              button(class: "button button-secondary", type: "submit") { "Create Token" }
             end
           end
 

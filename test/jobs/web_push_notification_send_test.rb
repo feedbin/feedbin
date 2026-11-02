@@ -110,6 +110,7 @@ class WebPushNotificationSendTest < ActiveSupport::TestCase
   test "safari pushes go out under the website push id" do
     @users.each { |user| user.devices.create!(token: "token#{user.id}", device_type: :safari) }
     pool = PushServerMock.new("200")
+    original = ENV["APPLE_PUSH_WEBSITE_ID"]
     ENV["APPLE_PUSH_WEBSITE_ID"] = "web.com.feedbin.test"
     WebPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
       WebPushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
@@ -117,7 +118,7 @@ class WebPushNotificationSendTest < ActiveSupport::TestCase
 
     assert_equal ["web.com.feedbin.test"], pool.topics.values.uniq
   ensure
-    ENV.delete("APPLE_PUSH_WEBSITE_ID")
+    ENV["APPLE_PUSH_WEBSITE_ID"] = original
   end
 
   test "a suspended account gets no web push" do
@@ -129,5 +130,18 @@ class WebPushNotificationSendTest < ActiveSupport::TestCase
     end
 
     assert_equal ["token#{@users.last.id}"], pool.topics.keys
+  end
+
+  test "a safari topic APNs refuses is reported once" do
+    @users.each { |user| user.devices.create!(token: "token#{user.id}", device_type: :safari) }
+    reported = []
+    pool = PushServerMock.new("400", reason: "TopicDisallowed")
+    ErrorService.stub(:notify, ->(*args, **kwargs) { reported << (args.first || kwargs) }) do
+      WebPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+        WebPushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
+      end
+    end
+
+    assert_equal ["WebPushNotificationSend#TopicDisallowed"], reported.map { _1[:error_class] }
   end
 end

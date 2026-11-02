@@ -3,20 +3,25 @@ class PodcastPushNotification
 
   def perform(user_id, entry_id)
     ErrorService.context(user_id: user_id, entry_id: entry_id)
+    return unless User.where(id: user_id, suspended: false).exists?
     entry = Entry.find(entry_id)
-    tokens = Device.where(user_id: user_id, active: true).podcast.pluck(:token)
-    tokens.each do |token|
+    devices = Device.where(user_id: user_id, active: true).podcast.pluck(:token, Arel.sql("devices.data->>'apns_environment'"))
+    refused = Hash.new(0)
+    devices.each do |token, environment|
       notification = build_notification(token, entry)
+      # A development build's token belongs to APNs's sandbox.
+      pool = (environment == "development") ? DevicePushNotificationSend::SANDBOX_POOL : DevicePushNotificationSend::APNOTIC_POOL
+      response = pool.with { |connection| connection.push(notification) }
+      next unless response
 
-      response = DevicePushNotificationSend::APNOTIC_POOL.with do |connection|
-        connection.push(notification)
-      end
-
-      if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
+      reason = response.body["reason"] if %w[400 403].include?(response.status)
+      if response.status == "410" || DevicePushNotificationSend::GONE.include?(reason)
         Rails.logger.info { "Bad device token user_id=#{user_id}" }
         Device.where("lower(token) = ?", token.downcase).take&.destroy
       end
+      refused[[reason, notification.topic]] += 1 if reason && reason != "BadDeviceToken"
     end
+    DevicePushNotificationSend.report_refusals(refused, job: self.class.name)
   end
 
   private
