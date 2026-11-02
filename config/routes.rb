@@ -139,6 +139,7 @@ Rails.application.routes.draw do
         resources :actions, only: [:index, :create, :update, :destroy] do
           get :entries, on: :member
         end
+        resources :playlists, only: [:index, :create, :update, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           post :purchases
         end
