@@ -16,7 +16,12 @@ module Api
       # account switch on the same device, and two accounts at the same
       # version must not match.
       def list_etag(list)
-        %("#{list}:#{@user.id}:#{versions.fetch(list)}")
+        etag_for(list, versions.fetch(list))
+      end
+
+      # For a list whose version is another list's, or a composite.
+      def etag_for(name, *parts)
+        %("#{name}:#{@user.id}:#{parts.join(":")}")
       end
 
       # Sets the ETag and answers 304 when the client already has this
