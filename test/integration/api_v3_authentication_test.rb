@@ -114,6 +114,19 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  test "tells caches to revalidate every response and never share it" do
+    get "/v3/subscriptions", headers: bearer(@token.plaintext_token)
+    assert_equal "no-cache, private", response.headers["Cache-Control"]
+    etag = response.headers["ETag"]
+
+    get "/v3/subscriptions", headers: bearer(@token.plaintext_token).merge("If-None-Match" => etag)
+    assert_response :not_modified
+    assert_equal "no-cache, private", response.headers["Cache-Control"]
+
+    get "/v3/nothing", headers: bearer(@token.plaintext_token)
+    assert_equal "no-cache, private", response.headers["Cache-Control"]
+  end
+
   test "serves the v3 root" do
     get "/v3", headers: bearer(@token.plaintext_token)
 

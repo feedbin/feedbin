@@ -15,6 +15,17 @@ module Api
       wrap_parameters false
 
       before_action :validate_content_type
+      before_action :forbid_caching
+
+      # Every v3 response is private to its token and must be revalidated
+      # with If-None-Match: a URL-keyed cache that served a stored body
+      # without asking would show one account's list to another after a
+      # switch, and a shared cache must never store one at all.
+      def forbid_caching
+        # Through the hash: Rails rewrites the header and keeps "private"
+        # beside "no-cache" only as an extra.
+        response.cache_control.replace(no_cache: true, extras: ["private"])
+      end
 
       # Unmatched v3 paths land here, after authentication, so an unknown
       # route and a missing record look the same.
