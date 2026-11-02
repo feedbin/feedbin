@@ -1,8 +1,8 @@
 module Api
   module V3
-    # GET /feeds (the user's feeds, with an ETag), GET /feeds/{id},
-    # GET /feeds/{id}/entries (one feed's timeline), and GET /feeds/lookup,
-    # which takes no token: the feed URL is the credential.
+    # GET /feeds (the user's feeds and the feeds of their starred entries, with
+    # an ETag), GET /feeds/{id}, GET /feeds/{id}/entries (one feed's timeline),
+    # and GET /feeds/lookup, which takes no token: the feed URL is the credential.
     class FeedsController < ApiController
       include Timeline
 
@@ -14,10 +14,10 @@ module Api
       LOOKUPS_PER_HOUR = 120
 
       def index
-        feed_ids = @user.subscriptions.select(:feed_id)
-        return if not_modified?(feeds_etag(feed_ids))
+        feeds = listed_feeds
+        return if not_modified?(feeds_etag(feeds))
 
-        feeds = Feed.where(id: feed_ids).includes(*Feed::ICON_PRELOADS, :touch_icon_image_record).order(:id)
+        feeds = feeds.includes(*Feed::ICON_PRELOADS, :touch_icon_image_record).order(:id)
         render_list(feeds.map { FeedSerializer.new(_1).to_h })
       end
 
@@ -81,12 +81,21 @@ module Api
         false
       end
 
-      # The set of feeds changes with the subscriptions list, and a feed's row
-      # changes whenever the crawler saves it, so the subscriptions version and
-      # the newest updated_at together move on every change a client sees.
-      def feeds_etag(feed_ids)
-        newest = Feed.where(id: feed_ids).maximum(:updated_at)
-        %("feeds:#{@user.id}:#{versions.fetch("subscriptions")}:#{newest ? (newest.to_r * 1_000_000).to_i : 0}")
+      # Every feed the user can read: the ones they subscribe to and the ones
+      # they have starred entries from, the same rule as readable_feed. A
+      # relation over two subqueries, so the ETag and the list share it.
+      def listed_feeds
+        Feed.where(id: @user.subscriptions.select(:feed_id))
+          .or(Feed.where(id: @user.starred_entries.select(:feed_id)))
+      end
+
+      # The set of feeds changes with the subscriptions list and the starred
+      # list, and a feed's row changes whenever the crawler saves it, so the
+      # two versions and the newest updated_at together move on every change a
+      # client sees.
+      def feeds_etag(feeds)
+        newest = feeds.maximum(:updated_at)
+        etag_for("feeds", versions.fetch("subscriptions"), versions.fetch("starred"), newest ? (newest.to_r * 1_000_000).to_i : 0)
       end
 
       def lookup_ids

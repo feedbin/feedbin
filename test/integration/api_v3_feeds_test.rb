@@ -51,7 +51,55 @@ class ApiV3FeedsTest < ActionDispatch::IntegrationTest
     assert_equal @feeds.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
   end
 
+  test "lists a feed the user only has starred entries from" do
+    kept, subscribed = @feeds
+    StarredEntry.create_from_owners(@user, entry_in(kept))
+    StarredEntry.create_from_owners(@user, entry_in(subscribed))
+    @user.subscriptions.find_by!(feed: kept).destroy!
+
+    get "/v3/feeds", headers: bearer
+
+    assert_response :success
+    assert_equal [kept.id, subscribed.id].sort, JSON.parse(response.body)["data"].map { _1["id"] }
+  end
+
+  test "the etag moves when a star adds a feed" do
+    other = Feed.create!(feed_url: "https://other.example/feed", host: "other.example", title: "Other")
+    get "/v3/feeds", headers: bearer
+    etag = response.headers["ETag"]
+    assert_equal @feeds.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
+
+    get "/v3/feeds", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :not_modified
+
+    StarredEntry.create_from_owners(@user, entry_in(other))
+
+    get "/v3/feeds", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+    refute_equal etag, response.headers["ETag"]
+    assert_includes JSON.parse(response.body)["data"].map { _1["id"] }, other.id
+  end
+
+  test "the etag moves when the last star from a feed is removed" do
+    other = Feed.create!(feed_url: "https://other.example/feed", host: "other.example", title: "Other")
+    starred = StarredEntry.create_from_owners(@user, entry_in(other))
+    get "/v3/feeds", headers: bearer
+    etag = response.headers["ETag"]
+    assert_includes JSON.parse(response.body)["data"].map { _1["id"] }, other.id
+
+    starred.destroy!
+
+    get "/v3/feeds", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+    refute_equal etag, response.headers["ETag"]
+    assert_equal @feeds.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
+  end
+
   private
+
+  def entry_in(feed)
+    feed.entries.create!(title: "Kept", url: "#{feed.feed_url}/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex)
+  end
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}
