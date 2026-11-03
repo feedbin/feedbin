@@ -126,9 +126,10 @@ Rails.application.routes.draw do
         end
         resources :entries, only: [:index]
         resources :tokens, only: [:index, :destroy]
-        get "subscriptions.opml", to: "subscriptions#export", format: false
+        get "subscriptions.opml", to: "subscriptions/exports#show", format: false
         resources :subscriptions, only: [:index, :show, :create, :update, :destroy] do
-          put :tags, on: :member
+          # PUT only: the tags are a set, and a PATCH of a set is ambiguous.
+          put :tags, to: "subscriptions/tags#update", on: :member
         end
         namespace :feeds do
           resource :lookup, only: :show
@@ -140,7 +141,7 @@ Rails.application.routes.draw do
         get "search", to: "search#index"
         resources :saved_searches, only: [:index, :create, :update, :destroy]
         resources :actions, only: [:index, :create, :update, :destroy] do
-          get :entries, on: :member
+          resources :entries, only: :index, module: :actions
         end
         resources :playlists, only: [:index, :create, :update, :destroy]
         resources :devices, only: [:create, :destroy]
