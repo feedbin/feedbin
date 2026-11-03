@@ -121,17 +121,20 @@ Rails.application.routes.draw do
       end
 
       namespace :v3 do
-        resources :entries, only: [:index] do
-          post :state, on: :collection
+        namespace :entries do
+          resource :state, only: :create
         end
+        resources :entries, only: [:index]
         resources :tokens, only: [:index, :destroy]
         get "subscriptions.opml", to: "subscriptions#export", format: false
         resources :subscriptions, only: [:index, :show, :create, :update, :destroy] do
           put :tags, on: :member
         end
-        get "feeds/lookup", to: "feeds#lookup"
+        namespace :feeds do
+          resource :lookup, only: :show
+        end
         resources :feeds, only: [:index, :show] do
-          get :entries, on: :member
+          resources :entries, only: :index, module: :feeds
         end
         resources :tags, only: [:index, :update, :destroy]
         get "search", to: "search#index"
@@ -146,14 +149,13 @@ Rails.application.routes.draw do
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           post :purchases
         end
-        get "collections", to: "collections#index"
-        get "collections/:id/ids", to: "collections#ids"
-        get "collections/:id/entries", to: "collections#entries"
-        post "collections/:id/entries", to: "collections#add"
-        patch "collections/:id/entries", to: "collections#bulk"
-        delete "collections/:id/entries", to: "collections#clear"
-        patch "collections/:id/entries/:entry_id", to: "collections#update"
-        delete "collections/:id/entries/:entry_id", to: "collections#remove"
+        resources :collections, only: :index do
+          scope module: :collections do
+            resource :ids, only: :show
+            resources :entries, only: [:index, :create, :update, :destroy]
+            resource :entries, only: [:update, :destroy], controller: "bulk_entries", as: :bulk_entries
+          end
+        end
 
         match "/", to: "api#not_found", via: :all
         match "*path", to: "api#not_found", via: :all

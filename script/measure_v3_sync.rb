@@ -28,8 +28,9 @@ ActiveRecord::Base.transaction do
   base = Entry.where(feed_id: user.subscriptions.select(:feed_id))
   newest = base.order(created_at: :desc, id: :desc).first
   if newest
-    page = Api::V3::Timeline.page(base, :created_at, :asc, limit: 101, after: [newest.created_at, newest.id])
-    explain(connection, page.to_sql)
+    cursor = {"sort" => "received_asc", "timestamp" => (newest.created_at.to_r * 1_000_000).to_i, "id" => newest.id}
+    page = Api::V3::Timeline.page(base, "received_asc", limit: 100, cursor: cursor)
+    explain(connection, page.relation.to_sql)
   else
     puts "  The user's feeds have no entries."
   end
@@ -42,6 +43,6 @@ ActiveRecord::Base.transaction do
   connection.execute("SET LOCAL statement_timeout = '30s'")
   {"unread" => user.unread_entries, "starred" => user.starred_entries}.each do |name, scope|
     puts "  #{name}: #{scope.count} rows"
-    explain(connection, scope.select(Arel.sql("count(*), coalesce(sum(hashtext(concat_ws(':', entry_id))), 0)")).to_sql)
+    explain(connection, scope.reorder(nil).select(Arel.sql("count(*), coalesce(sum(hashtext(concat_ws(':', entry_id))), 0)")).to_sql)
   end
 end

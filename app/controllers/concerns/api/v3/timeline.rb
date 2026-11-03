@@ -22,14 +22,12 @@ module Api
       }.freeze
       STREAMS = %w[received_asc edited_asc].freeze
 
-      # One keyset page: entries after a (time, id) position in the order,
-      # with the id as tiebreak. script/measure_v3_sync.rb runs it too.
-      def self.page(scope, column, direction, limit:, after: nil)
-        if after
-          operator = (direction == :asc) ? ">" : "<"
-          scope = scope.where("(entries.#{column}, entries.id) #{operator} (?, ?)", *after)
-        end
-        scope.order(column => direction, :id => direction).limit(limit)
+      # One keyset page of the timeline in an order. script/measure_v3_sync.rb
+      # runs it too.
+      def self.page(scope, order, limit:, cursor: nil)
+        column, direction = ORDERS.fetch(order)
+        scope = scope.where.not(edited_at: nil) if order == "edited_asc"
+        KeysetPage.new(scope, sort: order, column: column, direction: direction, limit: limit, cursor: cursor, key: "timestamp")
       end
 
       private
@@ -47,33 +45,22 @@ module Api
 
       def render_timeline
         limit = page_limit
-        scope = filtered_entries
-        total = scope.count if boolean_param(:total)
+        page = Timeline.page(filtered_entries.for_api_v3, order, limit: limit, cursor: cursor_fields)
+        entries = page.records
+        next_cursor = page.next_cursor || (tail_cursor(page) if STREAMS.include?(order))
 
-        column, direction = ORDERS.fetch(order)
-        scope = scope.where.not(edited_at: nil) if order == "edited_asc"
-        entries = Timeline.page(scope.merge(with_associations), column, direction, limit: limit + 1, after: cursor_position).to_a
-
-        more = entries.size > limit
-        entries.pop if more
-        next_cursor = if more
-          cursor_at(entries.last, column)
-        elsif STREAMS.include?(order)
-          tail_cursor(entries, column)
-        end
-
-        meta = {as_of: as_of}
-        meta.merge!(stream_cursors(entries)) if streams? && order == TIMELINE && params[:cursor].blank?
-        meta[:total] = total if total
         render_list(
-          serialize(entries),
-          page: page_object(limit: limit, next_cursor: next_cursor, more: more),
-          meta: meta
+          serialize_entries(entries),
+          page: page_object(limit: limit, next_cursor: next_cursor, more: page.more?),
+          meta: timeline_meta(entries)
         )
       end
 
-      def cursor_at(entry, column)
-        Cursor.encode(sort: order, timestamp: microseconds(entry.public_send(column)), id: entry.id)
+      def timeline_meta(entries)
+        meta = {as_of: as_of}
+        meta.merge!(stream_cursors(entries)) if streams? && order == TIMELINE && params[:cursor].blank?
+        meta[:total] = filtered_entries.count if boolean_param(:total)
+        meta
       end
 
       # The default timeline page hands a client its two stream positions, so
@@ -82,39 +69,19 @@ module Api
       # newest entry on the page; edits from the response time, since the
       # page already carries every edit made before it.
       def stream_cursors(entries)
-        now = Time.at(Rational(microseconds(Time.now), 1_000_000)).utc
-        arrivals = if entries.any?
-          Cursor.encode(sort: "received_asc", timestamp: microseconds(entries.first.created_at), id: entries.first.id)
-        else
-          Cursor.encode(sort: "received_asc", timestamp: microseconds(now), id: 0)
-        end
+        now = microseconds(Time.now)
+        arrivals = entries.any? ? [microseconds(entries.first.created_at), entries.first.id] : [now, 0]
         {
-          arrivals_cursor: arrivals,
-          edits_cursor: Cursor.encode(sort: "edited_asc", timestamp: microseconds(now), id: 0)
+          arrivals_cursor: Cursor.encode(sort: "received_asc", timestamp: arrivals.first, id: arrivals.last),
+          edits_cursor: Cursor.encode(sort: "edited_asc", timestamp: now, id: 0)
         }
       end
 
       # A stream's last page still ends with a cursor to resume from: after
       # the last entry, or the cursor the client sent when nothing is new. A
       # stream is only ever entered through a cursor, so one is always there.
-      def tail_cursor(entries, column)
-        entries.any? ? cursor_at(entries.last, column) : params[:cursor]
-      end
-
-      def with_associations
-        Entry.with_list_associations.with_renderings.preload(feed: :touch_icon_image_record)
-      end
-
-      # With expand=feed, each feed is serialized once per response, however
-      # many of its entries are on the page.
-      def serialize(entries)
-        expand = expansions(EntrySerializer::EXPANSIONS)
-        feed_hashes = if expand.include?("feed")
-          entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
-        else
-          {}
-        end
-        entries.map { EntrySerializer.new(_1, feed: feed_hashes[_1.feed_id], expand: expand).to_h }
+      def tail_cursor(page)
+        page.records.any? ? page.cursor_at(page.records.last) : params[:cursor]
       end
 
       def filtered_entries
@@ -145,17 +112,6 @@ module Api
           raise Cursor::Invalid unless ORDERS.key?(value)
           value
         end
-      end
-
-      # A cursor with fields that don't parse is invalid rather than silently
-      # restarting.
-      # The cursor's (time, id), or nil on a first page.
-      def cursor_position
-        fields = cursor_fields or return nil
-        timestamp, id = fields.values_at("timestamp", "id")
-        raise Cursor::Invalid unless timestamp.is_a?(Integer) && id.is_a?(Integer)
-
-        [Time.at(Rational(timestamp, 1_000_000)).utc, id]
       end
 
       def microseconds(time)

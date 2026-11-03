@@ -88,6 +88,23 @@ module Api
           detail: "The request was understood but #{errors.one? ? "a value is" : "#{errors.size} values are"} invalid.",
           errors: errors
       end
+
+      def status_query_invalid
+        render_problem :unprocessable_content, "query_invalid", title: "Query invalid", detail: "The query could not be parsed."
+      end
+
+      def status_rate_limited(retry_after:, detail:)
+        response.set_header("Retry-After", retry_after.to_i.to_s)
+        render_problem :too_many_requests, "rate_limited", title: "Rate limited", detail: detail
+      end
+
+      # A record's validation errors as problem errors. pointers maps an
+      # attribute to the body field it came from, when they differ.
+      def record_errors(record, pointers = {})
+        record.errors.map do |error|
+          {pointer: "/#{pointers.fetch(error.attribute, error.attribute)}", code: (error.type == :blank) ? "missing" : "invalid_value", detail: error.full_message}
+        end
+      end
     end
   end
 end

@@ -21,13 +21,14 @@ module Api
         Timestamp.parse(params[name]) or raise Problems::InvalidParameter.new("#{name} must be an RFC 3339 timestamp with a UTC offset.", pointer: name.to_s, code: "invalid_value")
       end
 
-      # Comma-separated ids, at most MAX_IDS.
-      def id_list(name)
+      # Comma-separated positive ids, at most max, without repeats. of names
+      # them in the message.
+      def id_list(name, max: MAX_IDS, of: "ids")
         return nil unless params.key?(name)
         ids = params[name].to_s.split(",").map { Integer(_1.strip, exception: false) }
-        raise Problems::InvalidParameter.new("#{name} must be comma-separated ids.", pointer: name.to_s, code: "invalid_value") if ids.empty? || ids.any?(&:nil?)
-        raise Problems::InvalidParameter.new("#{name} takes at most #{MAX_IDS} ids.", pointer: name.to_s, code: "too_many") if ids.size > MAX_IDS
-        ids
+        raise Problems::InvalidParameter.new("#{name} must be comma-separated #{of}.", pointer: name.to_s, code: "invalid_value") if ids.empty? || ids.any? { _1.nil? || _1 <= 0 }
+        raise Problems::InvalidParameter.new("#{name} takes at most #{max} ids.", pointer: name.to_s, code: "too_many") if ids.size > max
+        ids.uniq
       end
     end
   end

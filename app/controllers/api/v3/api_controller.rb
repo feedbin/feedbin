@@ -11,6 +11,7 @@ module Api
       include Conditional
       include Expansion
       include Params
+      include BodyFields
 
       # A v3 body is the resource itself, never wrapped in a root key.
       wrap_parameters false
@@ -35,6 +36,12 @@ module Api
       end
 
       private
+
+      # The JSON body, as parsed: a verb's array or a merge patch's null
+      # arrives as sent, not filtered through params.
+      def body
+        request.request_parameters
+      end
 
       def validate_content_type
         return unless request.post? || request.put? || request.patch?

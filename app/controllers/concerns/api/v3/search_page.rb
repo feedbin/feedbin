@@ -13,12 +13,10 @@ module Api
         after = search_cursor
         entries, next_after, count = search.page(limit: limit, after: after)
         next_cursor = next_after && Cursor.encode(sort: EntrySearch::CURSOR_SORT, after: next_after)
-        expand = expansions(EntrySerializer::EXPANSIONS)
-        feeds = expand.include?("feed") ? entries.map(&:feed).uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] } : {}
         meta = {as_of: as_of, query: search.expanded_query}
         meta[:total] = count if total
         render_list(
-          entries.map { EntrySerializer.new(_1, feed: feeds[_1.feed_id], expand: expand).to_h },
+          serialize_entries(entries),
           page: page_object(limit: limit, next_cursor: next_cursor, more: !next_cursor.nil?),
           meta: meta
         )

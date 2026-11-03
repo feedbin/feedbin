@@ -17,6 +17,20 @@ module Api
           names
         end
       end
+
+      # Entries as the entry object. With expand=feed, each feed is
+      # serialized once per response, however many of its entries there are.
+      # memberships: {entry id => membership hash}, on collection reads.
+      def serialize_entries(entries, memberships: {})
+        expand = expansions(EntrySerializer::EXPANSIONS)
+        feeds = expand.include?("feed") ? serialize_feeds(entries.map(&:feed)) : {}
+        entries.map { EntrySerializer.new(_1, feed: feeds[_1.feed_id], expand: expand, membership: memberships[_1.id]).to_h }
+      end
+
+      # {feed id => feed object}
+      def serialize_feeds(feeds)
+        feeds.uniq(&:id).to_h { [_1.id, FeedSerializer.new(_1).to_h] }
+      end
     end
   end
 end

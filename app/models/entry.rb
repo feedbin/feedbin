@@ -96,6 +96,11 @@ class Entry < ApplicationRecord
     includes(:feed).preload(:owned_image_records).with_renderings
   }
 
+  # What Api::V3::EntrySerializer and an embedded feed read.
+  scope :for_api_v3, -> {
+    with_list_associations.with_renderings.preload(feed: :touch_icon_image_record)
+  }
+
   def newsletter?
     feed.newsletter?
   end

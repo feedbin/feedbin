@@ -19,6 +19,8 @@ module Api
 
       RECENTLY_READ_LIMIT = 100
       SEARCH_IDS_LIMIT = 500
+      # How long an arrival can take to reach Elasticsearch.
+      INDEX_LAG = 5.minutes
 
       def self.all(user)
         SYSTEM.map { new(user, **_1) } +
@@ -90,18 +92,81 @@ module Api
         when "queue" then [:order, :asc]
         when "recently_read" then [:id, :desc]
         when "updated" then [:updated_at, :desc]
+        when "pages" then [:published, :desc]
         else [:created_at, :desc]
         end
       end
 
       # The whole id list, ascending. A saved search's is its unread matches.
       def ids
-        if search?
+        @ids ||= if search?
           search_ids
         elsif pages?
           pages.order(:id).pluck(:id)
         else
           rows.reorder(nil).order(:entry_id).pluck(:entry_id)
+        end
+      end
+
+      # What the id list's ETag is made of: it moves whenever #ids would.
+      def ids_version
+        if search?
+          search_version
+        elsif pages?
+          pages_version
+        else
+          Fingerprint.of(rows, :entry_id)
+        end
+      end
+
+      # One page of the collection's entries in its sort. The timeline and
+      # Pages page entries; the rest page their membership rows.
+      def page(limit:, cursor: nil)
+        column, direction = key
+        KeysetPage.new(page_scope, sort: "collection:#{@id}", column: column, direction: direction, limit: limit, cursor: cursor, tiebreak: rows ? :entry_id : :id)
+      end
+
+      # The entries on a page, in order, and their memberships by entry id.
+      # A membership row whose entry is gone is left out.
+      def entries_on(page)
+        records = page.records
+        unless rows
+          return [records, pages? ? records.to_h { [_1.id, membership(_1)] } : {}]
+        end
+        entries = Entry.where(id: records.map(&:entry_id)).for_api_v3.index_by(&:id)
+        listed = records.select { entries.key?(_1.entry_id) }
+        [listed.map { entries[_1.entry_id] }, listed.to_h { [_1.entry_id, membership(_1)] }]
+      end
+
+      # POST /collections/{id}/entries (see Additions).
+      def add(body)
+        Additions.new(@user, self, body).call
+      end
+
+      # The queue's per-row and bulk writes; the other collections don't take
+      # them (accepts?).
+      def update_entry(entry_id, body)
+        row = @user.queued_entries.find_by!(entry_id: entry_id)
+        QueueMembershipWrite.new(row, body).apply
+        membership(row.reload)
+      end
+
+      def update_entries(rows)
+        QueueMembershipWrite.apply_all(@user, rows)
+      end
+
+      def remove(entry_id)
+        @user.queued_entries.where(entry_id: entry_id).destroy_all
+      end
+
+      def clear
+        case @id
+        when "recently_read" then @user.recently_read_entries.delete_all
+        when "recently_played" then RecentlyPlayedEntry.clear_for_user(@user.id)
+        when "queue"
+          entry_ids = @user.queued_entries.pluck(:entry_id)
+          @user.queued_entries.delete_all
+          EntryCounterRepair.enqueue(entry_ids)
         end
       end
 
@@ -142,6 +207,47 @@ module Api
 
       def to_h
         {object: "collection", id: @id, kind: @kind, title: @title, sort: @sort, hidden: hidden, writes: @writes, query: @query}
+      end
+
+      private
+
+      def page_scope
+        if timeline?
+          Entry.where(feed_id: @user.subscriptions.select(:feed_id)).for_api_v3
+        elsif pages?
+          pages.for_api_v3
+        else
+          rows
+        end
+      end
+
+      # A saved search's matches follow the unread list, stars (is:starred),
+      # the feeds subscribed to, their tags, and the query, so a quiet poll
+      # needs no search. While the newest unread row may still be waiting
+      # for Elasticsearch, the ids themselves are part of it too, so the list
+      # changes when indexing catches up.
+      def search_version
+        parts = [
+          Fingerprint.of(@user.unread_entries, :entry_id),
+          Fingerprint.of(@user.starred_entries, :entry_id),
+          Fingerprint.of(@user.subscriptions, :feed_id),
+          Fingerprint.of(@user.taggings, :feed_id, :tag_id),
+          microseconds(@saved_search.updated_at || @saved_search.created_at)
+        ]
+        parts << Digest::SHA256.hexdigest(ids.join(","))[0, 32] if @user.unread_entries.where(created_at: INDEX_LAG.ago..).exists?
+        parts.join(":")
+      end
+
+      # Pages has no membership table: its entries are rows of entries, so
+      # the count, the newest id and the newest save move on every add, edit
+      # and delete.
+      def pages_version
+        count, newest_id, updated = pages.pick(Arel.sql("count(*)"), Arel.sql("max(id)"), Arel.sql("max(updated_at)"))
+        [count, newest_id || 0, updated ? microseconds(updated) : 0].join(":")
+      end
+
+      def microseconds(time)
+        (time.to_r * 1_000_000).to_i
       end
     end
   end

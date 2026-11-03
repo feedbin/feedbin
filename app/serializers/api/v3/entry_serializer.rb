@@ -1,8 +1,7 @@
 module Api
   module V3
-    # The entry object. Load entries with
-    # Entry.with_list_associations.with_renderings so the image rows, feed,
-    # and stored rendering come preloaded. The default shape carries feed_id;
+    # The entry object. Load entries with Entry.for_api_v3 so the image rows,
+    # feed, and stored rendering come preloaded. The default shape carries feed_id;
     # expand names what to add (EXPANSIONS): the feed (feed is its serialized
     # hash, built once per feed) and the optional bodies under content. A
     # body not asked for is left out, one asked for that the entry does not

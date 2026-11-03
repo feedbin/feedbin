@@ -49,7 +49,7 @@ module Api
         ids = response.ids
         more = ids.size > limit
         ids = ids.first(limit)
-        entries = Entry.where(id: ids).with_list_associations.with_renderings.preload(feed: :touch_icon_image_record).index_by(&:id)
+        entries = Entry.where(id: ids).for_api_v3.index_by(&:id)
         after = more ? sort_values(response, limit) : nil
         [ids.filter_map { entries[_1] }, after, response.total]
       end
