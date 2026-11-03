@@ -1,26 +1,19 @@
-# Measures two costs the v3 design leaves open (feedbin-api-docs design.md,
-# open questions 20 and 21), on real data:
+# Measures two costs of v3 polling on real data. Read-only: each runs in a
+# READ ONLY transaction with a 30 second statement_timeout.
 #
 # 1. An empty arrivals page: GET /v3/entries with a received_asc cursor at
-#    the user's newest entry, which is what a quiet poll asks. Read-only: it
-#    runs in a READ ONLY transaction.
-# 2. The sync_versions trigger on fan-out: one unreads insert with a row per
-#    active subscriber of FEED_ID, as a new entry makes. NOT read-only: the
-#    insert really runs, then the transaction is rolled back. While it is
-#    open it holds row locks on those users' sync_versions rows (the
-#    trigger's upsert), so pick a quiet moment. lock_timeout gives up after
-#    2 seconds rather than wait on another session's lock while holding its
-#    own, and statement_timeout caps the insert at 30 seconds. The rows are for the feed's oldest entry, which few
-#    subscribers still have unread; rows that already exist are skipped, and
-#    EXPLAIN reports how many were inserted.
+#    the user's newest entry, which is what a quiet poll asks (feedbin-api-docs
+#    design.md, open question 20).
+# 2. The ETags of the user's unread and starred id lists: the fingerprint
+#    Api::V3::Conditional computes on every poll of /collections/{id}/ids,
+#    the work a 304 still does.
 #
-# Usage: bin/rails runner script/measure_v3_sync.rb USER_ID FEED_ID
+# Usage: bin/rails runner script/measure_v3_sync.rb USER_ID
 
-user_id, feed_id = ARGV.map { Integer(_1) }
-abort "usage: bin/rails runner script/measure_v3_sync.rb USER_ID FEED_ID" unless user_id && feed_id
+user_id = Integer(ARGV.first, exception: false)
+abort "usage: bin/rails runner script/measure_v3_sync.rb USER_ID" unless user_id
 
 user = User.find(user_id)
-feed = Feed.find(feed_id)
 connection = ActiveRecord::Base.connection
 $stdout.sync = true
 
@@ -42,23 +35,13 @@ ActiveRecord::Base.transaction do
   end
 end
 
-subscribers = Subscription.where(feed_id: feed.id, active: true).count
-oldest = feed.entries.order(:id).first or abort "Feed #{feed.id} has no entries."
 puts
-puts "== 2. Unreads insert for #{subscribers} subscribers of feed #{feed.id} (rolled back)"
+puts "== 2. Id list ETags for user #{user.id}"
 ActiveRecord::Base.transaction do
-  connection.execute("SET LOCAL lock_timeout = '2s'")
+  connection.execute("SET TRANSACTION READ ONLY")
   connection.execute("SET LOCAL statement_timeout = '30s'")
-  insert = ActiveRecord::Base.sanitize_sql_array([<<~SQL, feed_id: feed.id, entry_id: oldest.id])
-    INSERT INTO unreads (user_id, feed_id, entry_id, published, entry_created_at, created_at, updated_at)
-    SELECT user_id, feed_id, :entry_id, now(), now(), now(), now()
-    FROM subscriptions
-    WHERE feed_id = :feed_id AND active
-    ON CONFLICT (user_id, entry_id) DO NOTHING
-  SQL
-  puts "  Entry #{oldest.id}. Tuples Inserted is the fan-out; the Trigger line is the sync_versions cost, included in Execution Time."
-  explain(connection, insert)
-  raise ActiveRecord::Rollback
+  {"unread" => user.unread_entries, "starred" => user.starred_entries}.each do |name, scope|
+    puts "  #{name}: #{scope.count} rows"
+    explain(connection, scope.select(Arel.sql("count(*), coalesce(sum(hashtext(concat_ws(':', entry_id))), 0)")).to_sql)
+  end
 end
-puts
-puts "Rolled back. unreads rows for entry #{oldest.id}: #{UnreadEntry.where(entry_id: oldest.id).count}"

@@ -46,7 +46,7 @@ module Api
       # For the endpoints only Feedbin's own apps may call (see
       # Api::V3::Scopes). RFC 6750 §3.1's insufficient_scope.
       def require_scope(name)
-        return if Scopes.granted(@token).include?(name)
+        return if @token.includes_scope?(name)
         response.headers["WWW-Authenticate"] = %(Bearer realm="Feedbin", error="insufficient_scope", scope="#{name}")
         render_problem :forbidden, "insufficient_scope",
           title: "Insufficient scope",

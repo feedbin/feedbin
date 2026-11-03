@@ -25,7 +25,7 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal @feeds.map(&:id), body["data"].map { _1["feed_id"] }
     assert_equal Tag.where(name: %w[Apple News]).order(:name).pluck(:id), body["data"].first["tag_ids"]
     assert_equal [], body["data"].last["tag_ids"]
-    assert_equal %("subscriptions:#{@user.id}:#{SyncVersion.for(@user)["subscriptions"]}"), response.headers["ETag"]
+    assert_match(/\A"subscriptions:#{@user.id}:\h{32}"\z/, response.headers["ETag"])
   end
 
   test "expand=feed,tags embeds the feed and tag objects" do

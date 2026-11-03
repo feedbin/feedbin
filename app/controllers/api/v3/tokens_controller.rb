@@ -11,7 +11,7 @@ module Api
       # A token can revoke itself; revoking another needs account, checked
       # before the lookup so the answer doesn't say which ids exist.
       def destroy
-        return require_scope("account") unless params[:id].to_s == @token.id.to_s || Scopes.granted(@token).include?("account")
+        return require_scope("account") unless params[:id].to_s == @token.id.to_s || @token.includes_scope?("account")
         active_tokens.find(params[:id]).revoke
         head :no_content
       end

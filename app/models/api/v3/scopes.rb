@@ -11,13 +11,6 @@ module Api
       def self.for(application)
         application.scopes.include?("account") ? FIRST_PARTY : DEFAULT
       end
-
-      # A token's scopes. One still marked full was minted before the split
-      # (by a process running the old code during a deploy) and gets what
-      # its app would get now.
-      def self.granted(token)
-        token.scopes.include?("full") ? self.for(token.application).split : token.scopes.to_a
-      end
     end
   end
 end

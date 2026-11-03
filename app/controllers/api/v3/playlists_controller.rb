@@ -8,8 +8,9 @@ module Api
 
       def index
         @user.migrate_playlists!
-        return if not_modified?(list_etag("playlists"))
-        render_list(@user.playlists.order(Arel.sql("lower(title)"), :id).map { PlaylistSerializer.new(_1).to_h })
+        data = @user.playlists.order(Arel.sql("lower(title)"), :id).map { PlaylistSerializer.new(_1).to_h }
+        return if not_modified?(etag_for("playlists", digest(data)))
+        render_list(data)
       end
 
       # A title the user already has returns that playlist, as Airshow v1

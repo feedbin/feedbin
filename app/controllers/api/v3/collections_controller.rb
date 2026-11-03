@@ -18,7 +18,7 @@ module Api
 
       def index
         data = Collection.all(@user).map(&:to_h)
-        return if not_modified?(etag_for("collections", Digest::SHA256.hexdigest(JSON.generate(data))[0, 32]))
+        return if not_modified?(etag_for("collections", digest(data)))
         render_list(data)
       end
 
@@ -26,7 +26,7 @@ module Api
         return status_not_found if collection.timeline?
         etag = if collection.search? then search_ids_etag
         elsif collection.pages? then pages_etag
-        else list_etag(collection.id)
+        else etag_for(collection.id, fingerprint(collection.rows, :entry_id))
         end
         return if not_modified?(etag)
         render_list(@search_ids || collection.ids)
@@ -122,13 +122,19 @@ module Api
       end
 
       # A saved search's matches follow the unread list, stars (is:starred),
-      # the feeds subscribed to, and the query: a quiet poll is answered from
-      # those. While the newest unread row may still be waiting for
-      # Elasticsearch, the ids themselves are part of the ETag too, so the list
-      # changes when indexing catches up even though no version moves.
+      # the feeds subscribed to, their tags, and the query: a quiet poll is
+      # answered from those without asking Elasticsearch. While the newest
+      # unread row may still be waiting for Elasticsearch, the ids themselves
+      # are part of the ETag too, so the list changes when indexing catches up.
       def search_ids_etag
         search = collection.saved_search
-        parts = [versions.fetch("unread"), versions.fetch("starred"), versions.fetch("subscriptions"), ((search.updated_at || search.created_at).to_r * 1_000_000).to_i]
+        parts = [
+          fingerprint(@user.unread_entries, :entry_id),
+          fingerprint(@user.starred_entries, :entry_id),
+          fingerprint(@user.subscriptions, :feed_id),
+          fingerprint(@user.taggings, :feed_id, :tag_id),
+          ((search.updated_at || search.created_at).to_r * 1_000_000).to_i
+        ]
         if @user.unread_entries.where(created_at: INDEX_LAG.ago..).exists?
           @search_ids = collection.ids
           parts << Digest::SHA256.hexdigest(@search_ids.join(","))[0, 32]
@@ -136,9 +142,9 @@ module Api
         etag_for(collection.id, *parts)
       end
 
-      # Pages has no sync version: its entries are rows of entries, so the
-      # count, the newest id and the newest save move on every add, edit and
-      # delete.
+      # Pages has no membership table: its entries are rows of entries, so
+      # the count, the newest id and the newest save move on every add, edit
+      # and delete.
       def pages_etag
         count, newest_id, updated = collection.pages.pick(Arel.sql("count(*)"), Arel.sql("max(id)"), Arel.sql("max(updated_at)"))
         etag_for("pages", count, newest_id || 0, updated ? (updated.to_r * 1_000_000).to_i : 0)

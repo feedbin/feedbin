@@ -11,8 +11,9 @@ module Api
       OFFER_LIFETIME = 1.day
 
       def index
-        return if not_modified?(list_etag("subscriptions"))
-        render_list(serialize(scope.to_a))
+        data = serialize(scope.to_a)
+        return if not_modified?(etag_for("subscriptions", digest(data)))
+        render_list(data)
       end
 
       def show

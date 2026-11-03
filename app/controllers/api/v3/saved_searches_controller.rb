@@ -4,8 +4,9 @@ module Api
     # The query is validated with Elasticsearch before it is stored.
     class SavedSearchesController < ApiController
       def index
-        return if not_modified?(list_etag("saved_searches"))
-        render_list(@user.saved_searches.order(Arel.sql("lower(name)")).map { SavedSearchSerializer.new(_1).to_h })
+        data = @user.saved_searches.order(Arel.sql("lower(name)")).map { SavedSearchSerializer.new(_1).to_h }
+        return if not_modified?(etag_for("saved_searches", digest(data)))
+        render_list(data)
       end
 
       def create

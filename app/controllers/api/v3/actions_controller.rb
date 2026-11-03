@@ -13,8 +13,9 @@ module Api
       FIXED_ACTIONS = {"mute" => ["mark_read"]}.freeze
 
       def index
-        return if not_modified?(list_etag("actions"))
-        render_list(actions.order(Arel.sql("lower(title)"), :id).map { ActionSerializer.new(_1).to_h })
+        data = actions.order(Arel.sql("lower(title)"), :id).map { ActionSerializer.new(_1).to_h }
+        return if not_modified?(etag_for("actions", digest(data)))
+        render_list(data)
       end
 
       def create

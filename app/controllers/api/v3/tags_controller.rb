@@ -1,11 +1,11 @@
 module Api
   module V3
-    # GET /tags, PATCH /tags/{id}, DELETE /tags/{id}. Taggings bump the
-    # subscriptions version, so that is the tag list's ETag too.
+    # GET /tags, PATCH /tags/{id}, DELETE /tags/{id}.
     class TagsController < ApiController
       def index
-        return if not_modified?(etag_for("tags", versions.fetch("subscriptions")))
-        render_list(tags.each_with_subscription_ids.map { |tag, ids| TagSerializer.new(tag, subscription_ids: ids).to_h })
+        data = tags.each_with_subscription_ids.map { |tag, ids| TagSerializer.new(tag, subscription_ids: ids).to_h }
+        return if not_modified?(etag_for("tags", digest(data)))
+        render_list(data)
       end
 
       # Renaming usually changes the id, and a name the user already has

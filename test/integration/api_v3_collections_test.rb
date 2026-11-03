@@ -26,20 +26,20 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_equal @entries.map(&:id).sort, body["data"]
     assert_nil body["page"]
     assert_nil body["meta"]
-    assert_equal %("unread:#{@user.id}:#{SyncVersion.for(@user)["unread"]}"), response.headers["ETag"]
+    assert_match(/\A"unread:#{@user.id}:\d+\.-?\d+"\z/, response.headers["ETag"])
   end
 
-  test "another account's etag at the same version is not a match" do
-    get "/v3/collections/unread/ids", headers: bearer
-    etag = response.headers["ETag"]
+  test "another account with the same list does not match" do
+    @user.unread_entries.delete_all
     other = users(:ben)
+    other.unread_entries.delete_all
     other.setting_on!(:api_v3)
     other_token = other.oauth_applications.create!(name: "Reader", redirect_uri: "").access_tokens.create!(resource_owner_id: other.id, scopes: "read write account")
-    # This account's tag at the other account's version: what a URL-keyed
-    # cache would send after an account switch if the tag held no account.
-    etag_at_other_version = etag.sub(/:\d+"\z/, %(:#{SyncVersion.for(other)["unread"]}"))
+    get "/v3/collections/unread/ids", headers: bearer
+    etag = response.headers["ETag"]
 
-    get "/v3/collections/unread/ids", headers: {"Authorization" => "Bearer #{other_token.plaintext_token}", "If-None-Match" => etag_at_other_version}
+    # What a URL-keyed cache would send after an account switch.
+    get "/v3/collections/unread/ids", headers: {"Authorization" => "Bearer #{other_token.plaintext_token}", "If-None-Match" => etag}
 
     assert_response :success
     refute_equal etag, response.headers["ETag"]
@@ -71,6 +71,20 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_response :success
     refute_equal etag, response.headers["ETag"]
     assert_equal [@entries.first.id], JSON.parse(response.body)["data"]
+  end
+
+  test "the etag moves when one entry leaves the list and another joins" do
+    @user.unread_entries.delete_all
+    UnreadEntry.create_from_owners(@user, @entries.first)
+    get "/v3/collections/unread/ids", headers: bearer
+    etag = response.headers["ETag"]
+
+    @user.unread_entries.delete_all
+    UnreadEntry.create_from_owners(@user, @entries.last)
+
+    get "/v3/collections/unread/ids", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+    assert_equal [@entries.last.id], JSON.parse(response.body)["data"]
   end
 
   test "unknown collections are not found" do

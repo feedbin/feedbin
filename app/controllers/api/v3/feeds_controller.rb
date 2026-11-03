@@ -99,9 +99,9 @@ module Api
         Feed.where(Feed.arel_table[:id].in(ids))
       end
 
-      # A digest of the listed ids, not the lists' versions: Recently Read
-      # changes on nearly every read, and a version-based ETag would resend
-      # every feed each poll. The newest updated_at covers the crawler saving
+      # A digest of the listed ids, not of the lists they come from: Recently
+      # Read changes on nearly every read, and an ETag that followed it would
+      # resend every feed each poll. The newest updated_at covers the crawler saving
       # a feed's row.
       def feeds_etag(feeds)
         newest = feeds.maximum(:updated_at)
