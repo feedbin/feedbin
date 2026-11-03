@@ -56,8 +56,7 @@ module Api
 
       def offered_or_readable(id)
         feed = Feed.find_by(id: id) if id.is_a?(Integer)
-        return [] unless feed && (Rails.cache.exist?(offered_key(feed.id)) || @user.can_read_feed?(feed))
-        [feed]
+        (feed && (Rails.cache.exist?(offered_key(feed.id)) || @user.can_read_feed?(feed))) ? [feed] : []
       end
 
       def offered_key(feed_id)

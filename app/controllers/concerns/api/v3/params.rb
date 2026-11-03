@@ -12,13 +12,13 @@ module Api
         case params[name]
         when "true" then true
         when "false" then false
-        else raise Problems::InvalidParameter.new("#{name} must be true or false.", pointer: name.to_s, code: "invalid_value")
+        else raise invalid_param(name, "invalid_value", "#{name} must be true or false.")
         end
       end
 
       def time_param(name)
         return nil unless params.key?(name)
-        Timestamp.parse(params[name]) or raise Problems::InvalidParameter.new("#{name} must be an RFC 3339 timestamp with a UTC offset.", pointer: name.to_s, code: "invalid_value")
+        Timestamp.parse(params[name]) or raise invalid_param(name, "invalid_value", "#{name} must be an RFC 3339 timestamp with a UTC offset.")
       end
 
       # Comma-separated positive ids, at most max, without repeats. of names
@@ -26,9 +26,14 @@ module Api
       def id_list(name, max: MAX_IDS, of: "ids")
         return nil unless params.key?(name)
         ids = params[name].to_s.split(",").map { Integer(_1.strip, exception: false) }
-        raise Problems::InvalidParameter.new("#{name} must be comma-separated #{of}.", pointer: name.to_s, code: "invalid_value") if ids.empty? || ids.any? { _1.nil? || _1 <= 0 }
-        raise Problems::InvalidParameter.new("#{name} takes at most #{max} ids.", pointer: name.to_s, code: "too_many") if ids.size > max
+        raise invalid_param(name, "invalid_value", "#{name} must be comma-separated #{of}.") if ids.empty? || ids.any? { _1.nil? || _1 <= 0 }
+        raise invalid_param(name, "too_many", "#{name} takes at most #{max} ids.") if ids.size > max
         ids.uniq
+      end
+
+      # A bad query-string parameter: the pointer is its name.
+      def invalid_param(name, code, detail)
+        Problems::InvalidParameter.new(detail, pointer: name.to_s, code: code)
       end
     end
   end

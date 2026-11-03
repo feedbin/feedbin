@@ -14,7 +14,7 @@ module Api
 
         def show
           url = params[:url].to_s.strip
-          raise Problems::InvalidParameter.new("url is required.", pointer: "url", code: "missing") if url.empty?
+          raise invalid_param(:url, "missing", "url is required.") if url.empty?
           ids = id_list(:ids, max: MAX_IDS, of: "entry ids")
           changed_after = time_param(:changed_after)
 

@@ -12,7 +12,7 @@ module Api
           names = params[:expand].to_s.split(",").map(&:strip).reject(&:empty?).uniq
           unknown = names - allowed
           if unknown.any?
-            raise Problems::InvalidParameter.new("expand must be a comma-separated list of #{allowed.join(", ")}.", pointer: "expand", code: "invalid_value")
+            raise invalid_param(:expand, "invalid_value", "expand must be a comma-separated list of #{allowed.join(", ")}.")
           end
           names
         end

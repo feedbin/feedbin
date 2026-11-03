@@ -148,7 +148,7 @@ Rails.application.routes.draw do
         resources :imports, only: [:create, :show]
         resources :pages, only: [:create, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
-          post :purchases
+          resources :purchases, only: :create, module: :account
         end
         resources :collections, only: :index do
           scope module: :collections do

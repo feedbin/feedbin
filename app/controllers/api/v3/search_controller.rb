@@ -7,7 +7,7 @@ module Api
 
       def index
         query = params[:query].to_s
-        raise Problems::InvalidParameter.new("query is required.", pointer: "query", code: "missing") if query.strip.empty?
+        raise invalid_param(:query, "missing", "query is required.") if query.strip.empty?
         search = EntrySearch.new(@user,
           query: query,
           feed_ids: id_list(:feed_ids),

@@ -50,7 +50,7 @@ module Api
       def page_limit(default: DEFAULT_LIMIT, max: MAX_LIMIT)
         return default unless params.key?(:limit)
         limit = Integer(params[:limit], exception: false)
-        raise Problems::InvalidParameter.new("limit must be an integer from 1 to #{max}.", pointer: "limit", code: "out_of_range") unless limit&.between?(1, max)
+        raise invalid_param(:limit, "out_of_range", "limit must be an integer from 1 to #{max}.") unless limit&.between?(1, max)
         limit
       end
 
