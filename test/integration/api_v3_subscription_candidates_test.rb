@@ -25,14 +25,14 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     assert_response :success
     body = JSON.parse(response.body)
     assert_equal "list", body["object"]
-    assert_equal [@found.id, @second.id], body["data"].map { it["feed"]["id"] }
-    assert_equal "feed", body["data"].first["feed"]["object"]
+    assert_equal [@found.id, @second.id], body["data"].map { it["id"] }
+    assert_equal ["feed", "feed"], body["data"].map { it["object"] }
+    assert_equal Api::V3::FeedSerializer.new(@found).to_h.keys.map(&:to_s) + %w[subscription_id daily_entry_counts], body["data"].first.keys
     assert_equal [nil, subscription.id], body["data"].map { it["subscription_id"] }
     counts = body["data"].first["daily_entry_counts"]
     assert_equal 30, counts.size
     assert_equal [2, 4], [counts.first, counts.last]
     assert_equal 6, counts.sum
-    assert_equal [nil, nil], body["data"].map { it["id"] }
     assert_nil body["tags"]
     assert_equal 1, @user.subscriptions.count
   end
@@ -42,7 +42,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
       post "/v3/subscriptions/new", params: {q: "marco.example"}.to_json, headers: json
     end
     assert_response :success
-    assert_equal [@found.id], JSON.parse(response.body)["data"].map { it["feed"]["id"] }
+    assert_equal [@found.id], JSON.parse(response.body)["data"].map { it["id"] }
     refute @user.subscriptions.exists?(feed: @found)
   end
 
@@ -53,7 +53,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
       end
     end
     assert_response :success
-    assert_equal [@found.id], JSON.parse(response.body)["data"].map { it["feed"]["id"] }
+    assert_equal [@found.id], JSON.parse(response.body)["data"].map { it["id"] }
   end
 
   test "a subscription to a feed that redirected to a candidate counts" do
@@ -163,7 +163,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal ["https://private.example/rss", {username: "me", password: "right", raise_errors: true}], sent
     body = JSON.parse(response.body)
-    assert_equal [@found.id], body["data"].map { it["feed"]["id"] }
+    assert_equal [@found.id], body["data"].map { it["id"] }
     assert_equal [], body["tags"]
   end
 

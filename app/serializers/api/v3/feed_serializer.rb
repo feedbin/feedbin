@@ -1,14 +1,17 @@
 module Api
   module V3
     # The feed object. Load feeds with Feed::ICON_PRELOADS and
-    # :touch_icon_image_record so the image rows come preloaded.
+    # :touch_icon_image_record so the image rows come preloaded. candidate is
+    # what Find feeds adds ({subscription_id:, daily_entry_counts:}), as an
+    # entry's membership is on collection reads.
     class FeedSerializer
-      def initialize(feed)
+      def initialize(feed, candidate: nil)
         @feed = feed
+        @candidate = candidate
       end
 
       def to_h
-        {
+        hash = {
           object: "feed",
           id: @feed.id,
           title: @feed.title.presence,
@@ -25,6 +28,8 @@ module Api
           health: health,
           channel_id: @feed.channel_id
         }
+        hash.merge!(@candidate) if @candidate
+        hash
       end
 
       private

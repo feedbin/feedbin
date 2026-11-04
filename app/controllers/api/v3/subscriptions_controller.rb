@@ -75,7 +75,7 @@ module Api
       end
 
       def candidates_body(candidates, expand)
-        list = {object: "list", data: candidates.map { FeedCandidateSerializer.new(it).to_h }}
+        list = {object: "list", data: candidates.map { FeedSerializer.new(it.feed, candidate: {subscription_id: it.subscription&.id, daily_entry_counts: it.daily_entry_counts}).to_h }}
         if expand.include?("tags")
           list[:tags] = TagList.new(@user).each_with_subscription_ids.map { |tag, ids| TagSerializer.new(tag, subscription_ids: ids).to_h }
         end

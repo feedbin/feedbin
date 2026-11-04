@@ -17,6 +17,13 @@ class Api::V3::FeedSerializerTest < ActiveSupport::TestCase
     assert_nil json[:health][:message]
   end
 
+  test "a find candidate adds the subscription id and daily counts after the feed's own fields" do
+    json = Api::V3::FeedSerializer.new(@feed, candidate: {subscription_id: 7, daily_entry_counts: [1, 2]}).to_h
+
+    assert_equal %i[object id title description kind feed_url site_url hostname images health channel_id subscription_id daily_entry_counts], json.keys
+    assert_equal [7, [1, 2]], json.values_at(:subscription_id, :daily_entry_counts)
+  end
+
   test "finds the favicon and touch icon by host and the channel's picture" do
     @feed.update_column(:channel_id, "UCBJycsmduvYEL83R_U4JriQ")
     create_favicon_row("example.com")
