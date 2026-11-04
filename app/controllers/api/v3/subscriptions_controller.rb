@@ -1,15 +1,29 @@
 module Api
   module V3
     # The user's subscriptions: one response with an ETag, ids by default,
-    # expand=feed,tags to embed the objects; subscribe by URL, search words
-    # or feed id (Subscribe); retitle and set preferences; unsubscribe. The
-    # tag set and the OPML export are under Subscriptions::.
+    # expand=feed,tags to embed the objects; the feeds a URL or search words
+    # offer (FeedCandidates); subscribe to several at once (Subscribe);
+    # retitle and set preferences; unsubscribe. The tag set and the OPML
+    # export are under Subscriptions::.
     class SubscriptionsController < ApiController
       include SubscriptionScoped
 
       PREFERENCES = %w[muted media_only show_updates].freeze
+      CANDIDATE_EXPANSIONS = %w[tags].freeze
 
       before_action :set_subscription, only: [:show, :update, :destroy]
+
+      rescue_from FeedCandidates::CredentialsRequired do
+        render_problem :unprocessable_content, "credentials_required",
+          title: "Credentials required",
+          detail: "The site needs a username and password. Send them as feed_username and feed_password to POST /subscriptions/new."
+      end
+
+      rescue_from FeedCandidates::CredentialsInvalid do
+        render_problem :unprocessable_content, "credentials_invalid",
+          title: "Credentials invalid",
+          detail: "The site refused that username and password."
+      end
 
       def index
         data = serialize(subscriptions)
@@ -21,16 +35,15 @@ module Api
         render json: serialize([@subscription]).first
       end
 
-      # Exactly one feed subscribes (201, or 200 when already subscribed);
-      # several are a 300 with the candidates; none is a 404.
-      def create
-        subscribe = Subscribe.new(@user, body)
-        feeds = subscribe.feeds
-        return status_not_found if feeds.empty?
-        return render_choices(subscribe) if feeds.many?
+      # GET, or POST when the feed needs credentials, which never go in a URL.
+      def new
+        expand = expansions(CANDIDATE_EXPANSIONS)
+        candidates = FeedCandidates.new(@user, candidate_query, **feed_credentials).candidates
+        render json: candidates_body(candidates, expand)
+      end
 
-        subscription, created = subscribe.subscribe
-        render json: serialize([subscription]).first, status: created ? :created : :ok
+      def create
+        render json: Subscribe.new(@user, body).subscribe
       end
 
       def update
@@ -55,12 +68,32 @@ module Api
         expand = expansions(SubscriptionSerializer::EXPANSIONS)
         feeds = expand.include?("feed") ? serialize_feeds(subscriptions.map(&:feed)) : {}
         tags = subscription_list.tags_by_feed_id
-        subscriptions.map { SubscriptionSerializer.new(_1, tags: tags.fetch(_1.feed_id, []), feed: feeds[_1.feed_id], expand: expand).to_h }
+        subscriptions.map { SubscriptionSerializer.new(it, tags: tags.fetch(it.feed_id, []), feed: feeds[it.feed_id], expand: expand).to_h }
       end
 
-      def render_choices(subscribe)
-        subscribe.offer
-        render json: {object: "list", data: subscribe.feeds.map { FeedSerializer.new(_1).to_h }}, status: :multiple_choices
+      def candidate_query
+        return required_string("q") if request.post?
+
+        %i[feed_username feed_password].each do |name|
+          raise invalid_param(name, "invalid_value", "Send #{name} to POST /subscriptions/new, never in a URL.") if params.key?(name)
+        end
+        query = params[:q]
+        raise invalid_param(:q, "missing", "q is required.") unless query.is_a?(String) && query.strip.present?
+        raise invalid_param(:q, "invalid_value", "Send feed credentials to POST /subscriptions/new, never in a URL.") if FeedCandidates.credentials_in?(query)
+        query.strip
+      end
+
+      def feed_credentials
+        return {} unless request.post?
+        {username: optional_string("feed_username"), password: optional_string("feed_password")}
+      end
+
+      def candidates_body(candidates, expand)
+        list = {object: "list", data: candidates.map { FeedCandidateSerializer.new(it).to_h }}
+        if expand.include?("tags")
+          list[:tags] = TagList.new(@user).each_with_subscription_ids.map { |tag, ids| TagSerializer.new(tag, subscription_ids: ids).to_h }
+        end
+        list
       end
 
       # A merge patch: custom_title (null clears it) and preferences key by
