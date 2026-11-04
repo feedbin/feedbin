@@ -8,8 +8,8 @@ class EntryVideoTest < ActiveSupport::TestCase
   end
 
   test "record keeps one row per entry and video" do
-    EntryVideo.record(entry_id: @entry.id, provider_ids: %w[a b])
-    EntryVideo.record(entry_id: @entry.id, provider_ids: %w[b c])
+    assert_equal %w[a b], EntryVideo.record(entry_id: @entry.id, provider_ids: %w[a b]).sort
+    assert_equal %w[c], EntryVideo.record(entry_id: @entry.id, provider_ids: %w[b c])
 
     assert_equal %w[a b c], EntryVideo.where(entry_id: @entry.id).order(:provider_id).pluck(:provider_id)
   end

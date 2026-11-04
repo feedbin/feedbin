@@ -109,5 +109,25 @@ module ImageCrawler
       assert_equal plain_before.to_f, plain.reload.updated_at.to_f
       assert_equal youtube_before.to_f, youtube.reload.updated_at.to_f
     end
+
+    test "marks entries showing the channel's videos edited when the avatar was stored" do
+      entry = create_entry(Feed.create!(feed_url: "http://example.com/feed.xml"))
+      Embed.youtube_video.create!(provider_id: "video_id", parent_id: "UCabc", data: {})
+      EntryVideo.record(entry_id: entry.id, provider_ids: ["video_id"])
+
+      ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png", "provider_id" => "UCabc"})
+
+      assert_equal 2, entry.reload.revision
+    end
+
+    test "marks nothing edited when the payload carries no provider_id" do
+      entry = create_entry(Feed.create!(feed_url: "http://example.com/feed.xml"))
+      Embed.youtube_video.create!(provider_id: "video_id", parent_id: "UCabc", data: {})
+      EntryVideo.record(entry_id: entry.id, provider_ids: ["video_id"])
+
+      ChannelImage.new.perform("UCabc-channel", {"storage_path" => "abc/abc123.png", "provider_id" => nil})
+
+      assert_equal 1, entry.reload.revision
+    end
   end
 end

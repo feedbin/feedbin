@@ -7,10 +7,12 @@
 class EntryVideo < ApplicationRecord
   belongs_to :entry
 
+  # Returns the ids that weren't recorded for the entry before.
   def self.record(entry_id:, provider_ids:)
-    return if provider_ids.empty?
+    return [] if provider_ids.empty?
     now = Time.current
-    insert_all(provider_ids.uniq.map { {entry_id:, provider_id: it, created_at: now} }, unique_by: [:provider_id, :entry_id])
+    rows = provider_ids.uniq.map { {entry_id:, provider_id: it, created_at: now} }
+    insert_all(rows, unique_by: [:provider_id, :entry_id], returning: [:provider_id]).rows.flatten
   end
 
   def self.bump_for_videos(provider_ids)

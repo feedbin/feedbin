@@ -17,17 +17,34 @@ class HarvestEmbeds
   def find_embeds(entry_id)
     entry = Entry.find(entry_id)
 
-    want = Nokogiri::HTML5(entry.content).css("iframe, a").each_with_object([]) do |element, array|
+    iframed = []
+    linked = []
+    Nokogiri::HTML5(entry.content).css("iframe, a").each do |element|
       url = element["src"] || element["href"]
       if match = IframeEmbed::Youtube.recognize_url?(url)
-        array.push(match[1])
+        (element.name == "iframe" ? iframed : linked).push(match[1])
       end
     end
 
     video_id = entry.data&.safe_dig("youtube_video_id")
-    want.push(video_id) if video_id
+    iframed.push(video_id) if video_id
 
-    add_missing_to_queue(want)
+    record_videos(entry, iframed.uniq)
+    add_missing_to_queue(iframed + linked)
+  end
+
+  # The videos an entry shows as players (API v3 lists them), so their
+  # harvest can mark the entry edited. A video stored after the entry was
+  # created but before this row existed (the feed crawler queues ids ahead
+  # of the entry) may have missed a client that already synced the entry,
+  # so the entry is marked here. Only for newly recorded videos: entries
+  # are scanned again on every update.
+  def record_videos(entry, ids)
+    added = EntryVideo.record(entry_id: entry.id, provider_ids: ids)
+    return if added.empty?
+    if Embed.youtube_video.where(provider_id: added).where("updated_at > ?", entry.created_at).exists?
+      EntryVideo.bump(Entry.where(id: entry.id))
+    end
   end
 
   def add_missing_to_queue(want)
@@ -106,6 +123,9 @@ class HarvestEmbeds
           entry.update(provider_parent_id: embed.parent_id, embed_duration: embed.duration_in_seconds)
         end
       end
+
+      # Entries synced before these rows existed refetch them as edits.
+      EntryVideo.bump_for_videos(videos.map(&:provider_id))
 
       requeue_live_videos(videos)
     end

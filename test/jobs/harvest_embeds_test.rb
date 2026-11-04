@@ -182,6 +182,65 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_empty HarvestEmbeds::Download::Redownload.jobs
   end
 
+  test "records the iframed videos, not the linked ones, and still queues both" do
+    @entry.update(content: %(<iframe src="https://www.youtube.com/embed/video_id"></iframe><a href="https://www.youtube.com/watch?v=link_id">x</a>))
+
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal ["video_id"], EntryVideo.where(entry_id: @entry.id).pluck(:provider_id)
+    assert_equal %w[link_id video_id], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }.sort
+  end
+
+  test "records a YouTube feed entry's own video" do
+    @entry.update(data: {youtube_video_id: "video_id"})
+
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal ["video_id"], EntryVideo.where(entry_id: @entry.id).pluck(:provider_id)
+  end
+
+  test "an entry whose video data was stored after it was created is marked edited" do
+    @entry.update(content: %(<iframe src="https://www.youtube.com/embed/video_id"></iframe>))
+    Embed.youtube_video.create!(provider_id: "video_id", data: {}, updated_at: @entry.created_at + 1.minute)
+
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal 2, @entry.reload.revision
+  end
+
+  test "scanning an entry again does not mark it edited again" do
+    @entry.update(content: %(<iframe src="https://www.youtube.com/embed/video_id"></iframe>))
+    Embed.youtube_video.create!(provider_id: "video_id", data: {}, updated_at: @entry.created_at + 1.minute)
+
+    HarvestEmbeds.new.perform(@entry.id)
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal 2, @entry.reload.revision
+  end
+
+  test "an entry whose video data was stored before it was created is not marked edited" do
+    @entry.update(content: %(<iframe src="https://www.youtube.com/embed/video_id"></iframe>))
+    Embed.youtube_video.create!(provider_id: "video_id", data: {}, updated_at: @entry.created_at - 1.minute)
+
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal 1, @entry.reload.revision
+  end
+
+  test "a download marks the entries showing the videos it stored edited" do
+    other = create_entry(@feed)
+    EntryVideo.record(entry_id: @entry.id, provider_ids: ["video_id"])
+    EntryVideo.record(entry_id: other.id, provider_ids: ["missing_id"])
+    stub_youtube_api
+
+    HarvestEmbeds::Download.new.perform(["video_id", "missing_id"])
+
+    @entry.reload
+    assert_equal 2, @entry.revision
+    assert_not_nil @entry.edited_at
+    assert_equal 1, other.reload.revision
+  end
+
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)
     video_item = {
       id: "video_id",
