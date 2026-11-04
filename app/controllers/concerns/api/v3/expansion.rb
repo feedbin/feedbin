@@ -24,7 +24,8 @@ module Api
       def serialize_entries(entries, memberships: {})
         expand = expansions(EntrySerializer::EXPANSIONS)
         feeds = expand.include?("feed") ? serialize_feeds(entries.map(&:feed)) : {}
-        entries.map { EntrySerializer.new(_1, feed: feeds[_1.feed_id], expand: expand, membership: memberships[_1.id]).to_h }
+        videos = VideoLoader.call(entries)
+        entries.map { EntrySerializer.new(_1, feed: feeds[_1.feed_id], expand: expand, membership: memberships[_1.id], videos: videos[_1.id]).to_h }
       end
 
       # {feed id => feed object}

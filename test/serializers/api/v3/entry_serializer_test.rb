@@ -21,6 +21,21 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     assert_equal "avatar", json[:images][:icon][:kind]
   end
 
+  test "a YouTube video entry lists its own video" do
+    entry = create_entry(@feed)
+    entry.update!(data: {"youtube_video_id" => "Hq8Xw2Lk5dA"}, provider: :youtube, provider_id: "Hq8Xw2Lk5dA")
+    Embed.create!(source: :youtube_video, provider_id: "Hq8Xw2Lk5dA", parent_id: "UC1", data: {"snippet" => {"title" => "A video"}})
+
+    videos = serialize(entry)[:videos]
+
+    assert_equal ["Hq8Xw2Lk5dA"], videos.map { it[:id] }
+    assert_equal "A video", videos.first[:title]
+  end
+
+  test "an entry without videos has an empty list" do
+    assert_equal [], serialize(create_entry(@feed))[:videos]
+  end
+
   test "a newsletter's author is the sender" do
     @feed.update!(feed_type: :newsletter)
     entry = create_entry(@feed)

@@ -40,7 +40,7 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     get "/v3/entries", params: {ids: entry.id.to_s}, headers: bearer
 
     json = JSON.parse(response.body)["data"].first
-    assert_equal %w[object id feed_id kind title author summary url hostname published_at received_at revision edited_at images link_preview attachments origin categories extracted_content_url content extracted], json.keys
+    assert_equal %w[object id feed_id kind title author summary url hostname published_at received_at revision edited_at images link_preview attachments videos origin categories extracted_content_url content extracted], json.keys
     assert_equal ["html"], json["content"].keys
     assert_equal @feed.id, json["feed_id"]
     assert_equal "podcast", json["kind"]
@@ -263,6 +263,17 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_content
     assert_equal "received_after", JSON.parse(response.body)["errors"].first["pointer"]
+  end
+
+  test "an entry lists the YouTube videos it iframes" do
+    entry = @entries.last
+    entry.update!(content: %(<p>Watch</p><iframe src="https://www.youtube.com/embed/AAA"></iframe>))
+    Embed.create!(source: :youtube_video, provider_id: "AAA", parent_id: "UC1", data: {"snippet" => {"title" => "A video"}})
+
+    get "/v3/entries", params: {ids: entry.id.to_s}, headers: bearer
+
+    videos = JSON.parse(response.body)["data"].first["videos"]
+    assert_equal [["AAA", "A video"]], videos.map { [_1["id"], _1["title"]] }
   end
 
   private

@@ -10,12 +10,15 @@ module Api
       EXPANSIONS = %w[feed changes original_newsletter].freeze
 
       # membership is what a collection knows about the entry, serialized;
-      # present only on collection reads.
-      def initialize(entry, feed: nil, expand: [], membership: nil)
+      # present only on collection reads. videos is the entry's list from
+      # VideoLoader, which a page of entries loads once; left out, the entry
+      # loads its own.
+      def initialize(entry, feed: nil, expand: [], membership: nil, videos: nil)
         @entry = entry
         @feed = feed
         @expand = expand
         @membership = membership
+        @videos = videos
       end
 
       def to_h
@@ -39,6 +42,7 @@ module Api
           },
           link_preview: link_preview,
           attachments: attachments,
+          videos: @videos || VideoLoader.call([@entry])[@entry.id],
           origin: origin,
           categories: Array(@entry.categories),
           extracted_content_url: @entry.fully_qualified_url && @entry.extracted_content_url,

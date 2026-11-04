@@ -20,7 +20,8 @@ module Api
 
           feed = FeedLookup.find(url) or return status_not_found
           entries = lookup_entries(feed, ids, changed_after)
-          render json: FeedSerializer.new(feed).to_h.merge(entries: entries.map { EntrySerializer.new(_1).to_h })
+          videos = VideoLoader.call(entries)
+          render json: FeedSerializer.new(feed).to_h.merge(entries: entries.map { EntrySerializer.new(_1, videos: videos[_1.id]).to_h })
         end
 
         private
