@@ -22,6 +22,8 @@ class Entry < ApplicationRecord
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
   # The stored formatting, which may be stale. Read rendering instead.
   has_one :rendering_record, class_name: "EntryRendering", inverse_of: :entry, dependent: :delete
+  # No dependent option: the foreign key cascades.
+  has_many :entry_videos
 
   # What a rendering is made from, besides the feed. A save that changes any
   # of these re-renders. Data and settings hold other keys the formatter

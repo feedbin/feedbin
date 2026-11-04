@@ -557,6 +557,17 @@ ALTER TABLE ONLY public.entry_renderings ALTER COLUMN blob SET STORAGE EXTERNAL;
 
 
 --
+-- Name: entry_videos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.entry_videos (
+    entry_id bigint NOT NULL,
+    provider_id text NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: feed_stats; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2475,6 +2486,20 @@ CREATE UNIQUE INDEX index_entries_on_public_id ON public.entries USING btree (pu
 
 
 --
+-- Name: index_entry_videos_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entry_videos_on_entry_id ON public.entry_videos USING btree (entry_id);
+
+
+--
+-- Name: index_entry_videos_on_provider_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_entry_videos_on_provider_id_and_entry_id ON public.entry_videos USING btree (provider_id, entry_id);
+
+
+--
 -- Name: index_feed_stats_on_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3233,6 +3258,14 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
+-- Name: entry_videos fk_rails_bbab5ccbe7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.entry_videos
+    ADD CONSTRAINT fk_rails_bbab5ccbe7 FOREIGN KEY (entry_id) REFERENCES public.entries(id) ON DELETE CASCADE;
+
+
+--
 -- Name: playlists fk_rails_d67ef1eb45; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3248,6 +3281,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261103120000'),
 ('20261102150000'),
 ('20261102140000'),
 ('20261030130000'),
