@@ -1,6 +1,6 @@
 module Api
   module V3
-    # GET /subscriptions/new: the feeds a typed query offers the user, as the
+    # POST /subscriptions/new: the feeds a typed query offers the user, as the
     # web's add-feed dialog finds them. A URL is fetched and its feeds
     # discovered; words search known feeds. Either way the result is a list,
     # every feed in it is offered (Subscribe.offer) and refreshed, and nothing

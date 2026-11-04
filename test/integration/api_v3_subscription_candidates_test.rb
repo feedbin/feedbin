@@ -19,7 +19,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     FeedStat.create!(feed: @found, day: 30.days.ago.to_date, entries_count: 9)
 
     finding([@found, @second]) do
-      get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: "https://marco.example"}.to_json, headers: json
     end
 
     assert_response :success
@@ -39,7 +39,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
 
   test "a single result is still a list" do
     finding([@found]) do
-      get "/v3/subscriptions/new", params: {q: "marco.example"}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: "marco.example"}.to_json, headers: json
     end
     assert_response :success
     assert_equal [@found.id], JSON.parse(response.body)["data"].map { it["feed"]["id"] }
@@ -49,7 +49,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
   test "words search known feeds" do
     Feed.stub(:search, Feed.where(id: @found.id)) do
       FeedFinder.stub(:new, ->(*, **) { flunk "words must not be fetched" }) do
-        get "/v3/subscriptions/new", params: {q: "marco arment"}, headers: bearer
+        post "/v3/subscriptions/new", params: {q: "marco arment"}.to_json, headers: json
       end
     end
     assert_response :success
@@ -60,34 +60,34 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     old = Feed.create!(feed_url: "https://old.example/rss", redirected_to: @found.feed_url)
     subscription = @user.subscriptions.create!(feed: old)
     finding([@found]) do
-      get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: "https://marco.example"}.to_json, headers: json
     end
     assert_equal [subscription.id], JSON.parse(response.body)["data"].map { it["subscription_id"] }
   end
 
   test "nothing found is no_feed_found, for words and for a page without a feed" do
     Feed.stub(:search, Feed.none) do
-      get "/v3/subscriptions/new", params: {q: "daring fireball"}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: "daring fireball"}.to_json, headers: json
     end
     assert_problem "no_feed_found", detail: /daring fireball/
 
     stub_request(:get, "http://plain.example/").to_return(body: "<html><body><a href=\"/about\">About</a></body></html>", headers: {"Content-Type" => "text/html"})
     stub_guesses("http://plain.example")
-    get "/v3/subscriptions/new", params: {q: "plain.example"}, headers: bearer
+    post "/v3/subscriptions/new", params: {q: "plain.example"}.to_json, headers: json
     assert_problem "no_feed_found"
   end
 
   test "a file that is neither a feed nor a page is not_a_feed" do
     stub_request(:get, "https://img.example/logo.png").to_return(body: "\x89PNG\r\n\x1A\n\x00\x00", headers: {"Content-Type" => "image/png"})
     stub_guesses("https://img.example")
-    get "/v3/subscriptions/new", params: {q: "https://img.example/logo.png"}, headers: bearer
+    post "/v3/subscriptions/new", params: {q: "https://img.example/logo.png"}.to_json, headers: json
     assert_problem "not_a_feed"
   end
 
   test "an error from the site is upstream_error with its http_code" do
     {404 => {}, 500 => {}, 401 => {"WWW-Authenticate" => "Bearer"}}.each do |status, headers|
       stub_request(:get, "https://broken.example/feed").to_return(status: status, headers: headers)
-      get "/v3/subscriptions/new", params: {q: "https://broken.example/feed"}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: "https://broken.example/feed"}.to_json, headers: json
       body = assert_problem("upstream_error", detail: /broken\.example/)
       assert_equal status, body["http_code"]
     end
@@ -95,17 +95,17 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
 
   test "a site that cannot be reached is unreachable" do
     stub_request(:get, "https://slow.example/feed").to_timeout
-    get "/v3/subscriptions/new", params: {q: "https://slow.example/feed"}, headers: bearer
+    post "/v3/subscriptions/new", params: {q: "https://slow.example/feed"}.to_json, headers: json
     assert_problem "unreachable", detail: /slow\.example/
 
     stub_request(:get, "https://down.example/feed").to_raise(HTTP::ConnectionError)
-    get "/v3/subscriptions/new", params: {q: "https://down.example/feed"}, headers: bearer
+    post "/v3/subscriptions/new", params: {q: "https://down.example/feed"}.to_json, headers: json
     assert_problem "unreachable"
   end
 
   test "an address that does not parse is invalid_url" do
     ["http://", "http://exa mple.com/feed", "http://:80/feed"].each do |q|
-      get "/v3/subscriptions/new", params: {q: q}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: q}.to_json, headers: json
       assert_problem "invalid_url"
     end
   end
@@ -114,41 +114,34 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     @user.subscriptions.create!(feed: @second)
     @second.tag(["Apple"], @user)
     finding([@found]) do
-      get "/v3/subscriptions/new", params: {q: "https://marco.example", expand: "tags"}, headers: bearer
+      post "/v3/subscriptions/new?expand=tags", params: {q: "https://marco.example"}.to_json, headers: json
     end
     tags = JSON.parse(response.body)["tags"]
     assert_equal [["tag", "Apple"]], tags.map { it.values_at("object", "name") }
 
-    get "/v3/subscriptions/new", params: {q: "x.example", expand: "feed"}, headers: bearer
+    post "/v3/subscriptions/new?expand=feed", params: {q: "x.example"}.to_json, headers: json
     assert_response :unprocessable_content
   end
 
   test "q is required" do
-    get "/v3/subscriptions/new", headers: bearer
+    post "/v3/subscriptions/new", params: {}.to_json, headers: json
     assert_response :unprocessable_content
-    assert_equal ["q", "missing"], JSON.parse(response.body)["errors"].first.values_at("pointer", "code")
+    assert_equal ["/q", "missing"], JSON.parse(response.body)["errors"].first.values_at("pointer", "code")
 
     post "/v3/subscriptions/new", params: {q: " "}.to_json, headers: json
     assert_response :unprocessable_content
     assert_equal ["/q", "missing"], JSON.parse(response.body)["errors"].first.values_at("pointer", "code")
   end
 
-  test "the GET refuses feed credentials" do
-    get "/v3/subscriptions/new", params: {q: "https://marco.example", feed_password: "secret"}, headers: bearer
-    assert_response :unprocessable_content
-    assert_equal "feed_password", JSON.parse(response.body)["errors"].first["pointer"]
-
-    FeedFinder.stub(:new, ->(*, **) { flunk "credentials in a GET must not be used" }) do
-      get "/v3/subscriptions/new", params: {q: "https://me:secret@marco.example/rss"}, headers: bearer
-    end
-    assert_response :unprocessable_content
-    assert_equal ["q", "invalid_value"], JSON.parse(response.body)["errors"].first.values_at("pointer", "code")
+  test "find is POST only" do
+    get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
+    assert_response :not_found
   end
 
   test "a protected feed asks for credentials, then says they were wrong" do
     stub_request(:get, "https://private.example/rss").to_return(status: 401, headers: {"WWW-Authenticate" => "Basic realm=\"feed\""})
 
-    get "/v3/subscriptions/new", params: {q: "https://private.example/rss"}, headers: bearer
+    post "/v3/subscriptions/new", params: {q: "https://private.example/rss"}.to_json, headers: json
     assert_problem "credentials_required"
 
     post "/v3/subscriptions/new", params: {q: "https://private.example/rss", feed_username: "me", feed_password: "wrong"}.to_json, headers: json
@@ -176,7 +169,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
 
   test "offered candidates can be subscribed by id" do
     finding([@found, @second]) do
-      get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
+      post "/v3/subscriptions/new", params: {q: "https://marco.example"}.to_json, headers: json
     end
     post "/v3/subscriptions", params: {feeds: [{feed_id: @found.id}, {feed_id: @second.id}]}.to_json, headers: json
     assert_response :success

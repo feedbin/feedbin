@@ -29,7 +29,8 @@ module Api
         render json: serialize([@subscription]).first
       end
 
-      # GET, or POST when the feed needs credentials, which never go in a URL.
+      # POST, so neither what the user typed nor a feed password lands in a
+      # URL.
       def new
         expand = expansions(CANDIDATE_EXPANSIONS)
         candidates = FeedCandidates.new(@user, candidate_query, **feed_credentials).candidates
@@ -66,19 +67,10 @@ module Api
       end
 
       def candidate_query
-        return required_string("q") if request.post?
-
-        %i[feed_username feed_password].each do |name|
-          raise invalid_param(name, "invalid_value", "Send #{name} to POST /subscriptions/new, never in a URL.") if params.key?(name)
-        end
-        query = params[:q]
-        raise invalid_param(:q, "missing", "q is required.") unless query.is_a?(String) && query.strip.present?
-        raise invalid_param(:q, "invalid_value", "Send feed credentials to POST /subscriptions/new, never in a URL.") if FeedCandidates.credentials_in?(query)
-        query.strip
+        required_string("q")
       end
 
       def feed_credentials
-        return {} unless request.post?
         {username: optional_string("feed_username"), password: optional_string("feed_password")}
       end
 

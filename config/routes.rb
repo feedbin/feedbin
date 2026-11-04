@@ -127,9 +127,10 @@ Rails.application.routes.draw do
         resources :entries, only: [:index]
         resources :tokens, only: [:index, :destroy]
         get "subscriptions.opml", to: "subscriptions/exports#show", format: false
-        # The POST form carries feed credentials in a body, never a URL.
+        # POST: what the user typed, and any feed password, go in a body,
+        # never a URL.
         post "subscriptions/new", to: "subscriptions#new"
-        resources :subscriptions, only: [:index, :show, :new, :create, :update, :destroy] do
+        resources :subscriptions, only: [:index, :show, :create, :update, :destroy] do
           # PUT only: the tags are a set, and a PATCH of a set is ambiguous.
           put :tags, to: "subscriptions/tags#update", on: :member
         end

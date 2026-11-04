@@ -2,7 +2,7 @@ module Api
   module V3
     # POST /subscriptions: subscribe to several feeds at once, each with an
     # optional custom title, with tag_names applied to every new one. A
-    # feed_id must be one GET /subscriptions/new offered the user within a
+    # feed_id must be one POST /subscriptions/new offered the user within a
     # day, or a feed they can already read: feed ids are sequential, and
     # Pages, newsletter and secret-URL feeds are ordinary rows. Any other id
     # is skipped as not_found, so an id that wasn't offered doesn't reveal
