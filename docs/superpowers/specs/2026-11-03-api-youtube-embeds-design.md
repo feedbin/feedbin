@@ -145,10 +145,10 @@ conventions):
   Old entries get their `videos` too: the list is read from `Embed` rows at
   response time, and `HarvestEmbeds` has stored rows for new entries'
   iframes since December 2020. Entries harvested before this ships need no
-  bump, only the lookup mapping if the
-  builder's chosen mapping is recorded at harvest time (then existing
-  entries need it backfilled so later avatar and live-stream bumps find
-  them).
+  bump. The entry-to-video mapping is recorded at harvest time and is not
+  backfilled either (Claude's call): an entry harvested before this ships
+  only misses a later avatar or live-stream bump, which matters for
+  entries in the first days after shipping and none after.
 
 ## Non-goals
 
