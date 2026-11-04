@@ -38,6 +38,15 @@ module FeedCrawler
       assert_not_nil entry.edited_at
     end
 
+    test "a revision bumped since the entry was loaded is not lost" do
+      EntryVideo.record(entry_id: @entry.id, provider_ids: ["video_id"])
+      EntryVideo.bump_for_videos(["video_id"])
+
+      EntryUpdate.create!(update_data(@old_content.sub("Original", "Changed")), @entry)
+
+      assert_equal 3, @entry.reload.revision
+    end
+
     test "a change to other attributes leaves the revision alone" do
       EntryUpdate.create!(update_data(@old_content).merge("fingerprint" => SecureRandom.uuid), @entry)
 
