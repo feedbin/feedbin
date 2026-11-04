@@ -304,7 +304,7 @@ class ContentFormatter
   # The version stored renderings are written with. A stored rendering with
   # another version is re-rendered on read. Bump it with any change that
   # alters output; the fingerprint test fails until you do.
-  VERSION = 1
+  VERSION = 2
 
   # redcarpet paragraphs text entries; addressable normalizes every URL the
   # filters rewrite.
