@@ -1,12 +1,14 @@
 class FeedFinder
-
   attr_reader :url, :response, :import_mode
 
-  def initialize(url, import_mode: false, username: nil, password: nil)
-    @url          = url
-    @import_mode  = import_mode
-    @username     = username
-    @password     = password
+  # raise_errors: let every failure through, for a caller that explains it
+  # (Api::V3::FeedCandidates) rather than showing "no feed found".
+  def initialize(url, import_mode: false, username: nil, password: nil, raise_errors: false)
+    @url = url
+    @import_mode = import_mode
+    @username = username
+    @password = password
+    @raise_errors = raise_errors
   end
 
   def self.feeds(url, **args)
@@ -55,8 +57,8 @@ class FeedFinder
     raise
   rescue => exception
     if import_mode? && existing_feed.present?
-      return [existing_feed]
-    elsif import_mode? || Rails.env.development?
+      [existing_feed]
+    elsif import_mode? || @raise_errors || Rails.env.development?
       raise exception
     else
       Rails.logger.error exception.message

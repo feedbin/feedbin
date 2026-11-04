@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/stub_any_instance"
 
 class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
   setup do
@@ -17,7 +18,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     FeedStat.create!(feed: @found, day: 29.days.ago.to_date, entries_count: 2)
     FeedStat.create!(feed: @found, day: 30.days.ago.to_date, entries_count: 9)
 
-    FeedFinder.stub(:feeds, [@found, @second]) do
+    finding([@found, @second]) do
       get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
     end
 
@@ -37,7 +38,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
   end
 
   test "a single result is still a list" do
-    FeedFinder.stub(:feeds, [@found]) do
+    finding([@found]) do
       get "/v3/subscriptions/new", params: {q: "marco.example"}, headers: bearer
     end
     assert_response :success
@@ -47,7 +48,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
 
   test "words search known feeds" do
     Feed.stub(:search, Feed.where(id: @found.id)) do
-      FeedFinder.stub(:feeds, ->(*) { flunk "words must not be fetched" }) do
+      FeedFinder.stub(:new, ->(*, **) { flunk "words must not be fetched" }) do
         get "/v3/subscriptions/new", params: {q: "marco arment"}, headers: bearer
       end
     end
@@ -58,36 +59,61 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
   test "a subscription to a feed that redirected to a candidate counts" do
     old = Feed.create!(feed_url: "https://old.example/rss", redirected_to: @found.feed_url)
     subscription = @user.subscriptions.create!(feed: old)
-    FeedFinder.stub(:feeds, [@found]) do
+    finding([@found]) do
       get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
     end
     assert_equal [subscription.id], JSON.parse(response.body)["data"].map { it["subscription_id"] }
   end
 
-  test "nothing found is an empty list, including a site that fails" do
-    FeedFinder.stub(:feeds, []) do
-      get "/v3/subscriptions/new", params: {q: "https://nothing.example"}, headers: bearer
-    end
-    assert_response :success
-    assert_equal [], JSON.parse(response.body)["data"]
-
-    FeedFinder.stub(:feeds, ->(*) { raise Errno::ECONNREFUSED }) do
-      get "/v3/subscriptions/new", params: {q: "https://broken.example"}, headers: bearer
-    end
-    assert_response :success
-    assert_equal [], JSON.parse(response.body)["data"]
-
-    Feed.stub(:search, ->(*) { raise Search::Connection::ResponseError, "down" }) do
+  test "nothing found is no_feed_found, for words and for a page without a feed" do
+    Feed.stub(:search, Feed.none) do
       get "/v3/subscriptions/new", params: {q: "daring fireball"}, headers: bearer
     end
-    assert_response :success
-    assert_equal [], JSON.parse(response.body)["data"]
+    assert_problem "no_feed_found", detail: /daring fireball/
+
+    stub_request(:get, "http://plain.example/").to_return(body: "<html><body><a href=\"/about\">About</a></body></html>", headers: {"Content-Type" => "text/html"})
+    stub_guesses("http://plain.example")
+    get "/v3/subscriptions/new", params: {q: "plain.example"}, headers: bearer
+    assert_problem "no_feed_found"
+  end
+
+  test "a file that is neither a feed nor a page is not_a_feed" do
+    stub_request(:get, "https://img.example/logo.png").to_return(body: "\x89PNG\r\n\x1A\n\x00\x00", headers: {"Content-Type" => "image/png"})
+    stub_guesses("https://img.example")
+    get "/v3/subscriptions/new", params: {q: "https://img.example/logo.png"}, headers: bearer
+    assert_problem "not_a_feed"
+  end
+
+  test "an error from the site is upstream_error with its http_code" do
+    {404 => {}, 500 => {}, 401 => {"WWW-Authenticate" => "Bearer"}}.each do |status, headers|
+      stub_request(:get, "https://broken.example/feed").to_return(status: status, headers: headers)
+      get "/v3/subscriptions/new", params: {q: "https://broken.example/feed"}, headers: bearer
+      body = assert_problem("upstream_error", detail: /broken\.example/)
+      assert_equal status, body["http_code"]
+    end
+  end
+
+  test "a site that cannot be reached is unreachable" do
+    stub_request(:get, "https://slow.example/feed").to_timeout
+    get "/v3/subscriptions/new", params: {q: "https://slow.example/feed"}, headers: bearer
+    assert_problem "unreachable", detail: /slow\.example/
+
+    stub_request(:get, "https://down.example/feed").to_raise(HTTP::ConnectionError)
+    get "/v3/subscriptions/new", params: {q: "https://down.example/feed"}, headers: bearer
+    assert_problem "unreachable"
+  end
+
+  test "an address that does not parse is invalid_url" do
+    ["http://", "http://exa mple.com/feed", "http://:80/feed"].each do |q|
+      get "/v3/subscriptions/new", params: {q: q}, headers: bearer
+      assert_problem "invalid_url"
+    end
   end
 
   test "expand=tags adds the user's tags" do
     @user.subscriptions.create!(feed: @second)
     @second.tag(["Apple"], @user)
-    FeedFinder.stub(:feeds, [@found]) do
+    finding([@found]) do
       get "/v3/subscriptions/new", params: {q: "https://marco.example", expand: "tags"}, headers: bearer
     end
     tags = JSON.parse(response.body)["tags"]
@@ -112,7 +138,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     assert_equal "feed_password", JSON.parse(response.body)["errors"].first["pointer"]
 
-    FeedFinder.stub(:feeds, ->(*) { flunk "credentials in a GET must not be used" }) do
+    FeedFinder.stub(:new, ->(*, **) { flunk "credentials in a GET must not be used" }) do
       get "/v3/subscriptions/new", params: {q: "https://me:secret@marco.example/rss"}, headers: bearer
     end
     assert_response :unprocessable_content
@@ -120,39 +146,36 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
   end
 
   test "a protected feed asks for credentials, then says they were wrong" do
-    finder = ->(*, **) { raise unauthorized }
-    FeedFinder.stub(:feeds, finder) do
-      get "/v3/subscriptions/new", params: {q: "https://private.example/rss"}, headers: bearer
-      assert_response :unprocessable_content
-      assert_equal "credentials_required", JSON.parse(response.body)["code"]
+    stub_request(:get, "https://private.example/rss").to_return(status: 401, headers: {"WWW-Authenticate" => "Basic realm=\"feed\""})
 
-      post "/v3/subscriptions/new", params: {q: "https://private.example/rss", feed_username: "me", feed_password: "wrong"}.to_json, headers: json
-      assert_response :unprocessable_content
-      assert_equal "credentials_invalid", JSON.parse(response.body)["code"]
+    get "/v3/subscriptions/new", params: {q: "https://private.example/rss"}, headers: bearer
+    assert_problem "credentials_required"
 
-      post "/v3/subscriptions/new", params: {q: "https://me:wrong@private.example/rss"}.to_json, headers: json
-      assert_equal "credentials_invalid", JSON.parse(response.body)["code"]
-    end
+    post "/v3/subscriptions/new", params: {q: "https://private.example/rss", feed_username: "me", feed_password: "wrong"}.to_json, headers: json
+    assert_problem "credentials_invalid"
+
+    post "/v3/subscriptions/new", params: {q: "https://me:wrong@private.example/rss"}.to_json, headers: json
+    assert_problem "credentials_invalid"
   end
 
   test "the POST passes credentials to discovery" do
     sent = nil
     finder = ->(url, **args) {
       sent = [url, args]
-      [@found]
+      Struct.new(:find, :response).new([@found], nil)
     }
-    FeedFinder.stub(:feeds, finder) do
+    FeedFinder.stub(:new, finder) do
       post "/v3/subscriptions/new?expand=tags", params: {q: "https://private.example/rss", feed_username: "me", feed_password: "right"}.to_json, headers: json
     end
     assert_response :success
-    assert_equal ["https://private.example/rss", {username: "me", password: "right"}], sent
+    assert_equal ["https://private.example/rss", {username: "me", password: "right", raise_errors: true}], sent
     body = JSON.parse(response.body)
     assert_equal [@found.id], body["data"].map { it["feed"]["id"] }
     assert_equal [], body["tags"]
   end
 
   test "offered candidates can be subscribed by id" do
-    FeedFinder.stub(:feeds, [@found, @second]) do
+    finding([@found, @second]) do
       get "/v3/subscriptions/new", params: {q: "https://marco.example"}, headers: bearer
     end
     post "/v3/subscriptions", params: {feeds: [{feed_id: @found.id}, {feed_id: @second.id}]}.to_json, headers: json
@@ -162,9 +185,22 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
 
   private
 
-  def unauthorized
-    response = Struct.new(:headers).new({www_authenticate: "Basic realm=\"feed\""})
-    Feedkit::Unauthorized.new("401", response)
+  def finding(feeds, &)
+    FeedFinder.stub_any_instance(:find, feeds, &)
+  end
+
+  # Source::Guess tries /rss and /feed when a page links no feed.
+  def stub_guesses(origin)
+    %w[/rss /feed].each { stub_request(:get, "#{origin}#{it}").to_return(status: 404) }
+  end
+
+  def assert_problem(code, detail: nil)
+    assert_response :unprocessable_content
+    body = JSON.parse(response.body)
+    assert_equal code, body["code"], body.inspect
+    assert_equal "https://api.feedbin.com/errors/#{code}", body["type"]
+    assert_match detail, body["detail"] if detail
+    body
   end
 
   def bearer

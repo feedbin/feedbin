@@ -13,16 +13,10 @@ module Api
 
       before_action :set_subscription, only: [:show, :update, :destroy]
 
-      rescue_from FeedCandidates::CredentialsRequired do
-        render_problem :unprocessable_content, "credentials_required",
-          title: "Credentials required",
-          detail: "The site needs a username and password. Send them as feed_username and feed_password to POST /subscriptions/new."
-      end
-
-      rescue_from FeedCandidates::CredentialsInvalid do
-        render_problem :unprocessable_content, "credentials_invalid",
-          title: "Credentials invalid",
-          detail: "The site refused that username and password."
+      # Why nothing was found, as a problem the client can show.
+      rescue_from FeedCandidates::Failure do |failure|
+        render_problem :unprocessable_content, failure.code,
+          title: failure.title, detail: failure.message, http_code: failure.http_code
       end
 
       def index

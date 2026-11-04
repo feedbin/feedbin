@@ -57,7 +57,9 @@ module Api
 
       private
 
-      def render_problem(status, code, title:, detail:, errors: nil)
+      # extensions: members a code adds to the problem (RFC 9457 §3.2), such
+      # as upstream_error's http_code. nil members are left out.
+      def render_problem(status, code, title:, detail:, errors: nil, **extensions)
         body = {
           type: error_type(code),
           title: title,
@@ -67,6 +69,7 @@ module Api
           request_id: request.request_id
         }
         body[:errors] = errors if errors
+        body.merge!(extensions.compact)
         render json: body, status: status, content_type: "application/problem+json"
       end
 
