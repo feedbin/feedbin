@@ -140,9 +140,12 @@ conventions):
   avatar, the entries that embed that channel's videos are bumped once more.
   The entry lookup therefore has to work by channel id as well as by video
   id. A crawl that fails or finds no avatar bumps nothing.
-- No backfill. v3 is not on `main` and no client has synced with it, so
-  entries carry `videos` from the first response any client sees; entries
-  harvested before this ships need no bump, only the lookup mapping if the
+- No backfill of edits. v3 is not on `main` and no client has synced with
+  it, so entries carry `videos` from the first response any client sees.
+  Old entries get their `videos` too: the list is read from `Embed` rows at
+  response time, and `HarvestEmbeds` has stored rows for new entries'
+  iframes since December 2020. Entries harvested before this ships need no
+  bump, only the lookup mapping if the
   builder's chosen mapping is recorded at harvest time (then existing
   entries need it backfilled so later avatar and live-stream bumps find
   them).
@@ -153,6 +156,9 @@ conventions):
 - YouTube links (`<a href>`) as opposed to iframes. `HarvestEmbeds` collects
   linked videos too, but the website only makes cards from iframes, and so
   does this.
+- Harvesting videos that were never harvested: entries from before
+  December 2020, or whose harvest failed (the job doesn't retry). Those keep
+  the plain iframe (decided with Ben).
 - Videos inside a micropost's `extracted.content.html` (the linked
   article). The website cards those, but `HarvestEmbeds` never harvests
   them; they stay bare iframes for now. (Claude's call.)
