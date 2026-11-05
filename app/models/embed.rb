@@ -61,4 +61,19 @@ class Embed < ApplicationRecord
   def scheduled_time
     Time.parse(scheduled_start_time) if scheduled_start_time
   end
+
+  def actual_start_time
+    value = data.safe_dig("liveStreamingDetails", "actualStartTime")
+    Time.parse(value) if value
+  end
+
+  def actual_end_time
+    value = data.safe_dig("liveStreamingDetails", "actualEndTime")
+    Time.parse(value) if value
+  end
+
+  # When a stream was due to start, or started if it went live unscheduled.
+  def start_time
+    scheduled_time || actual_start_time
+  end
 end

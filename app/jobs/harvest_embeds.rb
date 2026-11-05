@@ -54,20 +54,40 @@ class HarvestEmbeds
   end
 
   def cache_embeds
+    return if self.class.paused?
     entry_ids = dequeue_ids(SET_NAME)
     entry_ids&.each_slice(50) do |ids|
       Download.perform_async(ids)
     end
   end
 
+  PAUSE_KEY = "#{name}-paused"
+
+  def self.paused?
+    Sidekiq.redis { it.call("EXISTS", PAUSE_KEY) } == 1
+  end
+
+  # YouTube's daily quota resets at midnight Pacific. Until then every request
+  # fails, so the queue just collects ids.
+  def self.pause_until_quota_resets
+    now = Time.now.in_time_zone("America/Los_Angeles")
+    seconds = (now.tomorrow.beginning_of_day - now).ceil
+    Sidekiq.redis { it.call("SET", PAUSE_KEY, "1", "EX", seconds) }
+  end
+
   class Download
     include Sidekiq::Worker
+    include SidekiqHelper
 
     def perform(ids)
-      items = []
+      videos = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
 
-      videos      = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails", "liveStreamingDetails"])
-      return unless videos
+      # Nothing else queues these ids again, and for a stream this is the
+      # link in its re-check chain, so a failed batch goes back in the queue.
+      unless videos
+        add_to_queue(SET_NAME, ids)
+        return
+      end
 
       # No "items" key is the ordinary answer for deleted, private, or
       # region-blocked ids -- normalise to [].
@@ -93,39 +113,51 @@ class HarvestEmbeds
         )
       end
 
-      items.concat(video_embeds)
-
-      items.concat(channel_embeds)
-
-      if items.present?
-        Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]})
+      changed = changed_embeds(video_embeds + channel_embeds)
+      if changed.present?
+        Embed.import(changed, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]})
       end
 
-      update_related_records(ids)
+      update_related_records(ids, changed: changed.map(&:provider_id))
     end
 
-    def update_related_records(ids)
-      videos    = Embed.youtube_video.where(provider_id: ids).includes(:parent)
+    # The embeds whose data differs from what is stored, new ones included.
+    # A stream is fetched hourly while it is live; an unchanged answer must
+    # not mark entries edited, re-render them, or re-crawl the avatar.
+    def changed_embeds(embeds)
+      return [] if embeds.empty?
+      stored = Embed.where(provider_id: embeds.map(&:provider_id).uniq)
+        .pluck(:source, :provider_id, :data)
+        .to_h { |source, provider_id, data| [[source, provider_id], data] }
+      embeds.reject { stored[[it.source, it.provider_id]] == it.data }
+    end
+
+    def update_related_records(ids, changed: ids)
+      videos    = Embed.youtube_video.where(provider_id: ids).includes(parent: :channel_image)
       # filter_map: the channels half of the API can come back empty (quota,
       # terminated channels) while the videos half succeeded.
       channels  = videos.filter_map(&:parent).uniq
       video_map = videos.index_by(&:provider_id)
 
       channels.each do |channel|
-        # Scheduled for every harvested channel, feed or no feed: the row is
-        # keyed by the channel, so a playlist entry from a channel nobody
-        # subscribes to directly resolves through the same row.
+        # Keyed by the channel, feed or no feed: a playlist entry from a
+        # channel nobody subscribes to directly resolves through the same
+        # row. Crawled again only when the channel changed or has no avatar.
+        next if channel.channel_image && !changed.include?(channel.provider_id)
         ImageCrawler::ChannelImage.schedule(channel)
       end
 
       Entry.provider_youtube.where(provider_id: ids).each do |entry|
         if embed = video_map[entry.provider_id]
-          entry.update(provider_parent_id: embed.parent_id, embed_duration: embed.duration_in_seconds)
+          # Saved only on a change: a save runs the update callbacks
+          # (rendering, views, search, another harvest) even when nothing did.
+          entry.assign_attributes(provider_parent_id: embed.parent_id, embed_duration: embed.duration_in_seconds)
+          entry.save if entry.changed?
         end
       end
 
-      # Entries synced before these rows existed refetch them as edits.
-      EntryVideo.bump_for_videos(videos.map(&:provider_id))
+      # Entries synced before this data changed refetch it as an edit.
+      EntryVideo.bump_for_videos(videos.map(&:provider_id) & changed)
 
       requeue_live_videos(videos)
     end
@@ -133,8 +165,9 @@ class HarvestEmbeds
     def requeue_live_videos(videos)
       videos.each do |video|
         if redownload?(video)
-          delay = if video.scheduled_time > Time.now
-            video.scheduled_time + 1.hour - Time.now
+          start = video.start_time
+          delay = if start > Time.now
+            start + 1.hour - Time.now
           else
             1.hour
           end
@@ -144,10 +177,13 @@ class HarvestEmbeds
       end
     end
 
+    # Checked again until the stream ends, for up to a day after it was due
+    # to start or, for a stream that went live unscheduled, after it started.
     def redownload?(video)
       return false if video.live_broadcast_content == "none"
-      return false if !video.scheduled_time
-      return false if video.scheduled_time < 24.hours.ago
+      return false if video.actual_end_time
+      return false if !video.start_time
+      return false if video.start_time < 24.hours.ago
       true
     end
 
@@ -163,11 +199,16 @@ class HarvestEmbeds
       # state, and a week-old answer for the same ids would keep it live.
       response = HTTP.timeout(write: 5, connect: 5, read: 10)
         .get("https://www.googleapis.com/youtube/v3/#{type}", **options)
-      JSON.parse(response.to_s) if response.status.success?
+      return JSON.parse(response.to_s) if response.status.success?
+
+      Sidekiq.logger.info "HarvestEmbeds youtube_api failed type=#{type} status=#{response.status.code}"
+      if response.status.code == 403 && response.to_s.include?("quotaExceeded")
+        HarvestEmbeds.pause_until_quota_resets
+      end
+      nil
     rescue HTTP::Error, OpenSSL::SSL::SSLError
       nil
     end
-
 
     class Redownload
       include Sidekiq::Worker

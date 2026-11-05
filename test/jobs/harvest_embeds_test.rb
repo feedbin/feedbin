@@ -251,6 +251,94 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal "none", Embed.youtube_video.find_by(provider_id: "video_id").live_broadcast_content
   end
 
+  test "a failed video request puts the ids back in the queue" do
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos}).to_return(status: 503)
+
+    HarvestEmbeds::Download.new.perform(["video_id", "other_id"])
+
+    assert_equal ["other_id", "video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }.sort
+  end
+
+  test "an exhausted quota puts the ids back and pauses harvesting until the quota resets" do
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
+      .to_return(status: 403, body: {error: {errors: [{reason: "quotaExceeded"}]}}.to_json)
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+    HarvestEmbeds.new.perform(nil, true)
+    assert_empty HarvestEmbeds::Download.jobs, "no downloads until the quota resets"
+    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+  end
+
+  test "downloading unchanged data does not mark entries edited again" do
+    EntryVideo.record(entry_id: @entry.id, provider_ids: ["video_id"])
+    stub_youtube_api(live_broadcast_content: "upcoming", live_streaming_details: {scheduledStartTime: 1.hour.from_now.iso8601})
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    assert_equal 2, @entry.reload.revision
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    assert_equal 2, @entry.reload.revision, "nothing changed"
+
+    stub_youtube_api(live_broadcast_content: "live", live_streaming_details: {scheduledStartTime: 1.hour.from_now.iso8601})
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    assert_equal 3, @entry.reload.revision, "the stream went live"
+  end
+
+  test "requeues a live stream that has no scheduled start" do
+    stub_youtube_api(live_broadcast_content: "live", live_streaming_details: {actualStartTime: 10.minutes.ago.iso8601})
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    job = HarvestEmbeds::Download::Redownload.jobs.last
+    assert_equal ["video_id"], job["args"]
+    assert_in_delta 1.hour.from_now.to_f, job["at"], 5.0
+  end
+
+  test "does not requeue a stream that has ended" do
+    stub_youtube_api(live_broadcast_content: "live", live_streaming_details: {
+      scheduledStartTime: 2.hours.ago.iso8601,
+      actualStartTime: 2.hours.ago.iso8601,
+      actualEndTime: 5.minutes.ago.iso8601
+    })
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    assert_empty HarvestEmbeds::Download::Redownload.jobs
+  end
+
+  test "a download leaves an entry whose video fields already match unsaved" do
+    stub_youtube_api
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    @entry.update(provider_parent_id: "channel_id", embed_duration: 9743)
+    HarvestEmbeds.jobs.clear
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    assert_empty HarvestEmbeds.jobs, "an unchanged entry runs no update callbacks"
+  end
+
+  test "an unchanged channel with an avatar is not crawled again" do
+    stub_youtube_api
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    create_image_row(provider: :embed_icon, provider_id: "channel_id", kind: :avatar, feed_id: nil, variant: "200x200")
+
+    assert_no_difference -> { ImageCrawler::Pipeline::Find.jobs.size } do
+      HarvestEmbeds::Download.new.perform(["video_id"])
+    end
+  end
+
+  test "an unchanged channel with no avatar yet is crawled again" do
+    stub_youtube_api
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
+      HarvestEmbeds::Download.new.perform(["video_id"])
+    end
+  end
+
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)
     video_item = {
       id: "video_id",
