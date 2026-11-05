@@ -241,6 +241,16 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal 1, other.reload.revision
   end
 
+  test "a redownload sees the stream's current state, not a cached answer" do
+    stub_youtube_api(live_broadcast_content: "live", live_streaming_details: {scheduledStartTime: 1.hour.ago.iso8601})
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    assert_equal "live", Embed.youtube_video.find_by(provider_id: "video_id").live_broadcast_content
+
+    stub_youtube_api(live_broadcast_content: "none")
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    assert_equal "none", Embed.youtube_video.find_by(provider_id: "video_id").live_broadcast_content
+  end
+
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)
     video_item = {
       id: "video_id",

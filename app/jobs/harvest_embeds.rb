@@ -159,8 +159,13 @@ class HarvestEmbeds
           id: ids.join(",")
         }
       }
-      response = UrlCache.new("https://www.googleapis.com/youtube/v3/#{type}", options).body
-      JSON.parse(response) if response
+      # Not through UrlCache: a stream's redownload has to see its current
+      # state, and a week-old answer for the same ids would keep it live.
+      response = HTTP.timeout(write: 5, connect: 5, read: 10)
+        .get("https://www.googleapis.com/youtube/v3/#{type}", **options)
+      JSON.parse(response.to_s) if response.status.success?
+    rescue HTTP::Error, OpenSSL::SSL::SSLError
+      nil
     end
 
 
