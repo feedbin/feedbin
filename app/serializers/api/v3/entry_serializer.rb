@@ -29,6 +29,7 @@ module Api
           kind: kind,
           title: kind == "micropost" ? nil : @entry.title&.to_plain_text.presence,
           author: author,
+          author_handle: author_handle,
           summary: @entry.summary.presence,
           url: url,
           hostname: url && Addressable::URI.parse(url).host,
@@ -81,6 +82,13 @@ module Api
         end
       end
 
+      # A micropost author's handle, "@name", as Micropost reads it (the post's
+      # author data, else an RSS feed's profile link). nil for any other kind.
+      def author_handle
+        return nil unless kind == "micropost"
+        @entry.micropost&.author_username.presence&.then { "@#{it.delete_prefix("@")}" }
+      end
+
       # A newsletter has no page of its own, so its url is Feedbin's copy.
       def url
         @url ||= (kind == "newsletter") ? @entry.newsletter_url : @entry.fully_qualified_url
@@ -91,7 +99,16 @@ module Api
       def icon_record
         @entry.icon_image_record ||
           (@entry.channel_image_record if kind == "video") ||
-          (@entry.feed.icon_image_record if kind == "podcast")
+          (@entry.feed.icon_image_record if kind == "podcast") ||
+          feed_avatar_record
+      end
+
+      # A micropost without its own avatar row (the crawl can miss one) falls back to the feed's icon, but only when
+      # that icon is itself an avatar: a single-author feed like a Mastodon account. A site logo would be wrong here.
+      def feed_avatar_record
+        return unless kind == "micropost"
+        record = @entry.feed.icon_image_record
+        record if record&.kind == "avatar"
       end
 
       def image(record)

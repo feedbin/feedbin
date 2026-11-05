@@ -47,6 +47,30 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     assert_equal "Ben", json[:author]
   end
 
+  test "a micropost carries its author's handle; other kinds don't" do
+    @feed.update!(options: {"image" => {"url" => "https://files.example.social/avatar.png", "link" => "https://example.social/@asymco", "title" => "Asymco"}})
+    entry = create_entry(@feed)
+    entry.update!(title: nil, data: {})
+
+    json = serialize(entry)
+
+    assert_equal "micropost", json[:kind]
+    assert_equal "@asymco", json[:author_handle]
+    assert_nil serialize(create_entry(@feed))[:author_handle]
+  end
+
+  test "a micropost without its own avatar uses the feed's avatar, but not a site icon" do
+    @feed.update!(options: {"image" => {"url" => "https://files.example.social/avatar.png", "link" => "https://example.social/@asymco", "title" => "Asymco"}})
+    entry = create_entry(@feed)
+    entry.update!(title: nil, data: {})
+    icon = create_image_row(provider: :feed_icon, provider_id: @feed.id.to_s, kind: :avatar)
+
+    assert_equal "avatar", serialize(Entry.find(entry.id))[:images][:icon][:kind]
+
+    icon.update!(kind: :site_icon)
+    assert_nil serialize(Entry.find(entry.id))[:images][:icon]
+  end
+
   test "a saved page" do
     @feed.update!(feed_type: :pages)
 
