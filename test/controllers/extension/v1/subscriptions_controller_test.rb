@@ -113,6 +113,15 @@ class Extension::V1::SubscriptionsControllerTest < ActionController::TestCase
     assert @user.subscriptions.where(feed: @feed).exists?
   end
 
+  test "does not subscribe to a newsletter feed by its URL" do
+    newsletter = Feed.create!(feed_url: "http://sender.example?1", title: "Newsletter", feed_type: :newsletter)
+    feeds_params = {newsletter.id.to_s => {"url" => newsletter.feed_url, "subscribe" => "1", "title" => "", "media_only" => "0"}}
+
+    assert_no_difference "Subscription.count" do
+      post :create, params: {feeds: feeds_params, tags: [], page_token: @user.page_token}, format: :json
+    end
+  end
+
   test "handles invalid feed id" do
     feeds_params = {
       "999999" => {

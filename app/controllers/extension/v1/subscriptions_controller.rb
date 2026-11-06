@@ -19,7 +19,8 @@ module Extension
       def create
         user = current_user
         urls = params[:feeds].values.map { it["url"] }
-        valid_feed_ids = Feed.where(feed_url: urls).pluck(:id)
+        # A newsletter's feed_url can be guessed.
+        valid_feed_ids = Feed.where(feed_url: urls).select { it.xml? || user.can_read_feed?(it) }.map(&:id)
 
         @subscriptions = Subscription.create_multiple(params[:feeds].to_unsafe_h, user, valid_feed_ids)
 
