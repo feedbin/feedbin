@@ -1,6 +1,4 @@
-# Sends Firebase Cloud Messaging (HTTP v1) messages to Android devices. It authorizes as the service account whose
-# JSON key FIREBASE_CREDENTIALS points to (a path, like APPLE_AUTH_KEY), trading a signed JWT for an access token
-# that it reuses until shortly before it expires.
+# FCM HTTP v1 sender, authorized as the service account whose JSON key is at FIREBASE_CREDENTIALS.
 class FirebaseMessaging
   SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
   GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer"
@@ -10,7 +8,6 @@ class FirebaseMessaging
   Response = Data.define(:status, :error_code) do
     def success? = status.between?(200, 299)
 
-    # The token no longer belongs to an installed app (uninstalled, data cleared, token rotated).
     def unregistered? = status == 404 || error_code == "UNREGISTERED"
   end
 
@@ -18,6 +15,8 @@ class FirebaseMessaging
     @credentials_path = credentials_path
     @lock = Mutex.new
   end
+
+  def configured? = @credentials_path.present?
 
   def deliver(message)
     response = client.auth("Bearer #{access_token}").post(send_url, json: {message: message})

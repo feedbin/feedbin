@@ -1,8 +1,6 @@
 class PodcastPushNotification
   include Sidekiq::Worker
 
-  # Android devices, sent through Firebase. APNs gets only the iOS (`podcast`) devices: it rejects an FCM token as
-  # BadDeviceToken, which would delete the device.
   FIREBASE = FirebaseMessaging.new
 
   def perform(user_id, entry_id)
@@ -10,6 +8,7 @@ class PodcastPushNotification
     entry = Entry.find(entry_id)
     devices = Device.where(user_id: user_id, active: true)
     devices.podcast.pluck(:token).each { |token| push_apns(token, entry, user_id) }
+    return unless FIREBASE.configured?
     devices.podcast_android.pluck(:token).each { |token| push_firebase(token, entry, user_id) }
   end
 
@@ -28,8 +27,7 @@ class PodcastPushNotification
     end
   end
 
-  # One failed send doesn't stop the user's other devices, and isn't retried: a retry would push to the devices that
-  # already got it.
+  # Rescued so one failure doesn't stop the other devices; a job retry would push to them twice.
   def push_firebase(token, entry, user_id)
     response = FIREBASE.deliver(firebase_message(token, entry))
     if response.unregistered?
@@ -46,8 +44,7 @@ class PodcastPushNotification
     Device.where("lower(token) = ?", token.downcase).take&.destroy
   end
 
-  # A data message: the app builds the notification itself (artwork, grouping by show) and refreshes the show first.
-  # FCM data values must be strings.
+  # A data message, so the app builds the notification. FCM requires string values.
   def firebase_message(token, entry)
     content = notification_content(entry)
     {

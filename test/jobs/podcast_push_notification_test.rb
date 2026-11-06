@@ -30,6 +30,8 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
       @delivered = []
     end
 
+    def configured? = true
+
     def deliver(message)
       @delivered << message
       response = @responses.shift || FirebaseMessaging::Response.new(status: 200, error_code: nil)
@@ -220,5 +222,18 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
       end
     end
     assert_equal 2, firebase.delivered.size
+  end
+
+  test "skips Android devices when Firebase isn't configured" do
+    @device.destroy
+    @user.devices.create!(token: "fcm-token", device_type: Device.device_types[:podcast_android])
+    firebase = FakeFirebase.new
+    firebase.define_singleton_method(:configured?) { false }
+
+    PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+      PodcastPushNotification.new.perform(@user.id, @entry.id)
+    end
+
+    assert_empty firebase.delivered
   end
 end

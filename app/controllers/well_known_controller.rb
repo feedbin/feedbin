@@ -14,22 +14,14 @@ class WellKnownController < ApplicationController
     }
   end
 
-  # Digital Asset Links: lets password managers on Android offer this site's
-  # logins in the app. ANDROID_ASSET_LINKS lists package=sha256 pairs, comma
-  # separated (a package can appear once per signing key). Unset, it answers
-  # with an empty statement list, like apple_site_association.
+  # Lets Android password managers offer this site's logins in Airshow.
   def android_asset_links
-    fingerprints = ENV["ANDROID_ASSET_LINKS"].to_s.split(",").filter_map { |pair|
-      package, fingerprint = pair.strip.split("=", 2)
-      [package, fingerprint] if package.present? && fingerprint.present?
-    }.group_by(&:first).transform_values { |pairs| pairs.map(&:last) }
-
-    render json: fingerprints.map { |package, sha256s|
-      {
-        relation: ["delegate_permission/common.get_login_creds"],
-        target: {namespace: "android_app", package_name: package, sha256_cert_fingerprints: sha256s}
-      }
-    }
+    fingerprints = ENV["ANDROID_ASSET_LINKS"].to_s.split(",")
+    statements = fingerprints.empty? ? [] : [{
+      relation: ["delegate_permission/common.get_login_creds"],
+      target: {namespace: "android_app", package_name: "com.feedbin.airshow", sha256_cert_fingerprints: fingerprints}
+    }]
+    render json: statements
   end
 
   def apple_pay

@@ -23,22 +23,19 @@ class WellKnownControllerTest < ActionController::TestCase
     end
   end
 
-  test "android_asset_links groups the configured fingerprints by package" do
-    ENV["ANDROID_ASSET_LINKS"] = "com.feedbin.airshow=AA:BB, com.feedbin.airshow=CC:DD,com.feedbin.airshow.debug=EE:FF"
+  test "android_asset_links lists the configured fingerprints for the Airshow app" do
+    ENV["ANDROID_ASSET_LINKS"] = "AA:BB,CC:DD"
     begin
       get :android_asset_links
       assert_response :success
       assert_equal "application/json", @response.media_type
-      statements = parse_json
-      assert_equal 2, statements.size
       assert_equal(
-        {
+        [{
           "relation" => ["delegate_permission/common.get_login_creds"],
           "target" => {"namespace" => "android_app", "package_name" => "com.feedbin.airshow", "sha256_cert_fingerprints" => ["AA:BB", "CC:DD"]}
-        },
-        statements.first
+        }],
+        parse_json
       )
-      assert_equal ["EE:FF"], statements.last.dig("target", "sha256_cert_fingerprints")
     ensure
       ENV.delete("ANDROID_ASSET_LINKS")
     end
