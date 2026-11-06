@@ -26,8 +26,7 @@ module Api
           created_at: @user.created_at.utc.iso8601,
           plan: plan,
           newsletter_address: @user.newsletter_address,
-          settings: settings,
-          page_token: @user.page_token
+          settings: settings
         }
       end
 

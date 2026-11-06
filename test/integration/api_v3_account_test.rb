@@ -16,12 +16,11 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     body = JSON.parse(response.body)
-    assert_equal %w[object id email created_at plan newsletter_address settings page_token], body.keys
+    assert_equal %w[object id email created_at plan newsletter_address settings], body.keys
     assert_equal ["account", @user.id, @user.email, @user.created_at.utc.iso8601], body.values_at("object", "id", "email", "created_at")
     assert_equal({"id" => @user.plan.stripe_id, "name" => @user.plan.name, "status" => (@user.trial_plan? ? "trial" : "active"), "expires_at" => @user.expires_at&.utc&.iso8601}, body["plan"])
     assert_equal @user.newsletter_address, body["newsletter_address"]
     assert_equal({"podcast_sort" => "published_desc", "podcast_download_limit" => 25, "hide_queue" => true, "hide_recently_read" => false, "hide_updated" => false, "hide_recently_played" => false}, body["settings"])
-    assert_equal @user.page_token, body["page_token"]
   end
 
   test "an expired account reports its plan as expired" do
