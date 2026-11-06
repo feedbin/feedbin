@@ -40,7 +40,7 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     get "/v3/entries", params: {ids: entry.id.to_s}, headers: bearer
 
     json = JSON.parse(response.body)["data"].first
-    assert_equal %w[object id feed_id kind title author summary url hostname published_at received_at revision edited_at images link_preview attachments videos origin categories extracted_content_url content extracted], json.keys
+    assert_equal %w[object id feed_id kind title author author_handle summary url hostname published_at received_at revision edited_at images link_preview attachments videos origin categories extracted_content_url content extracted], json.keys
     assert_equal ["html"], json["content"].keys
     assert_equal @feed.id, json["feed_id"]
     assert_equal "podcast", json["kind"]
