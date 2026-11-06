@@ -22,7 +22,7 @@ class Entry < ApplicationRecord
   has_one :channel_image_record, -> { provider_embed_icon }, class_name: "Image", foreign_key: :provider_id, primary_key: :provider_parent_id
   # The stored formatting, which may be stale. Read rendering instead.
   has_one :rendering_record, class_name: "EntryRendering", inverse_of: :entry, dependent: :delete
-  # No dependent option: the foreign key cascades.
+  # The foreign key cascades.
   has_many :entry_videos
 
   # What a rendering is made from, besides the feed. A save that changes any
@@ -98,7 +98,7 @@ class Entry < ApplicationRecord
     includes(:feed).preload(:owned_image_records).with_renderings
   }
 
-  # What Api::V3::EntrySerializer and an embedded feed read.
+  # Preloads what Api::V3::EntrySerializer and an embedded feed read.
   scope :for_api_v3, -> {
     with_list_associations.with_renderings.preload(feed: :touch_icon_image_record)
   }

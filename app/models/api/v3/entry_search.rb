@@ -1,9 +1,5 @@
 module Api
   module V3
-    # A search over the user's entries, paged with search_after: the user's
-    # query with the structured parameters applied as filters, validated
-    # with Elasticsearch before it runs, and one page of entries in search
-    # order.
     class EntrySearch
       class QueryInvalid < StandardError; end
 
@@ -13,11 +9,8 @@ module Api
 
       attr_reader :query
 
-      # query: the user's text. feed_ids/tag_ids: arrays of ids to keep to; an
-      # empty feed_ids matches nothing. read/starred: booleans.
-      # published_after: a Time. They are filters beside the text rather than
-      # tokens appended to it: the query string's default AND does not bind
-      # across an OR, so "a OR b feed_id:1" would make the text optional.
+      # An empty feed_ids matches nothing. Parameters are filters, not query tokens:
+      # the default AND doesn't bind across OR, so "a OR b feed_id:1" lets a match any feed.
       def initialize(user, query:, feed_ids: nil, tag_ids: nil, read: nil, starred: nil, published_after: nil)
         @user = user
         @text = query.to_s.strip
@@ -30,8 +23,7 @@ module Api
         @query = display_query
       end
 
-      # The search as one string in the search syntax, tag ids expanded to
-      # feed ids. It means what ran; the filters are applied separately.
+      # The search as one string in the search syntax, tag ids expanded to feed ids.
       def expanded_query
         Entry.replace_tag_ids(@query, @user)
       end
@@ -40,7 +32,7 @@ module Api
       def page(limit:, after: nil)
         return [[], nil, 0] if @none
         body = request_body
-        # false is a query Elasticsearch could not parse; nil is no answer.
+        # false: unparseable query; nil: no answer.
         case Search.client { _1.validate(index, query: {query: body[:query]}) }
         when false then raise QueryInvalid, "The query could not be parsed."
         when nil then raise Search::Connection::ResponseError, "Elasticsearch did not validate the query."
@@ -60,9 +52,7 @@ module Api
         Search.index_name(Entry.table_name)
       end
 
-      # build_query's sort, or relevance, with the entry id as a tiebreak so
-      # search_after never skips or repeats a hit; the structured parameters
-      # as filters.
+      # The id tiebreak keeps search_after from skipping or repeating hits.
       def request_body
         body = Entry.build_query(user: @user, query: @text)
         direction = body[:sort]&.first&.values&.first || "desc"
@@ -88,15 +78,13 @@ module Api
         parts << "tag_id:(#{@tag_ids.join(" OR ")})" if @tag_ids.present?
         parts << (@read ? "is:read" : "is:unread") unless @read.nil?
         parts << (@starred ? "is:starred" : "is:unstarred") unless @starred.nil?
-        # The search syntax keeps a range token verbatim, so the time's colons
-        # are escaped or they would end the token early.
+        # Unescaped colons would end the range token early.
         parts << "published:>#{@published_after.utc.iso8601.gsub(":", "\\:")}" if @published_after
         text = (parts.any? && @text.match?(/\bOR\b/)) ? "(#{@text})" : @text
         [text, *parts].reject(&:empty?).join(" ")
       end
 
-      # The sort values of the limit-th hit (the page's last), from the raw
-      # hits; search_after fetched one more to learn whether more exist.
+      # The limit-th hit's sort values; the search fetched one extra to detect more.
       def sort_values(response, limit)
         hits = response.data.safe_dig("hits", "hits")
         hits[limit - 1]["sort"]

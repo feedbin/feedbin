@@ -1,8 +1,5 @@
 module Api
   module V3
-    # Saved pages: an entry in the user's Pages feed. Saving runs SavePage in
-    # the request, as v2 does; when extraction fails it retries in the
-    # background and the entry fills in later.
     class PagesController < ApiController
       PAGES_PER_DAY = 100
 
@@ -24,16 +21,12 @@ module Api
 
       private
 
-      # Only an entry in the user's own Pages feed: the one SavePage gave
-      # them a generated subscription to.
       def set_page
         @page = @user.entries.find(params[:id])
         raise ActiveRecord::RecordNotFound unless @page.feed.pages? && @user.subscriptions.generated.exists?(feed_id: @page.feed_id)
       end
 
-      # Whether it's new is decided before saving, by the key SavePage finds
-      # the entry by: SavePage can save a new entry twice (a YouTube page is
-      # filled from its embed), which clears previously_new_record?.
+      # Checked before saving: SavePage can save a new entry twice, clearing previously_new_record?.
       # => [entry, created]
       def store_page(url, title)
         existed = Entry.exists?(public_id: SavePage.public_id_for(@user, url))

@@ -74,7 +74,7 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
     receipt = {transaction_id: SecureRandom.hex, purchase_date_ms: Time.now.to_i * 1_000, product_id: product_id}
     stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).to_return(body: {status: 0, receipt: {in_app: [receipt]}}.to_json, status: 200)
 
-    # TrialExpiration suspends a lapsed account; buying is how it comes back.
+    # A lapsed trial leaves the account suspended.
     @user.update!(suspended: true)
     time = Time.now
     Time.stub(:now, time) do

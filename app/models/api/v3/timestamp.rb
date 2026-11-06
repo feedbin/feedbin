@@ -1,8 +1,6 @@
 module Api
   module V3
-    # Times v3 accepts: RFC 3339 with a UTC offset. Without one Ruby reads a
-    # time in the server's zone, so the same string would mean different
-    # instants.
+    # RFC 3339 with a required UTC offset; without one Ruby uses the server's zone.
     module Timestamp
       FORMAT = /\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(Z|[+-]\d\d:\d\d)\z/
 

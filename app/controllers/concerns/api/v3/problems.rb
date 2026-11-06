@@ -1,14 +1,9 @@
-# Errors as RFC 9457 problem details, with the spec's two additions: a stable
-# `code` clients branch on, and the `request_id` that X-Request-Id carries.
-# See errors.md in feedbin-api-docs.
 module Api
   module V3
     module Problems
       extend ActiveSupport::Concern
 
-      # A query parameter or body value that was understood but is wrong.
-      # pointer is the query parameter's name, or a JSON Pointer into the
-      # body, as errors.md describes.
+      # pointer: a query parameter's name, or a JSON Pointer into the body.
       class InvalidParameter < StandardError
         attr_reader :pointer, :code
 
@@ -46,8 +41,6 @@ module Api
           status_validation_failed([{pointer: "/#{exception.param}", code: "missing", detail: "#{exception.param} is required."}])
         end
 
-        # A search, an action preview, or a saved-search scope whose query
-        # Elasticsearch cannot parse.
         rescue_from EntrySearch::QueryInvalid do |exception|
           render_problem :unprocessable_content, "query_invalid",
             title: "Query invalid",
@@ -57,8 +50,7 @@ module Api
 
       private
 
-      # extensions: members a code adds to the problem (RFC 9457 §3.2), such
-      # as upstream_error's http_code. nil members are left out.
+      # extensions: extra problem members (RFC 9457 §3.2); nil values are dropped.
       def render_problem(status, code, title:, detail:, errors: nil, **extensions)
         body = {
           type: error_type(code),
@@ -73,8 +65,7 @@ module Api
         render json: body, status: status, content_type: "application/problem+json"
       end
 
-      # The type URI that names the error class. It is the same on every host
-      # so clients can match it.
+      # Host-independent so clients can match on it.
       def error_type(code)
         URI::HTTPS.build(host: "api.feedbin.com", path: "/errors/#{code}").to_s
       end
@@ -101,8 +92,7 @@ module Api
         render_problem :too_many_requests, "rate_limited", title: "Rate limited", detail: detail
       end
 
-      # A record's validation errors as problem errors. pointers maps an
-      # attribute to the body field it came from, when they differ.
+      # pointers maps an attribute to its body field when the names differ.
       def record_errors(record, pointers = {})
         record.errors.map do |error|
           {pointer: "/#{pointers.fetch(error.attribute, error.attribute)}", code: (error.type == :blank) ? "missing" : "invalid_value", detail: error.full_message}

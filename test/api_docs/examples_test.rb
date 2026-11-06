@@ -1,10 +1,7 @@
 require "test_helper"
 require_relative "api_docs"
 
-# One test per page of feedbin-api-docs: runs the page's request against the
-# docs' fake account and compares the response with the example the docs
-# repo holds. `bin/rails api_docs:examples` writes them instead. Skipped
-# where the docs repo isn't checked out next to this one (or at API_DOCS).
+# Skipped unless feedbin-api-docs is checked out beside this repo (or at API_DOCS).
 class ApiDocsExamplesTest < ActionDispatch::IntegrationTest
   setup do
     @environment = ApiDocs::ENVIRONMENT.keys.index_with { ENV[it] }
@@ -59,8 +56,6 @@ class ApiDocsExamplesTest < ActionDispatch::IntegrationTest
         assert_response :success, "#{example.name}: #{response.body}"
         recorded
       end
-      # An object is the object itself; a snippet keeps the status, as an
-      # endpoint's response does.
       value = if example.kind == "snippets" then json
       elsif example.pick then json["body"].dig(*pointer(example.pick))
       else json["body"]
@@ -69,8 +64,6 @@ class ApiDocsExamplesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # Each run starts from the same world: changes roll back, and created rows
-  # take the same ids.
   def isolated(scenario, source)
     result = nil
     ActiveRecord::Base.transaction(requires_new: true) do

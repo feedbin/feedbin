@@ -1,7 +1,5 @@
 module Api
   module V3
-    # Action rules: the list with an ETag, create, update and delete
-    # (ActionWrite). A rule's preview is Actions::EntriesController.
     class ActionsController < ApiController
       include ActionScoped
 
@@ -30,8 +28,6 @@ module Api
 
       private
 
-      # The one base error besides bad syntax is a scope with no feeds left
-      # in it.
       def render_saved(action, status:)
         if action.save
           render json: ActionSerializer.new(action).to_h, status: status

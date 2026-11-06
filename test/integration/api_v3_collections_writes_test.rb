@@ -299,9 +299,7 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     many = count_queries { post "/v3/collections/recently_read/entries", params: {ids: entries.last(50).map(&:id)}.to_json, headers: json }
 
     assert_equal 50, JSON.parse(response.body)["applied"].size
-    # Per id, only RecentlyReadEntry.create_from_owners: savepoint, the
-    # uniqueness validation, the insert, release. A permission lookup per id
-    # made it nine.
+    # RecentlyReadEntry.create_from_owners: savepoint, validation, insert, release.
     assert_operator (many - few) / 45.0, :<=, 4, "#{few} queries for 5 ids, #{many} for 50"
   end
 
@@ -328,8 +326,6 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # Elasticsearch indexes after the unread row exists, so an ETag made from
-  # versions alone could cache a list missing the entry.
   test "a saved search's ids etag moves when a match is indexed late" do
     search = @user.saved_searches.create!(name: "Swift", query: "swift")
     late = @feed.entries.create!(title: "Swift late", url: "https://example.com/late", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: Time.now)
@@ -385,8 +381,6 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     assert_response :not_modified
   end
 
-  # Once the newest unread row is old enough to be indexed, a quiet poll is
-  # answered from versions, without asking Elasticsearch.
   test "a settled saved-search list answers a quiet poll without searching" do
     search = @user.saved_searches.create!(name: "Swift", query: "swift")
     swift_entries(2)

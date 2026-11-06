@@ -1,10 +1,7 @@
 module Api
   module V3
-    # Every v3 endpoint inherits from here. The spec is in feedbin-api-docs
-    # (conventions.md, errors.md, authentication.md).
     class ApiController < ActionController::API
-      # Problems first: rescue_from handlers declared later win, so the
-      # catch-all StandardError handler has to come before the specific ones.
+      # Must come first: later rescue_from handlers win over its StandardError catch-all.
       include Problems
       include Authentication
       include Pagination
@@ -13,32 +10,26 @@ module Api
       include Params
       include BodyFields
 
-      # A v3 body is the resource itself, never wrapped in a root key.
       wrap_parameters false
 
       before_action :validate_content_type
       before_action :forbid_caching
 
-      # Every v3 response is private to its token and must be revalidated
-      # with If-None-Match: a URL-keyed cache that served a stored body
-      # without asking would show one account's list to another after a
-      # switch, and a shared cache must never store one at all.
+      # A URL-keyed client cache would otherwise show one account's data to another
+      # after an account switch; shared caches must never store responses.
       def forbid_caching
-        # Through the hash: Rails rewrites the header and keeps "private"
-        # beside "no-cache" only as an extra.
+        # Rails rewrites Cache-Control; "private" survives beside no_cache only as an extra.
         response.cache_control.replace(no_cache: true, extras: ["private"])
       end
 
-      # Unmatched v3 paths land here, after authentication, so an unknown
-      # route and a missing record look the same.
+      # Runs after authentication, so an unknown route looks like a missing record.
       def not_found
         status_not_found
       end
 
       private
 
-      # The JSON body, as parsed: a verb's array or a merge patch's null
-      # arrives as sent, not filtered through params.
+      # Raw parsed JSON: top-level arrays and nulls arrive as sent, unlike params.
       def body
         request.request_parameters
       end
@@ -59,8 +50,7 @@ module Api
         end
       end
 
-      # Parse now, so a body that is not JSON is a 400 whether or not the
-      # action reads params.
+      # Parses eagerly so malformed JSON is a 400 even if the action never reads params.
       def parse_body
         request.request_parameters
       end

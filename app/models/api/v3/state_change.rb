@@ -1,19 +1,10 @@
 module Api
   module V3
-    # The state verbs behind POST /entries/state: mark_read, mark_unread,
-    # star, unstar and clear_updated, each with a list of entry ids, applied
-    # in one transaction. Ids the user cannot touch are skipped, not fatal.
-    # mark_read and clear_updated also take a scope, which sweeps the user's
-    # own rows in one statement and reports a count. See entries/state in
-    # feedbin-api-docs.
     class StateChange
       VERBS = %w[mark_read mark_unread star unstar clear_updated].freeze
       SCOPED_VERBS = %w[mark_read clear_updated].freeze
       OPPOSITES = {"mark_unread" => "mark_read", "unstar" => "star"}.freeze
       SCOPE_KEYS = %w[feed_ids tag_ids collection published_before received_before].freeze
-      # The collections a scope can name: those whose entries take state
-      # writes, plus Recently Read, Pages and saved searches. Not Airshow or Recently
-      # Played.
       SCOPE_COLLECTIONS = %w[unread all starred updated recently_read pages].freeze
       MAX_IDS = 1_000
 
@@ -47,8 +38,7 @@ module Api
         {applied: applied, skipped: skipped.map { |id, reason| {id: id, reason: reason} }}
       end
 
-      # The user's rows in one state table that a scope object selects. Keys
-      # combine with AND; no keys selects every row.
+      # Keys combine with AND; no keys selects every row.
       class Scope
         SLICE = 10_000
 
@@ -56,13 +46,10 @@ module Api
           @user = user
           @verb = verb
           @relation = (verb == "mark_read") ? user.unread_entries : user.updated_entries
-          # collection last: a saved search's walk is filtered by the rows the
-          # other keys leave.
+          # collection must be last: a saved search walks only the rows the other keys leave.
           scope.sort_by { |key, _| (key == "collection") ? 1 : 0 }.each { |key, value| narrow(key, value) }
         end
 
-        # A saved search's matches are deleted a slice at a time, so no
-        # statement carries more than SLICE ids.
         def delete_all
           return @relation.delete_all unless @search_ids
           @search_ids.each_slice(SLICE).sum { @relation.where(entry_id: _1).delete_all }
@@ -76,8 +63,6 @@ module Api
           when "tag_ids" then @relation = @relation.where(feed_id: @user.taggings.where(tag_id: id_list(key, value)).select(:feed_id))
           when "collection" then narrow_to_collection(value)
           when "published_before" then @relation = @relation.where(published: ...bound(key, value))
-          # When the row's entry reached the list: arrival for unread, the
-          # edit for Updated, the keys those collections page on.
           when "received_before" then @relation = @relation.where(((@verb == "mark_read") ? :entry_created_at : :updated_at) => ...bound(key, value))
           else raise invalid(key, "unknown", "#{key} is not a scope key. Use #{SCOPE_KEYS.join(", ")}.")
           end
@@ -86,7 +71,6 @@ module Api
         def narrow_to_collection(id)
           collection = Collection.find(@user, id) if id.is_a?(String) && (SCOPE_COLLECTIONS.include?(id) || id.start_with?("search_"))
           raise invalid("collection", "invalid_value", "collection must be #{SCOPE_COLLECTIONS.join(", ")}, or a saved search's collection id.") unless collection
-          # A table sweeps itself whole; the timeline is every row.
           return if collection.timeline? || (@verb == "mark_read" && id == "unread") || (@verb == "clear_updated" && id == "updated")
           if collection.search?
             @search_ids = search_matches(collection)
@@ -97,11 +81,8 @@ module Api
           end
         end
 
-        # Every match, not the 50 a saved search's id list carries. The id
-        # list is fixed before the delete, so an entry that arrives during
-        # the sweep is not in it.
-        # Only the entries the sweep can touch are walked: the user's unread
-        # (or Updated) rows, which bound the walk however broad the query.
+        # Every match, not just the 50 in the id list. Filtering to the user's rows
+        # bounds the walk however broad the query.
         def search_matches(collection)
           query = Entry.build_query(user: @user, query: collection.query)
           index = Search.index_name(Entry.table_name)
@@ -122,10 +103,8 @@ module Api
           value
         end
 
-        # The exclusive end of the instant the client named. Entry times go out
-        # in whole seconds while rows store microseconds, so a bound copied
-        # from an entry's received_at must still include that entry: the
-        # bound covers its whole last unit at the precision sent.
+        # Exclusive end of the named instant at the precision sent: times go out in
+        # whole seconds but rows store microseconds, so a copied bound must include its entry.
         def bound(key, value)
           time = Timestamp.parse(value) or raise invalid(key, "invalid_value", "#{key} must be an RFC 3339 timestamp with a UTC offset.")
           time + Rational(1, 10**value.to_s[/\.(\d+)/, 1].to_s.length)
@@ -138,8 +117,7 @@ module Api
 
       private
 
-      # => {verb => [ids] or Scope}, verbs in VERBS order, ids uniq in
-      # request order.
+      # => {verb => [ids] or Scope}, verbs in VERBS order.
       def validate
         raise invalid("", "missing", "Send at least one verb.") unless @body.is_a?(Hash) && @body.any?
 
@@ -159,8 +137,6 @@ module Api
           [verb, value.uniq]
         end.to_h
 
-        # A mark_read scope beside mark_unread ids is not a conflict: verbs
-        # apply in order, so those ids end up unread.
         OPPOSITES.each do |verb, opposite|
           both = Array(verbs[verb]) & Array(verbs[opposite])
           raise invalid("/#{verb}", "conflict", "#{both.first} is in both #{opposite} and #{verb}.") if both.any?
@@ -173,16 +149,13 @@ module Api
         EntryAccess.new(@user).permissions_for(ids)
       end
 
-      # mark_read may clear any unread row the user has, as v2 did: an unread
-      # row can outlive its subscription (FeedReplacer moves subscriptions),
-      # and a client must be able to clear what the unread list shows.
-      # clear_updated may likewise clear any Updated row the user has.
+      # Unread and Updated rows can outlive their subscription (FeedReplacer), so
+      # they're clearable regardless of access.
       def allowed?(verb, permission, updated)
         permission.reason.nil? || (verb == "mark_read" && permission.unread) || (verb == "clear_updated" && updated)
       end
 
-      # ids, and the entries that still exist for them: an Updated row has
-      # no foreign key, so clear_updated can name an entry that is gone.
+      # Updated rows have no foreign key, so clear_updated can name a deleted entry.
       def apply(verb, ids, entries)
         return if ids.empty?
 

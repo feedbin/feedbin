@@ -1,7 +1,5 @@
 module Api
   module V3
-    # Saved searches: the list with an ETag, and create, update and delete.
-    # The query is validated with Elasticsearch before it is stored.
     class SavedSearchesController < ApiController
       before_action :set_saved_search, only: [:update, :destroy]
 

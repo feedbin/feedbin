@@ -1,22 +1,12 @@
 module Api
   module V3
-    # POST /subscriptions: subscribe to several feeds at once, each with an
-    # optional custom title, with tag_names applied to every new one.
-    #
-    # Each feed is named by its feed_url exactly as POST /subscriptions/new
-    # returned it, not by id: ids are sequential, so an id would let anyone
-    # subscribe to any feed. Knowing a URL grants only what Find feeds
-    # already would, since Find returns a known feed for its URL, and a
-    # password-protected feed keeps its credentials in feed_url. Only XML
-    # feeds match: a newsletter's feed_url (sender domain and feed id) can
-    # be guessed. A Pages or newsletter feed the user can already read
-    # matches too. Any other URL is skipped as not_found, so it doesn't
-    # reveal that a feed exists. Nothing is stored between the two steps.
+    # Feeds are named by feed_url, never id: sequential ids would let anyone
+    # subscribe to any feed. Newsletter feed_urls are guessable, so only XML feeds
+    # match unless the user can already read the feed. Misses are not_found so
+    # they don't reveal that a feed exists.
     class Subscribe
       include BodyFields
 
-      # Find returns a handful of feeds: a search returns three, and a site
-      # rarely links more. Five covers those with room, and bounds abuse.
       MAX_FEEDS = 5
 
       attr_reader :body
@@ -26,9 +16,7 @@ module Api
         @body = body
       end
 
-      # A feed the user already subscribes to, directly or through a feed that
-      # redirected to it, is applied and left alone. Each new subscription is
-      # its own transaction with its taggings. => {applied:, skipped:}
+      # => {applied:, skipped:}
       def subscribe
         items = feed_items
         tags = tag_names
@@ -74,10 +62,8 @@ module Api
         feed.xml? || @user.can_read_feed?(feed)
       end
 
-      # Two requests at once (a double-tapped Add) both pass the existing
-      # check; the unique index stops the second, which is already
-      # subscribed. requires_new, so the failed insert rolls back to a
-      # savepoint when this runs inside another transaction.
+      # A concurrent duplicate hits the unique index. requires_new so the failed
+      # insert rolls back only to a savepoint inside an outer transaction.
       def create(feed, title, tags)
         Subscription.transaction(requires_new: true) do
           subscription = @user.subscriptions.create!(feed: feed, title: title)

@@ -1,8 +1,7 @@
 module Api
   module V3
-    # An OPML import and each item's outcome. Feedbin does not record which
-    # subscription an item became, so subscription_id is the user's
-    # subscription to the item's feed URL, when there is one.
+    # Imports don't record the resulting subscription, so subscription_id is
+    # looked up by the item's feed URL.
     class ImportSerializer
       def initialize(import)
         @import = import
@@ -32,8 +31,7 @@ module Api
         }
       end
 
-      # The importer stores the exception it hit, or nothing when the URL
-      # simply had no feed.
+      # nil error means the URL had no feed.
       def message(item)
         return unless item.failed? || item.fixable?
         ImportItem::ERRORS[item.error_class] || item.error_message.presence || "No feed found."

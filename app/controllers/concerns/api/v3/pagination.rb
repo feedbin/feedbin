@@ -1,6 +1,3 @@
-# The list envelope and cursor pagination from conventions.md: every list is
-# { object: "list", data:, page:, meta: }, and a page ends with a null
-# next_cursor.
 module Api
   module V3
     module Pagination
@@ -19,9 +16,6 @@ module Api
 
       private
 
-      # meta is present only on lists that carry one: entries lists, whose
-      # as_of is the time bound a client bootstraps its cursors from. A list
-      # that needs no cursor (ids, subscriptions, feeds, tokens) has none.
       def render_list(data, page: nil, meta: nil)
         body = {object: "list", data: data}
         body[:page] = page if page
@@ -29,9 +23,7 @@ module Api
         render json: body
       end
 
-      # next_url is the page to follow now and is null at the end. next_cursor
-      # is where to resume; for a sort that follows arrivals it outlives
-      # next_url (more: false), so the two are passed separately.
+      # next_cursor can outlive next_url (a stream with nothing more yet).
       def page_object(limit:, next_cursor:, more: next_cursor.present?)
         {
           limit: limit,
@@ -40,7 +32,6 @@ module Api
         }
       end
 
-      # This request with cursor replaced, ready for the client to follow.
       def next_page_url(cursor)
         uri = URI(request.url)
         uri.query = request.query_parameters.merge("cursor" => cursor).to_query

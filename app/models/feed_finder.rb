@@ -1,8 +1,7 @@
 class FeedFinder
   attr_reader :url, :response, :import_mode
 
-  # raise_errors: let every failure through, for a caller that explains it
-  # (Api::V3::FeedCandidates) rather than showing "no feed found".
+  # raise_errors: re-raise failures instead of returning no feeds.
   def initialize(url, import_mode: false, username: nil, password: nil, raise_errors: false)
     @url = url
     @import_mode = import_mode

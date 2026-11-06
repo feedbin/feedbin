@@ -1,7 +1,6 @@
 module Api
   module V3
-    # Access tokens start with fbn_v3_ so secret scanners can recognize a
-    # leaked one. 32 alphanumeric characters is about 190 bits.
+    # The fbn_v3_ prefix lets secret scanners recognize leaked tokens.
     class TokenGenerator
       PREFIX = "fbn_v3_"
 

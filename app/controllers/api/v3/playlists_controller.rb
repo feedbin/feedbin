@@ -1,7 +1,5 @@
 module Api
   module V3
-    # Airshow playlists: the list with an ETag, create (find by title),
-    # update and delete. The writes are PlaylistWrite.
     class PlaylistsController < ApiController
       before_action :set_playlist, only: [:update, :destroy]
 
@@ -22,7 +20,6 @@ module Api
         render json: PlaylistSerializer.new(@playlist).to_h
       end
 
-      # Queue rows and podcast subscriptions in it lose their playlist_id.
       def destroy
         @playlist.destroy
         head :no_content

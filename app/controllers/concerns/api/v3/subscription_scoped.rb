@@ -1,4 +1,3 @@
-# Loads @subscription from the subscriptions v3 lists (SubscriptionList).
 module Api
   module V3
     module SubscriptionScoped

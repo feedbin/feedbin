@@ -1,7 +1,6 @@
 module Api
   module V3
-    # An opaque pagination cursor: a position in the sort, encoded as hex JSON
-    # so it needs no escaping in a URL. Clients pass it back unchanged.
+    # Opaque pagination cursor: hex-encoded JSON, so it needs no URL escaping.
     class Cursor
       class Invalid < StandardError; end
 

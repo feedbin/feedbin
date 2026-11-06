@@ -3,9 +3,8 @@ class BasicAuthentication
     @app = app
   end
 
-  # Old clients send bare base64 credentials with no scheme. Every scheme is
-  # followed by a space and base64 has none, so a header without whitespace
-  # is the bare kind.
+  # Old clients send bare base64 credentials; base64 has no whitespace, so a
+  # header without any is that kind.
   def call(env)
     header = env["HTTP_AUTHORIZATION"]
     if header.is_a?(String) && !header.match?(/\s/)

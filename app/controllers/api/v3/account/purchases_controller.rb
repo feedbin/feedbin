@@ -1,9 +1,6 @@
 module Api
   module V3
     module Account
-      # POST /account/purchases: verifies an App Store receipt with Apple
-      # (production, then sandbox on 21007) and records each purchase, which
-      # extends the plan.
       class PurchasesController < ApiController
         before_action -> { require_scope("account") }
 

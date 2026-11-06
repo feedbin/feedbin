@@ -1,13 +1,7 @@
 module Api
   module V3
-    # One page of a relation in keyset order: rows after a cursor's
-    # (key, id) position, keyed on one column with a tiebreak column. A
-    # cursor is {sort:, <key>:, id:}: the sort it belongs to, the key as an
-    # integer (microseconds for a time), and the tiebreak. A cursor for
-    # another sort, or with fields that don't parse, is invalid rather than
-    # silently restarting.
+    # Cursor: {sort:, <key>:, id:}, the key an integer (microseconds for a time).
     class KeysetPage
-      # key: the cursor field the column's value goes in.
       def initialize(scope, sort:, column:, direction:, limit:, cursor: nil, tiebreak: :id, key: "key")
         @scope = scope
         @sort = sort
@@ -19,8 +13,7 @@ module Api
         @key = key
       end
 
-      # The query for the page, with one row more than the limit to tell
-      # whether another page follows.
+      # Fetches limit + 1 rows to tell whether another page follows.
       def relation
         scope = @scope
         if (after = position)

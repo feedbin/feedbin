@@ -1,8 +1,6 @@
 module Api
   module V3
-    # The sidebar's lists as one read model: the system collections in
-    # sidebar order, then the user's saved searches. Each knows the table
-    # behind it, how its entries are ordered, and which writes it takes.
+    # The sidebar's system collections and saved searches as one read model.
     class Collection
       attr_reader :id, :kind, :title, :sort, :writes, :query, :saved_search
 
@@ -65,14 +63,11 @@ module Api
         end
       end
 
-      # Pages' entries: the user's Pages feed's, none without one. Its
-      # entries are its rows, so it has no membership table.
       def pages
         Entry.where(feed_id: @user.feeds.pages.select(:id))
       end
 
-      # The membership rows, ordered as the collection's sort says, newest or
-      # first position first. nil for the timeline, searches and Pages.
+      # nil for the timeline, searches and Pages, which have no membership table.
       def rows
         case @id
         when "unread" then @user.unread_entries.order(entry_created_at: :desc, entry_id: :desc)
@@ -84,8 +79,7 @@ module Api
         end
       end
 
-      # The column a page is keyed on, and its direction. Microsecond times,
-      # or the queue's integer position.
+      # [column, direction]. Cursors carry times as integer microseconds.
       def key
         case @id
         when "unread" then [:entry_created_at, :desc]
@@ -97,7 +91,7 @@ module Api
         end
       end
 
-      # The whole id list, ascending. A saved search's is its unread matches.
+      # Ascending. A saved search's ids are its unread matches only.
       def ids
         @ids ||= if search?
           search_ids
@@ -108,7 +102,7 @@ module Api
         end
       end
 
-      # What the id list's ETag is made of: it moves whenever #ids would.
+      # The ids ETag; must change whenever #ids would.
       def ids_version
         if search?
           search_version
@@ -119,15 +113,12 @@ module Api
         end
       end
 
-      # One page of the collection's entries in its sort. The timeline and
-      # Pages page entries; the rest page their membership rows.
       def page(limit:, cursor: nil)
         column, direction = key
         KeysetPage.new(page_scope, sort: "collection:#{@id}", column: column, direction: direction, limit: limit, cursor: cursor, tiebreak: rows ? :entry_id : :id)
       end
 
-      # The entries on a page, in order, and their memberships by entry id.
-      # A membership row whose entry is gone is left out.
+      # => [entries, {entry_id => membership}]; rows whose entry is gone are dropped.
       def entries_on(page)
         records = page.records
         unless rows
@@ -138,13 +129,11 @@ module Api
         [listed.map { entries[_1.entry_id] }, listed.to_h { [_1.entry_id, membership(_1)] }]
       end
 
-      # POST /collections/{id}/entries (see Additions).
       def add(body)
         Additions.new(@user, self, body).call
       end
 
-      # The queue's per-row and bulk writes; the other collections don't take
-      # them (accepts?).
+      # Queue only; callers check accepts? first.
       def update_entry(entry_id, body)
         row = @user.queued_entries.find_by!(entry_id: entry_id)
         QueueMembershipWrite.new(row, body).apply
@@ -170,11 +159,8 @@ module Api
         end
       end
 
-      # Up to SEARCH_IDS_LIMIT unread matches, the newest published, in id
-      # order. Its own query, not the sidebar's badge aggregation, which
-      # stops at 50 matches and 50 saved searches. A stored query that no
-      # longer parses (Elasticsearch answers 400) matches nothing; any other
-      # error raises, so an outage is not cached as an empty list.
+      # A stored query that no longer parses (Elasticsearch 400) matches nothing;
+      # other errors raise so an outage isn't cached as an empty list.
       def search_ids
         unread_ids = @user.unread_entries.pluck(:entry_id)
         return [] if unread_ids.empty?
@@ -221,11 +207,8 @@ module Api
         end
       end
 
-      # A saved search's matches follow the unread list, stars (is:starred),
-      # the feeds subscribed to, their tags, and the query, so a quiet poll
-      # needs no search. While the newest unread row may still be waiting
-      # for Elasticsearch, the ids themselves are part of it too, so the list
-      # changes when indexing catches up.
+      # Avoids a search on a quiet poll. While a recent unread row may not be
+      # indexed yet, the ids are included so the ETag moves when indexing catches up.
       def search_version
         parts = [
           Fingerprint.of(@user.unread_entries, :entry_id),
@@ -238,9 +221,7 @@ module Api
         parts.join(":")
       end
 
-      # Pages has no membership table: its entries are rows of entries, so
-      # the count, the newest id and the newest save move on every add, edit
-      # and delete.
+      # Count, max id and max updated_at together move on every add, edit and delete.
       def pages_version
         count, newest_id, updated = pages.pick(Arel.sql("count(*)"), Arel.sql("max(id)"), Arel.sql("max(updated_at)"))
         [count, newest_id || 0, updated ? microseconds(updated) : 0].join(":")

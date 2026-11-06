@@ -2,9 +2,7 @@ require "builder"
 
 module Api
   module V3
-    # The user's subscriptions as OPML: untagged feeds, then one outline per
-    # tag. Only fetchable (xml) feeds: a newsletter or Pages feed URL is an
-    # identifier Feedbin made, not a feed another reader can pull.
+    # Only xml feeds: newsletter and Pages feed URLs aren't fetchable elsewhere.
     class OpmlExport
       def initialize(user)
         @user = user

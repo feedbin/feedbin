@@ -1,7 +1,6 @@
 module Api
   module V3
-    # A merge patch over the account's settings, by their API names
-    # (AccountSerializer::SETTINGS), stored the way the web app stores them.
+    # A merge patch over settings, keyed by AccountSerializer::SETTINGS names.
     class SettingsPatch
       include BodyFields
 

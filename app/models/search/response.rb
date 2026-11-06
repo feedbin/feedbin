@@ -1,6 +1,5 @@
 module Search
   class Response
-    # The parsed Elasticsearch response.
     attr_reader :data
 
     def initialize(data, page: 1, per_page: WillPaginate.per_page)
@@ -17,7 +16,7 @@ module Search
       @data.safe_dig("hits", "hits")&.map {|hit| hit["_id"].to_i } || []
     end
 
-    # The sort values of the last hit, for search_after. nil with no hits.
+    # nil with no hits.
     def last_sort
       @data.safe_dig("hits", "hits")&.last&.dig("sort")
     end

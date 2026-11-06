@@ -1,7 +1,5 @@
 module Api
   module V3
-    # The attachment object, in JSON Feed's shape: a file the entry carries,
-    # such as a podcast episode's audio.
     class AttachmentSerializer
       KINDS = %w[audio video image].freeze
       DOCUMENT_TYPES = %w[application/pdf application/epub+zip text/plain].freeze

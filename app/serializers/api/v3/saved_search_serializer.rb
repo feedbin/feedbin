@@ -1,7 +1,5 @@
 module Api
   module V3
-    # The saved search object. Its results are read through the collection
-    # search_{id}.
     class SavedSearchSerializer
       def initialize(saved_search)
         @saved_search = saved_search

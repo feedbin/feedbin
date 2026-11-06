@@ -1,6 +1,3 @@
-# Renders one page of an EntrySearch as an entries list: the envelope, the
-# search cursor (the last hit's sort values), and meta.query. Shared by
-# GET /search, a saved search's collection entries, and an action preview.
 module Api
   module V3
     module SearchPage

@@ -38,9 +38,8 @@ class Feed < ApplicationRecord
 
   enum :feed_type, {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
-  # A password-protected feed keeps its credentials in feed_url
-  # (https://user:pass@host/feed, as Feedkit::BasicAuth reads it). Search
-  # leaves these out: it would show one user's password to everyone.
+  # Password-protected feeds keep credentials in feed_url (user:pass@host);
+  # exclude them from anything shown to other users.
   scope :without_credentials, -> { where.not("feeds.feed_url ~ ?", "^[A-Za-z][A-Za-z0-9+.-]*://[^/?#]*@") }
 
   # custom_icon_format has no reader. It stays so a Receiver payload queued
@@ -163,9 +162,7 @@ class Feed < ApplicationRecord
     Rails.logger.info { "Failed to set host for feed: %s" % site_url }
   end
 
-  # Where the feed lives, for naming it when nothing else does: the stored
-  # host, else the host of its site URL, else of its feed URL. nil when none
-  # of them parses.
+  # nil when no host parses.
   def hostname
     host.presence || host_of(site_url) || host_of(feed_url)
   end

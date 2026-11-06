@@ -1,10 +1,7 @@
 module Api
   module V3
-    # A fingerprint of the set of rows in a relation: the row count and a sum
-    # of per-row hashes of some columns, as "count.sum". Order doesn't matter,
-    # so adding or removing any row moves it, and unlike count and newest id,
-    # a removal and an insert cannot net out. Postgres answers it from an
-    # index on the columns.
+    # "count.sum" of per-row column hashes: a removal plus an insert can't net out,
+    # unlike count and max id. Needs an index on the columns to stay cheap.
     module Fingerprint
       def self.of(scope, *columns)
         row = columns.map { scope.connection.quote_column_name(_1) }.join(", ")

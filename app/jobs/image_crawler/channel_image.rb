@@ -44,7 +44,7 @@ module ImageCrawler
       return if channel_id.blank?
 
       Feed.where(channel_id: channel_id).find_each(&:touch)
-      # API v3 entries carry the channel's avatar in their videos list.
+      # v3 entries embed the channel avatar.
       EntryVideo.bump_for_channel(channel_id)
     end
   end

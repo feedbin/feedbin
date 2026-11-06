@@ -1,7 +1,5 @@
 module Api
   module V3
-    # GET /feeds (every feed the user can read, with an ETag) and
-    # GET /feeds/{id}. A feed's entries and lookup by URL are under Feeds::.
     class FeedsController < ApiController
       include FeedScoped
 

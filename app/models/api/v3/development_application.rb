@@ -1,8 +1,6 @@
 module Api
   module V3
-    # The OAuth application behind tokens minted by POST /oauth/development_token,
-    # so local clients such as Feedbin Next can sign in without the browser flow.
-    # Created by db/seeds.rb and, if it is missing, by the route itself.
+    # The OAuth application behind POST /oauth/development_token tokens.
     class DevelopmentApplication
       CLIENT_ID = "feedbin-next-development"
       REDIRECT_URI = "feedbin-next://oauth/callback"

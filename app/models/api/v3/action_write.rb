@@ -1,10 +1,6 @@
 module Api
   module V3
-    # Assigns an action rule from a request body, without saving. required:
-    # a create, where title, kind and the scope must be given. A mute always
-    # marks read, so its actions are set here rather than taken from the
-    # body. The notifier belonged to the retired Feedbin Notifier: v3 neither
-    # shows nor accepts one.
+    # Assigns, without saving. required: a create (title, kind and scope must be given).
     class ActionWrite
       include BodyFields
 
@@ -37,9 +33,8 @@ module Api
         @required || body.key?(field)
       end
 
-      # Both lists empty as sent means every feed. Ids the user cannot use
-      # are dropped afterwards, so a list of only foreign ids fails
-      # validation instead of widening the rule to every feed.
+      # Empty lists mean every feed. Foreign ids are dropped after this check, so
+      # an all-foreign list fails validation instead of matching every feed.
       def assign_scope
         feed_ids = body.key?("feed_ids") ? integer_ids("feed_ids") : stored_feed_ids
         tag_ids = body.key?("tag_ids") ? integer_ids("tag_ids") : stored_tag_ids

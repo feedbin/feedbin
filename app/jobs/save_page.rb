@@ -87,8 +87,6 @@ class SavePage
     ).to_s
   end
 
-  # The key a saved page's entry is found by, so callers can tell whether a
-  # URL is already saved.
   def self.public_id_for(user, url)
     Digest::SHA1.hexdigest(feed_url_for(user) + url)
   end

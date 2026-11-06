@@ -1,6 +1,5 @@
 module Api
   module V3
-    # Push devices (DeviceRegistration).
     class DevicesController < ApiController
       before_action -> { require_scope("account") }
 

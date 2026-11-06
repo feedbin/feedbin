@@ -1,10 +1,7 @@
 module Api
   module V3
-    # The account object: plan, settings a client reads or writes, the
-    # newsletter address and the page token. Setting names are the API's;
-    # SETTINGS maps them onto the hstore keys the web app uses.
     class AccountSerializer
-      # API name => [stored key, type]
+      # API name => [stored hstore key, type]
       SETTINGS = {
         "podcast_sort" => ["podcast_sort_order", :sort],
         "podcast_download_limit" => ["podcast_download_limit", :integer],
@@ -13,8 +10,7 @@ module Api
         "hide_updated" => ["hide_updated", :boolean],
         "hide_recently_played" => ["hide_recently_played", :boolean]
       }.freeze
-      # API value => stored value, for podcast_sort. Stored names are the
-      # Playlist sort_order enum's.
+      # podcast_sort API value => Playlist sort_order enum value.
       SORTS = {"manual" => "custom", "published_desc" => "newest_first", "published_asc" => "oldest_first"}.freeze
       DEFAULT_DOWNLOAD_LIMIT = 10
 

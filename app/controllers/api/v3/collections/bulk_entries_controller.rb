@@ -1,8 +1,6 @@
 module Api
   module V3
     module Collections
-      # PATCH and DELETE /collections/{id}/entries: many memberships at once.
-      # Airshow takes the bulk update; the plain lists take clear.
       class BulkEntriesController < ApiController
         include CollectionScoped
 

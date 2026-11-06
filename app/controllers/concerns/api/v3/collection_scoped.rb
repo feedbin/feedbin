@@ -1,5 +1,3 @@
-# For the controllers under /collections/{id}: loads @collection, and refuses
-# a membership write the collection doesn't take.
 module Api
   module V3
     module CollectionScoped

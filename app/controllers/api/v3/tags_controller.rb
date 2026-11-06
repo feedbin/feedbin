@@ -1,6 +1,5 @@
 module Api
   module V3
-    # GET /tags, PATCH /tags/{id}, DELETE /tags/{id}.
     class TagsController < ApiController
       before_action :set_tag, only: [:update, :destroy]
 
@@ -10,8 +9,7 @@ module Api
         render_list(data)
       end
 
-      # Renaming usually changes the id, and a name the user already has
-      # merges the two. Tag.rename returns nil when the name cannot be used.
+      # Renaming can change the id or merge into an existing tag; nil means the name is unusable.
       def update
         renamed = Tag.rename(@user, @tag, required_string("name")) or raise invalid("name", "invalid_value", "name cannot be used as a tag.")
         render json: tags.serialize(renamed)

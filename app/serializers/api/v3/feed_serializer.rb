@@ -1,9 +1,7 @@
 module Api
   module V3
-    # The feed object. Load feeds with Feed::ICON_PRELOADS and
-    # :touch_icon_image_record so the image rows come preloaded. candidate is
-    # what Find feeds adds ({subscription_id:, daily_entry_counts:}), as an
-    # entry's membership is on collection reads.
+    # Preload Feed::ICON_PRELOADS and :touch_icon_image_record to avoid N+1s.
+    # candidate: {subscription_id:, daily_entry_counts:} from Find feeds.
     class FeedSerializer
       def initialize(feed, candidate: nil)
         @feed = feed

@@ -1,9 +1,6 @@
 module Api
   module V3
-    # The video object: a YouTube video iframed in an entry, from its
-    # harvested Embed row, for clients that draw their own player card.
-    # channel is the video's youtube_channel Embed and channel_image that
-    # channel's avatar Image; either may be missing.
+    # channel and channel_image may be nil.
     class VideoSerializer
       POSTER_SIZES = %w[maxres standard high medium default].freeze
 

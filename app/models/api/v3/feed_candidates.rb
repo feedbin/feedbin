@@ -1,14 +1,7 @@
 module Api
   module V3
-    # POST /subscriptions/new: the feeds a typed query offers the user, as the
-    # web's add-feed dialog finds them. A URL is fetched and its feeds
-    # discovered; words search known feeds. Either way the result is a list,
-    # every feed in it is refreshed, and nothing is subscribed: Subscribe
-    # takes a feed by the feed_url returned here. Finding nothing is a
-    # Failure that says why, for the client to show.
     class FeedCandidates
-      # code is the problem's code; detail is a sentence a client can show.
-      # http_code is the site's status, for upstream_error.
+      # detail is shown to users. http_code is the site's status, for upstream_error.
       class Failure < StandardError
         attr_reader :code, :title, :http_code
 
@@ -22,12 +15,11 @@ module Api
 
       Candidate = Data.define(:feed, :subscription, :daily_entry_counts)
 
-      # As ApplicationController#looks_like_url?.
+      # Mirrors ApplicationController#looks_like_url?.
       def self.url?(query)
         query.start_with?("http") || (query.include?(".") && !query.include?(" "))
       end
 
-      # user:pass@ in the authority, which Feedkit would send.
       def self.credentials_in?(query)
         Feedkit::BasicAuth.parse(query).username.present?
       end
@@ -59,9 +51,7 @@ module Api
         feeds
       end
 
-      # Feedkit's errors, grouped by what the user can do about them. Raised
-      # from a rescue clause, a Failure skips the clauses after it. Anything
-      # unexpected stays a 500.
+      # A Failure raised in a rescue clause skips the clauses after it.
       def discover
         finder = FeedFinder.new(@query, username: @username, password: @password, raise_errors: true)
         feeds = finder.find
@@ -84,8 +74,6 @@ module Api
         Feed.search(@query).to_a
       end
 
-      # The page loaded and no source found a feed: markup (HTML, or a feed
-      # that could not be saved) has no feed; anything else is not a feed.
       def empty_page(response)
         parsed = response&.parse(validate: false)
         parsed ? failure(:no_feed_found, "This page doesn’t have a feed.") : not_a_feed

@@ -14,8 +14,7 @@ class Settings::ApiApplicationsController < ApplicationController
   def create
     application = @user.oauth_applications.new(application_params)
     if application.save
-      # Secrets are stored hashed, so this is the only time the plaintext
-      # exists. It survives the redirect in the encrypted session cookie.
+      # Secrets are stored hashed, so this is the only time the plaintext exists.
       flash[:plaintext_secret] = application.plaintext_secret if application.confidential?
       redirect_to settings_api_application_path(application), notice: "Application created."
     else

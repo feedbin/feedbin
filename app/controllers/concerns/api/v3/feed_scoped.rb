@@ -1,5 +1,3 @@
-# Loads @feed for a feed the user can read (FeedList). One that exists but
-# isn't readable is 403 not_readable; one that doesn't exist is 404.
 module Api
   module V3
     module FeedScoped

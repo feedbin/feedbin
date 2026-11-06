@@ -1,7 +1,5 @@
 module Api
   module V3
-    # Query-string parameters shared across v3: booleans, times (see
-    # Timestamp) and id lists.
     module Params
       MAX_IDS = 1_000
 
@@ -21,8 +19,7 @@ module Api
         Timestamp.parse(params[name]) or raise invalid_param(name, "invalid_value", "#{name} must be an RFC 3339 timestamp with a UTC offset.")
       end
 
-      # Comma-separated positive ids, at most max, without repeats. of names
-      # them in the message.
+      # `of` names the ids in error messages.
       def id_list(name, max: MAX_IDS, of: "ids")
         return nil unless params.key?(name)
         ids = params[name].to_s.split(",").map { Integer(_1.strip, exception: false) }
@@ -31,7 +28,6 @@ module Api
         ids.uniq
       end
 
-      # A bad query-string parameter: the pointer is its name.
       def invalid_param(name, code, detail)
         Problems::InvalidParameter.new(detail, pointer: name.to_s, code: code)
       end

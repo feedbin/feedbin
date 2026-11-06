@@ -1,11 +1,7 @@
-# Sample data for API v3: one user subscribed to a feed of every entry kind,
-# with the data shapes each kind carries (image rows, enclosures and
-# chapters, YouTube ids, newsletter senders, micropost authors and saved
-# link pages, saved pages, and revised entries with an original).
+# API v3 sample data: one user subscribed to a feed of every entry kind.
+# Rerunning replaces the previous sample user and feeds.
 #
 #   rails runner script/api_v3_sample_data.rb [entries per feed, default 200]
-#
-# Development only. Rerunning replaces the previous sample user and feeds.
 
 abort "Development only." unless Rails.env.development?
 
@@ -33,7 +29,6 @@ def image_row(entry_or_key, provider:, kind:, variant: "542x304", width: 542, he
   )
 end
 
-# Remove the previous run.
 if (old = User.find_by(email: EMAIL))
   feed_ids = old.subscriptions.pluck(:feed_id)
   entry_ids = Entry.where(feed_id: feed_ids).pluck(:id)
@@ -81,7 +76,7 @@ feeds = {
 feeds.each_value { user.subscriptions.create!(feed: _1) }
 image_row(feeds[:podcast].id.to_s, provider: :feed_icon, kind: :cover_art, variant: "200x200", width: 200, height: 200).update!(feed_id: feeds[:podcast].id)
 image_row(feeds[:micropost].id.to_s, provider: :feed_icon, kind: :avatar, variant: "200x200", width: 200, height: 200).update!(feed_id: feeds[:micropost].id)
-# Favicons and touch icons are found by host, shared by every feed on it.
+# Icons are looked up by host.
 feeds.values.map(&:host).uniq.each do |host|
   image_row(host, provider: :website_favicon, kind: :site_icon, variant: "32x32", width: 32, height: 32, bytesize: 1_000)
   image_row(host, provider: :website_touch_icon, kind: :site_icon, variant: "180x180", width: 180, height: 180, bytesize: 9_000)
@@ -165,8 +160,7 @@ PER_FEED.times do |index|
   ))
 end
 
-# Creating an entry marks it unread for subscribers, so everything starts
-# unread.
+# Creating an entry marks it unread for subscribers.
 entries = Entry.where(feed_id: feeds.values.map(&:id))
 
 application = user.oauth_applications.create!(name: "Sample", redirect_uri: "")

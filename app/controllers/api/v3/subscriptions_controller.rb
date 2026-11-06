@@ -1,10 +1,5 @@
 module Api
   module V3
-    # The user's subscriptions: one response with an ETag, ids by default,
-    # expand=feed,tags to embed the objects; the feeds a URL or search words
-    # offer (FeedCandidates); subscribe to several at once (Subscribe);
-    # retitle and set preferences; unsubscribe. The tag set and the OPML
-    # export are under Subscriptions::.
     class SubscriptionsController < ApiController
       include SubscriptionScoped
 
@@ -13,7 +8,6 @@ module Api
 
       before_action :set_subscription, only: [:show, :update, :destroy]
 
-      # Why nothing was found, as a problem the client can show.
       rescue_from FeedCandidates::Failure do |failure|
         render_problem :unprocessable_content, failure.code,
           title: failure.title, detail: failure.message, http_code: failure.http_code
@@ -29,8 +23,7 @@ module Api
         render json: serialize([@subscription]).first
       end
 
-      # POST, so neither what the user typed nor a feed password lands in a
-      # URL.
+      # Routed as POST so feed passwords never land in a URL.
       def new
         expand = expansions(CANDIDATE_EXPANSIONS)
         candidates = FeedCandidates.new(@user, candidate_query, **feed_credentials).candidates
@@ -82,8 +75,6 @@ module Api
         list
       end
 
-      # A merge patch: custom_title (null clears it) and preferences key by
-      # key.
       def subscription_params
         attributes = {}
         if body.key?("custom_title")

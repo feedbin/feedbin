@@ -1,9 +1,7 @@
 module Api
   module V3
-    # POST /devices: a push token registered from a request body. A token
-    # identifies one physical device across accounts (see Device.register),
-    # so registering it again updates that device and moves it to this
-    # account.
+    # A token identifies one physical device across accounts, so registering it
+    # again moves that device to this account.
     class DeviceRegistration
       include BodyFields
 
@@ -26,8 +24,7 @@ module Api
 
       private
 
-      # registered_with marks a device action pushes may reach
-      # (Device.v3_ios).
+      # registered_with: v3 makes the device reachable by action pushes (Device.v3_ios).
       def attributes
         token = required_string("push_token")
         device_type = one_of("platform", PLATFORMS)
@@ -35,9 +32,7 @@ module Api
         OPTIONAL.each { |field, column| attributes[column] = optional_string(field) }
 
         if device_type == "notifier"
-          # Pushes go out under the app's bundle id.
           raise invalid("app_bundle_id", "missing", "app_bundle_id is required for ios.") if attributes[:application].blank?
-          # Airshow's pushes are podcast episodes, sent by PodcastPushNotification.
           attributes[:device_type] = "podcast" if attributes[:application] == ENV["APPLE_PUSH_TOPIC_PODCAST"]
         end
         attributes

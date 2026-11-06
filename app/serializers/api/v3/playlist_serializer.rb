@@ -1,7 +1,5 @@
 module Api
   module V3
-    # The playlist object. sort is Airshow's sort_order under the spec's
-    # names.
     class PlaylistSerializer
       SORTS = {"custom" => "manual", "newest_first" => "published_desc", "oldest_first" => "published_asc"}.freeze
 

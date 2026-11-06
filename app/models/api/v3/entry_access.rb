@@ -1,8 +1,6 @@
 module Api
   module V3
-    # What the user may do with a set of entry ids, in three queries. The
-    # write rule is v2's: subscribed to the entry's feed or the entry starred.
-    # unread and queueable are extra facts some writes need.
+    # Writable means subscribed to the entry's feed or starred.
     class EntryAccess
       Permission = Struct.new(:entry, :subscribed, :starred, :unread, :queueable) do
         def found? = !entry.nil?

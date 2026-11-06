@@ -1,6 +1,4 @@
-# Mints a v3 access token for any local user, so a native client can sign in
-# during development without the browser flow. The route only exists in
-# development and test; the check here is a second lock.
+# Mints a token for any user. The route is development/test only; the env check is a second lock.
 class Oauth::DevelopmentTokensController < ActionController::API
   def create
     return head :not_found unless Rails.env.local?

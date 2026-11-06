@@ -125,8 +125,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     assert Entry.exists?(theirs.id)
   end
 
-  # SavePage fills a YouTube page from its embed with a second save, which
-  # clears previously_new_record?.
+  # SavePage saves YouTube pages twice, which clears previously_new_record?.
   test "a new page filled in after it is created is still 201" do
     SavePage.stub(:new, Object.new.tap { |saver|
       saver.define_singleton_method(:perform) do |user_id, url, title, path = nil|

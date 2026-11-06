@@ -1,11 +1,8 @@
 module Api
   module V3
-    # A registered push device, without its token. An iOS device is stored
-    # as a notifier.
     class DeviceSerializer
       PLATFORMS = {"notifier" => "ios", "safari" => "safari"}.freeze
-      # How each device type reads back: Airshow registers as ios and is
-      # stored as a podcast device.
+      # Airshow registers as ios but is stored as podcast.
       SHOWN = PLATFORMS.merge("podcast" => "ios").freeze
 
       def initialize(device)

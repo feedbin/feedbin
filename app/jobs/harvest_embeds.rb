@@ -49,8 +49,7 @@ class HarvestEmbeds
     [iframed.compact.uniq, linked]
   end
 
-  # The feed crawler queues video ids before the entry exists, so a video
-  # can be stored before its EntryVideo row; the entry is marked edited then.
+  # A video can be stored before its EntryVideo row; the entry is marked edited then.
   def record_videos(entry, video_ids)
     added = EntryVideo.record(entry_id: entry.id, provider_ids: video_ids)
     return if added.empty?
@@ -92,8 +91,7 @@ class HarvestEmbeds
       Embed.new(data: item, provider_id: item["id"], parent_id: parent_id, source: source)
     end
 
-    # A live stream is fetched hourly; an unchanged answer must not touch
-    # its entries or channel.
+    # Live streams are refetched hourly; an unchanged answer must not touch anything.
     def changed_embeds(embeds)
       return [] if embeds.empty?
       stored = Embed.where(provider_id: embeds.map(&:provider_id).uniq)
@@ -110,8 +108,7 @@ class HarvestEmbeds
       requeue_live_videos(videos)
     end
 
-    # The channels request can fail while the videos one succeeded, so a
-    # video may have no parent.
+    # The channels request can fail independently, so a video may have no parent.
     def crawl_channel_images(videos, changed)
       videos.filter_map(&:parent).uniq.each do |channel|
         next if channel.channel_image && !changed.include?(channel.provider_id)

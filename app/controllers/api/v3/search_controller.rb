@@ -1,7 +1,5 @@
 module Api
   module V3
-    # GET /search: full-text search with the structured parameters folded
-    # into the query, paged by cursor with no depth limit.
     class SearchController < ApiController
       include SearchPage
 

@@ -1,8 +1,5 @@
 module Api
   module V3
-    # OPML imports. The body is the document itself, not JSON, so the JSON
-    # content type check does not apply to create. Limits match the web
-    # importer: 500 KB, six uploads per four hours.
     class ImportsController < ApiController
       MEDIA_TYPES = %w[text/x-opml application/xml text/xml].freeze
       MAX_BYTES = 500.kilobytes
@@ -12,8 +9,7 @@ module Api
       skip_before_action :validate_content_type, only: :create
       before_action :ensure_opml, :throttle, only: :create
 
-      # A filename puts the import on the web's Import & Export page, where
-      # fixable items can be resolved.
+      # A filename makes the import show on the web's Import & Export page.
       def create
         import = @user.imports.new(xml: request.raw_post, filename: "#{@token.application&.name || "API"} import")
         if import.save
@@ -29,7 +25,7 @@ module Api
 
       private
 
-      # Cheapest first: nothing is parsed until the size is known.
+      # Size is checked before the body is parsed.
       def ensure_opml
         return not_opml unless MEDIA_TYPES.include?(request.media_type)
         raise Problems::InvalidParameter.new("The OPML must be smaller than 500 KB.", pointer: "", code: "too_large") if request.raw_post.bytesize > MAX_BYTES

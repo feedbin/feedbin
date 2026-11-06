@@ -10,8 +10,7 @@ class DevicePushNotificationSend
     team_id: ENV["APPLE_TEAM_ID"],
     key_id: ENV["APPLE_KEY_ID"]
   }
-  # Production serves App Store and TestFlight builds; a development
-  # server serves Xcode builds, whose tokens belong to APNs's sandbox.
+  # Xcode builds register APNs sandbox tokens, which only development serves.
   APNOTIC_POOL = Apnotic::ConnectionPool.public_send(Rails.env.production? ? :new : :development, apnotic_options, size: 5) { |connection|
     connection.on(:error) { |exception| ErrorService.notify(exception) }
   }
@@ -72,9 +71,7 @@ class DevicePushNotificationSend
     self.class.report_refusals(refused)
   end
 
-  # Reasons that are our setup or the app's registration, not a device
-  # gone away (TopicDisallowed, DeviceTokenNotForTopic, InvalidProviderToken),
-  # once per reason and topic rather than once per device.
+  # Configuration errors, not dead devices: reported once per reason and topic.
   def self.report_refusals(refused, job: name)
     refused.each do |(reason, topic), count|
       ErrorService.notify(error_class: "#{job}##{reason}", error_message: "APNs refused #{count} pushes: #{reason}", parameters: {topic: topic, count: count})

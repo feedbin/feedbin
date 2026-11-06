@@ -1,9 +1,7 @@
 module Api
   module V3
     module Feeds
-      # GET /feeds/lookup: any feed Feedbin can reach (FeedLookup), with its
-      # entries newest published first. It takes no token: the feed URL is
-      # the credential, so it is throttled by address instead.
+      # No token: the feed URL is the credential.
       class LookupsController < ApiController
         skip_before_action :authenticate, :authorize_account
         before_action :throttle

@@ -1,12 +1,5 @@
-# Measures two costs of v3 polling on real data. Read-only: each runs in a
-# READ ONLY transaction with a 30 second statement_timeout.
-#
-# 1. An empty arrivals page: GET /v3/entries with a received_asc cursor at
-#    the user's newest entry, which is what a quiet poll asks (feedbin-api-docs
-#    design.md, open question 20).
-# 2. The ETags of the user's unread and starred id lists: the fingerprint
-#    Api::V3::Conditional computes on every poll of /collections/{id}/ids,
-#    the work a 304 still does.
+# Measures v3 polling costs on real data, read-only with a 30s statement_timeout:
+# an empty received_asc page of /v3/entries, and the unread/starred ids ETags.
 #
 # Usage: bin/rails runner script/measure_v3_sync.rb USER_ID
 

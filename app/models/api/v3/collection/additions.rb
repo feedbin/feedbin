@@ -1,9 +1,6 @@
 module Api
   module V3
     class Collection
-      # Entries joining Recently Read, Recently Played or Airshow's queue,
-      # from a body of {ids:, playlist_id:}. Each list has its own rule for
-      # who may add an entry; an id that fails it is skipped, not fatal.
       # => {applied: [ids], skipped: [{id:, reason:}]}
       class Additions
         include BodyFields
@@ -50,9 +47,8 @@ module Api
           true
         end
 
-        # Airshow plays episodes of podcasts the reader may not subscribe to,
-        # so a podcast subscription or a queued episode is enough, as the
-        # web's can_read_entry? allows the queue.
+        # Airshow plays podcasts the reader may not subscribe to, so a podcast
+        # subscription or a queued episode is enough.
         def add_recently_played(permission)
           @queued_ids ||= @user.queued_entries.pluck(:entry_id).to_set
           return false unless permission.writable? || permission.queueable || @queued_ids.include?(permission.entry.id)
@@ -60,8 +56,6 @@ module Api
           true
         end
 
-        # Queueing needs the podcast subscription Airshow keeps, not the
-        # reader's.
         def add_queued(permission)
           return false unless permission.queueable
           entry = permission.entry
@@ -79,7 +73,6 @@ module Api
           ids.uniq
         end
 
-        # Checked before any id is added, so a bad playlist writes nothing.
         def playlist_id
           return @playlist_id if defined?(@playlist_id)
           id = body["playlist_id"]

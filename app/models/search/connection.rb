@@ -53,9 +53,8 @@ module Search
       Response.new(data, page: page, per_page: per_page)
     end
 
-    # One page of hits after a position, for cursor paging with no depth
-    # limit. after is the previous page's last sort values, or nil. The
-    # query's sort must end in a tiebreak the caller added.
+    # after: the previous page's last sort values, or nil. The query's sort must
+    # end in a unique tiebreak.
     def search_after(index, query:, size:, after: nil)
       path = PATHS[:search] % {index:}
       body = query.merge(size: size.to_i.clamp(1, MAX_PER_PAGE))

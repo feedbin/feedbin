@@ -1,8 +1,6 @@
 module Api
   module V3
     module Collections
-      # GET /collections/{id}/ids: the whole id list, with an ETag that
-      # answers a quiet poll without loading it. The timeline has none.
       class IdsController < ApiController
         include CollectionScoped
 

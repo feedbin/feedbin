@@ -1,9 +1,7 @@
 module Api
   module V3
-    # The subscription object: one row of the user's feed list. The default
-    # shape carries feed_id and tag_ids; expand=feed,tags adds the objects.
-    # tags is [[id, name], ...] in display order; feed is the feed's
-    # serialized hash, built once per feed, needed only with expand=feed.
+    # tags: [[id, name], ...] in display order. feed: the serialized feed hash,
+    # needed only with expand=feed.
     class SubscriptionSerializer
       EXPANSIONS = %w[feed tags].freeze
 
@@ -36,16 +34,11 @@ module Api
 
       private
 
-      # The effective title, never null: the user's, else the feed's, else
-      # where the feed lives. "Untitled" is the web app's word for a feed
-      # that has none of them (Feed.include_user_title).
       def title
         @subscription.title.presence || @subscription.feed&.hostname || "Untitled"
       end
 
-      # The columns are nullable, and some rows hold NULL (the add-feed form
-      # used to write one for an unchecked box). NULL reads as the column's
-      # default.
+      # The columns are nullable and some rows hold NULL; read it as the default.
       def preference(name)
         value = @subscription[name]
         value.nil? ? Subscription.column_defaults.fetch(name.to_s) : value

@@ -20,8 +20,7 @@ module Api
         @user.oauth_access_tokens.where(revoked_at: nil)
       end
 
-      # A token can revoke itself; revoking another needs account, checked
-      # before the lookup so the answer doesn't say which ids exist.
+      # Scope is checked before the lookup so the response doesn't reveal which ids exist.
       def ensure_may_revoke
         require_scope("account") unless params[:id].to_s == @token.id.to_s
       end

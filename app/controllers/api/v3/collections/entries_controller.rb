@@ -1,10 +1,6 @@
 module Api
   module V3
     module Collections
-      # A collection's entries with their membership, and the writes to one
-      # membership: add (Recently Read, Recently Played, Airshow), and
-      # Airshow's update and remove. Unread, Starred and Updated are written
-      # with the state verbs instead.
       class EntriesController < ApiController
         include CollectionScoped
         include SearchPage

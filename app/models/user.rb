@@ -232,8 +232,7 @@ class User < ApplicationRecord
     update(setting_symbol => "0")
   end
 
-  # Feature flag for API v3: the settings page, OAuth authorization, and the
-  # API itself. Turn it on with user.setting_on!(:api_v3).
+  # Gates the API v3 settings page, OAuth authorization and API.
   def api_v3_enabled?
     setting_on?(:api_v3)
   end

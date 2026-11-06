@@ -1,6 +1,4 @@
-# Receipt verification against Apple's verifyReceipt service, for the v3
-# purchase endpoint (POST /v3/account/purchases). Returns Apple's parsed
-# JSON; status 0 is a verified receipt and 21007 means "try the sandbox".
+# Returns Apple's parsed JSON: status 0 is verified, 21007 means "try the sandbox".
 class AppStoreReceipt
   def self.verify(receipt_data)
     endpoints = Feedbin::Application.config.iap_endpoint
@@ -14,8 +12,7 @@ class AppStoreReceipt
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-    # Net::HTTP waits 60 seconds per phase by default, and this runs in a
-    # request thread.
+    # Net::HTTP waits 60s per phase by default; this runs in a request thread.
     http.open_timeout = 5
     http.write_timeout = 5
     http.read_timeout = 10

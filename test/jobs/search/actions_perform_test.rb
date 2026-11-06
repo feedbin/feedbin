@@ -85,8 +85,6 @@ module Search
       assert_equal [[[@user.id], @entry.id, true]], WebPushNotificationSend.jobs.map { _1["args"] }
     end
 
-    # The retired Feedbin Notifier's rule is hidden everywhere, so it must not
-    # start pushing to devices it never reached.
     test "a notifier action pushes nothing" do
       notifier = Action.create(user: @user, action_type: :notifier, query: @entry.title, feed_ids: @feeds.map(&:id), actions: ["send_ios_notification"])
       Sidekiq::Worker.clear_all

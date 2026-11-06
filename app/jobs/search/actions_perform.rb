@@ -17,8 +17,7 @@ module Search
         queues = {}
         user_actions = {}
         actions.each do |action_id, user_id, action_names, action_type|
-          # The retired Feedbin Notifier's rule: hidden in v3 and on the web,
-          # so its owner could not stop new pushes. It pushes nothing.
+          # Retired Notifier rules are hidden, so their owners couldn't stop pushes.
           action_names -= PUSHES if action_type == "notifier"
           user_actions[user_id] ||= []
           user_actions[user_id] << action_id
@@ -28,9 +27,6 @@ module Search
           end
         end
 
-        # send_ios_notification is the retired Notifier's value. Both push to
-        # every device the user has registered, once per user however many
-        # actions matched.
         pushes = PUSHES.each_with_object(Set.new) { |name, users| users.merge(queues.delete(name) || []) }
         if !update && pushes.any?
           priority_image_crawl

@@ -1,5 +1,3 @@
-# expand=a,b: the related objects and optional bodies a response adds to its
-# default shape, which carries ids. Each controller says which names it takes.
 module Api
   module V3
     module Expansion
@@ -18,9 +16,7 @@ module Api
         end
       end
 
-      # Entries as the entry object. With expand=feed, each feed is
-      # serialized once per response, however many of its entries there are.
-      # memberships: {entry id => membership hash}, on collection reads.
+      # memberships: {entry id => membership hash}
       def serialize_entries(entries, memberships: {})
         expand = expansions(EntrySerializer::EXPANSIONS)
         feeds = expand.include?("feed") ? serialize_feeds(entries.map(&:feed)) : {}

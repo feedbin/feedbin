@@ -1,11 +1,6 @@
-# What each docs page needs beyond ApiDocs::World, keyed by the page's path
-# under _endpoints/, and the request each object page's example comes from.
-# A block runs in the test, before the request, inside the transaction that
-# rolls back after it. Network access is blocked, so a page that reaches
-# out needs its stub here.
+# Per-page setup beyond ApiDocs::World, keyed by path under _endpoints/. Blocks
+# run inside the rolled-back transaction; network is blocked, so stub it here.
 module ApiDocs
-  # The unread timeline shows one source's entry at a time, as the example
-  # switcher presents it.
   scenario "entries/list", per_source: true do |source|
     UnreadEntry.where(user_id: 1).where.not(entry_id: source["entry_id"]).delete_all
     entry = Entry.find(source["entry_id"])
@@ -14,8 +9,7 @@ module ApiDocs
 
   scenario "feeds/entries", per_source: true
 
-  # Looked up recently, so the lookup serves what Feedbin has instead of
-  # fetching the feed again.
+  # Recently looked up, so the lookup doesn't refetch the feed.
   scenario "feeds/lookup" do
     Feed.where(id: 2210).update_all(standalone_request_at: NOW - 10.minutes)
   end
@@ -55,8 +49,7 @@ module ApiDocs
     OPML
   }
 
-  # Object pages. Each shows every field the object can have, so its
-  # request asks for every expansion.
+  # Object pages request every expansion.
   object "account", "/account"
   object "action", "/actions", pick: "data/0"
   object "attachment", "/entries?ids=2947218", pick: "data/0/attachments"
@@ -70,8 +63,7 @@ module ApiDocs
   object "token", "/tokens", pick: "data/0"
   object "video", "/entries?ids=2948530", pick: "data/0/videos/0"
 
-  # An entry with everything: its feed, both optional bodies, and the
-  # membership a collection read adds, from Airshow's queue.
+  # Read from Airshow's queue so the entry carries collection membership.
   object "entry", "/collections/queue/entries?expand=feed,changes,original_newsletter", per_source: true, pick: "data/0" do |source|
     QueuedEntry.where(user_id: 1).delete_all
     entry = Entry.find(source["entry_id"])
@@ -79,9 +71,7 @@ module ApiDocs
       playlist_id: 2, created_at: Time.utc(2026, 9, 8, 14, 2, 11), updated_at: Time.utc(2026, 9, 8, 14, 2, 11))
   end
 
-  # Snippets for prose. The envelope, on conventions.md: a timeline page
-  # with a next page. Lookup by id, on List entries: one id the user can't
-  # read.
+  # Snippets for prose.
   snippet "envelope", "/entries?limit=2"
   snippet "entries-by-id", "/entries?ids=2947218,2946102,2940771"
 end

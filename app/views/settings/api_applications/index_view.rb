@@ -56,7 +56,6 @@ module Settings
         end
       end
 
-      # Tokens the user granted to other people's apps through OAuth.
       def authorized_applications
         tokens = @user.oauth_access_tokens
           .where(revoked_at: nil)

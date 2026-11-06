@@ -1,8 +1,5 @@
 module Api
   module V3
-    # Airshow playlist writes from a request body. title and sort are edited
-    # offline, so on an update each carries {field}_updated_at and the newer
-    # value wins; a same-second write is a tie and is accepted.
     class PlaylistWrite
       include BodyFields
 
@@ -16,9 +13,8 @@ module Api
         @body = body
       end
 
-      # A title the user already has returns that playlist, as Airshow v1
-      # does, so a device that created it offline can claim it.
-      # => [playlist, created]
+      # An existing title returns that playlist, so a device that created it offline
+      # can claim it. => [playlist, created]
       def create
         title = required_string("title")
         sort = body.key?("sort") ? sort_order : "custom"

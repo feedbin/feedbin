@@ -1,8 +1,6 @@
 module Api
   module V3
     module Subscriptions
-      # PUT /subscriptions/{id}/tags: the whole tag set, answered with the
-      # subscription's tags.
       class TagsController < ApiController
         include SubscriptionScoped
 

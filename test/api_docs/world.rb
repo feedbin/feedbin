@@ -1,17 +1,12 @@
 module ApiDocs
-  # The docs' fake account: one user, the six sources in feedbin-api-docs'
-  # _data/examples/sources.yml with the ids every example uses, and what
-  # hangs off them. Rows are inserted with explicit ids and timestamps so
-  # every run writes the same examples. Content was first copied from the
-  # hand-written examples these replaced.
+  # The docs' fake account, built from _data/examples/sources.yml. Explicit
+  # ids and timestamps keep examples identical across runs.
   module World
     IMAGE_HOST = "https://images.feedbin.com"
 
     module_function
 
-    # Rows the world creates without an id take one from Sequences::WORLD.
-    # Then each table's next id follows its highest example id, so a row a
-    # request creates looks like the next one: saved search 13 after 12.
+    # Afterwards each table's next id follows its highest example id.
     def build
       Sequences.reset(start: Sequences::WORLD)
       user
@@ -232,8 +227,7 @@ module ApiDocs
       )
     end
 
-    # A feed the user doesn't subscribe to: Find feeds offers it beside the
-    # main feed, and its entry is the one a write skips as not subscribed.
+    # Not subscribed.
     def daring_fireball_articles
       feed = feed!(
         id: 1357, title: "Daring Fireball (Articles)", feed_url: "https://daringfireball.net/feeds/articles",
@@ -247,10 +241,7 @@ module ApiDocs
         content: "<p>On the small things that wear you down.</p>",
         published: Time.utc(2026, 9, 6, 14, 12, 40), created_at: Time.utc(2026, 9, 6, 14, 13, 2)
       )
-      # Entries a day for the last 30 days, oldest first, as the add-feed
-      # sparkline draws them. FeedStat counts back from the database's
-      # CURRENT_DATE, which the frozen clock doesn't reach, so rows are dated
-      # from it too.
+      # Daily counts, oldest first. Dated from CURRENT_DATE, which FeedStat uses and the frozen clock doesn't reach.
       {1356 => [3, 4, 2, 0, 5, 3, 4, 3, 2, 6, 3, 4, 2, 3, 5, 4, 3, 2, 4, 3, 5, 2, 3, 4, 6, 3, 2, 4, 3, 5],
        1357 => [0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1]}.each do |feed_id, counts|
         counts.each_with_index do |count, index|
@@ -270,8 +261,6 @@ module ApiDocs
       Tagging.create!(user: current_user, feed_id: 2210, tag: podcasts)
     end
 
-    # Unread: every entry but the saved page. Starred: the Daring Fireball
-    # piece. Recently read: the newsletter. Updated: the edited article.
     def states
       user = current_user
       Entry.where(feed_id: user.subscriptions.select(:feed_id)).where.not(feed_id: 4410).find_each do |entry|
@@ -282,8 +271,6 @@ module ApiDocs
       UpdatedEntry.create!(user: user, entry_id: 2945880, feed_id: 1356, published: Time.utc(2026, 9, 4, 4, 30), updated: Time.utc(2026, 9, 4, 6, 2, 44))
     end
 
-    # Airshow: this week's ATP episode, part played, in the Commute
-    # playlist, then last week's. Recently played: last week's.
     def collections
       user = current_user
       Playlist.create!(id: 2, user: user, title: "Commute", sort_order: :custom, created_at: Time.utc(2025, 1, 10, 8, 44, 19), updated_at: Time.utc(2026, 8, 30, 19, 11, 52))
@@ -293,9 +280,7 @@ module ApiDocs
       RecentlyPlayedEntry.create!(user: user, entry_id: 2946102, progress: 2210, duration: 6135, created_at: Time.utc(2026, 8, 29, 7, 15, 2))
     end
 
-    # Token 88 makes every request: "current" in the token list. 61 is the
-    # user's other device. Doorkeeper stores only a hash, so the secret goes
-    # in through the generator.
+    # Doorkeeper stores only a hash, so the secret goes in through the generator.
     def token
       application = Doorkeeper::Application.create!(id: 31, name: "Unread", redirect_uri: "", scopes: Api::V3::Scopes::FIRST_PARTY, owner: current_user)
       {61 => ["Reeder on Ben’s Mac", Time.utc(2026, 4, 12, 9, 30, 15), Time.utc(2026, 9, 7, 22, 3, 51), "fbn_v3_docsotherdevicetoken0000000000"],
@@ -319,8 +304,6 @@ module ApiDocs
       import.import_items.create!(status: :failed, details: {title: "Old Blog", xml_url: "https://example.com/rss", html_url: "https://example.com"})
     end
 
-    # Elasticsearch has the entries, for search, actions and saved
-    # searches, and the feeds, for Find feeds.
     def index
       records = [*Entry.where(feed_id: [1356, 1357, 2210, 3021, 3877, 4102, 4410]), *Feed.where(id: [1356, 1357, 2210, 3021, 3877, 4102])].map do |record|
         Search::BulkRecord.new(action: "index", index: Search.index_name(record.class.table_name), id: record.id, document: record.search_data)
@@ -330,8 +313,6 @@ module ApiDocs
         client.refresh
       end
     end
-
-    # Helpers
 
     def feed!(id:, **attributes)
       Feed.insert!({id: id, created_at: Time.utc(2012, 1, 1), updated_at: Time.utc(2026, 9, 9), feed_type: Feed.feed_types[attributes.delete(:feed_type) || :xml]}.merge(attributes))
@@ -369,19 +350,14 @@ module ApiDocs
     end
   end
 
-  # Rows a request creates get the next id from the table's sequence. Set
-  # every sequence to a fixed value so a created row's id is the same on
-  # every run, whatever the test database has seen.
+  # Fixed sequences, so rows a request creates get the same id every run.
   module Sequences
     module_function
 
-    # Where the world's unnamed rows start: above every example id, below
-    # every fixture id (fixture ids are hashes of their labels, all above
-    # 30,000,000).
+    # Above every example id, below every fixture id (all above 30,000,000).
     WORLD = 20_000_000
 
-    # start: every sequence's next value. Without it, each table's next id
-    # is one past its highest example id.
+    # Without start, each table's next id is one past its highest id.
     def reset(start: nil)
       connection = ActiveRecord::Base.connection
       connection.select_rows(<<~SQL).each do |table, sequence|

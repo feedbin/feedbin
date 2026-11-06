@@ -1,18 +1,10 @@
 module Api
   module V3
-    # The entry object. Load entries with Entry.for_api_v3 so the image rows,
-    # feed, and stored rendering come preloaded. The default shape carries feed_id;
-    # expand names what to add (EXPANSIONS): the feed (feed is its serialized
-    # hash, built once per feed) and the optional bodies under content. A
-    # body not asked for is left out, one asked for that the entry does not
-    # have is null.
+    # Load entries with Entry.for_api_v3 to avoid N+1 queries.
     class EntrySerializer
       EXPANSIONS = %w[feed changes original_newsletter].freeze
 
-      # membership is what a collection knows about the entry, serialized;
-      # present only on collection reads. videos is the entry's list from
-      # VideoLoader, which a page of entries loads once; left out, the entry
-      # loads its own.
+      # videos: preloaded from VideoLoader; nil loads this entry's own.
       def initialize(entry, feed: nil, expand: [], membership: nil, videos: nil)
         @entry = entry
         @feed = feed
@@ -82,20 +74,15 @@ module Api
         end
       end
 
-      # A micropost author's handle, "@name", as Micropost reads it (the post's
-      # author data, else an RSS feed's profile link). nil for any other kind.
       def author_handle
         return nil unless kind == "micropost"
         @entry.micropost&.author_username.presence&.then { "@#{it.delete_prefix("@")}" }
       end
 
-      # A newsletter has no page of its own, so its url is Feedbin's copy.
       def url
         @url ||= (kind == "newsletter") ? @entry.newsletter_url : @entry.fully_qualified_url
       end
 
-      # Episode art or a micropost author's avatar, then a YouTube channel's
-      # picture, then a podcast's show art.
       def icon_record
         @entry.icon_image_record ||
           (@entry.channel_image_record if kind == "video") ||
@@ -103,8 +90,7 @@ module Api
           feed_avatar_record
       end
 
-      # A micropost without its own avatar row (the crawl can miss one) falls back to the feed's icon, but only when
-      # that icon is itself an avatar: a single-author feed like a Mastodon account. A site logo would be wrong here.
+      # Only an avatar icon (single-author feeds) can stand in for a micropost author.
       def feed_avatar_record
         return unless kind == "micropost"
         record = @entry.feed.icon_image_record
@@ -168,7 +154,6 @@ module Api
         {provider: "youtube", id: @entry.provider_id, channel_id: @entry.provider_parent_id}
       end
 
-      # The body object: html always, then each optional body in INCLUDES order.
       def content
         body = {html: content_html}
         body[:changes] = changes if @expand.include?("changes")
@@ -183,22 +168,18 @@ module Api
         @entry.content
       end
 
-      # The current body with the edit since the original marked as
-      # insertions and deletions. Stored with the rendering; nil until an edit.
+      # nil until the entry is edited.
       def changes
         @entry.content_diff&.then { {html: _1.to_s} }
       end
 
-      # The email as it was sent, lightly formatted: relaxed sanitization,
-      # proxied images, and layout breakpoints pushed out of a reader pane's
-      # reach. Rendered on request; nil for anything but a newsletter.
+      # Rendered on request, not stored; nil for anything but a newsletter.
       def original_newsletter
         return nil unless kind == "newsletter"
         {html: ContentFormatter.newsletter_format(@entry.content).to_s}
       end
 
-      # The article a micropost links to, as HarvestLinks saved it (it saves
-      # the first link only), with the stored api rendering. nil otherwise.
+      # HarvestLinks saves only a micropost's first link.
       def extracted
         url, html = @entry.rendering.extracted_pages.first
         page = url && saved_page(url) or return nil

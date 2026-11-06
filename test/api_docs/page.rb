@@ -1,10 +1,6 @@
 module ApiDocs
-  # One page of feedbin-api-docs: an endpoint (_endpoints/<resource>/<name>.md)
-  # or an object (_objects/<name>.md). An endpoint's front matter is the
-  # request: method, route or example_path, example_query and request, the
-  # same fields the docs' curl example is built from, so the two can't
-  # disagree. {feed_id}, {entry_id} and {subscription_id} fill from a source
-  # in _data/sources.yml.
+  # A docs page. An endpoint's request is read from the same front matter its
+  # curl example uses; {feed_id}-style tokens fill from _data/sources.yml.
   class Page
     TOKEN = /\{(\w+_id)\}/
 
@@ -31,8 +27,7 @@ module ApiDocs
       "/v3#{fill(front_matter["example_path"] || front_matter.fetch("route"), source)}"
     end
 
-    # The query as [[name, value]] pairs, decoded: the docs write it the way
-    # a reader would type it, such as with spaces in a search.
+    # Decoded: the docs write queries as typed, e.g. with spaces.
     def query(source)
       text = front_matter["example_query"] or return []
       fill(text, source).split("&").map { |pair| pair.split("=", 2).map { CGI.unescape(it.to_s) } }
@@ -42,7 +37,6 @@ module ApiDocs
       front_matter["request"]&.then { fill(it.strip, source) }
     end
 
-    # The tokens the request uses, such as "entry_id".
     def tokens
       [front_matter["example_path"], front_matter["example_query"], front_matter["request"]].compact.flat_map { it.scan(TOKEN).flatten }.uniq
     end

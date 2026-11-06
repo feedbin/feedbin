@@ -1,19 +1,8 @@
-# The timeline: entries newest received first, with the filters, the cursor
-# that carries its own order, the two stream cursors on the first page, and
-# the tail cursor on a stream's last page. GET /entries and
-# GET /feeds/{id}/entries share it; a controller sets the base scope and
-# whether the page hands out stream cursors.
 module Api
   module V3
     module Timeline
       extend ActiveSupport::Concern
 
-      # There is no sort parameter. The timeline is newest received first, and
-      # a cursor carries its own order: a timeline page continues the
-      # timeline, and the two stream cursors a timeline page hands out
-      # (meta.arrivals_cursor, meta.edits_cursor) follow arrivals and edits
-      # oldest first. A stream's last page still ends with a cursor
-      # (tail_cursor).
       TIMELINE = "received_desc"
       ORDERS = {
         "received_desc" => [:created_at, :desc],
@@ -22,8 +11,7 @@ module Api
       }.freeze
       STREAMS = %w[received_asc edited_asc].freeze
 
-      # One keyset page of the timeline in an order. script/measure_v3_sync.rb
-      # runs it too.
+      # Also called by script/measure_v3_sync.rb.
       def self.page(scope, order, limit:, cursor: nil)
         column, direction = ORDERS.fetch(order)
         scope = scope.where.not(edited_at: nil) if order == "edited_asc"
@@ -32,13 +20,10 @@ module Api
 
       private
 
-      # The entries the timeline draws from. Overridden for one feed.
       def timeline_base
         Entry.where(feed_id: @user.subscriptions.select(:feed_id))
       end
 
-      # Whether the first page carries meta.arrivals_cursor and
-      # meta.edits_cursor. Only the whole timeline does.
       def streams?
         true
       end
@@ -63,11 +48,7 @@ module Api
         meta
       end
 
-      # The default timeline page hands a client its two stream positions, so
-      # it can show the newest entries and start following arrivals and edits
-      # from there without paging through history. Arrivals resume after the
-      # newest entry on the page; edits from the response time, since the
-      # page already carries every edit made before it.
+      # Edits resume from now: the page already reflects every earlier edit.
       def stream_cursors(entries)
         now = microseconds(Time.now)
         arrivals = entries.any? ? [microseconds(entries.first.created_at), entries.first.id] : [now, 0]
@@ -77,9 +58,7 @@ module Api
         }
       end
 
-      # A stream's last page still ends with a cursor to resume from: after
-      # the last entry, or the cursor the client sent when nothing is new. A
-      # stream is only ever entered through a cursor, so one is always there.
+      # Streams are only entered through a cursor, so params[:cursor] is present.
       def tail_cursor(page)
         page.records.any? ? page.cursor_at(page.records.last) : params[:cursor]
       end
@@ -104,7 +83,6 @@ module Api
         scope
       end
 
-      # The order comes from the cursor; without one, the timeline.
       def order
         @order ||= begin
           fields = cursor_fields

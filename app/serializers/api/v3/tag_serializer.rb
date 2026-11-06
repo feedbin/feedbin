@@ -1,7 +1,6 @@
 module Api
   module V3
-    # The tag object. Tags are global rows keyed by name; what belongs to the
-    # user is the set of tagged subscriptions, so subscription_ids is passed in.
+    # Tags are global rows, so the user's subscription_ids are passed in.
     # tags.name is nullable; a nameless tag is "".
     class TagSerializer
       def initialize(tag, subscription_ids:)

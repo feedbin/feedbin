@@ -1,15 +1,9 @@
 module Api
   module V3
-    # The videos lists for a page of entries: the YouTube videos each entry's
-    # API rendering iframes, serialized from their harvested Embed rows.
-    # Read at response time, so a re-harvest (a live stream that ended, a
-    # description that gained chapters) shows without re-rendering. Three
-    # queries for the whole page: videos, channels, channel avatars.
     class VideoLoader
       IFRAME_SRC = /<iframe\b[^>]*?\ssrc\s*=\s*(["'])(.*?)\1/im
 
-      # YouTube ids of the iframes in html, first appearance first. A scan,
-      # not a parse: this runs over every entry of every response.
+      # A regex scan, not a parse: this runs over every entry of every response.
       def self.video_ids(html)
         return [] if html.blank?
         html.scan(IFRAME_SRC).filter_map do |_, src|
@@ -18,8 +12,7 @@ module Api
         end.uniq
       end
 
-      # {entry id => [video object]} for every entry. A video with no Embed
-      # row (harvest pending, deleted, private) is left out.
+      # {entry id => [video object]}. Videos with no Embed row are left out.
       def self.call(entries)
         ids = entries.to_h { [it.id, video_ids(it.rendering.api)] }
         wanted = ids.values.flatten.uniq

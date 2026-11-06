@@ -1,10 +1,7 @@
 module Api
   module V3
-    # Typed readers for a JSON request body. Each takes the field's name and
-    # by default reads it from #body; a bad value raises InvalidParameter with
-    # a JSON pointer to the field, under @pointer when the body sits inside a
-    # larger one. A nested field is named by its path ("preferences/muted"),
-    # and the message names only its last segment.
+    # Typed readers for a JSON body. A bad value raises InvalidParameter pointing
+    # at the field (under @pointer); nested fields are paths like "preferences/muted".
     module BodyFields
       private
 
@@ -28,7 +25,7 @@ module Api
         value
       end
 
-      # choices is a list, or a hash from wire values to stored ones.
+      # choices: a list, or {wire value => stored value}.
       def one_of(field, choices, value = body[field], detail: "#{label(field)} must be one of #{choices.to_a.map { Array(_1).first }.join(", ")}.")
         raise invalid(field, "invalid_value", detail) unless choices.include?(value)
         choices.is_a?(Hash) ? choices.fetch(value) : value

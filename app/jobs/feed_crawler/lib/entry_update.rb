@@ -33,16 +33,13 @@ module FeedCrawler
         end
       end
 
-      # API v3's revision: every change a reader could see, not only the
-      # significant ones that notify.
       revised = changes.intersect?(REVISED_ATTRIBUTES)
       update["edited_at"] = Time.now if revised
 
       Sidekiq.logger.info "Updating entry=#{@original_entry.public_id} changes=#{changes.join(",")}"
 
       @original_entry.update(update)
-      # Incremented in SQL: EntryVideo bumps the column too, and a value read
-      # when this entry was loaded would undo one of theirs.
+      # Incremented in SQL so a concurrent EntryVideo bump isn't overwritten.
       Entry.update_counters(@original_entry.id, revision: 1) if revised
 
       Librato.increment("entry.update")

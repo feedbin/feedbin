@@ -1,8 +1,6 @@
 module Api
   module V3
-    # The user's tags with the subscriptions in each, in natural name order.
-    # Tags are shared rows; a user "has" a tag through taggings on feeds they
-    # subscribe to.
+    # Tags are shared rows; a user has a tag through taggings on subscribed feeds.
     class TagList
       def initialize(user)
         @user = user

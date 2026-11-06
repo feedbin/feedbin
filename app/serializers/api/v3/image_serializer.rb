@@ -1,6 +1,5 @@
 module Api
   module V3
-    # The image object: one stored rendition on Feedbin's image host.
     class ImageSerializer
       def initialize(image)
         @image = image
