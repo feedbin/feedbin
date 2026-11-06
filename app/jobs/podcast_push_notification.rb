@@ -22,7 +22,7 @@ class PodcastPushNotification
     end
 
     if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
-      Rails.logger.info { "Bad device token user_id=#{user_id}" }
+      Sidekiq.logger.info "Bad device token user_id=#{user_id}"
       remove_device(token)
     end
   end
@@ -31,10 +31,10 @@ class PodcastPushNotification
   def push_firebase(token, entry, user_id)
     response = FIREBASE.deliver(firebase_message(token, entry))
     if response.unregistered?
-      Rails.logger.info { "Unregistered Firebase token user_id=#{user_id}" }
+      Sidekiq.logger.info "Unregistered Firebase token user_id=#{user_id}"
       remove_device(token)
     elsif !response.success?
-      Rails.logger.info { "Firebase push failed status=#{response.status} error=#{response.error_code} user_id=#{user_id}" }
+      Sidekiq.logger.info "Firebase push failed status=#{response.status} error=#{response.error_code} user_id=#{user_id}"
     end
   rescue => exception
     ErrorService.notify(exception)
