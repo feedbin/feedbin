@@ -158,15 +158,6 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     ENV["APPLE_PUSH_TOPIC_PODCAST"] = original
   end
 
-  test "a development build says which push environment it uses" do
-    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: "development"}.to_json, headers: json
-    assert_equal "development", Device.find(JSON.parse(response.body)["id"]).data["apns_environment"]
-
-    post "/v3/devices", params: {push_token: "def456", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: "staging"}.to_json, headers: json
-    assert_response :unprocessable_content
-    assert_equal "/apns_environment", JSON.parse(response.body)["errors"].first["pointer"]
-  end
-
   test "a page already in an unsubscribed Pages feed answers 200" do
     url = "https://example.com/again"
     feed = Feed.create!(title: "Pages", feed_type: :pages, protected: true, feed_url: "http://pages.test/#{@user.id}")
@@ -178,13 +169,6 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal existing.id, JSON.parse(response.body)["id"]
-  end
-
-  test "a null push environment is production" do
-    post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.app", apns_environment: nil}.to_json, headers: json
-
-    assert_response :created
-    assert_equal "production", Device.find(JSON.parse(response.body)["id"]).data["apns_environment"]
   end
 
   private

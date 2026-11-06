@@ -140,20 +140,6 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
     assert_equal 2, reported.first[:parameters][:count]
   end
 
-  test "a development build's device goes through the sandbox" do
-    @devices.first.update!(data: @devices.first.data.merge("apns_environment" => "development"))
-    production = PushServerMock.new("200")
-    sandbox = PushServerMock.new("200")
-    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, production) do
-      DevicePushNotificationSend.stub_const(:SANDBOX_POOL, sandbox) do
-        DevicePushNotificationSend.new.perform(@users.map(&:id), @entries.first.id, false)
-      end
-    end
-
-    assert_equal ["token#{@users.first.id}"], sandbox.topics.keys
-    assert_equal ["token#{@users.last.id}"], production.topics.keys
-  end
-
   test "a token for another app is removed and reported once" do
     reported = []
     pool = PushServerMock.new("400", reason: "DeviceTokenNotForTopic")

@@ -214,6 +214,7 @@ Rails.application.routes.draw do
   delete :logout, to: "sessions#destroy", as: "logout"
 
   get ".well-known/apple-app-site-association", to: "well_known#apple_site_association"
+  get ".well-known/assetlinks.json", to: "well_known#android_asset_links", format: false
   get ".well-known/apple-developer-merchantid-domain-association", to: "well_known#apple_pay"
   get ".well-known/change-password", to: "well_known#change_password"
 

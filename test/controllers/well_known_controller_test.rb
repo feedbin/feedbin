@@ -23,6 +23,39 @@ class WellKnownControllerTest < ActionController::TestCase
     end
   end
 
+  test "android_asset_links lists the configured fingerprints for the Airshow app" do
+    ENV["ANDROID_ASSET_LINKS"] = "AA:BB,CC:DD"
+    begin
+      get :android_asset_links
+      assert_response :success
+      assert_equal "application/json", @response.media_type
+      assert_equal(
+        [{
+          "relation" => ["delegate_permission/common.get_login_creds"],
+          "target" => {"namespace" => "android_app", "package_name" => "com.feedbin.airshow", "sha256_cert_fingerprints" => ["AA:BB", "CC:DD"]}
+        }],
+        parse_json
+      )
+    ensure
+      ENV.delete("ANDROID_ASSET_LINKS")
+    end
+  end
+
+  test "android_asset_links renders no statements when the variable is unset" do
+    original = ENV.delete("ANDROID_ASSET_LINKS")
+    begin
+      get :android_asset_links
+      assert_response :success
+      assert_equal [], parse_json
+    ensure
+      ENV["ANDROID_ASSET_LINKS"] = original if original
+    end
+  end
+
+  test "android_asset_links is served at the exact path Android fetches" do
+    assert_recognizes({controller: "well_known", action: "android_asset_links"}, "/.well-known/assetlinks.json")
+  end
+
   test "apple_pay renders the configured apple pay key as plain text" do
     ENV["APPLE_PAY_KEY"] = "the-key-content"
     begin

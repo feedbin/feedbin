@@ -10,12 +10,9 @@ class DevicePushNotificationSend
     team_id: ENV["APPLE_TEAM_ID"],
     key_id: ENV["APPLE_KEY_ID"]
   }
-  APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) { |connection|
-    connection.on(:error) { |exception| ErrorService.notify(exception) }
-  }
-
-  # A development build's token belongs to APNs's sandbox.
-  SANDBOX_POOL = Apnotic::ConnectionPool.development(apnotic_options, size: 2) { |connection|
+  # Production serves App Store and TestFlight builds; a development
+  # server serves Xcode builds, whose tokens belong to APNs's sandbox.
+  APNOTIC_POOL = Apnotic::ConnectionPool.public_send(Rails.env.production? ? :new : :development, apnotic_options, size: 5) { |connection|
     connection.on(:error) { |exception| ErrorService.notify(exception) }
   }
 
@@ -34,32 +31,30 @@ class DevicePushNotificationSend
       user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
     end
 
-    tokens = devices.where(user_id: user_ids).pluck(:user_id, :token, :operating_system, :application, Arel.sql("devices.data->>'apns_environment'"))
+    tokens = devices.where(user_id: user_ids).pluck(:user_id, :token, :operating_system, :application)
     return if tokens.empty?
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
     default_title = format_text(feed.title)
 
-    sandbox = {}
-    production = {}
-    tokens.each do |user_id, token, operating_system, application, environment|
+    notifications = {}
+    tokens.each do |user_id, token, operating_system, application|
       # Per iteration. Reassigning feed_title carried one subscriber's private
       # rename into every later recipient's notification.
       feed_title = feed_titles[user_id] || default_title
       notification = build_notification(token, feed_title, entry, operating_system, application)
-      ((environment == "development") ? sandbox : production)[notification.apns_id] = notification
+      notifications[notification.apns_id] = notification
     end
 
-    deliver(APNOTIC_POOL, production) if production.any?
-    deliver(SANDBOX_POOL, sandbox) if sandbox.any?
+    deliver(notifications)
   end
 
   private
 
-  def deliver(pool, notifications)
+  def deliver(notifications)
     refused = Hash.new(0)
-    pool.with do |connection|
+    APNOTIC_POOL.with do |connection|
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|

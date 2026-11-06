@@ -1,7 +1,7 @@
 class Device < ApplicationRecord
   belongs_to :user
 
-  enum :device_type, {notifier: 0, safari: 1, podcast: 2, browser: 3}
+  enum :device_type, {notifier: 0, safari: 1, podcast: 2, browser: 3, podcast_android: 4}
 
   # iOS apps that registered through v3, each with its own bundle id. The
   # retired Feedbin Notifier registered notifier devices through v2; those

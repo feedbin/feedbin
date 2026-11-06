@@ -1,30 +1,77 @@
 class PodcastPushNotification
   include Sidekiq::Worker
 
+  FIREBASE = FirebaseMessaging.new
+
   def perform(user_id, entry_id)
     ErrorService.context(user_id: user_id, entry_id: entry_id)
     return unless User.where(id: user_id, suspended: false).exists?
     entry = Entry.find(entry_id)
-    devices = Device.where(user_id: user_id, active: true).podcast.pluck(:token, Arel.sql("devices.data->>'apns_environment'"))
+    devices = Device.where(user_id: user_id, active: true)
     refused = Hash.new(0)
-    devices.each do |token, environment|
-      notification = build_notification(token, entry)
-      # A development build's token belongs to APNs's sandbox.
-      pool = (environment == "development") ? DevicePushNotificationSend::SANDBOX_POOL : DevicePushNotificationSend::APNOTIC_POOL
-      response = pool.with { |connection| connection.push(notification) }
-      next unless response
-
-      reason = response.body["reason"] if %w[400 403].include?(response.status)
-      if response.status == "410" || DevicePushNotificationSend::GONE.include?(reason)
-        Rails.logger.info { "Bad device token user_id=#{user_id}" }
-        Device.where("lower(token) = ?", token.downcase).take&.destroy
-      end
-      refused[[reason, notification.topic]] += 1 if reason && reason != "BadDeviceToken"
-    end
+    devices.podcast.pluck(:token).each { |token| push_apns(token, entry, user_id, refused) }
     DevicePushNotificationSend.report_refusals(refused, job: self.class.name)
+    return unless FIREBASE.configured?
+    devices.podcast_android.pluck(:token).each { |token| push_firebase(token, entry, user_id) }
   end
 
   private
+
+  def push_apns(token, entry, user_id, refused)
+    notification = build_notification(token, entry)
+    response = DevicePushNotificationSend::APNOTIC_POOL.with { |connection| connection.push(notification) }
+    return unless response
+
+    reason = response.body["reason"] if %w[400 403].include?(response.status)
+    if response.status == "410" || DevicePushNotificationSend::GONE.include?(reason)
+      Sidekiq.logger.info "Bad device token user_id=#{user_id}"
+      remove_device(token)
+    end
+    refused[[reason, notification.topic]] += 1 if reason && reason != "BadDeviceToken"
+  end
+
+  # Rescued so one failure doesn't stop the other devices; a job retry would push to them twice.
+  def push_firebase(token, entry, user_id)
+    response = FIREBASE.deliver(firebase_message(token, entry))
+    if response.unregistered?
+      Sidekiq.logger.info "Unregistered Firebase token user_id=#{user_id}"
+      remove_device(token)
+    elsif !response.success?
+      Sidekiq.logger.info "Firebase push failed status=#{response.status} error=#{response.error_code} user_id=#{user_id}"
+    end
+  rescue => exception
+    ErrorService.notify(exception)
+  end
+
+  def remove_device(token)
+    Device.where("lower(token) = ?", token.downcase).take&.destroy
+  end
+
+  # A data message, so the app builds the notification. FCM requires string values.
+  def firebase_message(token, entry)
+    content = notification_content(entry)
+    {
+      token: token,
+      data: {
+        feed_id:   entry.feed_id.to_s,
+        entry_id:  entry.id.to_s,
+        title:     content[:title],
+        subtitle:  content[:subtitle],
+        body:      content[:body],
+        image_url: content[:image].to_s
+      },
+      android: {priority: "high"}
+    }
+  end
+
+  def notification_content(entry)
+    {
+      title:    format_text(entry.title),
+      subtitle: format_text(entry.feed.title),
+      body:     format_text(find_summary(entry) || entry.summary),
+      image:    entry.data["itunes_image"] || entry.feed.options["itunes_image"]
+    }
+  end
 
   def format_text(text)
     text ||= ""
@@ -45,23 +92,15 @@ class PodcastPushNotification
   end
 
   def build_notification(token, entry)
-    title    = format_text(entry.title)
-    subtitle = format_text(entry.feed.title)
-    body     = find_summary(entry) || entry.summary
-    body     = format_text(body)
-    image    = entry.data["itunes_image"] || entry.feed.options["itunes_image"]
+    content = notification_content(entry)
 
     Apnotic::Notification.new(token).tap do |notification|
-      notification.alert = {
-        title:    title,
-        subtitle: subtitle,
-        body:     body
-      }
+      notification.alert = content.slice(:title, :subtitle, :body)
       notification.custom_payload = {
         data: {
           feed_id:   entry.feed_id,
           entry_id:  entry.id,
-          image_url: image
+          image_url: content[:image]
         }
       }
 

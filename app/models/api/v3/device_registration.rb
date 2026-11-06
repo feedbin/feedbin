@@ -8,7 +8,6 @@ module Api
       include BodyFields
 
       PLATFORMS = DeviceSerializer::PLATFORMS.invert.freeze
-      APNS_ENVIRONMENTS = %w[production development].freeze
       OPTIONAL = {"app_bundle_id" => :application, "model" => :model, "operating_system" => :operating_system}.freeze
 
       attr_reader :body
@@ -32,8 +31,7 @@ module Api
       def attributes
         token = required_string("push_token")
         device_type = one_of("platform", PLATFORMS)
-        environment = one_of("apns_environment", APNS_ENVIRONMENTS, body["apns_environment"] || "production", detail: "apns_environment must be production or development.")
-        attributes = {token: token, device_type: device_type, active: true, data: {"registered_with" => "v3", "apns_environment" => environment}}
+        attributes = {token: token, device_type: device_type, active: true, data: {"registered_with" => "v3"}}
         OPTIONAL.each { |field, column| attributes[column] = optional_string(field) }
 
         if device_type == "notifier"

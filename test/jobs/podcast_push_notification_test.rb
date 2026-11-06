@@ -22,6 +22,24 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
     Response = Struct.new(:status, :body)
   end
 
+  class FakeFirebase
+    attr_reader :delivered
+
+    def initialize(*responses)
+      @responses = responses
+      @delivered = []
+    end
+
+    def configured? = true
+
+    def deliver(message)
+      @delivered << message
+      response = @responses.shift || FirebaseMessaging::Response.new(status: 200, error_code: nil)
+      raise response if response.is_a?(Exception)
+      response
+    end
+  end
+
   setup do
     @user = users(:new)
     @feed = create_feeds(@user, 1).first
@@ -97,21 +115,6 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
     end
   end
 
-  test "a development build's device goes through the sandbox" do
-    @device.update!(data: {"apns_environment" => "development"})
-    production = SyncPushPool.new(status: "200")
-    sandbox = SyncPushPool.new(status: "200")
-
-    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, production) do
-      DevicePushNotificationSend.stub_const(:SANDBOX_POOL, sandbox) do
-        PodcastPushNotification.new.perform(@user.id, @entry.id)
-      end
-    end
-
-    assert_equal ["podcast-token"], sandbox.pushed.map(&:token)
-    assert_empty production.pushed
-  end
-
   test "a suspended account gets no podcast push" do
     @user.update!(suspended: true)
     pool = SyncPushPool.new(status: "200")
@@ -155,5 +158,103 @@ class PodcastPushNotificationTest < ActiveSupport::TestCase
 
     notification = pool.pushed.first
     assert_equal "Only summary present", notification.alert[:body]
+  end
+
+  test "sends Android devices a Firebase data message and keeps them away from APNs" do
+    @device.destroy
+    @user.devices.create!(token: "fcm-token", device_type: Device.device_types[:podcast_android])
+    pool = SyncPushPool.new(status: "200")
+    firebase = FakeFirebase.new
+
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+
+    assert_equal 0, pool.pushed.size
+    assert_equal 1, firebase.delivered.size
+    message = firebase.delivered.first
+    assert_equal "fcm-token", message[:token]
+    assert_equal "high", message.dig(:android, :priority)
+    assert_equal(
+      {
+        feed_id: @feed.id.to_s,
+        entry_id: @entry.id.to_s,
+        title: "Episode 1",
+        subtitle: @feed.title,
+        body: "A short subtitle",
+        image_url: "http://example.com/episode.jpg"
+      },
+      message[:data]
+    )
+    assert message[:data].values.all?(String)
+  end
+
+  test "pushes to iOS and Android devices of the same user" do
+    @user.devices.create!(token: "fcm-token", device_type: Device.device_types[:podcast_android])
+    pool = SyncPushPool.new(status: "200")
+    firebase = FakeFirebase.new
+
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
+      PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+
+    assert_equal ["podcast-token"], pool.pushed.map(&:token)
+    assert_equal ["fcm-token"], firebase.delivered.map { |message| message[:token] }
+  end
+
+  test "skips inactive Android devices" do
+    @user.devices.create!(token: "fcm-token", device_type: Device.device_types[:podcast_android], active: false)
+    firebase = FakeFirebase.new
+
+    DevicePushNotificationSend.stub_const(:APNOTIC_POOL, SyncPushPool.new(status: "200")) do
+      PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+
+    assert_empty firebase.delivered
+  end
+
+  test "removes an Android device whose token Firebase reports unregistered" do
+    @device.destroy
+    @user.devices.create!(token: "fcm-token", device_type: Device.device_types[:podcast_android])
+    firebase = FakeFirebase.new(FirebaseMessaging::Response.new(status: 404, error_code: "UNREGISTERED"))
+
+    assert_difference "Device.count", -1 do
+      PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+  end
+
+  test "a failed Firebase send leaves the device and still reaches the user's other devices" do
+    @device.destroy
+    @user.devices.create!(token: "fcm-1", device_type: Device.device_types[:podcast_android])
+    @user.devices.create!(token: "fcm-2", device_type: Device.device_types[:podcast_android])
+    firebase = FakeFirebase.new(FirebaseMessaging::Error.new("token request failed"))
+
+    assert_no_difference "Device.count" do
+      PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+        PodcastPushNotification.new.perform(@user.id, @entry.id)
+      end
+    end
+    assert_equal 2, firebase.delivered.size
+  end
+
+  test "skips Android devices when Firebase isn't configured" do
+    @device.destroy
+    @user.devices.create!(token: "fcm-token", device_type: Device.device_types[:podcast_android])
+    firebase = FakeFirebase.new
+    firebase.define_singleton_method(:configured?) { false }
+
+    PodcastPushNotification.stub_const(:FIREBASE, firebase) do
+      PodcastPushNotification.new.perform(@user.id, @entry.id)
+    end
+
+    assert_empty firebase.delivered
   end
 end
