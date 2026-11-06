@@ -33,6 +33,21 @@ class FeedsControllerTest < ActionController::TestCase
     assert_equal(@feeds.first.title, assigns(:feeds).first.title)
   end
 
+  test "search leaves out feeds whose URL holds credentials" do
+    login_as @user
+    clear_search
+    open = Feed.create!(feed_url: "https://secret-example.test/feed", title: "Secret Example")
+    locked = Feed.create!(feed_url: "https://me:hunter2@secret-example.test/members.rss", title: "Secret Example Members")
+    Search.client do |client|
+      client.bulk([open, locked].map { Search::BulkRecord.new(action: "index", index: Search.index_name(Feed.table_name), id: it.id, document: it.search_data) })
+      client.refresh
+    end
+
+    post :search, params: {q: "secret example"}, xhr: true
+
+    assert_equal [open], assigns(:feeds).to_a
+  end
+
   test "update feed" do
     login_as @user
 

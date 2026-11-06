@@ -11,9 +11,9 @@ module Api
       include BodyFields
 
       OFFER_LIFETIME = 1.day
-      # Find offers a handful of feeds; the cap only bounds abuse. A guess:
-      # see design.md, Open questions.
-      MAX_FEEDS = 100
+      # Find offers a handful of feeds: a search returns three, and a site
+      # rarely links more. Five covers those with room, and bounds abuse.
+      MAX_FEEDS = 5
 
       attr_reader :body
 

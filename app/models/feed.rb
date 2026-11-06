@@ -38,6 +38,11 @@ class Feed < ApplicationRecord
 
   enum :feed_type, {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
+  # A password-protected feed keeps its credentials in feed_url
+  # (https://user:pass@host/feed, as Feedkit::BasicAuth reads it). Search
+  # leaves these out: it would show one user's password to everyone.
+  scope :without_credentials, -> { where.not("feeds.feed_url ~ ?", "^[A-Za-z][A-Za-z0-9+.-]*://[^/?#]*@") }
+
   # custom_icon_format has no reader. It stays so a Receiver payload queued
   # by the previous deploy's parser, which still carries the key, updates
   # the feed rather than raising. Remove it in the next deploy.

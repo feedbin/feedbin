@@ -94,7 +94,7 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
       [{feeds: [{feed_id: "1"}]}, "/feeds/0/feed_id", "invalid_value"],
       [{feeds: [{feed_id: 1, custom_title: 5}]}, "/feeds/0/custom_title", "invalid_value"],
       [{feeds: [{feed_id: 1}, {feed_id: 1}]}, "/feeds/1/feed_id", "conflict"],
-      [{feeds: (1..101).map { {feed_id: it} }}, "/feeds", "too_many"],
+      [{feeds: (1..6).map { {feed_id: it} }}, "/feeds", "too_many"],
       [{feeds: [{feed_id: 1}], tag_names: "Apple"}, "/tag_names", "invalid_value"],
       [{url: "https://new.example"}, "/feeds", "missing"]
     ].each do |params, pointer, code|
