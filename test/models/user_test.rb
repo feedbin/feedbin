@@ -133,4 +133,16 @@ class UserTest < ActiveSupport::TestCase
     assert_nil User.find_by_email(nil)
     assert_nil User.find_by_email(email: @user.email)
   end
+
+  test "changing the password revokes API tokens" do
+    user = users(:ben)
+    application = user.oauth_applications.create!(name: "Reader", redirect_uri: "")
+    application.access_tokens.create!(resource_owner_id: user.id, scopes: "read")
+
+    user.setting_on!(:api_v3)
+    assert_equal 1, user.oauth_access_tokens.count
+
+    user.update!(password: "a-new-password", password_confirmation: "a-new-password", old_password_valid: true)
+    assert_equal 0, user.oauth_access_tokens.count
+  end
 end

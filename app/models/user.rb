@@ -99,6 +99,7 @@ class User < ApplicationRecord
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
+  after_update :revoke_api_tokens, if: :saved_change_to_password_digest?
 
   after_create :schedule_trial_jobs
 
@@ -332,6 +333,11 @@ class User < ApplicationRecord
     if password_digest_changed? && !old_password_valid
       errors.add(:old_password, "is incorrect")
     end
+  end
+
+  def revoke_api_tokens
+    oauth_access_tokens.delete_all
+    oauth_access_grants.delete_all
   end
 
   def reset_auth_token
