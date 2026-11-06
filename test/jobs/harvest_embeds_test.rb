@@ -400,13 +400,11 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal "channel_id", args["provider_id"]
   end
 
-  # The channels half of the API can come back empty while the videos half
-  # succeeded; a nil parent must not kill this retry: false job.
   test "survives videos whose channel embed was never imported" do
     Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
 
     assert_nothing_raised do
-      HarvestEmbeds::Download.new.update_related_records(["video_id"])
+      HarvestEmbeds::Download.new.send(:update_related_records, ["video_id"], [])
     end
   end
 end
