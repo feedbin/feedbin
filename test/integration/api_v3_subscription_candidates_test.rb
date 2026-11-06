@@ -167,11 +167,12 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     assert_equal [], body["tags"]
   end
 
-  test "offered candidates can be subscribed by id" do
+  test "found candidates can be subscribed by the feed_url returned" do
     finding([@found, @second]) do
       post "/v3/subscriptions/new", params: {q: "https://marco.example"}.to_json, headers: json
     end
-    post "/v3/subscriptions", params: {feeds: [{feed_id: @found.id}, {feed_id: @second.id}]}.to_json, headers: json
+    urls = JSON.parse(response.body)["data"].map { it["feed_url"] }
+    post "/v3/subscriptions", params: {feeds: urls.map { {feed_url: it} }}.to_json, headers: json
     assert_response :success
     assert_equal [@found.id, @second.id], JSON.parse(response.body)["applied"]
   end

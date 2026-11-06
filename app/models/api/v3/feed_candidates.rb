@@ -3,9 +3,9 @@ module Api
     # POST /subscriptions/new: the feeds a typed query offers the user, as the
     # web's add-feed dialog finds them. A URL is fetched and its feeds
     # discovered; words search known feeds. Either way the result is a list,
-    # every feed in it is offered (Subscribe.offer) and refreshed, and nothing
-    # is subscribed. Finding nothing is a Failure that says why, for the
-    # client to show.
+    # every feed in it is refreshed, and nothing is subscribed: Subscribe
+    # takes a feed by the feed_url returned here. Finding nothing is a
+    # Failure that says why, for the client to show.
     class FeedCandidates
       # code is the problem's code; detail is a sentence a client can show.
       # http_code is the site's status, for upstream_error.
@@ -46,7 +46,6 @@ module Api
           preload(feeds)
           existing = @user.existing_subscriptions(feeds)
           stats = FeedStat.daily_counts(feed_ids: feeds.map(&:id))
-          Subscribe.offer(@user, feeds)
           feeds.each { it.priority_refresh(@user) }
           feeds.map { Candidate.new(it, existing[it.id] || existing[it.feed_url], stats[it.id]&.counts || []) }
         end

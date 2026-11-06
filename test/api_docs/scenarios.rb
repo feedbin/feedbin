@@ -25,12 +25,6 @@ module ApiDocs
     QueuedEntry.where(user_id: 1).delete_all
   end
 
-  # Find feeds offered both feeds, so Subscribe takes the one the user
-  # can't otherwise read.
-  scenario "subscriptions/create" do
-    Api::V3::Subscribe.offer(World.current_user, Feed.where(id: [1356, 1357]).to_a)
-  end
-
   # A page not saved before, so the response is the 201 a new save gets.
   scenario "pages/create" do
     Entry.where(id: 2951002).delete_all

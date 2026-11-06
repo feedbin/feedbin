@@ -25,14 +25,13 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "subscribes to several offered feeds with titles and tags, and leaves an existing one alone" do
+  test "subscribes to several feeds by URL with titles and tags, and leaves an existing one alone" do
     feed = Feed.create!(feed_url: "https://new.example/feed", title: "New")
     other = Feed.create!(feed_url: "https://new.example/podcast", title: "New Podcast")
     @feed.tag(["Old"], @user)
     @subscription.update!(title: "Kept")
-    offer(feed, other, @feed)
 
-    post "/v3/subscriptions", params: {feeds: [{feed_id: feed.id, custom_title: " Mine "}, {feed_id: other.id, custom_title: " "}, {feed_id: @feed.id, custom_title: "Ignored"}], tag_names: ["Apple", "News"]}.to_json, headers: json
+    post "/v3/subscriptions", params: {feeds: [{feed_url: feed.feed_url, title: " Mine "}, {feed_url: other.feed_url, title: " "}, {feed_url: @feed.feed_url, title: "Ignored"}], tag_names: ["Apple", "News"]}.to_json, headers: json
 
     assert_response :success
     body = JSON.parse(response.body)
@@ -45,30 +44,36 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_equal %w[Old], @user.taggings.where(feed: @feed).joins(:tag).pluck("tags.name")
   end
 
-  test "a feed id that was not offered and is not readable is skipped" do
+  test "only an exact XML feed URL, or a feed the user can already read, is subscribed" do
     ben = users(:ben)
     private_feed = Feed.create!(feed_url: "https://private.example/feed?token=secret", title: "Private")
     ben.subscriptions.create!(feed: private_feed)
     their_pages = Feed.create!(feed_url: "http://pages.test/theirs", title: "Pages", feed_type: :pages, protected: true)
     ben.subscriptions.create!(feed: their_pages, kind: :generated)
-    starred_from = Feed.create!(feed_url: "https://starred.example/feed", title: "Starred")
+    their_newsletter = Feed.create!(feed_url: "http://sender.example?1", title: "Newsletter", feed_type: :newsletter)
+    ben.subscriptions.create!(feed: their_newsletter)
+    starred_from = Feed.create!(feed_url: "http://starred.example?2", title: "Starred", feed_type: :newsletter)
     StarredEntry.create_from_owners(@user, starred_from.entries.create!(title: "s", url: "https://starred.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex))
+    skipped = ["https://private.example/feed", "HTTPS://private.example/feed?token=secret", their_pages.feed_url, their_newsletter.feed_url, "https://unknown.example/feed"]
 
-    post "/v3/subscriptions", params: {feeds: [{feed_id: private_feed.id}, {feed_id: their_pages.id}, {feed_id: 0}, {feed_id: starred_from.id}]}.to_json, headers: json
+    post "/v3/subscriptions", params: {feeds: [*skipped.map { {feed_url: it} }]}.to_json, headers: json
 
     assert_response :success
     body = JSON.parse(response.body)
-    assert_equal [starred_from.id], body["applied"]
-    assert_equal [private_feed.id, their_pages.id, 0].map { {"id" => it, "reason" => "not_found"} }, body["skipped"]
-    refute @user.subscriptions.exists?(feed_id: [private_feed.id, their_pages.id])
+    assert_equal [], body["applied"]
+    assert_equal skipped.map { {"feed_url" => it, "reason" => "not_found"} }, body["skipped"]
+
+    post "/v3/subscriptions", params: {feeds: [{feed_url: private_feed.feed_url}, {feed_url: starred_from.feed_url}]}.to_json, headers: json
+
+    assert_equal [private_feed.id, starred_from.id], JSON.parse(response.body)["applied"]
+    refute @user.subscriptions.exists?(feed_id: [their_pages.id, their_newsletter.id])
   end
 
   test "a feed reached through a redirect counts as subscribed" do
     target = Feed.create!(feed_url: "https://moved.example/feed", title: "Moved")
     @feed.update!(redirected_to: target.feed_url)
-    offer(target)
 
-    post "/v3/subscriptions", params: {feeds: [{feed_id: target.id}]}.to_json, headers: json
+    post "/v3/subscriptions", params: {feeds: [{feed_url: target.feed_url}]}.to_json, headers: json
 
     assert_equal [target.id], JSON.parse(response.body)["applied"]
     refute @user.subscriptions.exists?(feed: target)
@@ -76,9 +81,8 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
 
   test "a subscription another request just created counts as applied" do
     feed = Feed.create!(feed_url: "https://race.example/feed", title: "Race")
-    offer(feed)
     @user.subscriptions.create!(feed: feed)
-    subscribe = Api::V3::Subscribe.new(@user, {"feeds" => [{"feed_id" => feed.id}]})
+    subscribe = Api::V3::Subscribe.new(@user, {"feeds" => [{"feed_url" => feed.feed_url}]})
 
     @user.stub(:existing_subscriptions, {}) do
       assert_equal({applied: [feed.id], skipped: []}, subscribe.subscribe)
@@ -91,11 +95,12 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
       [{}, "/feeds", "missing"],
       [{feeds: []}, "/feeds", "invalid_value"],
       [{feeds: [1]}, "/feeds/0", "invalid_value"],
-      [{feeds: [{feed_id: "1"}]}, "/feeds/0/feed_id", "invalid_value"],
-      [{feeds: [{feed_id: 1, custom_title: 5}]}, "/feeds/0/custom_title", "invalid_value"],
-      [{feeds: [{feed_id: 1}, {feed_id: 1}]}, "/feeds/1/feed_id", "conflict"],
-      [{feeds: (1..6).map { {feed_id: it} }}, "/feeds", "too_many"],
-      [{feeds: [{feed_id: 1}], tag_names: "Apple"}, "/tag_names", "invalid_value"],
+      [{feeds: [{feed_id: 1}]}, "/feeds/0/feed_url", "invalid_value"],
+      [{feeds: [{feed_url: ""}]}, "/feeds/0/feed_url", "invalid_value"],
+      [{feeds: [{feed_url: "https://a.example/feed", title: 5}]}, "/feeds/0/title", "invalid_value"],
+      [{feeds: [{feed_url: "https://a.example/feed"}, {feed_url: "https://a.example/feed"}]}, "/feeds/1/feed_url", "conflict"],
+      [{feeds: (1..6).map { {feed_url: "https://a.example/#{it}"} }}, "/feeds", "too_many"],
+      [{feeds: [{feed_url: "https://a.example/feed"}], tag_names: "Apple"}, "/tag_names", "invalid_value"],
       [{url: "https://new.example"}, "/feeds", "missing"]
     ].each do |params, pointer, code|
       post "/v3/subscriptions", params: params.to_json, headers: json
@@ -184,15 +189,11 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
 
     feed = Feed.create!(feed_url: "https://comma.example/feed", title: "Comma")
     StarredEntry.create_from_owners(@user, feed.entries.create!(title: "c", url: "https://comma.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex))
-    post "/v3/subscriptions", params: {feeds: [{feed_id: feed.id}], tag_names: ["Arts, Culture"]}.to_json, headers: json
+    post "/v3/subscriptions", params: {feeds: [{feed_url: feed.feed_url}], tag_names: ["Arts, Culture"]}.to_json, headers: json
     assert_equal ["Arts, Culture"], @user.taggings.where(feed: feed).joins(:tag).pluck("tags.name")
   end
 
   private
-
-  def offer(*feeds)
-    Api::V3::Subscribe.offer(@user, feeds)
-  end
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}
