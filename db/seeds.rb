@@ -25,7 +25,7 @@ SuggestedCategory.create!(name: "News")
 SuggestedCategory.create!(name: "Gaming")
 
 if Rails.env.development?
-  u = User.new(email: "ben@benubois.com", password: "passw0rd", password_confirmation: "passw0rd", admin: true)
+  u = User.new(email: "ben@benubois.com", password: "passw0rd", password_confirmation: "passw0rd", admin: true, api_v3: "1")
   u.plan = plan
   u.update_auth_token = true
   u.save
