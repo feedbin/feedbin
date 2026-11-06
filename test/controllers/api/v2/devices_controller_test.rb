@@ -15,6 +15,15 @@ class Api::V2::DevicesControllerTest < ApiControllerTestCase
     end
   end
 
+  test "should create an Android podcast device" do
+    api_content_type
+    login_as @user
+
+    post :create, params: {device: {token: "fcm-token", device_type: "podcast_android", model: "Pixel 9a", application: "Airshow", operating_system: "Android 17", active: true}}, format: :json
+    assert_response :success
+    assert @user.devices.find_by(token: "fcm-token").podcast_android?
+  end
+
   test "should move a device registered by another account to this one" do
     token = "https://push.example.com/shared-browser-profile"
     users(:new).devices.create!(token: token, device_type: Device.device_types[:notifier])

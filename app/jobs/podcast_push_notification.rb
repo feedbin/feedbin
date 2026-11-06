@@ -1,25 +1,77 @@
 class PodcastPushNotification
   include Sidekiq::Worker
 
+  # Android devices, sent through Firebase. APNs gets only the iOS (`podcast`) devices: it rejects an FCM token as
+  # BadDeviceToken, which would delete the device.
+  FIREBASE = FirebaseMessaging.new
+
   def perform(user_id, entry_id)
     ErrorService.context(user_id: user_id, entry_id: entry_id)
     entry = Entry.find(entry_id)
-    tokens = Device.where(user_id: user_id, active: true).podcast.pluck(:token)
-    tokens.each do |token|
-      notification = build_notification(token, entry)
-
-      response = DevicePushNotificationSend::APNOTIC_POOL.with do |connection|
-        connection.push(notification)
-      end
-
-      if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
-        Rails.logger.info { "Bad device token user_id=#{user_id}" }
-        Device.where("lower(token) = ?", token.downcase).take&.destroy
-      end
-    end
+    devices = Device.where(user_id: user_id, active: true)
+    devices.podcast.pluck(:token).each { |token| push_apns(token, entry, user_id) }
+    devices.podcast_android.pluck(:token).each { |token| push_firebase(token, entry, user_id) }
   end
 
   private
+
+  def push_apns(token, entry, user_id)
+    notification = build_notification(token, entry)
+
+    response = DevicePushNotificationSend::APNOTIC_POOL.with do |connection|
+      connection.push(notification)
+    end
+
+    if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
+      Rails.logger.info { "Bad device token user_id=#{user_id}" }
+      remove_device(token)
+    end
+  end
+
+  # One failed send doesn't stop the user's other devices, and isn't retried: a retry would push to the devices that
+  # already got it.
+  def push_firebase(token, entry, user_id)
+    response = FIREBASE.deliver(firebase_message(token, entry))
+    if response.unregistered?
+      Rails.logger.info { "Unregistered Firebase token user_id=#{user_id}" }
+      remove_device(token)
+    elsif !response.success?
+      Rails.logger.info { "Firebase push failed status=#{response.status} error=#{response.error_code} user_id=#{user_id}" }
+    end
+  rescue => exception
+    ErrorService.notify(exception)
+  end
+
+  def remove_device(token)
+    Device.where("lower(token) = ?", token.downcase).take&.destroy
+  end
+
+  # A data message: the app builds the notification itself (artwork, grouping by show) and refreshes the show first.
+  # FCM data values must be strings.
+  def firebase_message(token, entry)
+    content = notification_content(entry)
+    {
+      token: token,
+      data: {
+        feed_id:   entry.feed_id.to_s,
+        entry_id:  entry.id.to_s,
+        title:     content[:title],
+        subtitle:  content[:subtitle],
+        body:      content[:body],
+        image_url: content[:image].to_s
+      },
+      android: {priority: "high"}
+    }
+  end
+
+  def notification_content(entry)
+    {
+      title:    format_text(entry.title),
+      subtitle: format_text(entry.feed.title),
+      body:     format_text(find_summary(entry) || entry.summary),
+      image:    entry.data["itunes_image"] || entry.feed.options["itunes_image"]
+    }
+  end
 
   def format_text(text)
     text ||= ""
@@ -40,23 +92,15 @@ class PodcastPushNotification
   end
 
   def build_notification(token, entry)
-    title    = format_text(entry.title)
-    subtitle = format_text(entry.feed.title)
-    body     = find_summary(entry) || entry.summary
-    body     = format_text(body)
-    image    = entry.data["itunes_image"] || entry.feed.options["itunes_image"]
+    content = notification_content(entry)
 
     Apnotic::Notification.new(token).tap do |notification|
-      notification.alert = {
-        title:    title,
-        subtitle: subtitle,
-        body:     body
-      }
+      notification.alert = content.slice(:title, :subtitle, :body)
       notification.custom_payload = {
         data: {
           feed_id:   entry.feed_id,
           entry_id:  entry.id,
-          image_url: image
+          image_url: content[:image]
         }
       }
 

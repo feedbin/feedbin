@@ -1,7 +1,7 @@
 class Device < ApplicationRecord
   belongs_to :user
 
-  enum :device_type, {notifier: 0, safari: 1, podcast: 2, browser: 3}
+  enum :device_type, {notifier: 0, safari: 1, podcast: 2, browser: 3, podcast_android: 4}
 
   # index_devices_on_lower_tokens covers lower(token) alone, with no user_id,
   # so a token identifies one physical device rather than one device per
