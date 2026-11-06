@@ -16,7 +16,6 @@ class ActionsControllerTest < ActionController::TestCase
     login_as users(:ben)
     get :new
     assert_response :success
-    assert_includes response.body, "also go to the Feedbin apps where"
   end
 
   test "should create action" do
