@@ -28,7 +28,8 @@ module ApiDocs
 
   # An object (_data/objects/<name>.json, the JSON Pointer `pick` into the
   # response) or a snippet (_data/snippets/<name>.json, the whole response).
-  Example = Data.define(:kind, :name, :method, :path, :body, :per_source, :pick, :setup)
+  # status: the response the request must get; success when nil.
+  Example = Data.define(:kind, :name, :method, :path, :body, :per_source, :pick, :setup, :status, :authenticated)
 
   @scenarios = {}
   @examples = []
@@ -41,11 +42,12 @@ module ApiDocs
     end
 
     def object(name, path, method: :get, body: nil, per_source: false, pick: nil, &setup)
-      @examples << Example.new(kind: "objects", name: name, method: method, path: path, body: body, per_source: per_source, pick: pick, setup: setup)
+      @examples << Example.new(kind: "objects", name: name, method: method, path: path, body: body, per_source: per_source, pick: pick, setup: setup, status: nil, authenticated: true)
     end
 
-    def snippet(name, path, method: :get, body: nil, &setup)
-      @examples << Example.new(kind: "snippets", name: name, method: method, path: path, body: body, per_source: false, pick: nil, setup: setup)
+    # status: for a snippet of an error. authenticated: false sends no token.
+    def snippet(name, path, method: :get, body: nil, status: nil, authenticated: true, &setup)
+      @examples << Example.new(kind: "snippets", name: name, method: method, path: path, body: body, per_source: false, pick: nil, setup: setup, status: status, authenticated: authenticated)
     end
 
     def docs_root

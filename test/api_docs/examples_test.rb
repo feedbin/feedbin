@@ -50,10 +50,10 @@ class ApiDocsExamplesTest < ActionDispatch::IntegrationTest
     sources.to_h do |source|
       name = example.per_source ? "#{example.name}/#{source["key"]}" : example.name
       json = isolated(example, source) do
-        headers = headers(true)
+        headers = headers(example.authenticated)
         headers["Content-Type"] = "application/json" if example.body
         process(example.method, "/v3#{example.path.gsub(ApiDocs::Page::TOKEN) { source.fetch($1) }}", params: example.body, headers: headers)
-        assert_response :success, "#{example.name}: #{response.body}"
+        assert_response example.status || :success, "#{example.name}: #{response.body}"
         recorded
       end
       value = if example.kind == "snippets" then json

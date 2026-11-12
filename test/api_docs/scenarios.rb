@@ -74,4 +74,13 @@ module ApiDocs
   # Snippets for prose.
   snippet "envelope", "/entries?limit=2"
   snippet "entries-by-id", "/entries?ids=2947218,2946102,2940771"
+  snippet "state-scope", "/entries/state", method: :post, body: {mark_read: {feed_ids: [1356, 2210], published_before: "2026-09-09T00:00:00Z"}}.to_json
+
+  # Problems. The docs quote these rather than typing an error out.
+  snippet "unauthorized", "/entries", status: 401, authenticated: false
+  snippet "cursor-invalid", "/entries?cursor=zz", status: 400
+  snippet "validation-failed", "/playlists/2", method: :patch, status: 422, body: {title: "Road trips"}.to_json
+  snippet "upstream-error", "/subscriptions/new", method: :post, status: 422, body: {q: "https://example.com/feed"}.to_json do
+    stub_request(:get, "https://example.com/feed").to_return(status: 404)
+  end
 end
