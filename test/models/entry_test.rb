@@ -103,6 +103,31 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal("http://daringfireball.net/test", @entry.fully_qualified_url)
   end
 
+  test "extracted_content_url is the extract service's url for the entry" do
+    @entry.url = "https://example.com/post"
+
+    with_env("EXTRACT_HOST" => "https://extract.example.com", "EXTRACT_USER" => "feedbin", "EXTRACT_SECRET" => "secret") do
+      assert_equal MercuryParser.new("https://example.com/post").service_url, @entry.extracted_content_url
+      assert_match %r{\Ahttps://extract\.example\.com/parser/feedbin/\h{40}\?base64_url=}, @entry.extracted_content_url
+    end
+  end
+
+  # An API page reads this for every entry, and a swallowed exception per
+  # entry is slow, most of all in development where better_errors captures
+  # every frame of each one.
+  test "extracted_content_url is nil and raises nothing without the extract service" do
+    @entry.url = "https://example.com/post"
+
+    with_env("EXTRACT_HOST" => nil, "EXTRACT_USER" => nil, "EXTRACT_SECRET" => nil) do
+      raised = []
+      url = :unset
+      TracePoint.new(:raise) { raised << _1.raised_exception.class }.enable { url = @entry.extracted_content_url }
+
+      assert_nil url
+      assert_empty raised
+    end
+  end
+
   test "rebase_url returns a String for absolute urls" do
     result = @entry.rebase_url("http://example.com/podcast.mp3")
     assert_instance_of String, result

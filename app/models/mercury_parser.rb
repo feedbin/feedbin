@@ -1,5 +1,18 @@
 class MercuryParser
+  SETTINGS = %w[EXTRACT_HOST EXTRACT_USER EXTRACT_SECRET].freeze
+
+  class NotConfigured < StandardError
+    def initialize(message = "The extract service is not configured. Set #{SETTINGS.join(", ")}.")
+      super
+    end
+  end
+
   attr_reader :url
+
+  # The extract service is optional. Development runs without it.
+  def self.configured?
+    SETTINGS.all? { ENV[_1].present? }
+  end
 
   def initialize(url, data: nil, html: nil)
     @url = url
@@ -59,7 +72,12 @@ class MercuryParser
     }
   end
 
+  # nil when the extract service is not configured, so a caller that only
+  # hands the URL on (Entry#extracted_content_url, once for every entry of an
+  # API page) has nothing to rescue.
   def service_url
+    return nil unless self.class.configured?
+
     @service_url ||= begin
       digest = OpenSSL::Digest.new("sha1")
       signature = OpenSSL::HMAC.hexdigest(digest, ENV["EXTRACT_SECRET"], url)
@@ -73,6 +91,8 @@ class MercuryParser
 
   def result
     @result ||= begin
+      raise NotConfigured unless self.class.configured?
+
       response = HTTP.timeout(write: 5, connect: 5, read: 5)
         .use(:auto_inflate)
         .headers("Accept-Encoding" => "gzip")
