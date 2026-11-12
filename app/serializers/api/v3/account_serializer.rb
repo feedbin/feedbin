@@ -34,11 +34,17 @@ module Api
 
       def plan
         {
-          id: @user.plan.stripe_id,
+          id: plan_id,
           name: @user.plan.name,
           status: status,
           expires_at: @user.expires_at&.utc&.iso8601
         }
+      end
+
+      # A Stripe id carries a price tier (basic-yearly-3) that changes with
+      # pricing; the API names the plan (yearly).
+      def plan_id
+        @user.plan.stripe_id.delete_prefix("basic-").sub(/-\d+\z/, "").tr("-", "_")
       end
 
       def status

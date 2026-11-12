@@ -18,7 +18,7 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal %w[object id email created_at plan newsletter_address settings], body.keys
     assert_equal ["account", @user.id, @user.email, @user.created_at.utc.iso8601], body.values_at("object", "id", "email", "created_at")
-    assert_equal({"id" => @user.plan.stripe_id, "name" => @user.plan.name, "status" => (@user.trial_plan? ? "trial" : "active"), "expires_at" => @user.expires_at&.utc&.iso8601}, body["plan"])
+    assert_equal({"id" => "monthly", "name" => "Monthly", "status" => "active", "expires_at" => nil}, body["plan"])
     assert_equal @user.newsletter_address, body["newsletter_address"]
     assert_equal({"podcast_sort" => "published_desc", "podcast_download_limit" => 25, "hide_queue" => true, "hide_recently_read" => false, "hide_updated" => false, "hide_recently_played" => false}, body["settings"])
   end
@@ -34,6 +34,14 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
     @user.update_columns(suspended: false, expires_at: 1.day.ago, plan_id: Plan.find_by!(stripe_id: "timed").id)
     get "/v3/account", headers: bearer
     assert_equal "expired", JSON.parse(response.body)["plan"]["status"]
+  end
+
+  test "a plan's id names the plan, not its Stripe price" do
+    {"basic-yearly-3" => "yearly", "basic-monthly-2" => "monthly", "trial" => "trial", "app-subscription" => "app_subscription"}.each do |stripe_id, id|
+      @user.update_columns(plan_id: Plan.find_by!(stripe_id: stripe_id).id)
+      get "/v3/account", headers: bearer
+      assert_equal id, JSON.parse(response.body)["plan"]["id"], stripe_id
+    end
   end
 
   test "updates settings as a merge patch" do
