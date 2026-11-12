@@ -20,6 +20,11 @@ module Api
         def streams?
           false
         end
+
+        # One feed is read in order through its own index.
+        def windowed?
+          false
+        end
       end
     end
   end

@@ -2465,6 +2465,13 @@ CREATE INDEX index_entries_on_edited_at_and_id ON public.entries USING btree (ed
 
 
 --
+-- Name: index_entries_on_feed_id_and_created_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_feed_id_and_created_at_and_id ON public.entries USING btree (feed_id, created_at, id);
+
+
+--
 -- Name: index_entries_on_feed_id_include_id_published_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3281,6 +3288,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261112012500'),
 ('20261103120000'),
 ('20261102150000'),
 ('20261102140000'),

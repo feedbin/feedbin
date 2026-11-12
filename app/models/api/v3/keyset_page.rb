@@ -15,15 +15,7 @@ module Api
 
       # Fetches limit + 1 rows to tell whether another page follows.
       def relation
-        scope = @scope
-        if (after = position)
-          connection = @scope.connection
-          table = connection.quote_table_name(@scope.model.table_name)
-          column, tiebreak = [@column, @tiebreak].map { connection.quote_column_name(_1) }
-          operator = (@direction == :asc) ? ">" : "<"
-          scope = scope.where("(#{table}.#{column}, #{table}.#{tiebreak}) #{operator} (?, ?)", *after)
-        end
-        scope.reorder(@column => @direction, @tiebreak => @direction).limit(@limit + 1)
+        page_of(after_cursor(@scope))
       end
 
       def records
@@ -46,11 +38,28 @@ module Api
 
       def load
         @load ||= begin
-          rows = relation.to_a
+          rows = fetch
           more = rows.size > @limit
           rows.pop if more
           [rows, more]
         end
+      end
+
+      def fetch
+        relation.to_a
+      end
+
+      def after_cursor(scope)
+        return scope unless (after = position)
+        connection = scope.connection
+        table = connection.quote_table_name(scope.model.table_name)
+        column, tiebreak = [@column, @tiebreak].map { connection.quote_column_name(_1) }
+        operator = (@direction == :asc) ? ">" : "<"
+        scope.where("(#{table}.#{column}, #{table}.#{tiebreak}) #{operator} (?, ?)", *after)
+      end
+
+      def page_of(scope)
+        scope.reorder(@column => @direction, @tiebreak => @direction).limit(@limit + 1)
       end
 
       def position

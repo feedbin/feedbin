@@ -276,9 +276,81 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     assert_equal [["AAA", "A video"]], videos.map { [_1["id"], _1["title"]] }
   end
 
+  # The timeline is read a window of time at a time (WindowedKeysetPage). This
+  # walks it page by page, through each filter, over entries that are tied,
+  # days apart and years apart.
+  test "pages the whole timeline, through every filter, whatever the page size" do
+    other = Feed.create!(feed_url: "https://other.example.com/feed", host: "other.example.com", title: "Other", site_url: "https://other.example.com")
+    @user.subscriptions.create!(feed: other)
+    tied = @entries.second.created_at
+    times = [tied, tied, 5.days.ago, 200.days.ago, 200.days.ago, 4.years.ago]
+    spread = times.each_with_index.map do |time, index|
+      other.entries.create!(title: "Spread #{index}", url: "https://other.example.com/#{index}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, created_at: time)
+    end
+    newest_first = Entry.where(id: (@entries + spread).map(&:id)).sort_by { [_1.created_at, _1.id] }.reverse
+    unread = newest_first.values_at(1, 4, 8)
+    starred = newest_first.values_at(0, 4, 5)
+    cutoff = 6.days.ago
+    @user.unread_entries.delete_all
+    unread.each { UnreadEntry.create_from_owners(@user, _1) }
+    starred.each { StarredEntry.create_from_owners(@user, _1) }
+
+    {
+      {} => newest_first,
+      {read: "true"} => newest_first - unread,
+      {read: "false"} => newest_first & unread,
+      {starred: "true"} => newest_first & starred,
+      {starred: "false"} => newest_first - starred,
+      {read: "true", starred: "false"} => newest_first - unread - starred,
+      {received_after: cutoff.iso8601(6)} => newest_first.select { _1.created_at > cutoff }
+    }.each do |params, expected|
+      [1, 2, 4, 1000].each do |limit|
+        assert_equal expected.map(&:id), walk(params.merge(limit: limit)), "#{params}, limit #{limit}"
+      end
+    end
+  end
+
+  test "only the account's newest-first timeline is read by window" do
+    get "/v3/entries", params: {limit: 1}, headers: bearer
+    meta = JSON.parse(response.body)["meta"]
+
+    assert_equal 1, windowed_pages { get "/v3/entries", headers: bearer }
+    assert_equal 1, windowed_pages { get "/v3/entries", params: {read: "true", starred: "false", received_after: 1.day.ago.iso8601}, headers: bearer }
+    # Unread and starred pages start from the user's own rows, not the feeds.
+    assert_equal 0, windowed_pages { get "/v3/entries", params: {read: "false"}, headers: bearer }
+    assert_equal 0, windowed_pages { get "/v3/entries", params: {starred: "true"}, headers: bearer }
+    # A stream starts at its cursor, and one feed is already read in order.
+    assert_equal 0, windowed_pages { get "/v3/entries", params: {cursor: meta["arrivals_cursor"]}, headers: bearer }
+    assert_equal 0, windowed_pages { get "/v3/entries", params: {cursor: meta["edits_cursor"]}, headers: bearer }
+    assert_equal 0, windowed_pages { get "/v3/feeds/#{@feed.id}/entries", headers: bearer }
+  end
+
   private
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}
+  end
+
+  # The ids of every page, each fetched from the one before's next_url.
+  def walk(params)
+    ids = []
+    path = "/v3/entries?#{params.to_query}"
+    while path
+      get path, headers: bearer
+      assert_response :success
+      body = JSON.parse(response.body)
+      ids.concat(body["data"].map { _1["id"] })
+      raise "the timeline does not end" if ids.size > 100
+      path = body["page"]["next_url"]&.delete_prefix("http://api.example.com")
+    end
+    ids
+  end
+
+  def windowed_pages
+    built = 0
+    build = Api::V3::WindowedKeysetPage.method(:new)
+    Api::V3::WindowedKeysetPage.stub(:new, ->(*arguments, **options) { built += 1; build.call(*arguments, **options) }) { yield }
+    assert_response :success
+    built
   end
 end

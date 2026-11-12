@@ -11,26 +11,41 @@ module Api
       }.freeze
       STREAMS = %w[received_asc edited_asc].freeze
 
-      # Also called by script/measure_v3_sync.rb.
-      def self.page(scope, order, limit:, cursor: nil)
+      # Also called by script/measure_v3_sync.rb. With feeds, the page is read
+      # a window of time at a time (WindowedKeysetPage), and scope is the
+      # entries before they are narrowed to those feeds.
+      def self.page(scope, order, limit:, cursor: nil, feeds: nil)
         column, direction = ORDERS.fetch(order)
         scope = scope.where.not(edited_at: nil) if order == "edited_asc"
-        KeysetPage.new(scope, sort: order, column: column, direction: direction, limit: limit, cursor: cursor, key: "timestamp")
+        options = {sort: order, column: column, direction: direction, limit: limit, cursor: cursor, key: "timestamp"}
+        feeds ? WindowedKeysetPage.new(scope, feeds: feeds, **options) : KeysetPage.new(scope, **options)
       end
 
       private
 
       def timeline_base
-        Entry.where(feed_id: @user.subscriptions.select(:feed_id))
+        Entry.where(feed_id: timeline_feeds)
+      end
+
+      def timeline_feeds
+        @user.subscriptions.select(:feed_id)
       end
 
       def streams?
         true
       end
 
+      # A page drawn from every feed of the account, newest first, is read a
+      # window of time at a time. A stream starts at its cursor instead, and a
+      # page of unread or starred entries starts from the user's own rows,
+      # where windows over the feeds would only read around them.
+      def windowed?
+        order == TIMELINE && boolean_param(:read) != false && boolean_param(:starred) != true
+      end
+
       def render_timeline
         limit = page_limit
-        page = Timeline.page(filtered_entries.for_api_v3, order, limit: limit, cursor: cursor_fields)
+        page = timeline_page(limit)
         entries = page.records
         next_cursor = page.next_cursor || (tail_cursor(page) if STREAMS.include?(order))
 
@@ -63,9 +78,19 @@ module Api
         page.records.any? ? page.cursor_at(page.records.last) : params[:cursor]
       end
 
-      def filtered_entries
-        scope = timeline_base
+      def timeline_page(limit)
+        if windowed?
+          Timeline.page(filtered(Entry.all).for_api_v3, order, limit: limit, cursor: cursor_fields, feeds: timeline_feeds)
+        else
+          Timeline.page(filtered_entries.for_api_v3, order, limit: limit, cursor: cursor_fields)
+        end
+      end
 
+      def filtered_entries
+        filtered(timeline_base)
+      end
+
+      def filtered(scope)
         case boolean_param(:read)
         when true then scope = scope.where.not(id: @user.unread_entries.select(:entry_id))
         when false then scope = scope.where(id: @user.unread_entries.select(:entry_id))
