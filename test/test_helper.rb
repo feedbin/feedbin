@@ -12,6 +12,14 @@ require File.expand_path("../../config/environment", __FILE__)
 REDIS_URL = URI(ENV.fetch("REDIS_URL"))
 REDIS_DATABASE = REDIS_URL.path.delete_prefix("/").to_i
 
+# A Redis server has a fixed number of databases, 16 by default. Past the
+# last one, a worker's every Redis call fails with "DB index is out of range".
+REDIS_WORKER_LIMIT = Redis.new(url: REDIS_URL.to_s).then do |redis|
+  redis.config(:get, "databases").to_a.flatten.last.to_i - REDIS_DATABASE
+ensure
+  redis.close
+end
+
 # Points every Redis client at ENV["REDIS_URL"], for a parallel worker's own
 # database.
 def connect_test_redis
@@ -100,7 +108,7 @@ class ActiveSupport::TestCase
   include FactoryHelper
   include StripePaymentMethodHelper
 
-  parallelize(workers: :number_of_processors)
+  parallelize(workers: [(Concurrent.available_processor_count || Concurrent.processor_count).floor, REDIS_WORKER_LIMIT].min)
 
   parallelize_setup do |worker|
     ENV["TEST_WORKER"] = worker.to_s
