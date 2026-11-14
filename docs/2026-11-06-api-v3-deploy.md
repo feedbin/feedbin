@@ -1,6 +1,8 @@
 # Deploy checklist: API v3
 
-Two deploys. **Step one** is branch `api-v3-migrations`: the seven migrations and `structure.sql`, nothing else. It runs under today's code. **Step two** is branch `api-v3-oauth`: the code, once every migration has finished.
+Two deploys, each of its own branch. **Step one** is branch `api-v3-migrations`: the seven migrations and `structure.sql`, nothing else. It runs under today's code. **Step two** is branch `api-v3-oauth`: the code, once every migration has finished.
+
+**Step one is done.** It was deployed on 2026-11-14. `script/api_v3_prebuild.sh` took 24 minutes on db1 (`entries` 227 GB and 142M rows: 16 minutes for the `edited_at` index, 1 for `unreads`, 6 for `feed_id, created_at, id`), and the deploy's migration step then took 5 seconds.
 
 Today's code works on the new schema. The new tables are unused, the new `entries` columns have a default or allow null, and every `unreads` query by `user_id` can use a composite index. The step-one branch passes main's test suite on the new schema.
 
@@ -41,8 +43,8 @@ One read of `entries` takes about its heap size divided by the read rate: at 200
 
 `script/api_v3_prebuild.sh` does all of it: the two columns, the three indexes, and an `ANALYZE` of both tables. It is one file with no dependencies but `bash` and `psql`, and it runs on the database server itself.
 
-- [ ] **Start when nothing long is running:** no backfill, export, or `renderings:rebuild` pass. Before it finishes, a concurrent build waits for every transaction that started before it. The script lists the transactions open for more than 10 seconds when it starts.
-- [ ] **Copy the script to the database server and run it in `tmux`,** as a user that owns the tables. It refuses to start outside `tmux` or `screen`.
+- [x] **Start when nothing long is running:** no backfill, export, or `renderings:rebuild` pass. Before it finishes, a concurrent build waits for every transaction that started before it. The script lists the transactions open for more than 10 seconds when it starts.
+- [x] **Copy the script to the database server and run it in `tmux`,** as a user that owns the tables. It refuses to start outside `tmux` or `screen`.
 
 ```bash
 sudo -u postgres ./api_v3_prebuild.sh <database>
@@ -63,8 +65,8 @@ What it does, in order:
 | Analyzes `entries` and `unreads` | |
 | Checks that no index is invalid | It exits non-zero if one is. |
 
-- [ ] **If it stops, run it again.** Every step skips what is already there, and an index an interrupted build left invalid is dropped and built again.
-- [ ] **Watch a build from a second console.** Postgres 11 has no progress view for index builds (`pg_stat_progress_create_index` arrived in 12), so watch the statement and the index's size. The `(edited_at, id)` index stays near empty; the other two grow in the second half of the build.
+- [x] **If it stops, run it again.** Every step skips what is already there, and an index an interrupted build left invalid is dropped and built again.
+- [x] **Watch a build from a second console.** Postgres 11 has no progress view for index builds (`pg_stat_progress_create_index` arrived in 12), so watch the statement and the index's size. The `(edited_at, id)` index stays near empty; the other two grow in the second half of the build.
 
 ```sql
 SELECT pid, now() - query_start AS running, wait_event_type, wait_event, left(query, 70)
@@ -77,7 +79,7 @@ SELECT pg_size_pretty(pg_relation_size('index_entries_on_feed_id_and_created_at_
 
 ### Deploy
 
-- [ ] **Merge `api-v3-migrations` into main and `cap deploy`.** The migrations run inside the deploy, with the usual 10 s lock timeout and one-hour statement timeout. With the columns and indexes already there, what is left is new tables, one concurrent index drop, and an `ANALYZE` after each index migration.
+- [ ] **Deploy branch `api-v3-migrations`.** The migrations run inside the deploy, with the usual 10 s lock timeout and one-hour statement timeout. With the columns and indexes already there, what is left is new tables, one concurrent index drop, and an `ANALYZE` after each index migration.
 - [ ] **If the deploy's migration step fails,** nothing is half-built: run the deploy again. Every migration is safe to run again. The two that create tables and the one that creates the profiles table run in a transaction, and the three index migrations skip what exists and rebuild an index a failed build left invalid.
 
 ### After
@@ -96,22 +98,70 @@ The migrations still do everything themselves. Expect the deploy to block and Si
 
 ## Step two: code
 
-- [ ] **Bring main into `api-v3-oauth`.** The migration files and `structure.sql` are the same on both branches, so they merge cleanly. Run `bin/rails test`.
-- [ ] **Deploy web and Sidekiq together.**
-- [ ] **API v3 is off for everyone** until you turn it on for each user. That flag covers the settings page, OAuth authorization and the API itself. To try it yourself:
+`main` is already merged into `api-v3-oauth`. Its `db/migrate` and `structure.sql` are the same as step one's, so nothing is left to migrate.
+
+### Deploy
+
+- [ ] **Deploy branch `api-v3-oauth`.** The deploy restarts web and Sidekiq together, which is what this needs. It installs one new gem, `doorkeeper`. It needs no new environment variable: OAuth application logos go to `UNIFIED_BUCKET_IMAGES`, which production already cannot boot without.
+- [ ] **The migration step runs and finds nothing to do.** `db/seeds.rb` differs from the release before it, which is enough for the deploy to call `db:migrate`.
+- [ ] **Expect a rise in render load.** This release changes how stored renderings are laid out and bumps `ContentFormatter::VERSION` to 4, so every stored rendering is rendered and written again on its first read, as after the entry renderings deploy.
+- [ ] **Expect the crawler to start counting edits.** `revision` goes up and `edited_at` is set whenever an entry changes. `index_entries_on_edited_at_and_id` grows only as edits come in.
+
+Nothing changes for anyone yet. API v3 is off for every account until it is turned on, account by account.
+
+### Turn API v3 on, account by account
+
+The flag is the `api_v3` setting on a user. There is no screen for it; set it in a console (`bin/rails console` in `/usr/local/srv/apps/feedbin/current` on app4):
 
 ```ruby
-User.find_by!(email: "you@example.com").setting_on!(:api_v3)
+%w[you@example.com tester@example.com].each { User.find_by!(email: it).setting_on!(:api_v3) }
 ```
 
-- [ ] **Mark Feedbin's own apps as first-party** as soon as they are created, before anyone signs in with them, so their tokens get the `account` scope. Without it an app cannot read or change the account (`/v3/account`), register a device, record a purchase or list tokens. The task also upgrades the app's existing tokens, the ones created in settings included:
+Who needs it:
+
+- [ ] **You,** to see Settings > Developers and register applications.
+- [ ] **Everyone who will sign in with an app that uses v3.** Without it the authorize page answers a correct password with "This account can’t connect apps yet" (or a 404 if they are already signed in on the web), and the API answers `403 restricted`. That is each tester of the new iOS app, and you.
+
+Nobody else needs it. An application's owner needs it to manage the application, not for other people to sign in with it. To turn it off again: `user.setting_off!(:api_v3)`.
+
+Not gated by the flag: Settings > Account lists Authorized Apps for anyone who has one, so access can always be revoked.
+
+### Register Feedbin's own apps
+
+One application for each app Feedbin ships. Today that is the new iOS app (`feedbin-ios-next`); the Android app does not use v3 yet.
+
+- [ ] **Create it.** Signed in as the account that should own it, with `api_v3` on: Settings > Developers (the small link under API, `/settings/api`) > New Application.
+
+| Field | Value |
+| --- | --- |
+| Name | What the authorize page shows: "*Name* is requesting access to your account". For the iOS app, `Feedbin`. |
+| Redirect URIs | `feedbin-next://oauth/callback`, which is what the iOS app sends. |
+| Logo | Shown above the name on the authorize page. |
+| Description, URL, Contact Email | Optional; shown only on the application's own page. |
+
+- [ ] **Copy its Client ID** from the application's page. It is generated, not chosen.
+- [ ] **Mark it first-party, before anyone signs in with it.** On app4, in `/usr/local/srv/apps/feedbin/current`:
 
 ```bash
-bin/rails "api_v3:first_party[<application uid>]"
+bin/rails "api_v3:first_party[<client id>]"
 ```
 
-- [ ] **Expect the crawler to start counting edits.** `revision` goes up and `edited_at` is set whenever an entry changes. `index_entries_on_edited_at_and_id` grows only as edits come in.
+Without this its tokens are `read write` only, and the app cannot read or change the account (`/v3/account`), register a device, record a purchase or list tokens. The task also upgrades the application's existing tokens, the ones created in settings included. It prints the application's name, its scopes and how many tokens it upgraded.
+
+- [ ] **Give the Client ID to the app.** In `feedbin-ios-next`, `Configuration/Identity.xcconfig`:
+
+```
+FEEDBIN_OAUTH_CLIENT_ID[config=Release] = <client id>
+```
+
+Release builds talk to `https://api.feedbin.com/v3/` and send people to `https://feedbin.com/oauth/authorize` to sign in.
+
+- [ ] **Try it.** Sign in from a Release build with an account that has `api_v3` on. Then Settings > Account on the web lists the app under Authorized Apps.
+
+### After
+
+- [ ] **Update the API docs.** In `feedbin-api-docs`, `authentication.md` still says `GET /account` and `PATCH /account` need only `read write`, that settings are covered by `read write`, and describes the old `WWW-Authenticate` challenge. All of `/v3/account` needs `account` now, and the challenge is Doorkeeper's.
 
 ### Rollback
 
-- [ ] **Revert the code and leave the schema.** Step one already ran today's code on it.
+- [ ] **Deploy the release before it and leave the schema.** Step one already ran that code on this schema. Renderings written by this release are rendered again on first read by the old code. Applications, tokens and logos stay in the database and the image store, unused, for the next attempt.
