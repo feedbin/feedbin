@@ -63,10 +63,11 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
   end
 
   test "deletes the account in the background and revokes the token" do
-    delete "/v3/account", headers: bearer
+    assert_difference -> { UserDeleter.jobs.size }, +1 do
+      delete "/v3/account", headers: bearer
+    end
     assert_response :no_content
     assert @token.reload.revoked?
-    assert_equal 1, UserDeleter.jobs.size
     assert_equal [@user.id], UserDeleter.jobs.last["args"]
 
     get "/v3/account", headers: bearer
