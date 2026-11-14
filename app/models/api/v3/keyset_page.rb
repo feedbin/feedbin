@@ -2,6 +2,10 @@ module Api
   module V3
     # Cursor: {sort:, <key>:, id:}, the key an integer (microseconds for a time).
     class KeysetPage
+      # What a bigint column holds. As microseconds it is also every time
+      # Postgres can store, so a cursor inside it cannot fail the query.
+      BIGINT = (-2**63...2**63)
+
       def initialize(scope, sort:, column:, direction:, limit:, cursor: nil, tiebreak: :id, key: "key")
         @scope = scope
         @sort = sort
@@ -65,7 +69,8 @@ module Api
       def position
         return nil unless @cursor
         value, id = @cursor.values_at(@key, "id")
-        raise Cursor::Invalid unless @cursor["sort"] == @sort && value.is_a?(Integer) && id.is_a?(Integer)
+        raise Cursor::Invalid unless @cursor["sort"] == @sort && [value, id].all? { it.is_a?(Integer) && BIGINT.cover?(it) }
+        raise Cursor::Invalid if value.negative? && !integer_column?
         [decode(value), id]
       end
 

@@ -113,9 +113,16 @@ module Api
         end
       end
 
+      # The timeline spans every feed, so it is read a window of time at a
+      # time, as /v3/entries reads it.
       def page(limit:, cursor: nil)
         column, direction = key
-        KeysetPage.new(page_scope, sort: "collection:#{@id}", column: column, direction: direction, limit: limit, cursor: cursor, tiebreak: rows ? :entry_id : :id)
+        options = {sort: "collection:#{@id}", column: column, direction: direction, limit: limit, cursor: cursor}
+        if timeline?
+          WindowedKeysetPage.new(Entry.all.for_api_v3, feeds: @user.subscriptions.select(:feed_id), **options)
+        else
+          KeysetPage.new(page_scope, tiebreak: rows ? :entry_id : :id, **options)
+        end
       end
 
       # => [entries, {entry_id => membership}]; rows whose entry is gone are dropped.
@@ -198,13 +205,7 @@ module Api
       private
 
       def page_scope
-        if timeline?
-          Entry.where(feed_id: @user.subscriptions.select(:feed_id)).for_api_v3
-        elsif pages?
-          pages.for_api_v3
-        else
-          rows
-        end
+        pages? ? pages.for_api_v3 : rows
       end
 
       # Avoids a search on a quiet poll. While a recent unread row may not be

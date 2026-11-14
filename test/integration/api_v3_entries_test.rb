@@ -165,11 +165,22 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     [
       "zz",
       Api::V3::Cursor.encode(sort: "published_desc", timestamp: 1, id: 1),
-      Api::V3::Cursor.encode(sort: "received_asc", timestamp: "1", id: 1)
+      Api::V3::Cursor.encode(sort: "received_asc", timestamp: "1", id: 1),
+      Api::V3::Cursor.encode(sort: "received_asc", timestamp: 10**30, id: 1),
+      Api::V3::Cursor.encode(sort: "received_desc", timestamp: 10**30, id: 1),
+      Api::V3::Cursor.encode(sort: "received_asc", timestamp: -10**30, id: 1),
+      Api::V3::Cursor.encode(sort: "received_asc", timestamp: 1, id: 10**30)
     ].each do |cursor|
       get "/v3/entries", params: {cursor: cursor}, headers: bearer
       assert_response :bad_request, cursor
       assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
+    end
+  end
+
+  test "the largest cursor still reads" do
+    [2**63 - 1, 0].each do |timestamp|
+      get "/v3/entries", params: {cursor: Api::V3::Cursor.encode(sort: "received_asc", timestamp: timestamp, id: 2**63 - 1)}, headers: bearer
+      assert_response :success, timestamp
     end
   end
 
@@ -310,6 +321,22 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the All collection pages the same timeline, by window" do
+    other = Feed.create!(feed_url: "https://other.example.com/feed", host: "other.example.com", title: "Other", site_url: "https://other.example.com")
+    @user.subscriptions.create!(feed: other)
+    tied = @entries.second.created_at
+    spread = [tied, 5.days.ago, 200.days.ago, 4.years.ago].each_with_index.map do |time, index|
+      other.entries.create!(title: "Spread #{index}", url: "https://other.example.com/#{index}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, created_at: time)
+    end
+    newest_first = Entry.where(id: (@entries + spread).map(&:id)).sort_by { [_1.created_at, _1.id] }.reverse
+
+    [1, 2, 1000].each do |limit|
+      assert_equal newest_first.map(&:id), walk({limit: limit}, "/v3/collections/all/entries"), "limit #{limit}"
+    end
+    assert_equal 1, windowed_pages { get "/v3/collections/all/entries", headers: bearer }
+    assert_equal 0, windowed_pages { get "/v3/collections/unread/entries", headers: bearer }
+  end
+
   test "only the account's newest-first timeline is read by window" do
     get "/v3/entries", params: {limit: 1}, headers: bearer
     meta = JSON.parse(response.body)["meta"]
@@ -332,9 +359,9 @@ class ApiV3EntriesTest < ActionDispatch::IntegrationTest
   end
 
   # The ids of every page, each fetched from the one before's next_url.
-  def walk(params)
+  def walk(params, path = "/v3/entries")
     ids = []
-    path = "/v3/entries?#{params.to_query}"
+    path = "#{path}?#{params.to_query}"
     while path
       get path, headers: bearer
       assert_response :success
