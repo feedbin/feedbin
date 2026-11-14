@@ -13,13 +13,11 @@ class Settings::ApiApplicationsController < ApplicationController
   end
 
   def create
-    application = @user.oauth_applications.new(application_params)
-    if application.save
-      # Secrets are stored hashed, so this is the only time the plaintext exists.
-      flash[:plaintext_secret] = application.plaintext_secret if application.confidential?
-      redirect_to settings_api_application_path(application), notice: "Application created."
+    @application = @user.oauth_applications.new
+    if save_application
+      redirect_to settings_api_application_path(@application), notice: "Application created."
     else
-      render Settings::ApiApplications::NewView.new(application: application), status: :unprocessable_content
+      render Settings::ApiApplications::NewView.new(application: @application), status: :unprocessable_content
     end
   end
 
@@ -27,7 +25,6 @@ class Settings::ApiApplicationsController < ApplicationController
     render Settings::ApiApplications::ShowView.new(
       user: @user,
       application: @application,
-      plaintext_secret: flash[:plaintext_secret],
       plaintext_token: flash[:plaintext_token]
     )
   end
@@ -55,7 +52,7 @@ class Settings::ApiApplicationsController < ApplicationController
   # The logo is saved with the fields or not at all.
   def save_application
     Doorkeeper::Application.transaction do
-      @application.update(application_update_params) && save_logo or raise ActiveRecord::Rollback
+      @application.update(application_params) && save_logo or raise ActiveRecord::Rollback
     end
   end
 
@@ -67,11 +64,9 @@ class Settings::ApiApplicationsController < ApplicationController
     false
   end
 
+  # Every application is a public client: PKCE is required, and there is no
+  # client secret.
   def application_params
-    params.expect(doorkeeper_application: [:name, :redirect_uri, :confidential])
-  end
-
-  def application_update_params
     params.expect(doorkeeper_application: [:name, :redirect_uri])
   end
 end

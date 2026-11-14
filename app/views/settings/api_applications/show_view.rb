@@ -1,10 +1,9 @@
 module Settings
   module ApiApplications
     class ShowView < ApplicationView
-      def initialize(user:, application:, plaintext_secret: nil, plaintext_token: nil)
+      def initialize(user:, application:, plaintext_token: nil)
         @user = user
         @application = application
-        @plaintext_secret = plaintext_secret
         @plaintext_token = plaintext_token
       end
 
@@ -13,7 +12,6 @@ module Settings
           "API"
         end
 
-        one_time_secret("Client Secret", @plaintext_secret) if @plaintext_secret.present?
         one_time_secret("Access Token", @plaintext_token) if @plaintext_token.present?
 
         details
@@ -65,19 +63,6 @@ module Settings
             render Settings::ControlRowComponent.new do |row|
               row.title { "Client ID" }
               row.description { copyable(@application.uid) }
-            end
-          end
-
-          group.item do
-            render Settings::ControlRowComponent.new do |row|
-              row.title { "Client Type" }
-              row.description do
-                if @application.confidential?
-                  "Confidential. Authenticate to the token endpoint with the client secret, which was shown once when the app was created."
-                else
-                  "Public. Authenticate with PKCE (S256); there is no client secret."
-                end
-              end
             end
           end
 

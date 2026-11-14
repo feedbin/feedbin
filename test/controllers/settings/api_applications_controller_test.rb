@@ -63,17 +63,46 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "creates a public application" do
+  test "creates an application, public whatever the form sends" do
     login_as @user
 
     assert_difference -> { @user.oauth_applications.count }, 1 do
-      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: "myreader://callback", confidential: "0"}}
+      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: "myreader://callback", confidential: "1"}}
     end
 
     application = @user.oauth_applications.last
     assert_redirected_to settings_api_application_path(application)
     refute application.confidential?
     assert_nil flash[:plaintext_secret]
+  end
+
+  test "the new form takes a logo and has no client type" do
+    login_as @user
+
+    get :new
+
+    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name=logo]", settings_api_applications_path
+    assert_select "input[name='doorkeeper_application[confidential]']", count: 0
+  end
+
+  test "creates an application with its logo" do
+    login_as @user
+
+    post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, logo: logo_upload("image.png")}
+
+    assert Api::V3::ApplicationLogo.for(@user.oauth_applications.last)
+  end
+
+  test "a logo that is not an image creates nothing and says why" do
+    login_as @user
+
+    assert_no_difference -> { Doorkeeper::Application.count } do
+      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, logo: logo_upload("atom.xml")}
+    end
+
+    assert_response :unprocessable_content
+    assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
+    assert_select "form[action=?] input[name='doorkeeper_application[name]'][value=?]", settings_api_applications_path, "My Reader"
   end
 
   test "Feedbin's own apps offer token creation like any other" do
@@ -104,17 +133,6 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     get :show, params: {id: application}
 
     assert_select "form[action=?]", settings_api_application_path(application), count: 0
-  end
-
-  test "shows a confidential application's secret once" do
-    login_as @user
-
-    post :create, params: {doorkeeper_application: {name: "My Server", redirect_uri: "https://example.com/callback", confidential: "1"}}
-
-    application = @user.oauth_applications.last
-    assert application.confidential?
-    assert flash[:plaintext_secret].present?
-    assert application.secret_matches?(flash[:plaintext_secret])
   end
 
   test "rejects an invalid application" do
@@ -217,7 +235,7 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_select "a[href=?]", edit_settings_api_application_path(application), text: "Edit"
   end
 
-  test "renders the edit form without the client type" do
+  test "renders the edit form" do
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "myreader://callback")
     login_as @user
 
@@ -226,7 +244,6 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "input[name='doorkeeper_application[name]'][value=?]", "My Reader"
     assert_select "textarea[name='doorkeeper_application[redirect_uri]']", text: "myreader://callback"
-    assert_select "input[name='doorkeeper_application[confidential]']", count: 0
   end
 
   test "renames an application and changes its redirect URIs without touching its tokens" do
@@ -241,15 +258,6 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_equal "Reader Pro", application.name
     assert_equal %w[myreader://callback http://127.0.0.1/callback], application.redirect_uri.split
     assert_nil token.reload.revoked_at
-  end
-
-  test "an update cannot change the client type" do
-    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "", confidential: false)
-    login_as @user
-
-    patch :update, params: {id: application, doorkeeper_application: {name: "My Reader", confidential: "1"}}
-
-    refute application.reload.confidential?
   end
 
   test "rejects an invalid update" do

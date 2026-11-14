@@ -1,7 +1,6 @@
 module Settings
   module ApiApplications
-    # The fields an application's new and edit forms share. The client type is
-    # only on the new form: clients are built against one or the other.
+    # The fields an application's new and edit forms share.
     module Fields
       def errors
         if @application.errors.any?
@@ -11,9 +10,10 @@ module Settings
         end
       end
 
-      # Removal is its own form (#remove_logo), rendered outside this one.
+      # Removal is its own form (#remove_logo), which the edit view renders
+      # outside this one.
       def logo_field
-        logo = Api::V3::ApplicationLogo.for(@application)
+        logo = Api::V3::ApplicationLogo.for(@application) if @application.persisted?
 
         div class: "mb-8" do
           div(class: "mb-2 text-600") { label(for: "logo") { "Logo" } }

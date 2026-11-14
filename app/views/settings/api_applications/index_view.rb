@@ -46,7 +46,6 @@ module Settings
             group.item do
               render Settings::ControlRowComponent.new do |row|
                 row.title { application.name }
-                row.description { application.confidential? ? "Confidential" : "Public" }
                 row.control do
                   link_to "Manage", settings_api_application_path(application), class: "button button-tertiary"
                 end
