@@ -7,7 +7,7 @@ module Api
 
       def index
         list = FeedList.new(@user)
-        return if not_modified?(etag_for("feeds", list.version))
+        return unless stale?(etag: list.version)
         render_list(list.feeds.includes(*Feed::ICON_PRELOADS, :touch_icon_image_record).order(:id).map { FeedSerializer.new(_1).to_h })
       end
 

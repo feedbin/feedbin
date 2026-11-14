@@ -6,7 +6,7 @@ module Api
 
         def show
           return status_not_found if @collection.timeline?
-          return if not_modified?(etag_for(@collection.id, @collection.ids_version))
+          return unless stale?(etag: @collection.ids_version)
           render_list(@collection.ids)
         end
       end

@@ -7,7 +7,7 @@ module Api
 
       def index
         data = actions.order(Arel.sql("lower(title)"), :id).map { ActionSerializer.new(_1).to_h }
-        return if not_modified?(etag_for("actions", digest(data)))
+        return unless stale?(etag: digest(data))
         render_list(data)
       end
 

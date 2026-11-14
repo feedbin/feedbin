@@ -21,7 +21,7 @@ class ApiV3FeedsTest < ActionDispatch::IntegrationTest
     assert_nil body["meta"]
     assert_equal @feeds.map(&:id), body["data"].map { _1["id"] }
     assert_equal ["feed"], body["data"].map { _1["object"] }.uniq
-    assert response.headers["ETag"].start_with?(%("feeds:#{@user.id}:))
+    assert_match(/\AW\/"\h+"\z/, response.headers["ETag"])
   end
 
   test "returns 304 until a feed changes or the set of feeds changes" do

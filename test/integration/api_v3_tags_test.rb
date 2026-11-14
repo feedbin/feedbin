@@ -27,7 +27,7 @@ class ApiV3TagsTest < ActionDispatch::IntegrationTest
       {"object" => "tag", "id" => @news.id, "name" => "News", "subscription_ids" => @subscriptions.map(&:id)}
     ], body["data"]
     etag = response.headers["ETag"]
-    assert etag.start_with?(%("tags:#{@user.id}:))
+    assert_match(/\AW\/"\h+"\z/, etag)
 
     get "/v3/tags", headers: bearer.merge("If-None-Match" => etag)
     assert_response :not_modified

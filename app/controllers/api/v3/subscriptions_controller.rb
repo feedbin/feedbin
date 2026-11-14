@@ -15,7 +15,7 @@ module Api
 
       def index
         data = serialize(subscriptions)
-        return if not_modified?(etag_for("subscriptions", digest(data)))
+        return unless stale?(etag: digest(data))
         render_list(data)
       end
 

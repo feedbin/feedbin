@@ -26,7 +26,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_equal @entries.map(&:id).sort, body["data"]
     assert_nil body["page"]
     assert_nil body["meta"]
-    assert_match(/\A"unread:#{@user.id}:\d+\.-?\d+"\z/, response.headers["ETag"])
+    assert_match(/\AW\/"\h+"\z/, response.headers["ETag"])
   end
 
   test "another account with the same list does not match" do
@@ -54,7 +54,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_equal [@entries.first.id], JSON.parse(response.body)["data"]
   end
 
-  test "returns 304 for a matching etag, weak or strong, and 200 after a change" do
+  test "returns 304 for a matching etag and 200 after a change" do
     get "/v3/collections/starred/ids", headers: bearer
     etag = response.headers["ETag"]
 
@@ -62,7 +62,7 @@ class ApiV3CollectionsTest < ActionDispatch::IntegrationTest
     assert_response :not_modified
     assert_empty response.body
 
-    get "/v3/collections/starred/ids", headers: bearer.merge("If-None-Match" => "W/#{etag}")
+    get "/v3/collections/starred/ids", headers: bearer.merge("If-None-Match" => %("another", #{etag}))
     assert_response :not_modified
 
     StarredEntry.create_from_owners(@user, @entries.first)

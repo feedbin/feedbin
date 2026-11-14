@@ -54,7 +54,7 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
       get "/v3/collections/#{id}/ids", headers: bearer
       assert_response :success, id
       assert_equal [entry.id], JSON.parse(response.body)["data"], id
-      assert response.headers["ETag"].start_with?(%("#{id}:#{@user.id}:)), id
+      assert_match(/\AW\/"\h+"\z/, response.headers["ETag"], id)
     end
 
     get "/v3/collections/all/ids", headers: bearer
@@ -72,7 +72,7 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal matches.last(2).map(&:id).sort, JSON.parse(response.body)["data"]
-    assert response.headers["ETag"].start_with?(%("search_#{search.id}:#{@user.id}:))
+    assert_match(/\AW\/"\h+"\z/, response.headers["ETag"])
 
     get "/v3/collections/search_999999/ids", headers: bearer
     assert_response :not_found

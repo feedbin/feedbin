@@ -5,7 +5,7 @@ module Api
 
       def index
         data = @user.saved_searches.order(Arel.sql("lower(name)")).map { SavedSearchSerializer.new(_1).to_h }
-        return if not_modified?(etag_for("saved_searches", digest(data)))
+        return unless stale?(etag: digest(data))
         render_list(data)
       end
 

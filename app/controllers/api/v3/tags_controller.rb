@@ -5,7 +5,7 @@ module Api
 
       def index
         data = tags.each_with_subscription_ids.map { |tag, ids| TagSerializer.new(tag, subscription_ids: ids).to_h }
-        return if not_modified?(etag_for("tags", digest(data)))
+        return unless stale?(etag: digest(data))
         render_list(data)
       end
 

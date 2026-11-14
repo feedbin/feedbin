@@ -6,7 +6,7 @@ module Api
       def index
         @user.migrate_playlists!
         data = @user.playlists.order(Arel.sql("lower(title)"), :id).map { PlaylistSerializer.new(_1).to_h }
-        return if not_modified?(etag_for("playlists", digest(data)))
+        return unless stale?(etag: digest(data))
         render_list(data)
       end
 
