@@ -379,7 +379,7 @@ Rails.application.routes.draw do
     resources :api_authorizations, path: "api/authorizations", only: :destroy
     resources :api_applications, path: "api", only: [:index, :new, :create, :show, :edit, :update] do
       resources :tokens, controller: "api_tokens", only: [:create, :destroy]
-      resource :logo, controller: "api_application_logos", only: [:create, :destroy]
+      resource :logo, controller: "api_application_logos", only: :destroy
     end
 
     get :import_export, to: "imports#index"

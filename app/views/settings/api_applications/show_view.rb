@@ -14,15 +14,13 @@ module Settings
         end
         render Settings::SubtitleComponent.new do
           link_to "All applications", settings_api_applications_path
-          plain " · "
-          link_to "Edit", edit_settings_api_application_path(@application)
         end
 
         one_time_secret("Client Secret", @plaintext_secret) if @plaintext_secret.present?
         one_time_secret("Access Token", @plaintext_token) if @plaintext_token.present?
 
+        details
         credentials
-        logo
         tokens
       end
 
@@ -30,12 +28,61 @@ module Settings
         div class: "border border-blue-600 rounded-lg p-4 mb-14" do
           div(class: "text-600 font-bold mb-1") { title }
           div(class: "text-500 text-sm mb-3") { "Copy it now. It is stored hashed, so it won’t be shown again." }
-          div class: "font-mono text-sm break-all" do
-            render CopyableComponent.new(data: value) { value }
+          div(class: "text-sm") { copyable(value) }
+        end
+      end
+
+      # What the owner can change, on the edit form.
+      def details
+        logo = Api::V3::ApplicationLogo.for(@application)
+
+        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+          group.custom_header do
+            div class: "flex items-center mb-4" do
+              div class: "grow" do
+                render H2Component.new(class: "!mb-0") { "Details" }
+              end
+              link_to "Edit", edit_settings_api_application_path(@application), class: "button button-secondary"
+            end
+          end
+
+          group.item do
+            render Settings::ControlRowComponent.new do |row|
+              row.title { "Name" }
+              row.description { @application.name }
+            end
+          end
+
+          group.item do
+            render Settings::ControlRowComponent.new do |row|
+              row.title { "Logo" }
+              row.description do
+                if logo
+                  img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "w-12 h-12 rounded-[10px] object-contain mt-1"
+                else
+                  plain "None"
+                end
+              end
+            end
+          end
+
+          group.item do
+            render Settings::ControlRowComponent.new do |row|
+              row.title { "Redirect URIs" }
+              row.description do
+                uris = @application.redirect_uri.to_s.split
+                if uris.empty?
+                  plain "None. This app can only use tokens created below."
+                else
+                  uris.each { |uri| copyable(uri) }
+                end
+              end
+            end
           end
         end
       end
 
+      # Fixed when the application was created.
       def credentials
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
           group.header { "OAuth" }
@@ -43,9 +90,7 @@ module Settings
           group.item do
             render Settings::ControlRowComponent.new do |row|
               row.title { "Client ID" }
-              row.description do
-                span(class: "font-mono break-all") { render CopyableComponent.new(data: @application.uid) { @application.uid } }
-              end
+              row.description { copyable(@application.uid) }
             end
           end
 
@@ -64,56 +109,23 @@ module Settings
 
           group.item do
             render Settings::ControlRowComponent.new do |row|
-              row.title { "Redirect URIs" }
-              row.description do
-                uris = @application.redirect_uri.to_s.split
-                if uris.empty?
-                  plain "None. This app can only use tokens created below."
-                else
-                  uris.each { |uri| div(class: "font-mono break-all") { uri } }
-                end
-              end
-            end
-          end
-
-          group.item do
-            render Settings::ControlRowComponent.new do |row|
               row.title { "Authorization URL" }
-              row.description { span(class: "font-mono break-all") { oauth_authorization_url } }
+              row.description { copyable(oauth_authorization_url) }
             end
           end
 
           group.item do
             render Settings::ControlRowComponent.new do |row|
               row.title { "Token URL" }
-              row.description { span(class: "font-mono break-all") { oauth_token_url } }
+              row.description { copyable(oauth_token_url) }
             end
           end
         end
       end
 
-      def logo
-        logo = Api::V3::ApplicationLogo.for(@application)
-
-        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.header { "Logo" }
-
-          group.item do
-            div class: "py-3 flex flex-wrap items-center gap-4" do
-              if logo
-                img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "w-16 h-16 rounded-[14px] object-contain shrink-0"
-              end
-              form_with(url: settings_api_application_logo_path(@application), multipart: true, class: "flex flex-wrap items-center gap-4 grow min-w-0") do |form|
-                form.file_field :logo, accept: "image/png,image/jpeg,image/gif,image/webp", class: "grow basis-[200px] min-w-0 text-sm"
-                button(class: "button button-secondary", type: "submit") { logo ? "Replace" : "Upload" }
-              end
-              if logo
-                render(Settings::DeleteButtonComponent.new(url: settings_api_application_logo_path(@application), confirm: "Remove the logo?")) { "Remove" }
-              end
-            end
-          end
-
-          group.description { "Shown above your app’s name when it asks for access. PNG, JPEG, GIF or WebP, square works best." }
+      def copyable(value)
+        div class: "font-mono break-all [&_button]:text-left" do
+          render CopyableComponent.new(data: value) { value }
         end
       end
 

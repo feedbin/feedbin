@@ -39,7 +39,7 @@ class Settings::ApiApplicationsController < ApplicationController
   # Tokens belong to the application's id, so they survive a rename or new
   # redirect URIs.
   def update
-    if @application.update(application_update_params)
+    if save_application
       redirect_to settings_api_application_path(@application), notice: "Application updated."
     else
       render Settings::ApiApplications::EditView.new(application: @application), status: :unprocessable_content
@@ -50,6 +50,21 @@ class Settings::ApiApplicationsController < ApplicationController
 
   def set_application
     @application = @user.oauth_applications.find(params[:id])
+  end
+
+  # The logo is saved with the fields or not at all.
+  def save_application
+    Doorkeeper::Application.transaction do
+      @application.update(application_update_params) && save_logo or raise ActiveRecord::Rollback
+    end
+  end
+
+  def save_logo
+    return true unless params[:logo].respond_to?(:path)
+    return true if Api::V3::ApplicationLogo.replace(@application, params[:logo])
+
+    @application.errors.add(:base, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB")
+    false
   end
 
   def application_params

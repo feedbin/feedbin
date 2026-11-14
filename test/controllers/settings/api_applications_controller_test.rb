@@ -151,18 +151,64 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     end
   end
 
-  test "an application's page offers a logo upload, and removal once it has one" do
+  test "an application's page offers a copy button for each value a client needs" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "myreader://callback\nhttp://127.0.0.1/callback")
+    login_as @user
+
+    get :show, params: {id: application}
+
+    [application.uid, "myreader://callback", "http://127.0.0.1/callback", oauth_authorization_url, oauth_token_url].each do |value|
+      assert_select "[data-controller=copyable][data-copyable-data-value=?]", value
+    end
+  end
+
+  test "an application's page shows its logo, and changes nothing itself" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    Api::V3::ApplicationLogo.replace(application, logo_upload("image.png"))
+    login_as @user
+
+    get :show, params: {id: application}
+
+    assert_select "img[alt=?]", "My Reader logo"
+    assert_select "input[type=file]", count: 0
+  end
+
+  test "the edit form takes a logo, and offers removal once there is one" do
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
     login_as @user
 
-    get :show, params: {id: application.id}
-    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name=logo]", settings_api_application_logo_path(application)
-    assert_select "img[alt=?]", "My Reader logo", count: 0
+    get :edit, params: {id: application}
+    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name=logo]", settings_api_application_path(application)
+    assert_select "button[form=remove_logo]", count: 0
 
-    Api::V3::ApplicationLogo.replace(application, Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
-    get :show, params: {id: application.id}
+    Api::V3::ApplicationLogo.replace(application, logo_upload("image.png"))
+    get :edit, params: {id: application}
     assert_select "img[alt=?]", "My Reader logo"
-    assert_includes response.body, "Remove"
+    assert_select "form#remove_logo[action=?]", settings_api_application_logo_path(application)
+    assert_select "button[form=remove_logo]", text: "Remove"
+  end
+
+  test "saves a logo with the rest of the form" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    login_as @user
+
+    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, logo: logo_upload("image.png")}
+
+    assert_redirected_to settings_api_application_path(application)
+    assert_equal "Reader Pro", application.reload.name
+    assert Api::V3::ApplicationLogo.for(application)
+  end
+
+  test "a file that is not an image saves nothing and says why" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    login_as @user
+
+    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, logo: logo_upload("atom.xml")}
+
+    assert_response :unprocessable_content
+    assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
+    assert_equal "My Reader", application.reload.name
+    assert_nil Api::V3::ApplicationLogo.for(application)
   end
 
   test "an application's page links to its edit form" do
@@ -227,5 +273,11 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
       patch :update, params: {id: application, doorkeeper_application: {name: "Mine Now"}}
     end
     assert_equal "Not Yours", application.reload.name
+  end
+
+  private
+
+  def logo_upload(name)
+    Rack::Test::UploadedFile.new(support_file(name), "image/png")
   end
 end

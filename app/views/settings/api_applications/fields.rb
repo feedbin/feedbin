@@ -11,6 +11,25 @@ module Settings
         end
       end
 
+      # Removal is its own form (#remove_logo), rendered outside this one.
+      def logo_field
+        logo = Api::V3::ApplicationLogo.for(@application)
+
+        div class: "mb-8" do
+          div(class: "mb-2 text-600") { label(for: "logo") { "Logo" } }
+          div class: "flex flex-wrap items-center gap-4" do
+            if logo
+              img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "w-16 h-16 rounded-[14px] object-contain shrink-0"
+            end
+            input type: "file", name: "logo", id: "logo", accept: "image/png,image/jpeg,image/gif,image/webp", class: "grow basis-[200px] min-w-0 text-sm"
+            if logo
+              button(type: "submit", form: "remove_logo", class: "button button-secondary", data: {confirm: "Remove the logo?"}) { "Remove" }
+            end
+          end
+          p(class: "text-sm text-500 mt-2") { "Shown above your app’s name when it asks for access. PNG, JPEG, GIF or WebP; square works best." }
+        end
+      end
+
       def name_and_redirect_fields(form)
         div class: "mb-8" do
           render Form::TextInputComponent.new do |text|
