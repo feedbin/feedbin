@@ -76,16 +76,13 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_nil flash[:plaintext_secret]
   end
 
-  test "Feedbin's own apps have no token section, since their tokens come from signing in" do
+  test "Feedbin's own apps offer token creation like any other" do
     application = @user.oauth_applications.create!(name: "Feedbin", redirect_uri: "", scopes: "read write account")
-    application.access_tokens.create!(resource_owner_id: @user.id, device_name: "Development", scopes: "")
     login_as @user
 
     get :show, params: {id: application}
 
-    assert_response :success
-    refute_includes response.body, "Your Tokens"
-    refute_includes response.body, "Development"
+    assert_select "form[action=?] input[name='token[device_name]']", settings_api_application_tokens_path(application)
   end
 
   test "lists only the tokens created on the application's page, not sign-ins" do

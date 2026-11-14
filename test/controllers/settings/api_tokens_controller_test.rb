@@ -32,15 +32,13 @@ class Settings::ApiTokensControllerTest < ActionController::TestCase
     assert_equal "Name the token so you can tell it apart later.", flash[:alert]
   end
 
-  test "does not create a token for one of Feedbin's own apps" do
+  test "a token created for one of Feedbin's own apps never gets the account scope" do
     @application.update!(scopes: "read write account")
     login_as @user
 
-    assert_no_difference -> { @user.oauth_access_tokens.count } do
-      post :create, params: {api_application_id: @application, token: {device_name: "curl"}}
-    end
-    assert_redirected_to settings_api_application_path(@application)
-    assert flash[:alert].present?
+    post :create, params: {api_application_id: @application, token: {device_name: "curl"}}
+
+    assert_equal "read write", @user.oauth_access_tokens.last.scopes.to_s
   end
 
   test "does not create a token for another user's application" do

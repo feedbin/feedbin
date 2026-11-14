@@ -130,10 +130,7 @@ module Settings
       end
 
       def tokens
-        # Feedbin's own apps get their tokens by signing in, listed under
-        # Authorized Apps.
-        return if @application.scopes.include?("account")
-
+        # Tokens from signing in are listed under Authorized Apps.
         tokens = @application.access_tokens.where(resource_owner_id: @user.id, revoked_at: nil).where.not(device_name: nil).order(created_at: :desc)
 
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|

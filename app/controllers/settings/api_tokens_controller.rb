@@ -3,9 +3,6 @@ class Settings::ApiTokensController < ApplicationController
 
   def create
     application = @user.oauth_applications.find(params[:api_application_id])
-    if application.scopes.include?("account")
-      return redirect_to settings_api_application_path(application), alert: "Tokens for Feedbin's own apps come from signing in to the app."
-    end
     device_name = params.dig(:token, :device_name).to_s.strip
     if device_name.empty?
       return redirect_to settings_api_application_path(application), alert: "Name the token so you can tell it apart later."

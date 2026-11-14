@@ -25,6 +25,14 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
     assert_response :created
   end
 
+  test "a read/write token of a first-party app is judged by its own scopes, not its app's" do
+    created_in_settings = @first_party.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write")
+
+    post "/v3/devices", params: device_body, headers: bearer(created_in_settings), as: :json
+
+    assert_insufficient_scope
+  end
+
   test "third-party token cannot delete a device" do
     device = @user.devices.create!(token: "abc123", device_type: :notifier)
 
