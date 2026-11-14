@@ -56,10 +56,69 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Allow My Reader"
   end
 
-  test "sends a signed out user to the login form" do
+  test "a signed out visitor sees the authorize page without a redirect or notice" do
     get oauth_authorization_path(authorize_params)
 
-    assert_redirected_to login_url
+    assert_response :success
+    assert_select "input[name=email]"
+    assert_select "input[name=password]"
+    assert_select "button", text: "Sign in and authorize"
+    refute_includes response.body, "Please sign in."
+  end
+
+  test "signing in on the authorize page authorizes and signs in to Feedbin" do
+    post oauth_authorization_path, params: authorize_params.merge(email: @user.email, password: default_password)
+
+    location = URI(response.location)
+    assert_equal "myreader", location.scheme
+    assert Rack::Utils.parse_query(location.query)["code"].present?
+
+    get oauth_authorization_path(authorize_params)
+    assert_select "input[name=password]", count: 0
+    assert_select "button", text: "Authorize"
+  end
+
+  test "a wrong password returns to the authorize page with every parameter kept" do
+    state = "a b&c=d"
+    post oauth_authorization_path, params: authorize_params.merge(state: state, email: @user.email, password: "nope")
+
+    follow_redirect!
+    assert_equal oauth_authorization_path, path
+    assert_includes response.body, "Invalid email or password"
+    assert_select "input[name=email][value=?]", @user.email
+    assert_select "input[name=state][value=?]", state
+    assert_equal 0, Doorkeeper::AccessGrant.count
+  end
+
+  test "an unknown email or blank password is refused the same way" do
+    [{email: "nobody@example.com", password: default_password}, {email: @user.email, password: ""}].each do |credentials|
+      post oauth_authorization_path, params: authorize_params.merge(credentials)
+      follow_redirect!
+      assert_includes response.body, "Invalid email or password"
+    end
+  end
+
+  test "an account without API v3 is not signed in" do
+    post oauth_authorization_path, params: authorize_params.merge(email: users(:ann).email, password: default_password)
+
+    follow_redirect!
+    assert_includes response.body, "This account can’t connect apps yet"
+    assert_select "input[name=password]"
+  end
+
+  test "a signed out visitor can cancel" do
+    delete oauth_authorization_path, params: authorize_params
+
+    query = Rack::Utils.parse_query(URI(response.location).query)
+    assert_equal "access_denied", query["error"]
+    assert_equal "abc123", query["state"]
+  end
+
+  test "an unregistered redirect URI shows the error page to a signed out visitor" do
+    get oauth_authorization_path(authorize_params.merge(redirect_uri: "https://evil.example/cb"))
+
+    assert_includes response.body, "This app can’t connect to Feedbin"
+    assert_select "input[name=password]", count: 0
   end
 
   test "a new user signs up and comes back to the authorization screen" do
@@ -68,7 +127,6 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     create_stripe_plan(plan)
 
     get oauth_authorization_path(authorize_params)
-    assert_redirected_to login_url
 
     post users_url, params: {user: {email: "new-reader@example.com", password: default_password, plan_id: plan.id}}
 

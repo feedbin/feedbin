@@ -1,17 +1,15 @@
 Doorkeeper.configure do
   orm :active_record
 
-  # ApplicationController's sign-in redirect returns signed-out visitors here.
-  base_controller "ApplicationController"
+  # Skips ApplicationController's sign-in redirect: the authorize page signs
+  # visitors in itself, and renders layouts/oauth_page from its own views.
+  base_controller "Oauth::BaseController"
 
-  resource_owner_authenticator do
-    require_api_v3
-    current_user unless performed?
-  end
+  resource_owner_authenticator { oauth_resource_owner }
 
   enable_application_owner confirmation: true
 
-  # Requested scopes are replaced by Api::V3::Scopes (see assign_v3_scopes below).
+  # Requested scopes are replaced by Api::V3::Scopes (see Oauth::BaseController).
   default_scopes :read, :write
   optional_scopes :account
   enforce_configured_scopes
@@ -36,20 +34,4 @@ Doorkeeper.configure do
 
   allow_token_introspection false
   realm "Feedbin"
-end
-
-Rails.application.config.to_prepare do
-  # The authorization views render layouts/form_page themselves.
-  Doorkeeper::AuthorizationsController.layout false
-
-  Doorkeeper::AuthorizationsController.class_eval do
-    before_action :assign_v3_scopes, only: [:new, :create]
-
-    private
-
-    def assign_v3_scopes
-      application = Doorkeeper::Application.by_uid(params[:client_id].to_s)
-      params[:scope] = Api::V3::Scopes.for(application) if application
-    end
-  end
 end
