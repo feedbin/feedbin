@@ -121,6 +121,35 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_select "input[name=password]", count: 0
   end
 
+  test "not you signs out and returns to the authorize page" do
+    sign_in_as @user
+
+    delete oauth_session_path, params: authorize_params
+
+    follow_redirect!
+    assert_equal oauth_authorization_path, path
+    assert_select "input[name=password]"
+    assert_select "input[name=state][value=?]", "abc123"
+  end
+
+  test "not you never redirects off site" do
+    sign_in_as @user
+
+    delete oauth_session_path, params: authorize_params.merge(redirect_uri: "https://evil.example/cb")
+
+    assert_equal "www.example.com", URI(response.location).host
+    follow_redirect!
+    assert_includes response.body, "This app can’t connect to Feedbin"
+  end
+
+  test "a signed in visitor is offered a way to switch accounts" do
+    sign_in_as @user
+
+    get oauth_authorization_path(authorize_params)
+
+    assert_select "form[action=?] button", oauth_session_path, text: "Not you?"
+  end
+
   test "a new user signs up and comes back to the authorization screen" do
     StripeMock.start
     plan = plans(:trial)

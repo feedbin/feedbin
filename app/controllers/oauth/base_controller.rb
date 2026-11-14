@@ -6,7 +6,7 @@ class Oauth::BaseController < ApplicationController
   layout false
 
   skip_before_action :authorize
-  before_action :assign_v3_scopes, only: [:new, :create]
+  before_action :assign_v3_scopes
 
   private
 

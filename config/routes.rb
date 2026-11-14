@@ -182,6 +182,7 @@ Rails.application.routes.draw do
   use_doorkeeper do
     skip_controllers :applications, :authorized_applications, :token_info
   end
+  resource :session, only: :destroy, module: :oauth, path: "oauth/session", as: :oauth_session
 
   mount StripeEvent::Engine, at: "/stripe"
 

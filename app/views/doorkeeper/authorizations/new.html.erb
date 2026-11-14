@@ -13,6 +13,12 @@
       <button type="submit" class="button flex w-full">Sign in and authorize</button>
     <% end %>
   <% end %>
+  <% if signed_in? %>
+    <%= form_tag oauth_session_path, method: :delete do %>
+      <%= render "doorkeeper/authorizations/hidden_fields" %>
+      <button type="submit">Not you?</button>
+    <% end %>
+  <% end %>
   <%= form_tag oauth_authorization_path, method: :delete do %>
     <%= render "doorkeeper/authorizations/hidden_fields" %>
     <button type="submit" class="button button-secondary flex w-full">Cancel</button>
