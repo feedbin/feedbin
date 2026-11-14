@@ -93,7 +93,14 @@ module Settings
         tokens = @application.access_tokens.where(resource_owner_id: @user.id, revoked_at: nil).where.not(device_name: nil).order(created_at: :desc)
 
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.header { "Your Tokens" }
+          group.custom_header do
+            render H2Component.new(class: "!mb-1") { "Your Tokens" }
+            p class: "text-sm text-500 mb-4" do
+              plain "A token lets a script, a command-line tool, or the app you’re building use the API as you, without the sign-in step. Send it as "
+              code(class: "font-mono") { "Authorization: Bearer <token>" }
+              plain "."
+            end
+          end
 
           group.item do
             form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
@@ -123,7 +130,7 @@ module Settings
             end
           end
 
-          group.description { "Tokens act as your account and don’t expire. Revoke one to sign out the client using it." }
+          group.description { "A token is shown once when you create it, doesn’t expire, and can read and change everything in your account, so keep it private. Revoke it to cut off whatever is using it." }
         end
       end
     end
