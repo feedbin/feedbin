@@ -24,7 +24,10 @@
 #
 # The database is the argument, or PGDATABASE. Everything else about the
 # connection comes from the usual PG* variables. MAINTENANCE_WORK_MEM=2GB
-# gives the index sorts more memory than the server's default.
+# gives the index sorts more memory than the server's default. sudo drops the
+# environment, so variables go after it:
+#
+#   sudo -u postgres MAINTENANCE_WORK_MEM=2GB ./api_v3_prebuild.sh <database>
 
 set -Eeuo pipefail
 
@@ -35,9 +38,39 @@ if [ -z "$DATABASE" ]; then
   exit 64
 fi
 
-if [ -z "${TMUX:-}${STY:-}" ] && [ "${DETACHED_OK:-}" != "1" ]; then
+# sudo drops TMUX and STY with the rest of the environment, so the processes
+# above this one are checked too. /proc where there is one, ps otherwise.
+process_name() {
+  if [ -r "/proc/$1/comm" ]; then cat "/proc/$1/comm"; else ps -o comm= -p "$1"; fi
+}
+
+parent_of() {
+  local stat
+  if [ -r "/proc/$1/stat" ]; then
+    # The name, in parentheses, can hold spaces; the parent is the second field after it.
+    stat=$(<"/proc/$1/stat")
+    stat=${stat##*) }
+    set -- $stat
+    echo "$2"
+  else
+    ps -o ppid= -p "$1" | tr -d ' '
+  fi
+}
+
+in_multiplexer() {
+  local pid=$$ name
+  [ -n "${TMUX:-}${STY:-}" ] && return 0
+  while [ "${pid:-0}" -gt 1 ]; do
+    name=$(process_name "$pid" 2>/dev/null | tr '[:upper:]' '[:lower:]') || return 1
+    case "$name" in *tmux*|*screen*) return 0 ;; esac
+    pid=$(parent_of "$pid" 2>/dev/null) || return 1
+  done
+  return 1
+}
+
+if [ "${DETACHED_OK:-}" != "1" ] && ! in_multiplexer; then
   echo "Run this inside tmux or screen: the builds take an hour or more, and one that loses its connection has to start over." >&2
-  echo "DETACHED_OK=1 runs it anyway." >&2
+  echo "To run it anyway: sudo -u postgres DETACHED_OK=1 $0 $DATABASE" >&2
   exit 64
 fi
 

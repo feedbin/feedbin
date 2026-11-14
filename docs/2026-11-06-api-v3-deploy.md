@@ -48,7 +48,11 @@ One read of `entries` takes about its heap size divided by the read rate: at 200
 sudo -u postgres ./api_v3_prebuild.sh <database>
 ```
 
-`MAINTENANCE_WORK_MEM=2GB` in front gives the index sorts more memory than the server's default.
+`MAINTENANCE_WORK_MEM=2GB` gives the index sorts more memory than the server's default. `sudo` drops the environment, so a variable goes after it, not in front:
+
+```bash
+sudo -u postgres MAINTENANCE_WORK_MEM=2GB ./api_v3_prebuild.sh <database>
+```
 
 What it does, in order:
 
