@@ -85,11 +85,11 @@ module Settings
         # Stored hashed, so the value exists only on the request after create.
         created = Doorkeeper::AccessToken.by_token(@plaintext_token) if @plaintext_token.present?
 
-        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+        render Settings::ControlGroupComponent.new class: "mb-14 [&_[data-item-container]]:border-t-0" do |group|
           group.header { "Your Tokens" }
 
           group.item do
-            form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
+            form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "pb-3 flex items-center gap-4") do |form|
               div class: "grow" do
                 render Form::TextInputComponent.new do |text|
                   text.input do
