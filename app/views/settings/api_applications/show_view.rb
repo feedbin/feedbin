@@ -10,7 +10,7 @@ module Settings
 
       def view_template
         render Settings::H1Component.new do
-          @application.name
+          "API"
         end
         render Settings::SubtitleComponent.new do
           link_to "All applications", settings_api_applications_path
@@ -32,50 +32,27 @@ module Settings
         end
       end
 
-      # What the owner can change, on the edit form.
+      # What the owner can change, on the edit form. The card is the one
+      # Settings::Subscriptions::Shared::FormComponent opens with.
       def details
         logo = Api::V3::ApplicationLogo.for(@application)
+        uris = @application.redirect_uri.to_s.split
 
-        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.custom_header do
-            div class: "flex items-center mb-4" do
-              div class: "grow" do
-                render H2Component.new(class: "!mb-0") { "Details" }
-              end
-              link_to "Edit", edit_settings_api_application_path(@application), class: "button button-secondary"
+        div class: "border rounded-lg mb-14" do
+          div class: "flex items-center gap-3 p-4" do
+            if logo
+              img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "size-8 rounded-lg object-contain shrink-0"
             end
+            span(class: "truncate text-lg mr-6") { @application.name }
+            link_to "Edit", edit_settings_api_application_path(@application), class: "button button-secondary !ml-auto"
           end
-
-          group.item do
-            render Settings::ControlRowComponent.new do |row|
-              row.title { "Name" }
-              row.description { @application.name }
-            end
-          end
-
-          group.item do
-            render Settings::ControlRowComponent.new do |row|
-              row.title { "Logo" }
-              row.description do
-                if logo
-                  img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "w-12 h-12 rounded-[10px] object-contain mt-1"
-                else
-                  plain "None"
-                end
-              end
-            end
-          end
-
-          group.item do
-            render Settings::ControlRowComponent.new do |row|
-              row.title { "Redirect URIs" }
-              row.description do
-                uris = @application.redirect_uri.to_s.split
-                if uris.empty?
-                  plain "None. This app can only use tokens created below."
-                else
-                  uris.each { |uri| copyable(uri) }
-                end
+          div class: "border-t p-4" do
+            div(class: "text-600") { "Redirect URIs" }
+            div class: "text-500 text-sm" do
+              if uris.empty?
+                plain "None. This app can only use tokens created below."
+              else
+                uris.each { |uri| copyable(uri) }
               end
             end
           end
