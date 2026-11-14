@@ -172,6 +172,24 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "returned to My Reader (reader.example)"
   end
 
+  test "cancelling does not send the next sign in back to the authorize page" do
+    get oauth_authorization_path(authorize_params)
+    delete oauth_authorization_path, params: authorize_params
+
+    sign_in_as @user
+
+    assert_redirected_to root_url
+  end
+
+  test "authorizing does not leave a return location behind" do
+    get oauth_authorization_path(authorize_params)
+    post oauth_authorization_path, params: authorize_params.merge(email: @user.email, password: default_password)
+
+    sign_in_as @user
+
+    assert_redirected_to root_url
+  end
+
   test "a new user signs up and comes back to the authorization screen" do
     StripeMock.start
     plan = plans(:trial)

@@ -18,8 +18,9 @@ class Oauth::BaseController < ApplicationController
     elsif request.post?
       sign_in_resource_owner
     else
-      # Signing up or resetting a password elsewhere comes back here.
-      store_location
+      # Signing up or resetting a password elsewhere comes back here, unless
+      # the visitor cancelled.
+      request.get? ? store_location : clear_location
       nil
     end
   end
@@ -32,6 +33,7 @@ class Oauth::BaseController < ApplicationController
       refuse_sign_in "This account can’t connect apps yet."
     else
       sign_in user
+      clear_location
       user
     end
   end
