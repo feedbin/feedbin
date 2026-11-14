@@ -51,7 +51,12 @@ module Api
       private
 
       # extensions: extra problem members (RFC 9457 §3.2); nil values are dropped.
-      def render_problem(status, code, title:, detail:, errors: nil, **extensions)
+      def render_problem(status, ...)
+        render status: status, **problem_render_options(status, ...)
+      end
+
+      # The problem without its status, for a caller that sets that itself.
+      def problem_render_options(status, code, title:, detail:, errors: nil, **extensions)
         body = {
           type: error_type(code),
           title: title,
@@ -62,7 +67,7 @@ module Api
         }
         body[:errors] = errors if errors
         body.merge!(extensions.compact)
-        render json: body, status: status, content_type: "application/problem+json"
+        {json: body, content_type: "application/problem+json"}
       end
 
       # Host-independent so clients can match on it.

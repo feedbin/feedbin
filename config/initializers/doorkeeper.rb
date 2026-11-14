@@ -33,5 +33,9 @@ Doorkeeper.configure do
   force_ssl_in_redirect_uri { |uri| !%w[localhost 127.0.0.1 [::1]].include?(uri.host) }
 
   allow_token_introspection false
+
+  # The Authorization header only. A token in a query string ends up in logs
+  # and history, so that way in is for development.
+  access_token_methods :from_bearer_authorization, ->(request) { request.parameters[:access_token] if Rails.env.local? }
   realm "Feedbin"
 end

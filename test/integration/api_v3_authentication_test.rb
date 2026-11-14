@@ -6,7 +6,7 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
     @user = users(:ben)
     @user.setting_on!(:api_v3)
     @application = @user.oauth_applications.create!(name: "Test App", redirect_uri: "")
-    @token = @application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
+    @token = @application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write")
   end
 
   test "rejects a request without credentials" do
@@ -14,7 +14,7 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_response :unauthorized
     assert_equal "application/problem+json", response.media_type
-    assert_equal %(Bearer realm="Feedbin"), response.headers["WWW-Authenticate"]
+    assert_equal %(Bearer realm="Feedbin", error="invalid_token", error_description="The access token is invalid"), response.headers["WWW-Authenticate"]
 
     body = JSON.parse(response.body)
     assert_equal "unauthorized", body["code"]
@@ -44,7 +44,19 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
     get "/v3/subscriptions", headers: bearer(plaintext)
 
     assert_response :unauthorized
-    assert_includes response.headers["WWW-Authenticate"], %(error="invalid_token")
+    assert_equal "unauthorized", JSON.parse(response.body)["code"]
+    assert_equal %(Bearer realm="Feedbin", error="invalid_token", error_description="The access token was revoked"), response.headers["WWW-Authenticate"]
+  end
+
+  test "rejects a token with neither the read nor the write scope" do
+    blank = @application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
+
+    get "/v3/subscriptions", headers: bearer(blank.plaintext_token)
+
+    assert_response :forbidden
+    assert_equal "application/problem+json", response.media_type
+    assert_equal "insufficient_scope", JSON.parse(response.body)["code"]
+    assert_includes response.headers["WWW-Authenticate"], %(Bearer realm="Feedbin", error="insufficient_scope")
   end
 
   test "rejects an unknown token" do
@@ -57,7 +69,7 @@ class ApiV3AuthenticationTest < ActionDispatch::IntegrationTest
     get "/v3/subscriptions", headers: {"Authorization" => ActionController::HttpAuthentication::Basic.encode_credentials(@user.email, default_password)}
 
     assert_response :unauthorized
-    assert_equal %(Bearer realm="Feedbin"), response.headers["WWW-Authenticate"]
+    assert_includes response.headers["WWW-Authenticate"], %(Bearer realm="Feedbin", error="invalid_token")
   end
 
   test "restricts accounts without the feature flag" do

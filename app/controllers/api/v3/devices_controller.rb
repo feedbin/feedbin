@@ -1,7 +1,7 @@
 module Api
   module V3
     class DevicesController < ApiController
-      before_action -> { require_scope("account") }
+      before_action -> { doorkeeper_authorize! :account }
 
       def create
         device, created = DeviceRegistration.new(@user, body).register

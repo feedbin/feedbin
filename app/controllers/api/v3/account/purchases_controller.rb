@@ -2,7 +2,7 @@ module Api
   module V3
     module Account
       class PurchasesController < ApiController
-        before_action -> { require_scope("account") }
+        before_action -> { doorkeeper_authorize! :account }
 
         def create
           receipt = AppStoreReceipt.verify(required_string("receipt_data"))

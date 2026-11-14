@@ -1,7 +1,7 @@
 module Api
   module V3
     class AccountController < ApiController
-      before_action -> { require_scope("account") }
+      before_action -> { doorkeeper_authorize! :account }
 
       def show
         render json: AccountSerializer.new(@user).to_h

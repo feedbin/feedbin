@@ -1,9 +1,10 @@
 # Doorkeeper bearer tokens only: v3 never accepts the account password.
+# Doorkeeper finds the token, checks it and its scopes, and answers a failure
+# itself with the status and WWW-Authenticate header; only the body is ours.
 module Api
   module V3
     module Authentication
       extend ActiveSupport::Concern
-      include ActionController::HttpAuthentication::Token::ControllerMethods
 
       LAST_USED_RESOLUTION = 5.minutes
 
@@ -14,19 +15,15 @@ module Api
 
       private
 
+      # With no scope named, Doorkeeper asks for one of its defaults: read or write.
       def authenticate
-        @user = authenticate_with_http_token { |token, _options| user_for_token(token) }
-        @user ||= user_for_token(params[:access_token]) if params[:access_token].present? && Rails.env.local?
-        status_unauthorized unless @user
-      end
+        doorkeeper_authorize!
+        return if performed?
 
-      def user_for_token(plaintext)
-        token = Doorkeeper::AccessToken.by_token(plaintext)
-        return unless token&.accessible?
-
-        @token = token
-        token.update_column(:last_used_at, Time.now) unless token.last_used_at&.after?(LAST_USED_RESOLUTION.ago)
-        User.includes(:plan).find_by(id: token.resource_owner_id)
+        @token = doorkeeper_token
+        @token.update_column(:last_used_at, Time.now) unless @token.last_used_at&.after?(LAST_USED_RESOLUTION.ago)
+        # Tokens are deleted with their user, so a token has one.
+        @user = User.includes(:plan).find(@token.resource_owner_id)
       end
 
       def authorize_account
@@ -39,26 +36,24 @@ module Api
         end
       end
 
-      def require_scope(name)
-        return if @token.includes_scope?(name)
-        response.headers["WWW-Authenticate"] = %(Bearer realm="Feedbin", error="insufficient_scope", scope="#{name}")
-        render_problem :forbidden, "insufficient_scope",
-          title: "Insufficient scope",
-          detail: "This needs the #{name} scope, which only Feedbin's apps have."
-      end
-
       # Overridden where a suspended or restricted account may still act.
       def lapsed_account_allowed?
         false
       end
 
-      def status_unauthorized
-        challenge = %(Bearer realm="Feedbin")
-        challenge += %(, error="invalid_token") if ActionController::HttpAuthentication::Token.token_and_options(request)
-        response.headers["WWW-Authenticate"] = challenge
-        render_problem :unauthorized, "unauthorized",
+      def doorkeeper_unauthorized_render_options(**)
+        problem_render_options :unauthorized, "unauthorized",
           title: "Unauthorized",
           detail: "The access token is missing or has been revoked."
+      end
+
+      def doorkeeper_forbidden_render_options(**)
+        detail = if @_doorkeeper_scopes.map(&:to_s) == ["account"]
+          "This needs the account scope, which only Feedbin's apps have."
+        else
+          "This needs the #{@_doorkeeper_scopes.to_a.join(" or ")} scope."
+        end
+        problem_render_options :forbidden, "insufficient_scope", title: "Insufficient scope", detail: detail
       end
     end
   end

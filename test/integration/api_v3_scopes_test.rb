@@ -159,7 +159,8 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
   def assert_insufficient_scope
     assert_response :forbidden
     assert_equal "insufficient_scope", JSON.parse(response.body)["code"]
-    assert_includes response.headers["WWW-Authenticate"], %(error="insufficient_scope", scope="account")
+    assert_includes response.headers["WWW-Authenticate"], %(Bearer realm="Feedbin", error="insufficient_scope")
+    assert_includes JSON.parse(response.body)["detail"], "account scope"
   end
 
   # Runs the authorization-code flow and returns the issued token's scopes.

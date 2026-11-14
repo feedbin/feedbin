@@ -1,7 +1,7 @@
 module Api
   module V3
     class TokensController < ApiController
-      before_action -> { require_scope("account") }, only: :index
+      before_action -> { doorkeeper_authorize! :account }, only: :index
       before_action :ensure_may_revoke, only: :destroy
 
       def index
@@ -22,7 +22,7 @@ module Api
 
       # Scope is checked before the lookup so the response doesn't reveal which ids exist.
       def ensure_may_revoke
-        require_scope("account") unless params[:id].to_s == @token.id.to_s
+        doorkeeper_authorize!(:account) unless params[:id].to_s == @token.id.to_s
       end
     end
   end
