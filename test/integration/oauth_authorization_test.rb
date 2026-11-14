@@ -17,7 +17,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
 
     get oauth_authorization_path(authorize_params)
     assert_response :success
-    assert_includes response.body, "Allow My Reader to use your Feedbin account?"
+    assert_includes response.body, "Authorize My Reader to use your Feedbin account"
 
     post oauth_authorization_path, params: authorize_params
     assert_response :redirect
@@ -53,7 +53,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
 
     get oauth_authorization_path(authorize_params.except(:code_challenge, :code_challenge_method))
 
-    refute_includes response.body, "Allow My Reader"
+    refute_includes response.body, "Authorize My Reader"
   end
 
   test "a signed out visitor sees the authorize page without a redirect or notice" do
@@ -147,7 +147,29 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
 
     get oauth_authorization_path(authorize_params)
 
-    assert_select "form[action=?] button", oauth_session_path, text: "Not you?"
+    assert_select "form#oauth_switch_account[action=?]", oauth_session_path
+    assert_select "button[form=oauth_switch_account]", text: "Not you?"
+  end
+
+  test "the authorize page says what is granted, to whom, and how to undo it" do
+    sign_in_as @user
+
+    get oauth_authorization_path(authorize_params)
+
+    assert_select "h1", text: "Authorize My Reader to use your Feedbin account"
+    assert_includes response.body, "read and change your subscriptions, articles and settings"
+    assert_includes response.body, @user.email
+    assert_includes response.body, "returned to My Reader"
+    assert_includes response.body, "revoke access any time in Settings"
+  end
+
+  test "a web redirect names the host the visitor returns to" do
+    @application.update!(redirect_uri: "https://reader.example/callback")
+    sign_in_as @user
+
+    get oauth_authorization_path(authorize_params.merge(redirect_uri: "https://reader.example/callback"))
+
+    assert_includes response.body, "returned to My Reader (reader.example)"
   end
 
   test "a new user signs up and comes back to the authorization screen" do

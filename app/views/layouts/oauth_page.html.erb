@@ -1,0 +1,22 @@
+<% @class = "theme-auto" %>
+
+<% content_for :content do %>
+<%# Top-aligned on phones, and the page itself scrolls: layouts/form_page centres
+    a page exactly as tall as the screen, which leaves nothing to scroll when
+    the keyboard covers the lower half. The spacer is that scroll room. %>
+<div class="flex flex-col min-h-full p-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
+  <div class="w-full max-w-[480px] mx-auto sm:my-auto">
+    <div class="flex justify-center items-center mb-6 md:mb-12">
+      <%= svg_tag "logo-full", inline: true, class: "logo-full w-[140px] h-[38px]" %>
+    </div>
+
+    <%= yield :form_content %>
+  </div>
+  <div class="text-center text-sm text-500 pt-4 mt-auto sm:mt-0">
+    <a href="/privacy-policy" class="!text-500">Privacy Policy</a> | <a href="mailto:support@feedbin.com" class="!text-500">Support</a>
+  </div>
+  <div class="shrink-0 min-h-[max(var(--visual-viewport-offset,0px),env(safe-area-inset-bottom))]"></div>
+</div>
+<% end %>
+
+<%= render template: "layouts/application" %>

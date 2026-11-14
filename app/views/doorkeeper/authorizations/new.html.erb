@@ -1,29 +1,66 @@
-<% content_for :form_content do %>
-<div class="border rounded-md p-6 md:p-12 mb-8">
-  <h1 class="font-bold text-lg mb-4">Allow <%= @pre_auth.client.name %> to use your Feedbin account?</h1>
+<% app_name = @pre_auth.client.name %>
+<% redirect = URI.parse(@pre_auth.redirect_uri) rescue nil %>
+<% redirect_host = redirect.host if redirect&.scheme.in?(%w[http https]) %>
 
-  <%= form_tag oauth_authorization_path, method: :post, novalidate: true do %>
+<% content_for :form_content do %>
+<div class="border rounded-md p-6 md:p-12 mb-4">
+  <h1 class="font-bold text-lg mb-2">Authorize <%= app_name %> to use your Feedbin account</h1>
+  <p class="text-500 mb-6"><%= app_name %> will be able to read and change your subscriptions, articles and settings.</p>
+
+  <%= render partial: "shared/flash", locals: {flash: flash} %>
+
+  <%= form_tag oauth_authorization_path, method: :post, novalidate: true, data: {controller: "oauth-form", action: "visual-viewport:change@window->oauth-form#reveal"} do %>
     <%= render "doorkeeper/authorizations/hidden_fields" %>
-    <%= render partial: "shared/flash", locals: {flash: flash} %>
     <% if signed_in? %>
-      <button type="submit" class="button flex w-full">Authorize</button>
+      <p class="mb-6">
+        Signed in as <strong class="text-700 break-all"><%= current_user.email %></strong>.
+        <button type="submit" form="oauth_switch_account" class="text-blue-600 whitespace-nowrap">Not you?</button>
+      </p>
+      <button type="submit" class="button flex w-full min-h-[44px]" data-oauth-form-target="submit">Authorize</button>
     <% else %>
-      <%= email_field_tag :email, flash[:email], class: "text-input" %>
-      <%= password_field_tag :password, nil, class: "text-input" %>
-      <button type="submit" class="button flex w-full">Sign in and authorize</button>
+      <div class="mb-4">
+        <%= render Form::TextInputComponent.new do |text| %>
+          <% text.label_content do %>
+            <label for="email">Email</label>
+          <% end %>
+          <% text.input do %>
+            <%= email_field_tag :email, flash[:email], class: "peer text-input !text-[16px] dark:[color-scheme:dark]", autocomplete: "username", autocapitalize: "off", autocorrect: "off", spellcheck: "false", enterkeyhint: "next", data: {action: "keydown.enter->oauth-form#next"} %>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="mb-6">
+        <%= render Form::TextInputComponent.new do |text| %>
+          <% text.label_content do %>
+            <div class="flex items-center">
+              <label for="password">Password</label>
+              <%= link_to "Forgot your password?", new_password_reset_path, class: "ml-auto text-sm" %>
+            </div>
+          <% end %>
+          <% text.input do %>
+            <%= password_field_tag :password, nil, class: "text-input !text-[16px] dark:[color-scheme:dark]", autocomplete: "current-password", enterkeyhint: "go", data: {oauth_form_target: "password"} %>
+          <% end %>
+        <% end %>
+      </div>
+      <button type="submit" class="button flex w-full min-h-[44px]" data-oauth-form-target="submit">Sign in and authorize</button>
     <% end %>
   <% end %>
-  <% if signed_in? %>
-    <%= form_tag oauth_session_path, method: :delete do %>
-      <%= render "doorkeeper/authorizations/hidden_fields" %>
-      <button type="submit">Not you?</button>
-    <% end %>
-  <% end %>
-  <%= form_tag oauth_authorization_path, method: :delete do %>
+
+  <%= form_tag oauth_authorization_path, method: :delete, class: "mt-3" do %>
     <%= render "doorkeeper/authorizations/hidden_fields" %>
-    <button type="submit" class="button button-secondary flex w-full">Cancel</button>
+    <button type="submit" class="button button-secondary flex w-full min-h-[44px]">Cancel</button>
+  <% end %>
+
+  <% if signed_in? %>
+    <%= form_tag oauth_session_path, method: :delete, id: "oauth_switch_account" do %>
+      <%= render "doorkeeper/authorizations/hidden_fields" %>
+    <% end %>
   <% end %>
 </div>
+
+<p class="text-sm text-500 text-center">
+  You’ll be returned to <%= app_name %><%= " (#{redirect_host})" if redirect_host %>.
+  You can revoke access any time in Settings &gt; API.
+</p>
 <% end %>
 
-<%= render template: "layouts/form_page" %>
+<%= render template: "layouts/oauth_page" %>
