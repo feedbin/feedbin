@@ -357,8 +357,8 @@ module ApiDocs
     # Above every example id, below every fixture id (all above 30,000,000).
     WORLD = 20_000_000
 
-    # Without start, each table's next id is one past its highest id.
-    def reset(start: nil)
+    # Without start, each table's next id is one past its highest example id.
+    def reset(start: nil, below: WORLD)
       connection = ActiveRecord::Base.connection
       connection.select_rows(<<~SQL).each do |table, sequence|
         SELECT t.relname, s.relname FROM pg_class s
@@ -367,9 +367,16 @@ module ApiDocs
         JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = d.refobjsubid
         WHERE s.relkind = 'S' AND a.attname = 'id'
       SQL
-        value = start || connection.select_value("SELECT COALESCE(MAX(id), 0) + 1 FROM #{connection.quote_table_name(table)} WHERE id < #{WORLD}")
+        value = start || connection.select_value("SELECT COALESCE(MAX(id), 0) + 1 FROM #{connection.quote_table_name(table)}#{" WHERE id < #{below}" if below}")
         connection.execute("SELECT setval(#{connection.quote(sequence)}, #{value}, false)")
       end
+    end
+
+    # A sequence does not roll back with the test, and left low it gives a
+    # later test's rows ids below the fixtures', so `.first` stops finding a
+    # fixture. Puts each table's next id back above every row.
+    def restore
+      reset(below: nil)
     end
   end
 end

@@ -15,6 +15,7 @@ class ApiDocsExamplesTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
+    ApiDocs::Sequences.restore
     @environment&.each { |key, value| ENV[key] = value }
   end
 
