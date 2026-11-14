@@ -140,13 +140,13 @@ One application for each app Feedbin ships. Today that is the new iOS app (`feed
 | Description, URL, Contact Email | Optional; shown only on the application's own page. |
 
 - [ ] **Copy its Client ID** from the application's page. It is generated, not chosen.
-- [ ] **Mark it first-party, before anyone signs in with it.** On app4, in `/usr/local/srv/apps/feedbin/current`:
+- [ ] **Mark it first-party, before anyone signs in with it.** In the same console as the flag:
 
-```bash
-bin/rails "api_v3:first_party[<client id>]"
+```ruby
+Api::V3::Scopes.first_party!("<client id>")
 ```
 
-Without this its tokens are `read write` only, and the app cannot read or change the account (`/v3/account`), register a device, record a purchase or list tokens. The task also upgrades the application's existing tokens, the ones created in settings included. It prints the application's name, its scopes and how many tokens it upgraded.
+Without this its tokens are `read write` only, and the app cannot read or change the account (`/v3/account`), register a device, record a purchase or list tokens. It also upgrades the application's existing tokens, the ones created in settings included, and returns the application's name, its scopes and how many tokens it upgraded. A client id that matches nothing raises. The same thing from a shell is `bin/rails "api_v3:first_party[<client id>]"`.
 
 - [ ] **Give the Client ID to the app.** In `feedbin-ios-next`, `Configuration/Identity.xcconfig`:
 
