@@ -6,6 +6,10 @@ class HarvestEmbeds
 
   SET_NAME = "#{name}-ids"
   PAUSE_KEY = "#{name}-paused"
+  # The embed patterns capture whatever sits where an id belongs. YouTube
+  # refuses a request for one that isn't an id, and a refused batch is queued
+  # again, so anything else would fail its batch on every pass.
+  VIDEO_ID = /\A[\w-]+\z/
 
   def perform(entry_id, process = false)
     find_embeds(entry_id) if entry_id
@@ -20,7 +24,8 @@ class HarvestEmbeds
   end
 
   def add_missing_to_queue(video_ids)
-    missing = video_ids.uniq - Embed.youtube_video.where(provider_id: video_ids).pluck(:provider_id)
+    video_ids = video_ids.uniq.grep(VIDEO_ID)
+    missing = video_ids - Embed.youtube_video.where(provider_id: video_ids).pluck(:provider_id)
     add_to_queue(SET_NAME, missing) if missing.present?
   end
 
@@ -68,6 +73,9 @@ class HarvestEmbeds
     include SidekiqHelper
 
     def perform(video_ids)
+      video_ids = video_ids.grep(VIDEO_ID)
+      return if video_ids.empty?
+
       videos = youtube_api("videos", video_ids, %w[snippet contentDetails liveStreamingDetails])
       # Nothing else queues these ids again.
       return add_to_queue(SET_NAME, video_ids) unless videos

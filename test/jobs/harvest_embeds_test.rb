@@ -259,6 +259,30 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal ["other_id", "video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }.sort
   end
 
+  test "an id YouTube would refuse is never queued" do
+    @entry.update(content: %(<iframe src="https://www.youtube.com/embed/a,b,c"></iframe><iframe src="https://www.youtube.com/embed/?x=1"></iframe><iframe src="https://www.youtube.com/embed/video_id"></iframe>))
+
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+  end
+
+  test "a queued id YouTube would refuse is dropped, so it cannot fail its batch on every pass" do
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos}).to_return(status: 503)
+
+    HarvestEmbeds::Download.new.perform(["video_id", "a,b,c", ""])
+
+    assert_requested :get, %r{www.googleapis.com/youtube/v3/videos}, query: hash_including("id" => "video_id")
+    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+  end
+
+  test "a batch with no usable id makes no request" do
+    HarvestEmbeds::Download.new.perform(["a,b,c"])
+
+    assert_not_requested :get, %r{www.googleapis.com/youtube/v3/}
+    assert_empty Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+  end
+
   test "an exhausted quota puts the ids back and pauses harvesting until the quota resets" do
     stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
       .to_return(status: 403, body: {error: {errors: [{reason: "quotaExceeded"}]}}.to_json)
