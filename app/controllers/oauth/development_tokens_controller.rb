@@ -10,7 +10,6 @@ class Oauth::DevelopmentTokensController < ActionController::API
     application = Api::V3::DevelopmentApplication.ensure!(owner: user)
     token = application.access_tokens.create!(
       resource_owner_id: user.id,
-      device_name: "Development",
       scopes: Api::V3::Scopes.for(application)
     )
 

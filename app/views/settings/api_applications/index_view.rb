@@ -56,32 +56,32 @@ module Settings
         end
       end
 
+      # One row per app the user has signed in to, their own apps included.
+      # Revoking it signs them out of that app on every device.
       def authorized_applications
-        tokens = @user.oauth_access_tokens
-          .where(revoked_at: nil)
-          .where.not(application_id: @user.oauth_applications.select(:id))
-          .includes(:application)
-          .order(created_at: :desc)
-          .load
+        sign_ins = @user.oauth_access_tokens.sign_ins.includes(:application).load
+        return if sign_ins.empty?
 
-        return if tokens.empty?
+        apps = sign_ins.group_by(&:application).sort_by { |_, tokens| -tokens.map { it.last_used_at || it.created_at }.max.to_i }
 
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
           group.header { "Authorized Apps" }
-          tokens.each do |token|
+          apps.each do |application, tokens|
+            last_used = tokens.filter_map(&:last_used_at).max
             group.item do
               render Settings::ControlRowComponent.new do |row|
-                row.title { token.application.name }
+                row.title { application.name }
                 row.description do
-                  plain "Authorized #{timeago_text(token.created_at)}"
-                  plain " · Last used #{timeago_text(token.last_used_at)}" if token.last_used_at
+                  plain "Authorized #{timeago_text(tokens.map(&:created_at).min)}"
+                  plain " · Last used #{timeago_text(last_used)}" if last_used
                 end
                 row.control do
-                  render(Settings::DeleteButtonComponent.new(url: settings_api_application_token_path(token.application_id, token), confirm: "Revoke access for #{token.application.name}?")) { "Revoke" }
+                  render(Settings::DeleteButtonComponent.new(url: settings_api_authorization_path(application), confirm: "Revoke access for #{application.name}? It will be signed out on every device.")) { "Revoke" }
                 end
               end
             end
           end
+          group.description { "Apps that can use your account. Revoking one signs it out everywhere." }
         end
       end
     end

@@ -2,6 +2,7 @@ class Settings::ApiApplicationsController < ApplicationController
   layout "settings"
 
   before_action :require_api_v3
+  before_action :set_application, only: [:show, :edit, :update]
 
   def index
     render Settings::ApiApplications::IndexView.new(user: @user)
@@ -23,23 +24,39 @@ class Settings::ApiApplicationsController < ApplicationController
   end
 
   def show
-    application = @user.oauth_applications.find(params[:id])
     render Settings::ApiApplications::ShowView.new(
       user: @user,
-      application: application,
+      application: @application,
       plaintext_secret: flash[:plaintext_secret],
       plaintext_token: flash[:plaintext_token]
     )
   end
 
-  def destroy
-    @user.oauth_applications.find(params[:id]).destroy
-    redirect_to settings_api_applications_path, notice: "Application deleted."
+  def edit
+    render Settings::ApiApplications::EditView.new(application: @application)
+  end
+
+  # Tokens belong to the application's id, so they survive a rename or new
+  # redirect URIs.
+  def update
+    if @application.update(application_update_params)
+      redirect_to settings_api_application_path(@application), notice: "Application updated."
+    else
+      render Settings::ApiApplications::EditView.new(application: @application), status: :unprocessable_content
+    end
   end
 
   private
 
+  def set_application
+    @application = @user.oauth_applications.find(params[:id])
+  end
+
   def application_params
     params.expect(doorkeeper_application: [:name, :redirect_uri, :confidential])
+  end
+
+  def application_update_params
+    params.expect(doorkeeper_application: [:name, :redirect_uri])
   end
 end

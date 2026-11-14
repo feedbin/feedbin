@@ -23,6 +23,12 @@ class OauthDevelopmentTokenTest < ActionDispatch::IntegrationTest
     assert_equal 2, Doorkeeper::Application.find_by(uid: Api::V3::DevelopmentApplication::CLIENT_ID).access_tokens.count
   end
 
+  test "a development token is a sign-in, listed under Authorized Apps" do
+    post "/oauth/development_token", params: {user_id: @user.id}
+
+    assert_nil @user.oauth_access_tokens.last.device_name
+  end
+
   test "unknown user is not found" do
     post "/oauth/development_token", params: {user_id: 0}
     assert_response :not_found

@@ -14,6 +14,8 @@ module Settings
         end
         render Settings::SubtitleComponent.new do
           link_to "All applications", settings_api_applications_path
+          plain " · "
+          link_to "Edit", edit_settings_api_application_path(@application)
         end
 
         one_time_secret("Client Secret", @plaintext_secret) if @plaintext_secret.present?
@@ -22,7 +24,6 @@ module Settings
         credentials
         logo
         tokens
-        advanced
       end
 
       def one_time_secret(title, value)
@@ -117,31 +118,32 @@ module Settings
       end
 
       def tokens
-        tokens = @application.access_tokens.where(resource_owner_id: @user.id, revoked_at: nil).order(created_at: :desc)
+        # Feedbin's own apps get their tokens by signing in, listed under
+        # Authorized Apps.
+        return if @application.scopes.include?("account")
+
+        tokens = @application.access_tokens.where(resource_owner_id: @user.id, revoked_at: nil).where.not(device_name: nil).order(created_at: :desc)
 
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
           group.header { "Your Tokens" }
 
-          # Feedbin's own apps get their tokens by signing in.
-          unless @application.scopes.include?("account")
-            group.item do
-              form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
-                div class: "grow" do
-                  render Form::TextInputComponent.new do |text|
-                    text.input do
-                      form.text_field :device_name, placeholder: "Token name, like “curl on my Mac”", class: "peer text-input", autocomplete: "off"
-                    end
+          group.item do
+            form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
+              div class: "grow" do
+                render Form::TextInputComponent.new do |text|
+                  text.input do
+                    form.text_field :device_name, placeholder: "Token name, like “curl on my Mac”", class: "peer text-input", autocomplete: "off", required: true
                   end
                 end
-                button(class: "button button-secondary", type: "submit") { "Create Token" }
               end
+              button(class: "button button-secondary", type: "submit") { "Create Token" }
             end
           end
 
           tokens.each do |token|
             group.item do
               render Settings::ControlRowComponent.new do |row|
-                row.title { token.device_name.presence || "Unnamed token" }
+                row.title { token.device_name }
                 row.description do
                   plain "Created #{timeago_text(token.created_at)}"
                   plain(token.last_used_at ? " · Last used #{timeago_text(token.last_used_at)}" : " · Never used")
@@ -154,21 +156,6 @@ module Settings
           end
 
           group.description { "Tokens act as your account and don’t expire. Revoke one to sign out the client using it." }
-        end
-      end
-
-      def advanced
-        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.header { "Advanced" }
-          group.item do
-            render Settings::ControlRowComponent.new do |row|
-              row.title { "Delete Application" }
-              row.description { "Revokes every token issued to this app, including ones other people granted." }
-              row.control do
-                render(Settings::DeleteButtonComponent.new(url: settings_api_application_path(@application), confirm: "Delete #{@application.name}? Every token it holds stops working.")) { "Delete" }
-              end
-            end
-          end
         end
       end
     end

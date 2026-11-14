@@ -22,6 +22,16 @@ class Settings::ApiTokensControllerTest < ActionController::TestCase
     assert_equal token, Doorkeeper::AccessToken.by_token(flash[:plaintext_token])
   end
 
+  test "requires a token name" do
+    login_as @user
+
+    assert_no_difference -> { @user.oauth_access_tokens.count } do
+      post :create, params: {api_application_id: @application, token: {device_name: " "}}
+    end
+    assert_redirected_to settings_api_application_path(@application)
+    assert_equal "Name the token so you can tell it apart later.", flash[:alert]
+  end
+
   test "does not create a token for one of Feedbin's own apps" do
     @application.update!(scopes: "read write account")
     login_as @user
