@@ -12,19 +12,9 @@ module Settings
           "API"
         end
 
-        one_time_secret("Access Token", @plaintext_token) if @plaintext_token.present?
-
         details
         credentials
         tokens
-      end
-
-      def one_time_secret(title, value)
-        div class: "border border-blue-600 rounded-lg p-4 mb-14" do
-          div(class: "text-600 font-bold mb-1") { title }
-          div(class: "text-500 text-sm mb-3") { "Copy it now. It is stored hashed, so it won’t be shown again." }
-          div(class: "text-sm") { copyable(value) }
-        end
       end
 
       # What the owner can change, on the edit form. The card is the one
@@ -92,15 +82,11 @@ module Settings
         # Tokens from signing in are listed under Authorized Apps.
         tokens = @application.access_tokens.where(resource_owner_id: @user.id, revoked_at: nil).where.not(device_name: nil).order(created_at: :desc)
 
+        # Stored hashed, so the value exists only on the request after create.
+        created = Doorkeeper::AccessToken.by_token(@plaintext_token) if @plaintext_token.present?
+
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.custom_header do
-            render H2Component.new(class: "!mb-1") { "Your Tokens" }
-            p class: "text-sm text-500 mb-4" do
-              plain "A token lets a script, a command-line tool, or the app you’re building use the API as you, without the sign-in step. Send it as "
-              code(class: "font-mono") { "Authorization: Bearer <token>" }
-              plain "."
-            end
-          end
+          group.header { "Your Tokens" }
 
           group.item do
             form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "py-3 flex items-center gap-4") do |form|
@@ -116,12 +102,17 @@ module Settings
           end
 
           tokens.each do |token|
-            group.item do
+            group.item(id: "token_#{token.id}") do
               render Settings::ControlRowComponent.new do |row|
                 row.title { token.device_name }
                 row.description do
-                  plain "Created #{timeago_text(token.created_at)}"
-                  plain(token.last_used_at ? " · Last used #{timeago_text(token.last_used_at)}" : " · Never used")
+                  if token == created
+                    div(class: "text-700 my-1") { copyable(@plaintext_token) }
+                    plain "Copy it now, it won’t be shown again. It doesn’t expire and can read and change everything in your account, so keep it private."
+                  else
+                    plain "Created #{timeago_text(token.created_at)}"
+                    plain(token.last_used_at ? " · Last used #{timeago_text(token.last_used_at)}" : " · Never used")
+                  end
                 end
                 row.control do
                   render(Settings::DeleteButtonComponent.new(url: settings_api_application_token_path(@application, token), confirm: "Revoke this token? Clients using it will be signed out.")) { "Revoke" }
@@ -130,7 +121,11 @@ module Settings
             end
           end
 
-          group.description { "A token is shown once when you create it, doesn’t expire, and can read and change everything in your account, so keep it private. Revoke it to cut off whatever is using it." }
+          group.description do
+            plain "A token lets a script, a command-line tool, or the app you’re building use the API as you, without the sign-in step. Send it as "
+            code(class: "font-mono") { "Authorization: Bearer <token>" }
+            plain "."
+          end
         end
       end
     end

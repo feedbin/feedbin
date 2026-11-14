@@ -114,6 +114,30 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_select "form[action=?] input[name='token[device_name]']", settings_api_application_tokens_path(application)
   end
 
+  test "a new token's value is shown once, in its own row" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    application.access_tokens.create!(resource_owner_id: @user.id, device_name: "older", scopes: "")
+    token = application.access_tokens.create!(resource_owner_id: @user.id, device_name: "curl on my Mac", scopes: "")
+    login_as @user
+
+    get :show, params: {id: application}, flash: {plaintext_token: token.plaintext_token}
+
+    assert_select "#token_#{token.id} [data-copyable-data-value=?]", token.plaintext_token
+    assert_select "[data-copyable-data-value=?]", token.plaintext_token, count: 1
+    assert_select "#token_#{token.id}", text: /won’t be shown again/
+  end
+
+  test "a token's value is not shown on a later visit" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    token = application.access_tokens.create!(resource_owner_id: @user.id, device_name: "curl on my Mac", scopes: "")
+    login_as @user
+
+    get :show, params: {id: application}
+
+    refute_includes response.body, token.plaintext_token
+    assert_select "#token_#{token.id}", text: /Created/
+  end
+
   test "lists only the tokens created on the application's page, not sign-ins" do
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "myreader://callback")
     application.access_tokens.create!(resource_owner_id: @user.id, device_name: "curl on my Mac", scopes: "")
