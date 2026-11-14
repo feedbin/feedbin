@@ -2,14 +2,15 @@ module Api
   module V3
     # What an OAuth application's owner says about it: a description, where
     # to find it, how to reach them, and the logo the authorize page shows.
-    # The logo is always re-encoded: nothing an uploader sent is ever served
-    # back as it arrived.
+    # The logo is an object in the image store, always re-encoded: nothing an
+    # uploader sent is ever served back as it arrived.
     class ApplicationProfile < ApplicationRecord
       self.table_name = "oauth_application_profiles"
 
       LOGO_SIZE = 256
       LOGO_MAX_BYTES = 5.megabytes
       LOGO_FORMATS = %i[png jpeg gif webp]
+      LOGO_HEADERS = {"Content-Type" => "image/png", "Cache-Control" => "max-age=315360000, public, immutable"}.freeze
 
       normalizes :description, :url, :contact_email, with: -> { it.strip.presence }
 
@@ -19,8 +20,8 @@ module Api
       validate :url_is_a_web_address
       validate :logo_file_was_accepted
 
-      # Everything but the logo's bytes, which only the logo itself needs.
-      scope :without_logo, -> { select(column_names - ["logo"]) }
+      before_save { throw :abort unless store_logo }
+      after_commit :sweep_replaced_logo, on: [:update, :destroy]
 
       # The application's profile, unsaved if it has none yet.
       def self.for(application)
@@ -31,26 +32,28 @@ module Api
       # an image we accept fails validation, and the logo stays as it was.
       def logo_file=(upload)
         return unless upload.respond_to?(:path)
-        @logo_refused = false
-        if (png = self.class.png(upload))
-          assign_attributes(logo: png, logo_updated_at: Time.current)
-        else
-          @logo_refused = true
-        end
+        @logo_png = self.class.png(upload)
+        @logo_refused = @logo_png.nil?
       end
 
       def logo?
-        logo_updated_at.present?
+        logo_storage_path.present?
+      end
+
+      # nil without a logo, and where the image host is not set.
+      def logo_url
+        Image.public_url_for(logo_storage_path)
       end
 
       def remove_logo
-        update!(logo: nil, logo_updated_at: nil) if persisted?
+        update!(logo_storage_path: nil) if persisted?
       end
 
       # Saves the application and this profile of it together, or neither.
-      # Both are validated first, so each one's errors are there to show.
+      # Both are validated first, so each one's errors are there to show, and
+      # the logo is stored before the transaction opens.
       def save_with(application)
-        return false unless [application.valid?, valid?].all?
+        return false unless [application.valid?, valid?].all? && store_logo
         transaction do
           application.save!
           update!(application_id: application.id)
@@ -72,6 +75,32 @@ module Api
       end
 
       private
+
+      # Puts a pending upload in the image store under a path of its own. A
+      # path is never used twice, so a cached logo is never stale and deleting
+      # an old one cannot take a newer one with it. False, with an error,
+      # when the store does not take it.
+      def store_logo
+        return true unless @logo_png
+        raise Excon::Error, "the image store is not configured" unless Image.storage_configured?
+
+        path = Image.path_for(SecureRandom.hex(16), "png")
+        Image.storage_client.put_object(Image.bucket, path, @logo_png, LOGO_HEADERS)
+        self.logo_storage_path = path
+        @logo_png = nil
+        true
+      rescue Excon::Error => exception
+        ErrorService.notify(exception)
+        errors.add(:base, "Logo could not be stored. Try again")
+        false
+      end
+
+      # SweepStoredImages deletes the paths no images row references, which a
+      # logo's never is.
+      def sweep_replaced_logo
+        replaced = destroyed? ? logo_storage_path : saved_change_to_logo_storage_path&.first
+        SweepStoredImages.perform_async([replaced]) if replaced
+      end
 
       # The URL is rendered as a link, so nothing but http and https.
       def url_is_a_web_address

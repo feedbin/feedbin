@@ -14,14 +14,13 @@ module Settings
       # Removal is its own form (#remove_logo), which the edit view renders
       # outside this one.
       def logo_field
-        # The stored logo: an upload that was not saved has nothing to show.
-        logo = @profile.persisted? && @profile.logo_updated_at_in_database
+        logo = @profile.logo_url
 
         div class: "mb-8" do
           div(class: "mb-2 text-600") { label(for: "profile_logo_file") { "Logo" } }
           div class: "flex flex-wrap items-center gap-4" do
             if logo
-              img src: oauth_application_logo_path(@application.uid, v: logo.to_i), alt: "#{@application.name} logo", class: "w-16 h-16 rounded-[14px] object-contain shrink-0"
+              img src: logo, alt: "#{@application.name} logo", class: "w-16 h-16 rounded-[14px] object-contain shrink-0"
             end
             input type: "file", name: "profile[logo_file]", id: "profile_logo_file", accept: "image/png,image/jpeg,image/gif,image/webp", class: "grow basis-[200px] min-w-0 text-sm"
             if logo

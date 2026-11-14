@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Api::V3::ApplicationProfileTest < ActiveSupport::TestCase
+  STORED = %r{\Ahttps://test-account\.storage\.example\.com/images-test/(\h{3}/\h{32}\.png)\z}
+
   setup do
     @application = users(:ben).oauth_applications.create!(name: "My Reader", redirect_uri: "")
     @profile = Api::V3::ApplicationProfile.for(@application)
@@ -10,6 +12,7 @@ class Api::V3::ApplicationProfileTest < ActiveSupport::TestCase
     assert @profile.new_record?
     assert_equal @application.id, @profile.application_id
     refute @profile.logo?
+    assert_nil @profile.logo_url
   end
 
   test "keeps a description, a URL and a contact email, without surrounding space" do
@@ -43,87 +46,152 @@ class Api::V3::ApplicationProfileTest < ActiveSupport::TestCase
     refute @profile.update(description: "a" * 501)
   end
 
-  test "stores an uploaded logo as a PNG no larger than 256 pixels" do
-    assert @profile.update(logo_file: upload("image.png", "image/png"))
+  test "puts an uploaded logo in the image store as a PNG no larger than 256 pixels, cached for good" do
+    with_image_store do
+      assert @profile.update(logo_file: upload("image.png", "image/png"))
 
-    image = Vips::Image.new_from_buffer(@profile.reload.logo, "")
-    assert_equal :png, ImageFormat.new(@profile.logo).format
-    assert_equal 256, [image.width, image.height].max
-    assert @profile.logo?
+      assert_requested(:put, STORED, times: 1) do |request|
+        image = Vips::Image.new_from_buffer(request.body, "")
+        @stored_path = request.uri.path.delete_prefix("/images-test/")
+        request.headers["Content-Type"] == "image/png" &&
+          request.headers["Cache-Control"].include?("immutable") &&
+          ImageFormat.new(request.body).format == :png &&
+          [image.width, image.height].max == 256
+      end
+      assert_equal @stored_path, @profile.reload.logo_storage_path
+      assert @profile.logo?
+      assert_equal "https://images.example.com/#{@stored_path}", @profile.logo_url
+    end
   end
 
   test "converts other formats to PNG" do
-    @profile.update!(logo_file: upload("image.jpeg", "image/jpeg"))
+    with_image_store do
+      @profile.update!(logo_file: upload("image.jpeg", "image/jpeg"))
 
-    assert_equal :png, ImageFormat.new(@profile.reload.logo).format
+      assert_requested(:put, STORED) { ImageFormat.new(it.body).format == :png }
+    end
   end
 
-  test "refuses a logo that is not a plain raster image, whatever it claims to be, and saves nothing" do
-    %w[atom.xml favicon.ico].each do |file|
-      refute @profile.update(description: "Reads feeds.", logo_file: upload(file, "image/png")), file
-      assert_equal ["Logo must be a PNG, JPEG, GIF or WebP image under 5 MB"], @profile.errors.full_messages
-    end
+  test "refuses a logo that is not a plain raster image, whatever it claims to be, and stores nothing" do
+    with_image_store do
+      %w[atom.xml favicon.ico].each do |file|
+        refute @profile.update(description: "Reads feeds.", logo_file: upload(file, "image/png")), file
+        assert_equal ["Logo must be a PNG, JPEG, GIF or WebP image under 5 MB"], @profile.errors.full_messages
+      end
 
-    assert_equal 0, Api::V3::ApplicationProfile.count
+      assert_not_requested :put, STORED
+      assert_equal 0, Api::V3::ApplicationProfile.count
+    end
   end
 
   test "a refused logo leaves the one already there" do
-    @profile.update!(logo_file: upload("image.png", "image/png"))
-    stored = @profile.reload.logo
+    with_image_store do
+      @profile.update!(logo_file: upload("image.png", "image/png"))
+      stored = @profile.logo_storage_path
 
-    refute @profile.update(logo_file: upload("atom.xml", "image/png"))
+      assert_no_difference -> { SweepStoredImages.jobs.size } do
+        refute @profile.update(logo_file: upload("atom.xml", "image/png"))
+      end
 
-    assert_equal stored, Api::V3::ApplicationProfile.for(@application).logo
-  end
-
-  test "a new logo replaces the old one and moves its version" do
-    @profile.update!(logo_file: upload("image.png", "image/png"))
-    first = @profile.logo_updated_at
-
-    travel 1.minute do
-      @profile.update!(logo_file: upload("image.jpeg", "image/jpeg"))
+      assert_equal stored, Api::V3::ApplicationProfile.for(@application).logo_storage_path
     end
-
-    assert_equal 1, Api::V3::ApplicationProfile.where(application_id: @application.id).count
-    assert_operator @profile.logo_updated_at, :>, first
   end
 
-  test "editing the details leaves the logo's version alone" do
-    @profile.update!(logo_file: upload("image.png", "image/png"))
-    version = @profile.logo_updated_at
+  test "a new logo gets a path of its own, even for the same image, and the old object is deleted" do
+    with_image_store do
+      @profile.update!(logo_file: upload("image.png", "image/png"))
+      first = @profile.logo_storage_path
 
-    travel(1.minute) { @profile.update!(description: "Reads feeds.") }
+      assert_difference -> { SweepStoredImages.jobs.size }, +1 do
+        @profile.update!(logo_file: upload("image.png", "image/png"))
+      end
 
-    assert_equal version, @profile.reload.logo_updated_at
+      refute_equal first, @profile.logo_storage_path
+      assert_equal [[first]], SweepStoredImages.jobs.last["args"]
+      assert_equal 1, Api::V3::ApplicationProfile.where(application_id: @application.id).count
+    end
   end
 
-  test "removing the logo keeps the details" do
-    @profile.update!(description: "Reads feeds.", logo_file: upload("image.png", "image/png"))
+  test "editing the details leaves the logo alone" do
+    with_image_store do
+      @profile.update!(logo_file: upload("image.png", "image/png"))
+      stored = @profile.logo_storage_path
 
-    @profile.remove_logo
+      assert_no_difference -> { SweepStoredImages.jobs.size } do
+        @profile.update!(description: "Reads feeds.")
+      end
 
-    saved = Api::V3::ApplicationProfile.for(@application)
-    refute saved.logo?
-    assert_nil saved.logo
-    assert_equal "Reads feeds.", saved.description
+      assert_equal stored, @profile.reload.logo_storage_path
+      assert_requested :put, STORED, times: 1
+    end
   end
 
-  test "can be read without the logo's bytes" do
-    @profile.update!(description: "Reads feeds.", logo_file: upload("image.png", "image/png"))
+  test "removing the logo keeps the details and deletes the object" do
+    with_image_store do
+      @profile.update!(description: "Reads feeds.", logo_file: upload("image.png", "image/png"))
+      stored = @profile.logo_storage_path
 
-    listed = Api::V3::ApplicationProfile.without_logo.for(@application)
+      assert_difference -> { SweepStoredImages.jobs.size }, +1 do
+        @profile.remove_logo
+      end
 
-    assert listed.logo?
-    assert_equal "Reads feeds.", listed.description
-    refute listed.has_attribute?(:logo)
+      saved = Api::V3::ApplicationProfile.for(@application)
+      refute saved.logo?
+      assert_equal "Reads feeds.", saved.description
+      assert_equal [[stored]], SweepStoredImages.jobs.last["args"]
+    end
+  end
+
+  test "a logo the store does not take saves nothing and says so" do
+    with_image_store do
+      stub_request(:put, STORED).to_return(status: 503)
+
+      refute @profile.update(description: "Reads feeds.", logo_file: upload("image.png", "image/png"))
+
+      assert_equal ["Logo could not be stored. Try again"], @profile.errors.full_messages
+      assert_equal 0, Api::V3::ApplicationProfile.count
+    end
+  end
+
+  test "without an image store a logo is refused, and the details can still be saved" do
+    with_env("UNIFIED_BUCKET_IMAGES" => nil) do
+      refute @profile.update(logo_file: upload("image.png", "image/png"))
+      assert_equal ["Logo could not be stored. Try again"], @profile.errors.full_messages
+
+      assert Api::V3::ApplicationProfile.for(@application).update(description: "Reads feeds.")
+    end
   end
 
   test "is deleted with its application" do
-    @profile.update!(logo_file: upload("image.png", "image/png"))
+    @profile.update!(description: "Reads feeds.")
 
     @application.destroy
 
     assert_equal 0, Api::V3::ApplicationProfile.count
+  end
+
+  test "destroying a profile deletes its logo's object" do
+    with_image_store do
+      @profile.update!(logo_file: upload("image.png", "image/png"))
+      stored = @profile.logo_storage_path
+
+      @profile.destroy
+
+      assert_equal [[stored]], SweepStoredImages.jobs.last["args"]
+    end
+  end
+
+  test "deleting an account deletes the logos of its applications" do
+    with_image_store do
+      @profile.update!(logo_file: upload("image.png", "image/png"))
+      stored = @profile.logo_storage_path
+      StripeMock.start
+
+      users(:ben).destroy
+
+      assert_equal [[stored]], SweepStoredImages.jobs.last["args"]
+      assert_equal 0, Api::V3::ApplicationProfile.count
+    end
   end
 
   private

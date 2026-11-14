@@ -1,5 +1,5 @@
 # What an application's owner says about it, kept beside Doorkeeper's own
-# table instead of in it. The logo is small enough to live in the row.
+# table instead of in it. The logo is an object in the image store.
 class CreateOauthApplicationProfiles < ActiveRecord::Migration[8.1]
   def change
     create_table :oauth_application_profiles do |t|
@@ -7,8 +7,7 @@ class CreateOauthApplicationProfiles < ActiveRecord::Migration[8.1]
       t.text :description
       t.string :url
       t.string :contact_email
-      t.binary :logo
-      t.datetime :logo_updated_at
+      t.string :logo_storage_path
       t.timestamps
     end
   end

@@ -188,6 +188,12 @@ class ActiveSupport::TestCase
     previous.each { |key, value| value.nil? ? ENV.delete(key) : ENV[key] = value }
   end
 
+  # The image store: every write accepted, and a host to serve from.
+  def with_image_store(&)
+    stub_request(:put, %r{\Ahttps://test-account\.storage\.example\.com/images-test/})
+    with_env("UNIFIED_BUCKET_IMAGES" => "images-test", "UNIFIED_IMAGE_HOST" => "https://images.example.com", &)
+  end
+
   def parse_json
     JSON.parse(@response.body)
   end

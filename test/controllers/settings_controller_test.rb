@@ -56,14 +56,16 @@ class SettingsControllerTest < ActionController::TestCase
   end
 
   test "account shows an authorized app's logo" do
-    application = users(:ann).oauth_applications.create!(name: "Their Reader", redirect_uri: "theirreader://callback")
-    application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
-    Api::V3::ApplicationProfile.for(application).update!(logo_file: Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
-    login_as @user
+    with_image_store do
+      application = users(:ann).oauth_applications.create!(name: "Their Reader", redirect_uri: "theirreader://callback")
+      application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
+      Api::V3::ApplicationProfile.for(application).update!(logo_file: Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+      login_as @user
 
-    get :account
+      get :account
 
-    assert_select "img[alt=?][src^=?]", "Their Reader logo", oauth_application_logo_path(application.uid)
+      assert_select "img[alt=?][src=?]", "Their Reader logo", Api::V3::ApplicationProfile.for(application).logo_url
+    end
   end
 
   test "account has no Authorized Apps section when nothing is authorized" do

@@ -25,8 +25,8 @@ module Settings
 
         div class: "border rounded-lg mb-14" do
           div class: "flex items-center gap-3 p-4" do
-            if @profile.logo?
-              img src: oauth_application_logo_path(@application.uid, v: @profile.logo_updated_at.to_i), alt: "#{@application.name} logo", class: "size-8 rounded-lg object-contain shrink-0"
+            if @profile.logo_url
+              img src: @profile.logo_url, alt: "#{@application.name} logo", class: "size-8 rounded-lg object-contain shrink-0"
             end
             span(class: "truncate text-lg mr-6") { @application.name }
             link_to "Edit", edit_settings_api_application_path(@application), class: "button button-secondary !ml-auto"

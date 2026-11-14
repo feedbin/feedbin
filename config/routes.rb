@@ -183,7 +183,6 @@ Rails.application.routes.draw do
     skip_controllers :applications, :authorized_applications, :token_info
   end
   resource :session, only: :destroy, module: :oauth, path: "oauth/session", as: :oauth_session
-  get "oauth/applications/:uid/logo", to: "oauth/application_logos#show", as: :oauth_application_logo
 
   mount StripeEvent::Engine, at: "/stripe"
 

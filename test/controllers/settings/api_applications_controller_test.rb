@@ -57,32 +57,38 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
   end
 
   test "the new form takes a logo and has no client type" do
-    login_as @user
+    with_image_store do
+      login_as @user
 
-    get :new
+      get :new
 
-    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name='profile[logo_file]']", settings_api_applications_path
-    assert_select "input[name='doorkeeper_application[confidential]']", count: 0
+      assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name='profile[logo_file]']", settings_api_applications_path
+      assert_select "input[name='doorkeeper_application[confidential]']", count: 0
+    end
   end
 
   test "creates an application with its logo" do
-    login_as @user
+    with_image_store do
+      login_as @user
 
-    post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
+      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
 
-    assert Api::V3::ApplicationProfile.for(@user.oauth_applications.last).logo?
+      assert Api::V3::ApplicationProfile.for(@user.oauth_applications.last).logo?
+    end
   end
 
   test "a logo that is not an image creates nothing and says why" do
-    login_as @user
+    with_image_store do
+      login_as @user
 
-    assert_no_difference -> { Doorkeeper::Application.count } do
-      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("atom.xml")}}
+      assert_no_difference -> { Doorkeeper::Application.count } do
+        post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("atom.xml")}}
+      end
+
+      assert_response :unprocessable_content
+      assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
+      assert_select "form[action=?] input[name='doorkeeper_application[name]'][value=?]", settings_api_applications_path, "My Reader"
     end
-
-    assert_response :unprocessable_content
-    assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
-    assert_select "form[action=?] input[name='doorkeeper_application[name]'][value=?]", settings_api_applications_path, "My Reader"
   end
 
   test "Feedbin's own apps offer token creation like any other" do
@@ -182,52 +188,75 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
   end
 
   test "an application's page shows its logo, and changes nothing itself" do
-    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
-    Api::V3::ApplicationProfile.for(application).update!(logo_file: logo_upload("image.png"))
-    login_as @user
+    with_image_store do
+      application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+      Api::V3::ApplicationProfile.for(application).update!(logo_file: logo_upload("image.png"))
+      login_as @user
 
-    get :show, params: {id: application}
+      get :show, params: {id: application}
 
-    assert_select "img[alt=?]", "My Reader logo"
-    assert_select "input[type=file]", count: 0
+      assert_select "img[alt=?][src=?]", "My Reader logo", Api::V3::ApplicationProfile.for(application).logo_url
+      assert_select "input[type=file]", count: 0
+    end
   end
 
   test "the edit form takes a logo, and offers removal once there is one" do
-    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
-    login_as @user
+    with_image_store do
+      application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+      login_as @user
 
-    get :edit, params: {id: application}
-    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name='profile[logo_file]']", settings_api_application_path(application)
-    assert_select "button[form=remove_logo]", count: 0
+      get :edit, params: {id: application}
+      assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name='profile[logo_file]']", settings_api_application_path(application)
+      assert_select "button[form=remove_logo]", count: 0
 
-    Api::V3::ApplicationProfile.for(application).update!(logo_file: logo_upload("image.png"))
-    get :edit, params: {id: application}
-    assert_select "img[alt=?]", "My Reader logo"
-    assert_select "form#remove_logo[action=?]", settings_api_application_logo_path(application)
-    assert_select "button[form=remove_logo]", text: "Remove"
+      Api::V3::ApplicationProfile.for(application).update!(logo_file: logo_upload("image.png"))
+      get :edit, params: {id: application}
+      assert_select "img[alt=?]", "My Reader logo"
+      assert_select "form#remove_logo[action=?]", settings_api_application_logo_path(application)
+      assert_select "button[form=remove_logo]", text: "Remove"
+    end
   end
 
   test "saves a logo with the rest of the form" do
-    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
-    login_as @user
+    with_image_store do
+      application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+      login_as @user
 
-    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
+      patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
 
-    assert_redirected_to settings_api_application_path(application)
-    assert_equal "Reader Pro", application.reload.name
-    assert Api::V3::ApplicationProfile.for(application).logo?
+      assert_redirected_to settings_api_application_path(application)
+      assert_equal "Reader Pro", application.reload.name
+      assert Api::V3::ApplicationProfile.for(application).logo?
+    end
   end
 
   test "a file that is not an image saves nothing and says why" do
-    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
-    login_as @user
+    with_image_store do
+      application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+      login_as @user
 
-    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {logo_file: logo_upload("atom.xml")}}
+      patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {logo_file: logo_upload("atom.xml")}}
 
-    assert_response :unprocessable_content
-    assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
-    assert_equal "My Reader", application.reload.name
-    refute Api::V3::ApplicationProfile.for(application).logo?
+      assert_response :unprocessable_content
+      assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
+      assert_equal "My Reader", application.reload.name
+      refute Api::V3::ApplicationProfile.for(application).logo?
+    end
+  end
+
+  test "a logo the image store does not take creates nothing and says so" do
+    with_image_store do
+      stub_request(:put, %r{test-account\.storage\.example\.com/images-test/}).to_return(status: 503)
+      login_as @user
+
+      assert_no_difference -> { Doorkeeper::Application.count } do
+        post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
+      end
+
+      assert_response :unprocessable_content
+      assert_select "p.text-red-600", text: "Logo could not be stored. Try again."
+      assert_select "input[name=_method]", count: 0
+    end
   end
 
   test "the new and edit forms take a description, a URL and a contact email" do

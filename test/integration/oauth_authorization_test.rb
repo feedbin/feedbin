@@ -179,23 +179,19 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
   end
 
   test "shows the application's logo above the title" do
-    Api::V3::ApplicationProfile.for(@application).update!(logo_file: Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+    with_image_store do
+      Api::V3::ApplicationProfile.for(@application).update!(logo_file: Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
 
-    get oauth_authorization_path(authorize_params)
-    assert_select "img[alt=?]", "My Reader"
+      get oauth_authorization_path(authorize_params)
 
-    get css_select("img[alt='My Reader']").first["src"]
-    assert_response :success
-    assert_equal "image/png", response.media_type
-    assert_equal :png, ImageFormat.new(response.body).format
+      stored = Api::V3::ApplicationProfile.for(@application).logo_storage_path
+      assert_select "img[alt=?][src=?]", "My Reader", "https://images.example.com/#{stored}"
+    end
   end
 
   test "an application without a logo shows none" do
     get oauth_authorization_path(authorize_params)
     assert_select "img", count: 0
-
-    get oauth_application_logo_path(@application.uid)
-    assert_response :not_found
   end
 
   test "a new user signs up and comes back to the authorization screen" do

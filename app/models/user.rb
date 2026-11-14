@@ -125,6 +125,9 @@ class User < ApplicationRecord
   # own before_destroy when it is declared, all of them above this line, so
   # without it the rows are already gone by the time this runs.
   before_destroy :capture_counter_cache_targets, prepend: true
+  # Prepended for the same reason: the applications go with their profile
+  # rows, by foreign key, and a row deleted that way leaves its logo stored.
+  before_destroy :destroy_application_profiles, prepend: true
   after_commit :repair_entry_counter_caches, on: :destroy
 
   # How many distinct entry ids a destroy will carry before it stops
@@ -339,6 +342,10 @@ class User < ApplicationRecord
     if password_digest_changed? && !old_password_valid
       errors.add(:old_password, "is incorrect")
     end
+  end
+
+  def destroy_application_profiles
+    Api::V3::ApplicationProfile.where(application_id: oauth_applications.select(:id)).destroy_all
   end
 
   def revoke_api_tokens

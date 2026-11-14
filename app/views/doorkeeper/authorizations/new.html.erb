@@ -1,10 +1,10 @@
 <% app_name = @pre_auth.client.name %>
-<% profile = Api::V3::ApplicationProfile.without_logo.for(@pre_auth.client.application) %>
+<% logo_url = Api::V3::ApplicationProfile.for(@pre_auth.client.application).logo_url %>
 
 <% content_for :form_content do %>
 <div class="border rounded-md w-full max-w-[480px] mx-auto p-[40px]">
-  <% if profile.logo? %>
-    <%= image_tag oauth_application_logo_path(@pre_auth.client.uid, v: profile.logo_updated_at.to_i), alt: app_name, class: "block w-16 h-16 rounded-[14px] object-contain mx-auto mb-4" %>
+  <% if logo_url %>
+    <%= image_tag logo_url, alt: app_name, class: "block w-16 h-16 rounded-[14px] object-contain mx-auto mb-4" %>
   <% end %>
   <h1 class="font-bold text-lg text-center mb-6"><%= app_name %> is requesting access to your account</h1>
 

@@ -921,8 +921,7 @@ CREATE TABLE public.oauth_application_profiles (
     description text,
     url character varying,
     contact_email character varying,
-    logo bytea,
-    logo_updated_at timestamp(6) without time zone,
+    logo_storage_path character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
