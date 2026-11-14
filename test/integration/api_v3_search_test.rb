@@ -107,6 +107,22 @@ class ApiV3SearchTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a search Elasticsearch answered with an error is an error, not an empty page" do
+    failed = Search::Response.new({"error" => {"type" => "es_rejected_execution_exception"}, "status" => 429})
+    Search::Connection.stub_any_instance(:search_after, failed) do
+      assert_raises(Search::Connection::ResponseError) { get "/v3/search", params: {query: "swift"}, headers: bearer }
+    end
+  end
+
+  test "a cursor Elasticsearch cannot resume from is cursor_invalid" do
+    cursor = Api::V3::Cursor.encode(sort: Api::V3::EntrySearch::CURSOR_SORT, after: ["not", "a", "position"])
+
+    get "/v3/search", params: {query: "swift", cursor: cursor}, headers: bearer
+
+    assert_response :bad_request
+    assert_equal "cursor_invalid", JSON.parse(response.body)["code"]
+  end
+
   private
 
   def bearer

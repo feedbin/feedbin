@@ -38,6 +38,7 @@ module Api
         when nil then raise Search::Connection::ResponseError, "Elasticsearch did not validate the query."
         end
         response = Search.client { _1.search_after(index, query: body, size: limit + 1, after: after) }
+        check(response, after)
         ids = response.ids
         more = ids.size > limit
         ids = ids.first(limit)
@@ -50,6 +51,14 @@ module Api
 
       def index
         Search.index_name(Entry.table_name)
+      end
+
+      # Elasticsearch answers a failed search with an error body, which reads
+      # as no hits. The query has validated by now, so a 400 is the cursor's.
+      def check(response, after)
+        error = response.data["error"] or return
+        raise Cursor::Invalid if after && response.data["status"] == 400
+        raise Search::Connection::ResponseError, "Search failed: #{error}"
       end
 
       # The id tiebreak keeps search_after from skipping or repeating hits.
