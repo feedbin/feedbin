@@ -25,7 +25,7 @@ module Settings
               # Apps without a logo keep the space, so the names line up.
               if logos.any?
                 row.icon do
-                  div class: "size-8" do
+                  div class: "size-8 self-start" do
                     img(src: oauth_application_logo_path(application.uid, v: logo.updated_at.to_i), alt: "#{application.name} logo", class: "size-8 rounded-lg object-contain") if logo
                   end
                 end
