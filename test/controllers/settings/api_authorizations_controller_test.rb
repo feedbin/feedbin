@@ -13,7 +13,7 @@ class Settings::ApiAuthorizationsControllerTest < ActionController::TestCase
 
     delete :destroy, params: {id: @application.id}
 
-    assert_redirected_to settings_api_applications_path
+    assert_redirected_to settings_account_path
     assert tokens.all? { it.reload.revoked? }
   end
 
@@ -31,12 +31,13 @@ class Settings::ApiAuthorizationsControllerTest < ActionController::TestCase
     refute theirs.reload.revoked?
   end
 
-  test "is hidden without the feature flag" do
+  test "works with API v3 off, so access granted earlier can still be revoked" do
+    token = @application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
     @user.setting_off!(:api_v3)
     login_as @user
 
     delete :destroy, params: {id: @application.id}
 
-    assert_response :not_found
+    assert token.reload.revoked?
   end
 end

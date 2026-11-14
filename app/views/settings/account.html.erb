@@ -50,6 +50,8 @@
   <% end %>
 <% end %>
 
+<%= render Settings::AuthorizedAppsComponent.new(user: @user) %>
+
 <%= form_for(@user, method: :delete, id: "delete_user", html: {class: "mb-14"}) do |f| %>
   <%= render Settings::H2Component.new do %>
     Cancel Account

@@ -18,6 +18,50 @@ class SettingsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "account lists each app the user signed in to once, with a way to revoke it" do
+    application = users(:ann).oauth_applications.create!(name: "Someone Else's Reader", redirect_uri: "myreader://callback")
+    2.times { application.access_tokens.create!(resource_owner_id: @user.id, scopes: "") }
+    login_as @user
+
+    get :account
+
+    assert_includes response.body, "Authorized Apps"
+    assert_includes response.body, "Someone Else&#39;s Reader"
+    assert_select "form[action=?]", settings_api_authorization_path(application), count: 1
+  end
+
+  test "account lists sign-ins to the user's own apps, but not tokens they created" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "myreader://callback")
+    application.access_tokens.create!(resource_owner_id: @user.id, device_name: "curl on my Mac", scopes: "")
+    login_as @user
+
+    get :account
+    assert_select "form[action=?]", settings_api_authorization_path(application), count: 0
+
+    application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
+    get :account
+    assert_select "form[action=?]", settings_api_authorization_path(application), count: 1
+  end
+
+  test "account shows an authorized app's logo" do
+    application = users(:ann).oauth_applications.create!(name: "Their Reader", redirect_uri: "theirreader://callback")
+    application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
+    Api::V3::ApplicationLogo.replace(application, Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+    login_as @user
+
+    get :account
+
+    assert_select "img[alt=?][src^=?]", "Their Reader logo", oauth_application_logo_path(application.uid)
+  end
+
+  test "account has no Authorized Apps section when nothing is authorized" do
+    login_as @user
+
+    get :account
+
+    refute_includes response.body, "Authorized Apps"
+  end
+
   test "should get account @last_payment" do
     StripeMock.start
     event = StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id})
