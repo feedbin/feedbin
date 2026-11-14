@@ -3,8 +3,9 @@ module Settings
     class NewView < ApplicationView
       include Fields
 
-      def initialize(application:)
+      def initialize(application:, profile:)
         @application = application
+        @profile = profile
       end
 
       def view_template
@@ -14,7 +15,9 @@ module Settings
           end
 
           errors
-          name_and_redirect_fields(form)
+          name_field(form)
+          profile_fields
+          redirect_field(form)
           logo_field
 
           render Settings::ButtonRowComponent.new do

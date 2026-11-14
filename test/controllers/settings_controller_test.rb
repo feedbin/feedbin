@@ -58,7 +58,7 @@ class SettingsControllerTest < ActionController::TestCase
   test "account shows an authorized app's logo" do
     application = users(:ann).oauth_applications.create!(name: "Their Reader", redirect_uri: "theirreader://callback")
     application.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
-    Api::V3::ApplicationLogo.replace(application, Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+    Api::V3::ApplicationProfile.for(application).update!(logo_file: Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
     login_as @user
 
     get :account

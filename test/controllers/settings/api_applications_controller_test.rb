@@ -61,23 +61,23 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
 
     get :new
 
-    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name=logo]", settings_api_applications_path
+    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name='profile[logo_file]']", settings_api_applications_path
     assert_select "input[name='doorkeeper_application[confidential]']", count: 0
   end
 
   test "creates an application with its logo" do
     login_as @user
 
-    post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, logo: logo_upload("image.png")}
+    post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
 
-    assert Api::V3::ApplicationLogo.for(@user.oauth_applications.last)
+    assert Api::V3::ApplicationProfile.for(@user.oauth_applications.last).logo?
   end
 
   test "a logo that is not an image creates nothing and says why" do
     login_as @user
 
     assert_no_difference -> { Doorkeeper::Application.count } do
-      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, logo: logo_upload("atom.xml")}
+      post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {logo_file: logo_upload("atom.xml")}}
     end
 
     assert_response :unprocessable_content
@@ -183,7 +183,7 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
 
   test "an application's page shows its logo, and changes nothing itself" do
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
-    Api::V3::ApplicationLogo.replace(application, logo_upload("image.png"))
+    Api::V3::ApplicationProfile.for(application).update!(logo_file: logo_upload("image.png"))
     login_as @user
 
     get :show, params: {id: application}
@@ -197,10 +197,10 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     login_as @user
 
     get :edit, params: {id: application}
-    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name=logo]", settings_api_application_path(application)
+    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name='profile[logo_file]']", settings_api_application_path(application)
     assert_select "button[form=remove_logo]", count: 0
 
-    Api::V3::ApplicationLogo.replace(application, logo_upload("image.png"))
+    Api::V3::ApplicationProfile.for(application).update!(logo_file: logo_upload("image.png"))
     get :edit, params: {id: application}
     assert_select "img[alt=?]", "My Reader logo"
     assert_select "form#remove_logo[action=?]", settings_api_application_logo_path(application)
@@ -211,23 +211,109 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
     login_as @user
 
-    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, logo: logo_upload("image.png")}
+    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {logo_file: logo_upload("image.png")}}
 
     assert_redirected_to settings_api_application_path(application)
     assert_equal "Reader Pro", application.reload.name
-    assert Api::V3::ApplicationLogo.for(application)
+    assert Api::V3::ApplicationProfile.for(application).logo?
   end
 
   test "a file that is not an image saves nothing and says why" do
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
     login_as @user
 
-    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, logo: logo_upload("atom.xml")}
+    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {logo_file: logo_upload("atom.xml")}}
 
     assert_response :unprocessable_content
     assert_includes response.body, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB."
     assert_equal "My Reader", application.reload.name
-    assert_nil Api::V3::ApplicationLogo.for(application)
+    refute Api::V3::ApplicationProfile.for(application).logo?
+  end
+
+  test "the new and edit forms take a description, a URL and a contact email" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    Api::V3::ApplicationProfile.for(application).update!(description: "Reads feeds.", url: "https://example.com/reader", contact_email: "dev@example.com")
+    login_as @user
+
+    get :new
+    assert_select "textarea[name='profile[description]']"
+    assert_select "input[type=url][name='profile[url]']"
+    assert_select "input[type=email][name='profile[contact_email]']"
+
+    get :edit, params: {id: application}
+    assert_select "textarea[name='profile[description]']", text: "Reads feeds."
+    assert_select "input[name='profile[url]'][value=?]", "https://example.com/reader"
+    assert_select "input[name='profile[contact_email]'][value=?]", "dev@example.com"
+  end
+
+  test "creates an application with its description, URL and contact email" do
+    login_as @user
+
+    post :create, params: {doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {description: "Reads feeds.", url: "https://example.com/reader", contact_email: "dev@example.com"}}
+
+    application = @user.oauth_applications.last
+    assert_redirected_to settings_api_application_path(application)
+    assert_equal ["Reads feeds.", "https://example.com/reader", "dev@example.com"], Api::V3::ApplicationProfile.for(application).values_at(:description, :url, :contact_email)
+  end
+
+  test "updates an application's description, URL and contact email, and clears the ones left blank" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    Api::V3::ApplicationProfile.for(application).update!(description: "Reads feeds.", url: "https://example.com/reader")
+    login_as @user
+
+    patch :update, params: {id: application, doorkeeper_application: {name: "My Reader", redirect_uri: ""}, profile: {description: "Reads every feed.", url: "", contact_email: "dev@example.com"}}
+
+    assert_redirected_to settings_api_application_path(application)
+    assert_equal ["Reads every feed.", nil, "dev@example.com"], Api::V3::ApplicationProfile.for(application).values_at(:description, :url, :contact_email)
+  end
+
+  test "details that are not valid create nothing, say why, and keep what was typed" do
+    login_as @user
+
+    assert_no_difference -> { Doorkeeper::Application.count } do
+      post :create, params: {doorkeeper_application: {name: "", redirect_uri: ""}, profile: {description: "Reads feeds.", url: "javascript:alert(1)", contact_email: "nobody"}}
+    end
+
+    assert_response :unprocessable_content
+    assert_select "p.text-red-600", text: "Name can't be blank. Contact email is not an email address. URL must start with http:// or https://."
+    assert_select "form[action=?]", settings_api_applications_path
+    assert_select "input[name=_method]", count: 0
+    assert_select "textarea[name='profile[description]']", text: "Reads feeds."
+    assert_select "input[name='profile[contact_email]'][value=nobody]"
+  end
+
+  test "details that are not valid leave an existing application as it was" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    login_as @user
+
+    patch :update, params: {id: application, doorkeeper_application: {name: "Reader Pro", redirect_uri: ""}, profile: {url: "ftp://example.com"}}
+
+    assert_response :unprocessable_content
+    assert_equal "My Reader", application.reload.name
+    assert_equal 0, Api::V3::ApplicationProfile.count
+  end
+
+  test "an application's page shows its description, URL and contact email" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    Api::V3::ApplicationProfile.for(application).update!(description: "Reads feeds.", url: "https://example.com/reader", contact_email: "dev@example.com")
+    login_as @user
+
+    get :show, params: {id: application}
+
+    assert_includes response.body, "Reads feeds."
+    assert_select "a[href=?]", "https://example.com/reader"
+    assert_includes response.body, "dev@example.com"
+  end
+
+  test "cannot set the details of another person's application" do
+    theirs = users(:ann).oauth_applications.create!(name: "Theirs", redirect_uri: "")
+    login_as @user
+
+    assert_raises ActiveRecord::RecordNotFound do
+      patch :update, params: {id: theirs, doorkeeper_application: {name: "Mine", redirect_uri: ""}, profile: {description: "Mine now."}}
+    end
+
+    assert_equal 0, Api::V3::ApplicationProfile.count
   end
 
   test "an application's page links to its edit form" do

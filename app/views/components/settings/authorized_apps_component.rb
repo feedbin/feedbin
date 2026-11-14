@@ -12,8 +12,7 @@ module Settings
 
       apps = sign_ins.group_by(&:application).sort_by { |_, tokens| -tokens.map { it.last_used_at || it.created_at }.max.to_i }
 
-      # Without the image data: only whether there is one, and its version.
-      logos = Api::V3::ApplicationLogo.where(application_id: apps.map { |application, _| application.id }).select(:id, :application_id, :updated_at).index_by(&:application_id)
+      logos = Api::V3::ApplicationProfile.without_logo.where(application_id: apps.map { |application, _| application.id }).select(&:logo?).index_by(&:application_id)
 
       render Settings::ControlGroupComponent.new class: "mb-14" do |group|
         group.header { "Authorized Apps" }
@@ -26,7 +25,7 @@ module Settings
               if logos.any?
                 row.icon do
                   div class: "size-8 self-start" do
-                    img(src: oauth_application_logo_path(application.uid, v: logo.updated_at.to_i), alt: "#{application.name} logo", class: "size-8 rounded-lg object-contain") if logo
+                    img(src: oauth_application_logo_path(application.uid, v: logo.logo_updated_at.to_i), alt: "#{application.name} logo", class: "size-8 rounded-lg object-contain") if logo
                   end
                 end
               end

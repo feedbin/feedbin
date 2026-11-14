@@ -179,7 +179,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
   end
 
   test "shows the application's logo above the title" do
-    Api::V3::ApplicationLogo.replace(@application, Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+    Api::V3::ApplicationProfile.for(@application).update!(logo_file: Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
 
     get oauth_authorization_path(authorize_params)
     assert_select "img[alt=?]", "My Reader"

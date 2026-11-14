@@ -2,22 +2,23 @@ class Settings::ApiApplicationsController < ApplicationController
   layout "settings"
 
   before_action :require_api_v3
+  before_action :build_application, only: [:new, :create]
   before_action :set_application, only: [:show, :edit, :update]
+  before_action :set_profile, except: :index
 
   def index
     render Settings::ApiApplications::IndexView.new(user: @user)
   end
 
   def new
-    render Settings::ApiApplications::NewView.new(application: @user.oauth_applications.new)
+    render Settings::ApiApplications::NewView.new(application: @application, profile: @profile)
   end
 
   def create
-    @application = @user.oauth_applications.new
     if save_application
       redirect_to settings_api_application_path(@application), notice: "Application created."
     else
-      render Settings::ApiApplications::NewView.new(application: @application), status: :unprocessable_content
+      render Settings::ApiApplications::NewView.new(application: @application, profile: @profile), status: :unprocessable_content
     end
   end
 
@@ -25,12 +26,13 @@ class Settings::ApiApplicationsController < ApplicationController
     render Settings::ApiApplications::ShowView.new(
       user: @user,
       application: @application,
+      profile: @profile,
       plaintext_token: flash[:plaintext_token]
     )
   end
 
   def edit
-    render Settings::ApiApplications::EditView.new(application: @application)
+    render Settings::ApiApplications::EditView.new(application: @application, profile: @profile)
   end
 
   # Tokens belong to the application's id, so they survive a rename or new
@@ -39,34 +41,38 @@ class Settings::ApiApplicationsController < ApplicationController
     if save_application
       redirect_to settings_api_application_path(@application), notice: "Application updated."
     else
-      render Settings::ApiApplications::EditView.new(application: @application), status: :unprocessable_content
+      render Settings::ApiApplications::EditView.new(application: @application, profile: @profile), status: :unprocessable_content
     end
   end
 
   private
 
+  def build_application
+    @application = @user.oauth_applications.new
+  end
+
   def set_application
     @application = @user.oauth_applications.find(params[:id])
   end
 
-  # The logo is saved with the fields or not at all.
-  def save_application
-    Doorkeeper::Application.transaction do
-      @application.update(application_params) && save_logo or raise ActiveRecord::Rollback
-    end
+  def set_profile
+    @profile = Api::V3::ApplicationProfile.for(@application)
   end
 
-  def save_logo
-    return true unless params[:logo].respond_to?(:path)
-    return true if Api::V3::ApplicationLogo.replace(@application, params[:logo])
-
-    @application.errors.add(:base, "Logo must be a PNG, JPEG, GIF or WebP image under 5 MB")
-    false
+  def save_application
+    @application.assign_attributes(application_params)
+    @profile.assign_attributes(profile_params)
+    @profile.save_with(@application)
   end
 
   # Every application is a public client: PKCE is required, and there is no
   # client secret.
   def application_params
     params.expect(doorkeeper_application: [:name, :redirect_uri])
+  end
+
+  # logo_file is an upload, which becomes the logo.
+  def profile_params
+    params.fetch(:profile, {}).permit(:description, :url, :contact_email, :logo_file)
   end
 end

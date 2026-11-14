@@ -4,7 +4,7 @@ class Settings::ApiApplicationLogosController < ApplicationController
   before_action :set_application
 
   def destroy
-    Api::V3::ApplicationLogo.for(@application)&.destroy
+    Api::V3::ApplicationProfile.for(@application).remove_logo
     redirect_to edit_settings_api_application_path(@application), notice: "Logo removed."
   end
 

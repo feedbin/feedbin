@@ -1,9 +1,10 @@
 module Settings
   module ApiApplications
     class ShowView < ApplicationView
-      def initialize(user:, application:, plaintext_token: nil)
+      def initialize(user:, application:, profile:, plaintext_token: nil)
         @user = user
         @application = application
+        @profile = profile
         @plaintext_token = plaintext_token
       end
 
@@ -20,17 +21,19 @@ module Settings
       # What the owner can change, on the edit form. The card is the one
       # Settings::Subscriptions::Shared::FormComponent opens with.
       def details
-        logo = Api::V3::ApplicationLogo.for(@application)
         uris = @application.redirect_uri.to_s.split
 
         div class: "border rounded-lg mb-14" do
           div class: "flex items-center gap-3 p-4" do
-            if logo
-              img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "size-8 rounded-lg object-contain shrink-0"
+            if @profile.logo?
+              img src: oauth_application_logo_path(@application.uid, v: @profile.logo_updated_at.to_i), alt: "#{@application.name} logo", class: "size-8 rounded-lg object-contain shrink-0"
             end
             span(class: "truncate text-lg mr-6") { @application.name }
             link_to "Edit", edit_settings_api_application_path(@application), class: "button button-secondary !ml-auto"
           end
+          detail("Description") { plain @profile.description } if @profile.description
+          detail("URL") { link_to @profile.url, @profile.url, class: "break-all", rel: "noopener noreferrer" } if @profile.url
+          detail("Contact Email") { plain @profile.contact_email } if @profile.contact_email
           div class: "border-t p-4" do
             div(class: "text-600") { "Redirect URIs" }
             div class: "text-500 text-sm" do
@@ -41,6 +44,13 @@ module Settings
               end
             end
           end
+        end
+      end
+
+      def detail(title, &block)
+        div class: "border-t p-4" do
+          div(class: "text-600") { title }
+          div(class: "text-500 text-sm", &block)
         end
       end
 
