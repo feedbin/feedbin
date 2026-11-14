@@ -7,7 +7,7 @@ module Settings
 
       def view_template
         render Settings::H1Component.new do
-          "API"
+          "Developers"
         end
 
         p class: "text-500 mb-8" do

@@ -12,6 +12,18 @@ class SettingsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "the nav links to Developers below API, only with API v3 on" do
+    login_as @user
+
+    get :index
+    assert_select "a[href=?]", settings_api_applications_path, count: 0
+
+    @user.setting_on!(:api_v3)
+    get :index
+    assert_select "li:has(a[href='https://github.com/feedbin/feedbin-api#readme']) + li a[href=?]", settings_api_applications_path, text: "Developers"
+    refute_includes response.body, "Apps &amp; tokens"
+  end
+
   test "should get account" do
     login_as @user
     get :account

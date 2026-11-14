@@ -9,7 +9,7 @@ module Settings
 
       def view_template
         render Settings::H1Component.new do
-          "API"
+          "Developers"
         end
 
         details
@@ -86,7 +86,7 @@ module Settings
         created = Doorkeeper::AccessToken.by_token(@plaintext_token) if @plaintext_token.present?
 
         render Settings::ControlGroupComponent.new class: "mb-14 [&_[data-item-container]]:border-t-0" do |group|
-          group.header { "Your Tokens" }
+          group.header { "Personal Tokens" }
 
           group.item do
             form_with(scope: :token, url: settings_api_application_tokens_path(@application), class: "pb-3 flex items-center gap-4") do |form|
