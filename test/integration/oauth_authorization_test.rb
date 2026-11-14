@@ -62,7 +62,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "input[name=email]"
     assert_select "input[name=password]"
-    assert_select "button", text: "Sign in and authorize"
+    assert_select "button", text: "Authorize"
     refute_includes response.body, "Please sign in."
   end
 

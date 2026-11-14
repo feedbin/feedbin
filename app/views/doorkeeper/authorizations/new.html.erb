@@ -17,7 +17,6 @@
         Signed in as <strong class="text-700 break-all"><%= current_user.email %></strong>.
         <button type="submit" form="oauth_switch_account" class="text-blue-600 whitespace-nowrap">Not you?</button>
       </p>
-      <button type="submit" class="button flex w-full min-h-[44px]" data-oauth-form-target="submit">Authorize</button>
     <% else %>
       <div class="mb-4">
         <%= render Form::TextInputComponent.new do |text| %>
@@ -42,8 +41,8 @@
           <% end %>
         <% end %>
       </div>
-      <button type="submit" class="button flex w-full min-h-[44px]" data-oauth-form-target="submit">Sign in and authorize</button>
     <% end %>
+    <button type="submit" class="button flex w-full min-h-[44px]" data-oauth-form-target="submit">Authorize</button>
   <% end %>
 
   <% if signed_in? %>
