@@ -1,11 +1,14 @@
 <% app_name = @pre_auth.client.name %>
+<% logo = Api::V3::ApplicationLogo.for(@pre_auth.client.application) %>
 <% redirect = URI.parse(@pre_auth.redirect_uri) rescue nil %>
 <% redirect_host = redirect.host if redirect&.scheme.in?(%w[http https]) %>
 
 <% content_for :form_content do %>
 <div class="border rounded-md p-6 md:p-12 mb-4">
-  <h1 class="font-bold text-lg mb-2">Authorize <%= app_name %> to use your Feedbin account</h1>
-  <p class="text-500 mb-6"><%= app_name %> will be able to read and change your subscriptions, articles and settings.</p>
+  <% if logo %>
+    <%= image_tag oauth_application_logo_path(@pre_auth.client.uid, v: logo.updated_at.to_i), alt: app_name, class: "block w-16 h-16 rounded-[14px] object-contain mb-4" %>
+  <% end %>
+  <h1 class="font-bold text-lg mb-6"><%= app_name %> is requesting access to your account</h1>
 
   <%= render partial: "shared/flash", locals: {flash: flash} %>
 

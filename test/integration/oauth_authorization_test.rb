@@ -17,7 +17,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
 
     get oauth_authorization_path(authorize_params)
     assert_response :success
-    assert_includes response.body, "Authorize My Reader to use your Feedbin account"
+    assert_includes response.body, "My Reader is requesting access to your account"
 
     post oauth_authorization_path, params: authorize_params
     assert_response :redirect
@@ -53,7 +53,7 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
 
     get oauth_authorization_path(authorize_params.except(:code_challenge, :code_challenge_method))
 
-    refute_includes response.body, "Authorize My Reader"
+    refute_includes response.body, "My Reader is requesting access"
   end
 
   test "a signed out visitor sees the authorize page without a redirect or notice" do
@@ -151,13 +151,12 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_select "button[form=oauth_switch_account]", text: "Not you?"
   end
 
-  test "the authorize page says what is granted, to whom, and how to undo it" do
+  test "the authorize page says who is asking, as whom, and how to undo it" do
     sign_in_as @user
 
     get oauth_authorization_path(authorize_params)
 
-    assert_select "h1", text: "Authorize My Reader to use your Feedbin account"
-    assert_includes response.body, "read and change your subscriptions, articles and settings"
+    assert_select "h1", text: "My Reader is requesting access to your account"
     assert_includes response.body, @user.email
     assert_includes response.body, "returned to My Reader"
     assert_includes response.body, "revoke access any time in Settings"
@@ -188,6 +187,26 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     assert_redirected_to root_url
+  end
+
+  test "shows the application's logo above the title" do
+    Api::V3::ApplicationLogo.replace(@application, Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+
+    get oauth_authorization_path(authorize_params)
+    assert_select "img[alt=?]", "My Reader"
+
+    get css_select("img[alt='My Reader']").first["src"]
+    assert_response :success
+    assert_equal "image/png", response.media_type
+    assert_equal :png, ImageFormat.new(response.body).format
+  end
+
+  test "an application without a logo shows none" do
+    get oauth_authorization_path(authorize_params)
+    assert_select "img", count: 0
+
+    get oauth_application_logo_path(@application.uid)
+    assert_response :not_found
   end
 
   test "a new user signs up and comes back to the authorization screen" do

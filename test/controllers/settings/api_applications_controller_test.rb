@@ -120,4 +120,17 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_redirected_to settings_api_applications_path
     refute Doorkeeper::Application.exists?(application.id)
   end
+  test "an application's page offers a logo upload, and removal once it has one" do
+    application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
+    login_as @user
+
+    get :show, params: {id: application.id}
+    assert_select "form[action=?][enctype='multipart/form-data'] input[type=file][name=logo]", settings_api_application_logo_path(application)
+    assert_select "img[alt=?]", "My Reader logo", count: 0
+
+    Api::V3::ApplicationLogo.replace(application, Rack::Test::UploadedFile.new(support_file("image.png"), "image/png"))
+    get :show, params: {id: application.id}
+    assert_select "img[alt=?]", "My Reader logo"
+    assert_includes response.body, "Remove"
+  end
 end

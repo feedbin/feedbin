@@ -20,6 +20,7 @@ module Settings
         one_time_secret("Access Token", @plaintext_token) if @plaintext_token.present?
 
         credentials
+        logo
         tokens
         advanced
       end
@@ -87,6 +88,31 @@ module Settings
               row.description { span(class: "font-mono break-all") { oauth_token_url } }
             end
           end
+        end
+      end
+
+      def logo
+        logo = Api::V3::ApplicationLogo.for(@application)
+
+        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+          group.header { "Logo" }
+
+          group.item do
+            div class: "py-3 flex flex-wrap items-center gap-4" do
+              if logo
+                img src: oauth_application_logo_path(@application.uid, v: logo.updated_at.to_i), alt: "#{@application.name} logo", class: "w-16 h-16 rounded-[14px] object-contain shrink-0"
+              end
+              form_with(url: settings_api_application_logo_path(@application), multipart: true, class: "flex flex-wrap items-center gap-4 grow min-w-0") do |form|
+                form.file_field :logo, accept: "image/png,image/jpeg,image/gif,image/webp", class: "grow basis-[200px] min-w-0 text-sm"
+                button(class: "button button-secondary", type: "submit") { logo ? "Replace" : "Upload" }
+              end
+              if logo
+                render(Settings::DeleteButtonComponent.new(url: settings_api_application_logo_path(@application), confirm: "Remove the logo?")) { "Remove" }
+              end
+            end
+          end
+
+          group.description { "Shown above your app’s name when it asks for access. PNG, JPEG, GIF or WebP, square works best." }
         end
       end
 

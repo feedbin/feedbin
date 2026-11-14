@@ -912,6 +912,38 @@ ALTER SEQUENCE public.oauth_access_tokens_id_seq OWNED BY public.oauth_access_to
 
 
 --
+-- Name: oauth_application_logos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oauth_application_logos (
+    id bigint NOT NULL,
+    application_id bigint NOT NULL,
+    data bytea NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: oauth_application_logos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.oauth_application_logos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: oauth_application_logos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.oauth_application_logos_id_seq OWNED BY public.oauth_application_logos.id;
+
+
+--
 -- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1811,6 +1843,13 @@ ALTER TABLE ONLY public.oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
+-- Name: oauth_application_logos id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oauth_application_logos ALTER COLUMN id SET DEFAULT nextval('public.oauth_application_logos_id_seq'::regclass);
+
+
+--
 -- Name: oauth_applications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2147,6 +2186,14 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 ALTER TABLE ONLY public.oauth_access_tokens
     ADD CONSTRAINT oauth_access_tokens_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: oauth_application_logos oauth_application_logos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oauth_application_logos
+    ADD CONSTRAINT oauth_application_logos_pkey PRIMARY KEY (id);
 
 
 --
@@ -2710,6 +2757,13 @@ CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON public.oauth_access_to
 
 
 --
+-- Name: index_oauth_application_logos_on_application_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_oauth_application_logos_on_application_id ON public.oauth_application_logos USING btree (application_id);
+
+
+--
 -- Name: index_oauth_applications_on_owner; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3265,6 +3319,14 @@ ALTER TABLE ONLY public.oauth_access_grants
 
 
 --
+-- Name: oauth_application_logos fk_rails_b765d84f43; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oauth_application_logos
+    ADD CONSTRAINT fk_rails_b765d84f43 FOREIGN KEY (application_id) REFERENCES public.oauth_applications(id) ON DELETE CASCADE;
+
+
+--
 -- Name: entry_videos fk_rails_bbab5ccbe7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3284,10 +3346,10 @@ ALTER TABLE ONLY public.playlists
 -- PostgreSQL database dump complete
 --
 
-
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261113180000'),
 ('20261112012500'),
 ('20261103120000'),
 ('20261102150000'),
