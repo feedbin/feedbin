@@ -2,7 +2,7 @@
 <% logo = Api::V3::ApplicationLogo.for(@pre_auth.client.application) %>
 
 <% content_for :form_content do %>
-<div class="border rounded-md p-6 md:p-12">
+<div class="border rounded-md w-full max-w-[480px] mx-auto p-[40px]">
   <% if logo %>
     <%= image_tag oauth_application_logo_path(@pre_auth.client.uid, v: logo.updated_at.to_i), alt: app_name, class: "block w-16 h-16 rounded-[14px] object-contain mx-auto mb-4" %>
   <% end %>
