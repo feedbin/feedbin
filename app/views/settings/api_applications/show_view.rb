@@ -12,9 +12,6 @@ module Settings
         render Settings::H1Component.new do
           "API"
         end
-        render Settings::SubtitleComponent.new do
-          link_to "All applications", settings_api_applications_path
-        end
 
         one_time_secret("Client Secret", @plaintext_secret) if @plaintext_secret.present?
         one_time_secret("Access Token", @plaintext_token) if @plaintext_token.present?
