@@ -40,7 +40,8 @@ class Oauth::BaseController < ApplicationController
 
   def refuse_sign_in(message)
     flash[:error] = message
-    flash[:email] = params[:email]
+    # The flash rides in the session cookie, which a long enough value overflows.
+    flash[:email] = params[:email].to_s.first(255)
     redirect_to oauth_authorization_path(authorization_params)
     nil
   end

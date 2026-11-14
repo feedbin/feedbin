@@ -90,6 +90,15 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_equal 0, Doorkeeper::AccessGrant.count
   end
 
+  test "an email too long to be one is cut short, not kept whole in the session cookie" do
+    post oauth_authorization_path, params: authorize_params.merge(email: "#{"a" * 5_000}@example.com", password: "nope")
+
+    assert_response :redirect
+    follow_redirect!
+    assert_includes response.body, "Invalid email or password"
+    assert_select "input[name=email][value=?]", "a" * 255
+  end
+
   test "an unknown email or blank password is refused the same way" do
     [{email: "nobody@example.com", password: default_password}, {email: @user.email, password: ""}].each do |credentials|
       post oauth_authorization_path, params: authorize_params.merge(credentials)
