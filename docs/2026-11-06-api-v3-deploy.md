@@ -1,34 +1,45 @@
 # Deploy checklist: API v3
 
-Two deploys. **Step one** is branch `api-v3-migrations`: the five migrations and `structure.sql`, nothing else. It runs under today's code. **Step two** is branch `api-v3-oauth`: the code, once every migration has finished.
+Two deploys. **Step one** is branch `api-v3-migrations`: the seven migrations and `structure.sql`, nothing else. It runs under today's code. **Step two** is branch `api-v3-oauth`: the code, once every migration has finished.
 
 Today's code works on the new schema. The new tables are unused, the new `entries` columns have a default or allow null, and every `unreads` query by `user_id` can use a composite index. The step-one branch passes main's test suite on the new schema.
 
 ## Step one: schema
 
+**Build the slow parts by hand before deploying.** `cap deploy` runs `db:migrate` on app4 before it publishes the release, and it pauses every Sidekiq process (`deploy:quiet`) from the start of the deploy until the restart at the end. Three of these migrations build an index over all of `entries` or `unreads`, which together take an hour or more. Left to the deploy, that is an hour or more with no background jobs, on a build that dies with your SSH session and is cancelled by the one-hour statement timeout. Built by hand first, the deploy's migrations find everything in place and finish in seconds.
+
 The migrations, in the order they run:
 
-| Migration | Locks | Time |
-| --- | --- | --- |
-| `create_doorkeeper_tables` | New tables only | Instant |
-| `add_revision_to_entries` | `entries`, briefly, to add two columns. It changes the table definition only and rewrites no rows (Postgres 11+). Then a concurrent index build, which does not block reads or writes. | **Long:** the index scans all of `entries` twice |
-| `add_unreads_user_entry_created_at_index` | A concurrent index build | **Long:** scans all of `unreads` |
-| `remove_unreads_user_id_index` | A concurrent drop | Short |
-| `create_entry_videos` | `entries`, briefly, while the new table's foreign key is added. The new table is empty, so nothing is checked. | Instant |
+| Migration | What it does | By hand first | In the deploy |
+| --- | --- | --- | --- |
+| `create_doorkeeper_tables` | New tables | | Instant |
+| `add_revision_to_entries` | Two columns on `entries`, then an index on `(edited_at, id)` where `edited_at` is set. The index is empty, but building it reads all of `entries` twice. | **Yes** | Skips what exists |
+| `add_unreads_user_entry_created_at_index` | An index on `unreads` | **Yes** | Skips what exists |
+| `remove_unreads_user_id_index` | A concurrent drop | | Short |
+| `create_entry_videos` | A new table. Its foreign key takes a brief lock on `entries`; the table is empty, so nothing is checked. | | Instant |
+| `add_feed_id_created_at_id_index_to_entries` | An index on `entries (feed_id, created_at, id)`, about 7 GB at 160M entries | **Yes** | Skips what exists |
+| `create_oauth_application_profiles` | A new table. Its foreign key is to `oauth_applications`, which is new and empty. | | Instant |
 
-### Before
+### How long the builds take
 
-- [ ] **Raise the statement timeout.** `config/initializers/strong_migrations.rb` sets `StrongMigrations.statement_timeout = 1.hour` for the whole migration connection, and that includes the concurrent index builds. Set it above your longest expected build, for this deploy only. To size it, check the tables:
+These are estimates, not measurements. A concurrent build reads its table twice, and for `entries` that read is nearly all of the time, so the heap's size decides it:
 
 ```sql
 SELECT relname, pg_size_pretty(pg_relation_size(oid)) AS heap, reltuples::bigint AS rows
 FROM pg_class WHERE relname IN ('entries', 'unreads');
 ```
 
-- [ ] **Know what the 10 s lock timeout does.** `StrongMigrations.lock_timeout = 10.seconds` also applies here:
-  - **The `ALTER`s fail fast.** Adding the columns and the foreign key each need a brief exclusive lock on `entries`. If one waits more than 10 s, it fails rather than stall the site. Up to then, queries on `entries` queue behind it.
-  - **A long transaction can fail an index build.** Before it finishes, a concurrent build waits for every transaction that started before it. A transaction open longer than 10 s at that point fails the build, which leaves an invalid index behind (see "If a migration fails").
-- [ ] **Start when nothing long is running:** no backfill, export, or `renderings:rebuild` pass. To check:
+One read of `entries` takes about its heap size divided by the read rate: at 200 MB/s, 8 minutes for 100 GB and 25 minutes for 300 GB. Production traffic slows it.
+
+| Build | Work | Estimate |
+| --- | --- | --- |
+| `index_entries_on_edited_at_and_id` | Two reads of `entries`; nothing to sort | 15–60 min |
+| `index_unreads_on_user_id_and_entry_created_at_and_entry_id` | Two reads of `unreads` and a sort | 5–20 min |
+| `index_entries_on_feed_id_and_created_at_and_id` | Two reads of `entries`, a sort of every row, and the index written | 25–90 min |
+
+### Build by hand
+
+- [ ] **Start when nothing long is running:** no backfill, export, or `renderings:rebuild` pass. Before it finishes, a concurrent build waits for every transaction that started before it. To check:
 
 ```sql
 SELECT pid, now() - xact_start AS age, state, left(query, 80)
@@ -37,76 +48,79 @@ WHERE xact_start < now() - interval '10 seconds'
 ORDER BY xact_start;
 ```
 
-- [ ] **Optional: build the `unreads` index ahead of time, by hand.** Its migration skips an index that already exists and is valid, so building it first takes it out of the deploy. Don't do this for the `entries` index: its migration has no `if_not_exists` and fails if the index exists.
+- [ ] **Open a database console that survives your connection.** On app4, in `tmux`:
 
-```sql
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-CREATE INDEX CONCURRENTLY IF NOT EXISTS index_unreads_on_user_id_and_entry_created_at_and_entry_id
-  ON unreads (user_id, entry_created_at, entry_id);
+```bash
+cd /usr/local/srv/apps/feedbin/current && bin/rails dbconsole -p
 ```
 
-### Deploy
-
-- [ ] **Merge `api-v3-migrations` into main, deploy it, and run the migrations.**
-- [ ] **Watch the index builds.** In the second phase, `blocks_done` counts up to `blocks_total`:
-
-```sql
-SELECT p.pid, c.relname AS index, p.phase, p.blocks_done, p.blocks_total, p.tuples_done, p.tuples_total
-FROM pg_stat_progress_create_index p JOIN pg_class c ON c.oid = p.index_relid;
-```
-
-### After
-
-- [ ] **Confirm everything ran.** `bin/rails db:migrate:status` shows all five migrations as `up`.
-- [ ] **Confirm no index is invalid.** This must return no rows:
-
-```sql
-SELECT indexrelid::regclass FROM pg_index WHERE NOT indisvalid;
-```
-
-- [ ] **Watch `unreads` query times** for the next day. `index_unreads_on_user_id` is gone, and the composite indexes that start with `user_id` cover its queries.
-- [ ] **Put `statement_timeout` back to `1.hour`.**
-
-### If a migration fails
-
-Each one is safe to run again except `add_revision_to_entries`.
-
-- **`create_doorkeeper_tables`, `create_entry_videos`:** each runs in a transaction, so a failure leaves nothing behind. Run the migrations again.
-- **`add_unreads_user_entry_created_at_index`:** run it again. It drops an invalid index left by a failed build, then builds the index again.
-- **`remove_unreads_user_id_index`:** run it again.
-- **`add_revision_to_entries`:** it runs without a transaction, so whatever finished before the failure stays. Find out what that was:
-
-```sql
-SELECT column_name FROM information_schema.columns
-WHERE table_name = 'entries' AND column_name IN ('revision', 'edited_at');
-
-SELECT indexrelid::regclass, indisvalid FROM pg_index
-WHERE indexrelid = to_regclass('public.index_entries_on_edited_at_and_id');
-```
-
-Then finish its work by hand. Add whatever is missing, mark the migration as run, and run the rest:
+- [ ] **Add the columns.** Each `ALTER` needs a brief exclusive lock on `entries` and changes the table definition only; it rewrites no rows (Postgres 11+). With the 10 s lock timeout, one that cannot get its lock fails rather than stall the site. Run it again if it does.
 
 ```sql
 SET statement_timeout = 0;
 SET lock_timeout = '10s';
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1;
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS edited_at timestamp(6) without time zone;
+```
 
+- [ ] **Build the indexes,** one statement at a time. A concurrent build blocks no reads or writes, and it waits on old transactions without holding anyone else up, so the lock timeout comes off.
+
+```sql
+SET statement_timeout = 0;
 SET lock_timeout = 0;
-DROP INDEX CONCURRENTLY IF EXISTS index_entries_on_edited_at_and_id;  -- only if it is invalid
+
 CREATE INDEX CONCURRENTLY IF NOT EXISTS index_entries_on_edited_at_and_id
   ON entries (edited_at, id) WHERE edited_at IS NOT NULL;
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS index_unreads_on_user_id_and_entry_created_at_and_entry_id
+  ON unreads (user_id, entry_created_at, entry_id);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS index_entries_on_feed_id_and_created_at_and_id
+  ON entries (feed_id, created_at, id);
+```
+
+- [ ] **Watch a build from a second console.** Postgres 11 has no progress view for index builds (`pg_stat_progress_create_index` arrived in 12), so watch the statement and the index's size. The `(edited_at, id)` index stays near empty; the other two grow in the second half of the build.
+
+```sql
+SELECT pid, now() - query_start AS running, wait_event_type, wait_event, left(query, 70)
+FROM pg_stat_activity WHERE query ILIKE 'create index concurrently%';
+
+SELECT pg_size_pretty(pg_relation_size('index_entries_on_feed_id_and_created_at_and_id'));
+```
+
+- [ ] **Confirm no index is invalid.** This must return no rows. `IF NOT EXISTS` skips an invalid index a failed build left behind, so check after every build:
+
+```sql
+SELECT indexrelid::regclass FROM pg_index WHERE NOT indisvalid;
+```
+
+If one is listed, drop it and build it again:
+
+```sql
+DROP INDEX CONCURRENTLY IF EXISTS index_entries_on_feed_id_and_created_at_and_id;  -- the one listed
+```
+
+- [ ] **Refresh the statistics.**
+
+```sql
 ANALYZE entries;
-
-INSERT INTO schema_migrations (version) VALUES ('20261030120000');
+ANALYZE unreads;
 ```
 
-```bash
-bin/rails db:migrate
-```
+### Deploy
 
-`lock_timeout = 0` is safe for the index build: the build waits on old transactions without blocking anyone else. Keep 10 s on the `ALTER`s, which do block other queries while they wait.
+- [ ] **Merge `api-v3-migrations` into main and `cap deploy`.** The migrations run inside the deploy, with the usual 10 s lock timeout and one-hour statement timeout. With the columns and indexes already there, what is left is new tables, one concurrent index drop, and an `ANALYZE` after each index migration.
+- [ ] **If the deploy's migration step fails,** nothing is half-built: run the deploy again. Every migration is safe to run again. The two that create tables and the one that creates the profiles table run in a transaction, and the three index migrations skip what exists and rebuild an index a failed build left invalid.
+
+### After
+
+- [ ] **Confirm everything ran.** `bin/rails db:migrate:status` shows all seven migrations as `up`.
+- [ ] **Confirm no index is invalid,** with the query above.
+- [ ] **Watch `unreads` query times** for the next day. `index_unreads_on_user_id` is gone, and the composite indexes that start with `user_id` cover its queries.
+
+### If you skip the build by hand
+
+The migrations still do everything themselves. Expect the deploy to block and Sidekiq to stay paused until they finish, keep the SSH session alive, and raise `StrongMigrations.statement_timeout` in `config/initializers/strong_migrations.rb` above the longest build first: at one hour, a build that runs over is cancelled and leaves an invalid index. The `DB_STATEMENT_TIMEOUT=60min` the deploy sets does not help, because the initializer's value is applied when a migration starts.
 
 ## Step two: code
 
@@ -118,7 +132,7 @@ bin/rails db:migrate
 User.find_by!(email: "you@example.com").setting_on!(:api_v3)
 ```
 
-- [ ] **Mark Feedbin's own apps as first-party** after creating them, so their tokens get the `account` scope:
+- [ ] **Mark Feedbin's own apps as first-party** as soon as they are created, before anyone signs in with them, so their tokens get the `account` scope. Without it an app cannot read or change the account (`/v3/account`), register a device, record a purchase or list tokens. The task also upgrades the app's existing tokens, the ones created in settings included:
 
 ```bash
 bin/rails "api_v3:first_party[<application uid>]"

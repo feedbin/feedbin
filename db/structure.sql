@@ -912,6 +912,41 @@ ALTER SEQUENCE public.oauth_access_tokens_id_seq OWNED BY public.oauth_access_to
 
 
 --
+-- Name: oauth_application_profiles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oauth_application_profiles (
+    id bigint NOT NULL,
+    application_id bigint NOT NULL,
+    description text,
+    url character varying,
+    contact_email character varying,
+    logo_storage_path character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: oauth_application_profiles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.oauth_application_profiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: oauth_application_profiles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.oauth_application_profiles_id_seq OWNED BY public.oauth_application_profiles.id;
+
+
+--
 -- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1811,6 +1846,13 @@ ALTER TABLE ONLY public.oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
+-- Name: oauth_application_profiles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oauth_application_profiles ALTER COLUMN id SET DEFAULT nextval('public.oauth_application_profiles_id_seq'::regclass);
+
+
+--
 -- Name: oauth_applications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2150,6 +2192,14 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 
 --
+-- Name: oauth_application_profiles oauth_application_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oauth_application_profiles
+    ADD CONSTRAINT oauth_application_profiles_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: oauth_applications oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2465,6 +2515,13 @@ CREATE INDEX index_entries_on_edited_at_and_id ON public.entries USING btree (ed
 
 
 --
+-- Name: index_entries_on_feed_id_and_created_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_feed_id_and_created_at_and_id ON public.entries USING btree (feed_id, created_at, id);
+
+
+--
 -- Name: index_entries_on_feed_id_include_id_published_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2700,6 +2757,13 @@ CREATE INDEX index_oauth_access_tokens_on_resource_owner_id ON public.oauth_acce
 --
 
 CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON public.oauth_access_tokens USING btree (token);
+
+
+--
+-- Name: index_oauth_application_profiles_on_application_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_oauth_application_profiles_on_application_id ON public.oauth_application_profiles USING btree (application_id);
 
 
 --
@@ -3274,13 +3338,22 @@ ALTER TABLE ONLY public.playlists
 
 
 --
--- PostgreSQL database dump complete
+-- Name: oauth_application_profiles fk_rails_eb283eaca3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.oauth_application_profiles
+    ADD CONSTRAINT fk_rails_eb283eaca3 FOREIGN KEY (application_id) REFERENCES public.oauth_applications(id) ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261114090000'),
+('20261112012500'),
 ('20261103120000'),
 ('20261102150000'),
 ('20261102140000'),
