@@ -6,7 +6,7 @@ Today's code works on the new schema. The new tables are unused, the new `entrie
 
 ## Step one: schema
 
-**Build the slow parts by hand before deploying.** `cap deploy` runs `db:migrate` on app4 before it publishes the release, and it pauses every Sidekiq process (`deploy:quiet`) from the start of the deploy until the restart at the end. Three of these migrations build an index over all of `entries` or `unreads`, which together take an hour or more. Left to the deploy, that is an hour or more with no background jobs, on a build that dies with your SSH session and is cancelled by the one-hour statement timeout. Built by hand first, the deploy's migrations find everything in place and finish in seconds.
+**Build the slow parts before deploying, with `script/api_v3_prebuild.sh`.** `cap deploy` runs `db:migrate` on app4 before it publishes the release, and it pauses every Sidekiq process (`deploy:quiet`) from the start of the deploy until the restart at the end. Three of these migrations build an index over all of `entries` or `unreads`, which together take an hour or more. Left to the deploy, that is an hour or more with no background jobs, on a build that dies with your SSH session and is cancelled by the one-hour statement timeout. Built by hand first, the deploy's migrations find everything in place and finish in seconds.
 
 The migrations, in the order they run:
 
@@ -39,46 +39,27 @@ One read of `entries` takes about its heap size divided by the read rate: at 200
 
 ### Build by hand
 
-- [ ] **Start when nothing long is running:** no backfill, export, or `renderings:rebuild` pass. Before it finishes, a concurrent build waits for every transaction that started before it. To check:
+`script/api_v3_prebuild.sh` does all of it: the two columns, the three indexes, and an `ANALYZE` of both tables. It is one file with no dependencies but `bash` and `psql`, and it runs on the database server itself.
 
-```sql
-SELECT pid, now() - xact_start AS age, state, left(query, 80)
-FROM pg_stat_activity
-WHERE xact_start < now() - interval '10 seconds'
-ORDER BY xact_start;
-```
-
-- [ ] **Open a database console that survives your connection.** On app4, in `tmux`:
+- [ ] **Start when nothing long is running:** no backfill, export, or `renderings:rebuild` pass. Before it finishes, a concurrent build waits for every transaction that started before it. The script lists the transactions open for more than 10 seconds when it starts.
+- [ ] **Copy the script to the database server and run it in `tmux`,** as a user that owns the tables. It refuses to start outside `tmux` or `screen`.
 
 ```bash
-cd /usr/local/srv/apps/feedbin/current && bin/rails dbconsole -p
+sudo -u postgres ./api_v3_prebuild.sh <database>
 ```
 
-- [ ] **Add the columns.** Each `ALTER` needs a brief exclusive lock on `entries` and changes the table definition only; it rewrites no rows (Postgres 11+). With the 10 s lock timeout, one that cannot get its lock fails rather than stall the site. Run it again if it does.
+`MAINTENANCE_WORK_MEM=2GB` in front gives the index sorts more memory than the server's default.
 
-```sql
-SET statement_timeout = 0;
-SET lock_timeout = '10s';
-ALTER TABLE entries ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1;
-ALTER TABLE entries ADD COLUMN IF NOT EXISTS edited_at timestamp(6) without time zone;
-```
+What it does, in order:
 
-- [ ] **Build the indexes,** one statement at a time. A concurrent build blocks no reads or writes, and it waits on old transactions without holding anyone else up, so the lock timeout comes off.
+| Step | How |
+| --- | --- |
+| Adds `entries.revision` and `entries.edited_at` | Each `ALTER` needs a brief exclusive lock on `entries` and rewrites no rows (Postgres 11+). It waits 10 seconds for the lock, then fails rather than stall the site, and tries again, up to ten times. |
+| Builds the three indexes | `CREATE INDEX CONCURRENTLY`, one at a time, with no statement or lock timeout. Reads and writes carry on. |
+| Analyzes `entries` and `unreads` | |
+| Checks that no index is invalid | It exits non-zero if one is. |
 
-```sql
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS index_entries_on_edited_at_and_id
-  ON entries (edited_at, id) WHERE edited_at IS NOT NULL;
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS index_unreads_on_user_id_and_entry_created_at_and_entry_id
-  ON unreads (user_id, entry_created_at, entry_id);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS index_entries_on_feed_id_and_created_at_and_id
-  ON entries (feed_id, created_at, id);
-```
-
+- [ ] **If it stops, run it again.** Every step skips what is already there, and an index an interrupted build left invalid is dropped and built again.
 - [ ] **Watch a build from a second console.** Postgres 11 has no progress view for index builds (`pg_stat_progress_create_index` arrived in 12), so watch the statement and the index's size. The `(edited_at, id)` index stays near empty; the other two grow in the second half of the build.
 
 ```sql
@@ -88,24 +69,7 @@ FROM pg_stat_activity WHERE query ILIKE 'create index concurrently%';
 SELECT pg_size_pretty(pg_relation_size('index_entries_on_feed_id_and_created_at_and_id'));
 ```
 
-- [ ] **Confirm no index is invalid.** This must return no rows. `IF NOT EXISTS` skips an invalid index a failed build left behind, so check after every build:
-
-```sql
-SELECT indexrelid::regclass FROM pg_index WHERE NOT indisvalid;
-```
-
-If one is listed, drop it and build it again:
-
-```sql
-DROP INDEX CONCURRENTLY IF EXISTS index_entries_on_feed_id_and_created_at_and_id;  -- the one listed
-```
-
-- [ ] **Refresh the statistics.**
-
-```sql
-ANALYZE entries;
-ANALYZE unreads;
-```
+- [ ] **It ends with "Done."** and the time each build took.
 
 ### Deploy
 
@@ -115,7 +79,11 @@ ANALYZE unreads;
 ### After
 
 - [ ] **Confirm everything ran.** `bin/rails db:migrate:status` shows all seven migrations as `up`.
-- [ ] **Confirm no index is invalid,** with the query above.
+- [ ] **Confirm no index is invalid.** This must return no rows:
+
+```sql
+SELECT indexrelid::regclass FROM pg_index WHERE NOT indisvalid;
+```
 - [ ] **Watch `unreads` query times** for the next day. `index_unreads_on_user_id` is gone, and the composite indexes that start with `user_id` cover its queries.
 
 ### If you skip the build by hand
