@@ -12,9 +12,17 @@ module Api
         end.uniq
       end
 
+      # An entry that cannot be rendered has no videos. EntrySerializer reports
+      # the failure, so one entry does not fail the page.
+      def self.rendered(entry)
+        entry.rendering.api
+      rescue
+        nil
+      end
+
       # {entry id => [video object]}. Videos with no Embed row are left out.
       def self.call(entries)
-        ids = entries.to_h { [it.id, video_ids(it.rendering.api)] }
+        ids = entries.to_h { [it.id, video_ids(rendered(it))] }
         wanted = ids.values.flatten.uniq
         return ids.transform_values { [] } if wanted.empty?
 

@@ -33,6 +33,18 @@ class Api::V3::VideoLoaderTest < ActiveSupport::TestCase
     assert_equal({with_videos.id => [Api::V3::VideoSerializer.new(harvested).to_h], without.id => []}, result)
   end
 
+  test "call gives an entry that cannot be rendered no videos, and still loads the rest" do
+    Embed.create!(source: :youtube_video, provider_id: "AAA", parent_id: "UC1", data: {"snippet" => {"title" => "A"}})
+    with_videos = entry_with(%(<iframe src="https://www.youtube.com/embed/AAA"></iframe>))
+    broken = entry_with("<p>Words</p>")
+    broken.define_singleton_method(:rendering) { raise "formatter broke" }
+
+    videos = Api::V3::VideoLoader.call([with_videos, broken])
+
+    assert_equal ["AAA"], videos[with_videos.id].map { it[:id] }
+    assert_equal [], videos[broken.id]
+  end
+
   test "call loads a page of entries in three queries" do
     Embed.create!(source: :youtube_video, provider_id: "AAA", parent_id: "UC1", data: {})
     Embed.create!(source: :youtube_video, provider_id: "BBB", parent_id: "UC2", data: {})

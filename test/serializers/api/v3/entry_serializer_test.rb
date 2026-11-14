@@ -155,6 +155,31 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     refute_includes html, "<script"
   end
 
+  test "a link that is not a URL has no hostname" do
+    ["http://exa mple.com/a", "http://", "http://example.com:80a/"].each do |url|
+      entry = create_entry(@feed)
+      entry.update_columns(url: url)
+
+      json = serialize(entry)
+
+      assert_equal url, json[:url]
+      assert_nil json[:hostname], url
+    end
+  end
+
+  test "an entry that cannot be rendered serves a placeholder, never its unsanitized content" do
+    entry = create_entry(@feed)
+    entry.update_columns(content: %(<script>alert(1)</script><p onclick="x()">Words</p>))
+    EntryRendering.where(entry_id: entry.id).delete_all
+
+    json = ContentFormatter.stub(:versions, ->(*) { raise "formatter broke" }) do
+      ErrorService.stub(:notify, nil) { serialize(entry) }
+    end
+
+    assert_equal "<p>&ndash;&ndash;</p>", json[:content][:html]
+    assert_equal [], json[:videos]
+  end
+
   private
 
   def serialize(entry, expand: [], feed: nil)

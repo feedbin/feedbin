@@ -3,6 +3,8 @@ module Api
     # Load entries with Entry.for_api_v3 to avoid N+1 queries.
     class EntrySerializer
       EXPANSIONS = %w[feed changes original_newsletter].freeze
+      # What v2 serves for an entry that cannot be rendered.
+      UNRENDERED = "<p>&ndash;&ndash;</p>"
 
       # videos: preloaded from VideoLoader; nil loads this entry's own.
       def initialize(entry, feed: nil, expand: [], membership: nil, videos: nil)
@@ -24,7 +26,7 @@ module Api
           author_handle: author_handle,
           summary: @entry.summary.presence,
           url: url,
-          hostname: url && Addressable::URI.parse(url).host,
+          hostname: hostname(url),
           published_at: @entry.published.utc.iso8601,
           received_at: @entry.created_at.utc.iso8601,
           revision: @entry.revision,
@@ -83,6 +85,13 @@ module Api
         @url ||= (kind == "newsletter") ? @entry.newsletter_url : @entry.fully_qualified_url
       end
 
+      # Feeds publish links that are not URLs; one must not fail the page.
+      def hostname(url)
+        url && Addressable::URI.parse(url).host
+      rescue Addressable::URI::InvalidURIError
+        nil
+      end
+
       def icon_record
         @entry.icon_image_record ||
           (@entry.channel_image_record if kind == "video") ||
@@ -109,7 +118,7 @@ module Api
         {
           url: url,
           title: page&.title,
-          hostname: Addressable::URI.parse(url).host,
+          hostname: hostname(url),
           author: page&.author,
           image: image(@entry.link_image_record)
         }
@@ -161,11 +170,12 @@ module Api
         body
       end
 
+      # Never the stored content: only a rendering has been sanitized.
       def content_html
         @entry.rendering.api
       rescue => exception
         ErrorService.notify(exception, context: {entry_id: @entry.id})
-        @entry.content
+        UNRENDERED
       end
 
       # nil until the entry is edited.
@@ -186,7 +196,7 @@ module Api
         {
           url: url,
           title: page.title,
-          hostname: Addressable::URI.parse(url).host,
+          hostname: hostname(url),
           author: page.author,
           content: {html: html}
         }
