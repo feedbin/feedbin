@@ -1,7 +1,7 @@
 module Api
   module V3
     class AccountController < ApiController
-      before_action -> { require_scope("account") }, only: :destroy
+      before_action -> { require_scope("account") }
 
       def show
         render json: AccountSerializer.new(@user).to_h

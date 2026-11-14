@@ -69,12 +69,27 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
-  test "third-party token reads and updates the account" do
+  test "third-party token cannot read the account" do
     get "/v3/account", headers: bearer(@reader)
+
+    assert_insufficient_scope
+    refute_includes response.body, @user.email
+  end
+
+  test "third-party token cannot update the account" do
+    patch "/v3/account", params: {settings: {hide_updated: true}}, headers: bearer(@reader), as: :json
+
+    assert_insufficient_scope
+    refute @user.reload.setting_on?(:hide_updated)
+  end
+
+  test "first-party token reads and updates the account" do
+    get "/v3/account", headers: bearer(@feedbin)
     assert_response :success
 
-    patch "/v3/account", params: {settings: {}}, headers: bearer(@reader), as: :json
+    patch "/v3/account", params: {settings: {hide_updated: true}}, headers: bearer(@feedbin), as: :json
     assert_response :success
+    assert @user.reload.setting_on?(:hide_updated)
   end
 
   test "third-party token cannot list tokens" do
