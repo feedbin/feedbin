@@ -1,21 +1,19 @@
 <% app_name = @pre_auth.client.name %>
 <% logo = Api::V3::ApplicationLogo.for(@pre_auth.client.application) %>
-<% redirect = URI.parse(@pre_auth.redirect_uri) rescue nil %>
-<% redirect_host = redirect.host if redirect&.scheme.in?(%w[http https]) %>
 
 <% content_for :form_content do %>
-<div class="border rounded-md p-6 md:p-12 mb-4">
+<div class="border rounded-md p-6 md:p-12">
   <% if logo %>
-    <%= image_tag oauth_application_logo_path(@pre_auth.client.uid, v: logo.updated_at.to_i), alt: app_name, class: "block w-16 h-16 rounded-[14px] object-contain mb-4" %>
+    <%= image_tag oauth_application_logo_path(@pre_auth.client.uid, v: logo.updated_at.to_i), alt: app_name, class: "block w-16 h-16 rounded-[14px] object-contain mx-auto mb-4" %>
   <% end %>
-  <h1 class="font-bold text-lg mb-6"><%= app_name %> is requesting access to your account</h1>
+  <h1 class="font-bold text-lg text-center mb-6"><%= app_name %> is requesting access to your account</h1>
 
   <%= render partial: "shared/flash", locals: {flash: flash} %>
 
   <%= form_tag oauth_authorization_path, method: :post, novalidate: true, data: {controller: "oauth-form", action: "visual-viewport:change@window->oauth-form#reveal"} do %>
     <%= render "doorkeeper/authorizations/hidden_fields" %>
     <% if signed_in? %>
-      <p class="mb-6">
+      <p class="text-center mb-6">
         Signed in as <strong class="text-700 break-all"><%= current_user.email %></strong>.
         <button type="submit" form="oauth_switch_account" class="text-blue-600 whitespace-nowrap">Not you?</button>
       </p>
@@ -48,11 +46,6 @@
     <% end %>
   <% end %>
 
-  <%= form_tag oauth_authorization_path, method: :delete, class: "mt-3" do %>
-    <%= render "doorkeeper/authorizations/hidden_fields" %>
-    <button type="submit" class="button button-secondary flex w-full min-h-[44px]">Cancel</button>
-  <% end %>
-
   <% if signed_in? %>
     <%= form_tag oauth_session_path, method: :delete, id: "oauth_switch_account" do %>
       <%= render "doorkeeper/authorizations/hidden_fields" %>
@@ -60,10 +53,6 @@
   <% end %>
 </div>
 
-<p class="text-sm text-500 text-center">
-  You’ll be returned to <%= app_name %><%= " (#{redirect_host})" if redirect_host %>.
-  You can revoke access any time in Settings &gt; API.
-</p>
 <% end %>
 
 <%= render template: "layouts/oauth_page" %>

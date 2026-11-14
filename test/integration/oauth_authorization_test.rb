@@ -151,24 +151,13 @@ class OauthAuthorizationTest < ActionDispatch::IntegrationTest
     assert_select "button[form=oauth_switch_account]", text: "Not you?"
   end
 
-  test "the authorize page says who is asking, as whom, and how to undo it" do
+  test "the authorize page says who is asking and as whom" do
     sign_in_as @user
 
     get oauth_authorization_path(authorize_params)
 
     assert_select "h1", text: "My Reader is requesting access to your account"
     assert_includes response.body, @user.email
-    assert_includes response.body, "returned to My Reader"
-    assert_includes response.body, "revoke access any time in Settings"
-  end
-
-  test "a web redirect names the host the visitor returns to" do
-    @application.update!(redirect_uri: "https://reader.example/callback")
-    sign_in_as @user
-
-    get oauth_authorization_path(authorize_params.merge(redirect_uri: "https://reader.example/callback"))
-
-    assert_includes response.body, "returned to My Reader (reader.example)"
   end
 
   test "cancelling does not send the next sign in back to the authorize page" do
