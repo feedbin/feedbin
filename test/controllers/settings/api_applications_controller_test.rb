@@ -35,6 +35,17 @@ class Settings::ApiApplicationsControllerTest < ActionController::TestCase
     assert_select "form[action=?]", settings_api_authorization_path(application), count: 1
   end
 
+  test "Authorized Apps shows each app's logo" do
+    theirs = users(:ann).oauth_applications.create!(name: "Their Reader", redirect_uri: "theirreader://callback")
+    theirs.access_tokens.create!(resource_owner_id: @user.id, scopes: "")
+    Api::V3::ApplicationLogo.replace(theirs, logo_upload("image.png"))
+    login_as @user
+
+    get :index
+
+    assert_select "img[alt=?][src^=?]", "Their Reader logo", oauth_application_logo_path(theirs.uid)
+  end
+
   test "Authorized Apps leaves out tokens created on an application's page" do
     application = @user.oauth_applications.create!(name: "My Reader", redirect_uri: "")
     application.access_tokens.create!(resource_owner_id: @user.id, device_name: "curl on my Mac", scopes: "")
