@@ -149,6 +149,16 @@ class ContentFormatterTest < ActiveSupport::TestCase
     refute_includes result, "ignore"
   end
 
+  test "format! strips the substack body's own attributes" do
+    @entry.update!(newsletter_from: "writer@substack.com")
+    content = %(<div class="body markup" style="font-size:16px" data-behavior="x"><p style="color:red">Hello</p></div>)
+    result = ContentFormatter.format!(content, @entry)
+    assert_includes result, "Hello"
+    refute_includes result, "style="
+    refute_includes result, "markup"
+    refute_includes result, "data-behavior"
+  end
+
   test "every stored format renders from the entry alone" do
     ContentFormatter::FORMATS.each_key do |format|
       result = ContentFormatter.render(format, @entry.content, entry: @entry)
