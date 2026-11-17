@@ -3,7 +3,9 @@
 <% content_for :content do %>
 <%# Top-aligned on phones, and the page itself scrolls: layouts/form_page centres
     a page exactly as tall as the screen, which leaves nothing to scroll when
-    the keyboard covers the lower half. The spacer is that scroll room. %>
+    the keyboard covers the lower half. The spacer is that scroll room: the
+    most the keyboard has covered since it came up, so that moving to a field
+    with a shorter keyboard doesn't take back room the page has scrolled into. %>
 <div class="flex flex-col min-h-full p-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
   <div class="w-full max-w-[480px] mx-auto sm:my-auto">
     <div class="flex justify-center items-center mb-6 md:mb-12">
@@ -12,7 +14,7 @@
 
     <%= yield :form_content %>
   </div>
-  <div class="shrink-0 min-h-[max(var(--visual-viewport-offset,0px),env(safe-area-inset-bottom))]"></div>
+  <div class="shrink-0 min-h-[max(var(--visual-viewport-room,0px),env(safe-area-inset-bottom))]"></div>
 </div>
 <% end %>
 
