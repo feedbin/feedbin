@@ -81,7 +81,7 @@ class EntryRenderingTest < ActiveSupport::TestCase
   test "build renders full for a newsletter entry" do
     entry = create_entry(newsletter_feed)
     entry.update!(content: "<html><body><style>@media (max-width:480px){}</style><p>n</p></body></html>")
-    assert_includes EntryRendering.build(entry).full, "max-width:10000px"
+    assert_includes EntryRendering.build(entry).full, "<style>@container (max-width:480px){}</style><p>n</p></div>"
   end
 
   test "build renders a blank entry" do

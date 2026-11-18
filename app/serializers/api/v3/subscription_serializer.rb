@@ -5,6 +5,10 @@ module Api
     class SubscriptionSerializer
       EXPANSIONS = %w[feed tags].freeze
 
+      # Which body of an entry the subscription's articles open with, in the
+      # API's words for each body => the web app's view_mode.
+      VIEWS = {"default" => "article", "extracted" => "extract", "original_newsletter" => "newsletter"}.freeze
+
       def initialize(subscription, tags:, feed: nil, expand: [])
         @subscription = subscription
         @tags = tags
@@ -24,7 +28,8 @@ module Api
           preferences: {
             muted: preference(:muted),
             media_only: preference(:media_only),
-            show_updates: preference(:show_updates)
+            show_updates: preference(:show_updates),
+            view: VIEWS.key(@subscription.view_mode) || "default"
           }
         }
         hash[:feed] = @feed if @expand.include?("feed")

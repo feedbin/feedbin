@@ -19,7 +19,7 @@ class Api::V3::SubscriptionSerializerTest < ActiveSupport::TestCase
     assert_equal "Custom", json[:custom_title]
     assert_equal @feed.id, json[:feed_id]
     assert_equal [4, 9], json[:tag_ids]
-    assert_equal({muted: false, media_only: false, show_updates: true}, json[:preferences])
+    assert_equal({muted: false, media_only: false, show_updates: true, view: "default"}, json[:preferences])
   end
 
   test "expands the feed and tags when asked" do
@@ -45,15 +45,15 @@ class Api::V3::SubscriptionSerializerTest < ActiveSupport::TestCase
 
     json = Api::V3::SubscriptionSerializer.new(@subscription.reload, tags: []).to_h
 
-    assert_equal({muted: false, media_only: false, show_updates: true}, json[:preferences])
+    assert_equal({muted: false, media_only: false, show_updates: true, view: "default"}, json[:preferences])
   end
 
   test "a stored preference is not replaced by the default" do
-    @subscription.update_columns(muted: true, media_only: true, show_updates: false)
+    @subscription.update_columns(muted: true, media_only: true, show_updates: false, view_mode: Subscription.view_modes[:newsletter])
 
     json = Api::V3::SubscriptionSerializer.new(@subscription.reload, tags: []).to_h
 
-    assert_equal({muted: true, media_only: true, show_updates: false}, json[:preferences])
+    assert_equal({muted: true, media_only: true, show_updates: false, view: "original_newsletter"}, json[:preferences])
   end
 
   test "title falls back from the subscription to the feed to the feed's hostname" do

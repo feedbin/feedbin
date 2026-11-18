@@ -124,6 +124,18 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_equal "/preferences/muted", JSON.parse(response.body)["errors"].first["pointer"]
   end
 
+  test "preferences.view chooses which body the subscription's entries open with" do
+    patch "/v3/subscriptions/#{@subscription.id}", params: {preferences: {view: "original_newsletter"}}.to_json, headers: json
+    assert_response :success
+    assert_equal "original_newsletter", JSON.parse(response.body)["preferences"]["view"]
+    assert_equal "newsletter", @subscription.reload.view_mode
+
+    patch "/v3/subscriptions/#{@subscription.id}", params: {preferences: {view: "newsletter"}}.to_json, headers: json
+    assert_response :unprocessable_content
+    assert_equal "/preferences/view", JSON.parse(response.body)["errors"].first["pointer"]
+    assert_equal "newsletter", @subscription.reload.view_mode
+  end
+
   test "the Pages subscription is not a v3 subscription" do
     patch "/v3/subscriptions/#{@generated.id}", params: {custom_title: "Nope"}.to_json, headers: json
     assert_response :not_found

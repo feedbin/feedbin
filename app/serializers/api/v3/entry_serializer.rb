@@ -183,10 +183,19 @@ module Api
         @entry.content_diff&.then { {html: _1.to_s} }
       end
 
-      # Rendered on request, not stored; nil for anything but a newsletter.
+      # The stored full rendering; nil for anything but a newsletter. Rendering
+      # it on request cost 17ms an entry, so a page of newsletters took longer
+      # than a client waits.
       def original_newsletter
         return nil unless kind == "newsletter"
-        {html: ContentFormatter.newsletter_format(@entry.content).to_s}
+        {html: with_image_sources(@entry.rendering.full.to_s)}
+      end
+
+      # The stored rendering is the web app's, which proxies images and so
+      # leaves src off for its JavaScript to choose. A client gets the same
+      # pair content.html has: the original in src, the proxy in data-camo-src.
+      def with_image_sources(html)
+        html.gsub(' data-canonical-src="', ' src="')
       end
 
       # HarvestLinks saves only a micropost's first link.

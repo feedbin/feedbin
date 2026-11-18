@@ -81,7 +81,9 @@ module Api
           attributes[:title] = optional_string("custom_title", detail: "custom_title must be a string or null.").presence
         end
         if body.key?("preferences")
-          object("preferences").slice(*PREFERENCES).each { |key, value| attributes[key] = boolean("preferences/#{key}", value) }
+          preferences = object("preferences")
+          preferences.slice(*PREFERENCES).each { |key, value| attributes[key] = boolean("preferences/#{key}", value) }
+          attributes[:view_mode] = one_of("preferences/view", SubscriptionSerializer::VIEWS, preferences["view"]) if preferences.key?("view")
         end
         attributes
       end

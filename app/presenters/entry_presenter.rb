@@ -87,24 +87,10 @@ class EntryPresenter < BasePresenter
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
+  # The stored full rendering lays itself out (ContentFilters::NewsletterLayout);
+  # the view only has to put it in a shadow root.
   def newsletter_content
-    output = entry.rendering.full
-    output = <<-eod
-    <style>
-    body {
-      margin: 0  !important;
-      padding: 0 !important;
-    }
-    table, td, img {
-      max-width: 620px !important;
-    }
-    img[width="1"], img[height="1"] {
-      display: none !important;
-    }
-    </style>
-    #{output}
-    eod
-    output.html_safe
+    entry.rendering.full.html_safe
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)

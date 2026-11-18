@@ -71,7 +71,7 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     get "/v3/subscriptions", params: {expand: "feed"}, headers: bearer
 
     row = JSON.parse(response.body)["data"].last
-    assert_equal({"muted" => false, "media_only" => false, "show_updates" => true}, row["preferences"])
+    assert_equal({"muted" => false, "media_only" => false, "show_updates" => true, "view" => "default"}, row["preferences"])
     assert_equal "example1.com", row["title"]
     assert_nil row["custom_title"]
     assert_nil row["feed"]["title"]

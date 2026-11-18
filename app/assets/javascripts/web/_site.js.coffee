@@ -202,6 +202,67 @@ $.extend feedbin,
     context.querySelectorAll('a').forEach (element) ->
       element.setAttribute('target', '_blank')
       element.setAttribute('rel', 'noopener noreferrer')
+    feedbin.newsletterFit(context)
+
+  # The email lays itself out in the column (ContentFilters::NewsletterLayout).
+  # What is left for the page is the white card's own concern: text that
+  # would sit against the card's edge gets a gutter. The view starts out
+  # hidden and the pane can be resized, so this follows the width of the host
+  # rather than running once.
+  newsletterFit: (context) ->
+    host = context.host
+    return unless host && window.ResizeObserver
+    lastWidth = null
+    minimum = 16
+    observer = new ResizeObserver ->
+      width = host.clientWidth
+      return if width == 0 || width == lastWidth
+      lastWidth = width
+      host.style.padding = ''
+      left = 0
+      right = 0
+      # Padding one side reflows the text, which can move it against the
+      # other, so measure again until both sides clear.
+      for attempt in [1..3]
+        shortfall = feedbin.newsletterGutter(context, minimum)
+        break if shortfall.left <= 0 && shortfall.right <= 0
+        left = Math.min(minimum, left + Math.max(shortfall.left, 0))
+        right = Math.min(minimum, right + Math.max(shortfall.right, 0))
+        host.style.padding = "0 #{right}px 0 #{left}px"
+    observer.observe(host)
+
+  # How far short each side is of text clearing the edge of the column by the
+  # minimum. Only text counts: an image or a background that runs edge to edge
+  # is a design choice, and a newsletter with its own margins needs nothing.
+  newsletterGutter: (context, minimum) ->
+    box = context.host.getBoundingClientRect()
+    left = minimum
+    right = minimum
+    checked = new Map()
+    # Preheader text is hidden with whichever of these the sender's tool
+    # prefers, often on an ancestor, and would otherwise count as text at the
+    # edge.
+    hidden = (element) ->
+      return false unless element
+      return checked.get(element) if checked.has(element)
+      style = getComputedStyle(element)
+      collapsed = style.overflow != 'visible' && (element.clientHeight == 0 || element.clientWidth == 0)
+      result = style.visibility == 'hidden' || style.opacity == '0' || parseFloat(style.fontSize) < 2 || collapsed || hidden(element.parentElement)
+      checked.set(element, result)
+      result
+    walker = document.createTreeWalker(context, NodeFilter.SHOW_TEXT)
+    range = document.createRange()
+    while node = walker.nextNode()
+      continue unless node.nodeValue.trim()
+      parent = node.parentElement
+      continue if !parent || parent.tagName in ['STYLE', 'TITLE', 'SCRIPT'] || hidden(parent)
+      range.selectNodeContents(node)
+      for rect in range.getClientRects()
+        continue if rect.width < 1 || rect.height < 1
+        left = Math.min(left, rect.left - box.left)
+        right = Math.min(right, box.right - rect.right)
+    left: Math.round(minimum - Math.max(left, 0))
+    right: Math.round(minimum - Math.max(right, 0))
 
   reveal: (element, callback = null) ->
     parent = element.closest('li')

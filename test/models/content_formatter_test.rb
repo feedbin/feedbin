@@ -94,15 +94,39 @@ class ContentFormatterTest < ActiveSupport::TestCase
     end
   end
 
-  test "newsletter_format widens max-width media queries of 400px and up" do
-    input = "<style>@media screen and (max-width:480px) { .a {} } @media (max-width:320px) { .b {} }</style><p>x</p>"
-    result = ContentFormatter.newsletter_format(input)
-    assert_includes result, "(max-width:10000px)"
-    assert_includes result, "(max-width:320px)"
+  test "container_queries turns width media queries into container queries" do
+    {
+      "@media only screen and (max-width: 600px) {" => "@container (max-width:600px){",
+      "@media(min-width:480px){" => "@container (min-width:480px){",
+      "@media screen and (min-device-width: 768px) and (max-device-width: 1024px) {" => "@container (min-width:768px) and (max-width:1024px){",
+      "@media (max-width:500px), screen and (max-width:480px) {" => "@container ((max-width:500px)) or ((max-width:480px)){"
+    }.each do |media, container|
+      assert_equal "<style>#{container} .a { color: red } }</style>", ContentFilters::NewsletterLayout.container_queries("<style>#{media} .a { color: red } }</style>")
+    end
   end
 
-  test "Full.media_queries leaves a non-numeric width alone" do
-    assert_equal "@media (max-width:abcpx) {", ContentFormatter::Full.media_queries("@media (max-width:abcpx) {")
+  test "container_queries leaves media queries that are not purely about width" do
+    [
+      "@media (prefers-color-scheme: dark) {",
+      "@media only screen {",
+      "@media print {",
+      "@media screen and (max-width: 600px) and (orientation: portrait) {",
+      "@media (max-width: 600px), print {"
+    ].each do |media|
+      html = "<style>#{media} .a { color: red } }</style>"
+      assert_equal html, ContentFilters::NewsletterLayout.container_queries(html)
+    end
+  end
+
+  test "newsletter_format wraps the email in its own query container and releases pinned widths in it" do
+    result = ContentFormatter.newsletter_format(%(<style>@media (max-width: 600px) { .a { color: red } }</style><table width="600"><tr><td style="color: red; min-width: 320px; max-width: 900px"><img width="50%" src="http://example.com/a.png"><p>x</p></td></tr></table>))
+
+    assert result.start_with?(%(<div class="feedbin-newsletter" style="container-type:inline-size;overflow-wrap:break-word"><style>))
+    assert_includes result, "@container (max-width:600px){ .a { color: red } }"
+    assert_includes result, %(<table width="600" data-feedbin-width="600">)
+    assert_includes result, %(@container (max-width:600px){.feedbin-newsletter [data-feedbin-width="600"]{width:auto !important;min-width:0 !important})
+    assert_includes result, %(min-width: 320px; max-width: 900px" data-feedbin-width="320">)
+    refute_match(/<img[^>]*data-feedbin-width/, result, "a percentage width pins nothing")
   end
 
   test "VERSION is bumped when the formatter or its gems change" do

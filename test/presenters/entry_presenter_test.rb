@@ -48,13 +48,12 @@ class EntryPresenterTest < ActionView::TestCase
     assert_equal "<p>stored api</p>", presenter.app_content
   end
 
-  test "newsletter_content wraps the stored full rendering" do
+  test "newsletter_content is the stored full rendering" do
     @feed.update!(feed_type: :newsletter)
     entry = entry_with(content: "<html><body><p>n</p></body></html>")
     EntryRendering.where(entry_id: entry.id).update_all(blob: EntryRendering.encode({web: "", api: "", full: "<p>stored full</p>"}, content: entry.content, crc: EntryRendering.inputs_crc(entry)))
-    presenter = presenter_for(Entry.find(entry.id))
-    assert_includes presenter.newsletter_content, "<p>stored full</p>"
-    assert_includes presenter.newsletter_content, "<style>"
+
+    assert_equal "<p>stored full</p>", presenter_for(Entry.find(entry.id)).newsletter_content
   end
 
   test "newsletter_from reads the sender from settings" do

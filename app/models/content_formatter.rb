@@ -240,34 +240,11 @@ class ContentFormatter
   # "show original" view.
   class Full < Format
     def filters
-      [HTML::Pipeline::SanitizationFilter, (HTML::Pipeline::CamoFilter if camo?)].compact
+      [HTML::Pipeline::SanitizationFilter, (HTML::Pipeline::CamoFilter if camo?), ContentFilters::NewsletterLayout].compact
     end
 
     def context
       {whitelist: Sanitize::Config::RELAXED}.merge(camo_context)
-    end
-
-    def call(content)
-      super(self.class.media_queries(content))
-    end
-
-    # Email layouts switch to a narrow single column below a max-width
-    # breakpoint. Shown in the reader pane, which is narrower than the email
-    # was designed for, that column would win, so any breakpoint of 400px or
-    # more is pushed out of reach.
-    def self.media_queries(html)
-      regex = /@media(.*?)\(max-width:(.*?)px\)(.*?){/
-      html.gsub(regex) do |string|
-        matches = string.match(regex)
-        width = matches[2].strip
-        if width.to_i.to_s == width
-          width = width.to_i >= 400 ? 10_000 : width.to_i
-          string = "@media#{matches[1]}(max-width:#{width}px)#{matches[3]}{"
-        end
-        string
-      end
-    rescue
-      html
     end
   end
 
@@ -304,7 +281,7 @@ class ContentFormatter
   # The version stored renderings are written with. A stored rendering with
   # another version is re-rendered on read. Bump it with any change that
   # alters output; the fingerprint test fails until you do.
-  VERSION = 4
+  VERSION = 6
 
   # redcarpet paragraphs text entries; addressable normalizes every URL the
   # filters rewrite.

@@ -151,8 +151,19 @@ class Api::V3::EntrySerializerTest < ActiveSupport::TestCase
     assert_equal [:html, :changes, :original_newsletter], json[:content].keys
     html = json[:content][:original_newsletter][:html]
     assert_includes html, %(<td style="color: red">Hi</td>)
-    assert_includes html, "max-width:10000px"
+    assert_includes html, "@container (max-width:600px)"
     refute_includes html, "<script"
+  end
+
+  test "original_newsletter images keep their address in src beside the proxy's" do
+    @feed.update!(feed_type: :newsletter)
+    newsletter = create_entry(@feed)
+    stored = %(<div class="feedbin-newsletter"><img data-camo-src="https://camo.example/abc" data-canonical-src="http://example.com/a.png"></div>)
+    EntryRendering.where(entry_id: newsletter.id).update_all(blob: EntryRendering.encode({web: "", api: "", full: stored}, content: newsletter.content, crc: EntryRendering.inputs_crc(newsletter)))
+
+    html = serialize(Entry.find(newsletter.id), expand: %w[original_newsletter])[:content][:original_newsletter][:html]
+
+    assert_includes html, %(<img data-camo-src="https://camo.example/abc" src="http://example.com/a.png">)
   end
 
   test "a link that is not a URL has no hostname" do

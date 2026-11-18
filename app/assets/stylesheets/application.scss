@@ -4508,8 +4508,15 @@ body:has(dialog[open]) > .notification {
   background-color: white;
   overflow: hidden;
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
+}
+
+// A block, not a centered flex item: a flex item grows to its widest
+// unbreakable content and is then clipped on both sides.
+.newsletter-content {
+  max-width: 620px;
+  margin: 0 auto;
+  // Padding is added by feedbin.newsletterFit and must not widen the column.
+  box-sizing: border-box;
 }
 
 .content-option-switch {
