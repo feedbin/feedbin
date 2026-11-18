@@ -19,7 +19,9 @@ class ApiV3FeedsReadsTest < ActionDispatch::IntegrationTest
   test "shows a readable feed, 403 for an unreadable one, 404 for none" do
     get "/v3/feeds/#{@feed.id}", headers: bearer
     assert_response :success
-    assert_equal ["feed", @feed.id], JSON.parse(response.body).values_at("object", "id")
+    body = JSON.parse(response.body)
+    assert_equal ["feed", @feed.id], body.values_at("object", "id")
+    refute body.key?("daily_entry_counts")
 
     get "/v3/feeds/#{@other.id}", headers: bearer
     assert_response :forbidden
@@ -31,6 +33,18 @@ class ApiV3FeedsReadsTest < ActionDispatch::IntegrationTest
 
     get "/v3/feeds/0", headers: bearer
     assert_response :not_found
+  end
+
+  test "expand=daily_entry_counts adds a count for each of the last 30 days" do
+    get "/v3/feeds/#{@feed.id}", params: {expand: "daily_entry_counts"}, headers: bearer
+    assert_response :success
+    counts = JSON.parse(response.body)["daily_entry_counts"]
+    assert_equal 30, counts.length
+    assert counts.all?(Integer)
+
+    get "/v3/feeds/#{@feed.id}", params: {expand: "tags"}, headers: bearer
+    assert_response :unprocessable_entity
+    assert_equal "validation_failed", JSON.parse(response.body)["code"]
   end
 
   test "lists a feed's entries newest first with the timeline's filters and cursor" do

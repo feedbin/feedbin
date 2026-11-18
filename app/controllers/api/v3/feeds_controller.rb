@@ -12,7 +12,13 @@ module Api
       end
 
       def show
-        render json: FeedSerializer.new(@feed).to_h
+        render json: FeedSerializer.new(@feed, candidate: expanded_fields).to_h
+      end
+
+      private
+
+      def expanded_fields
+        {daily_entry_counts: @feed.daily_entry_counts} if expansions(FeedSerializer::EXPANSIONS).include?("daily_entry_counts")
       end
     end
   end

@@ -140,6 +140,11 @@ class Feed < ApplicationRecord
     FeedStat.daily_counts(feed_ids: [id])
   end
 
+  # Entries on each of the last 30 days, oldest first.
+  def daily_entry_counts
+    volume[id]&.counts || []
+  end
+
   def self.include_user_title
     feeds = select("feeds.*, subscriptions.title AS user_title")
     feeds.map do |feed|

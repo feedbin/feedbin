@@ -1,8 +1,11 @@
 module Api
   module V3
     # Preload Feed::ICON_PRELOADS and :touch_icon_image_record to avoid N+1s.
-    # candidate: {subscription_id:, daily_entry_counts:} from Find feeds.
+    # candidate: fields beyond the feed's own. {subscription_id:, daily_entry_counts:} from Find feeds;
+    # {daily_entry_counts:} from GET /feeds/{id}?expand=daily_entry_counts.
     class FeedSerializer
+      EXPANSIONS = %w[daily_entry_counts].freeze
+
       def initialize(feed, candidate: nil)
         @feed = feed
         @candidate = candidate
