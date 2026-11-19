@@ -90,6 +90,15 @@ GIT
       railties (>= 3.0)
 
 GIT
+  remote: https://github.com/feedbin/refract.git
+  revision: ea4fe6900694d88504a05d4e09e65c980475e76e
+  branch: main
+  specs:
+    refract (1.2.0)
+      prism
+      zeitwerk
+
+GIT
   remote: https://github.com/feedbin/sax-machine.git
   revision: 80c6e3b9eb4ab0ac16a0eeaac13d10a713d10423
   branch: feedbin
@@ -566,9 +575,6 @@ GEM
     redis (4.8.1)
     redis-client (0.31.0)
       connection_pool
-    refract (1.1.0)
-      prism
-      zeitwerk
     regexp_parser (2.13.4)
     reline (0.7.0)
       io-console (~> 0.5)
@@ -775,6 +781,7 @@ DEPENDENCIES
   rails-controller-testing
   redcarpet
   redis (< 5)
+  refract!
   requestjs-rails
   reverse_markdown
   ruby-prof

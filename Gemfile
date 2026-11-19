@@ -16,6 +16,7 @@ gem "carrierwave",     github: "feedbin/carrierwave",     branch: "feedbin"
 gem "sax-machine",     github: "feedbin/sax-machine",     branch: "feedbin"
 gem "feedjira",        github: "feedbin/feedjira",        branch: "f2"
 gem "feedkit",         github: "feedbin/feedkit",         branch: "main"
+gem "refract",         github: "feedbin/refract",         branch: "main", require: false
 gem "twitter",         github: "feedbin/twitter",         branch: "feedbin"
 gem "html-pipeline",   github: "feedbin/html-pipeline",   branch: "feedbin"
 gem "html_diff",       github: "feedbin/html_diff",       branch: "feedbin"
