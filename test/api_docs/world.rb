@@ -302,7 +302,7 @@ module ApiDocs
 
     # Doorkeeper stores only a hash, so the secret goes in through the generator.
     def token
-      application = Doorkeeper::Application.create!(id: 31, name: "Unread", redirect_uri: "", scopes: Api::V3::Scopes::FIRST_PARTY, owner: current_user)
+      application = Doorkeeper::Application.create!(id: 31, name: "Unread", redirect_uri: "unread://oauth", scopes: Api::V3::Scopes::FIRST_PARTY, owner: current_user)
       {61 => ["Reeder on Ben’s Mac", Time.utc(2026, 4, 12, 9, 30, 15), Time.utc(2026, 9, 7, 22, 3, 51), "fbn_v3_docsotherdevicetoken0000000000"],
        88 => ["Unread on Ben’s iPhone", Time.utc(2026, 9, 1, 18, 22, 4), Time.utc(2026, 9, 9, 8, 12, 40), ApiDocs::TOKEN]}.each do |id, (name, created_at, used_at, secret)|
         Api::V3::TokenGenerator.stub(:generate, secret) do
@@ -322,6 +322,9 @@ module ApiDocs
       import.save!(validate: false)
       import.import_items.create!(status: :complete, details: {title: "Daring Fireball", xml_url: "https://daringfireball.net/feeds/main", html_url: "https://daringfireball.net"})
       import.import_items.create!(status: :failed, details: {title: "Old Blog", xml_url: "https://example.com/rss", html_url: "https://example.com"})
+      SupportedSharingService.create!(id: 41, user: user, service_id: "email", email_name: "Ben Ubois", email_address: "ben@example.com")
+      SupportedSharingService.create!(id: 42, user: user, service_id: "pinboard", access_token: "ben:0123456789ABCDEF", access_secret: "n/a")
+      SharingService.create!(id: 9, user: user, label: "Search DuckDuckGo", url: "https://duckduckgo.com/?q=${title}")
     end
 
     def index

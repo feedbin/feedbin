@@ -1,4 +1,8 @@
 class SupportedSharingServicesController < ApplicationController
+  # An app's sign-in (ShareAuthorization) comes back here from the service with no web session.
+  skip_before_action :authorize, only: [:oauth_response, :oauth2_response]
+  before_action :complete_app_authorization, only: [:oauth_response, :oauth2_response]
+  before_action :authorize, only: [:oauth_response, :oauth2_response]
   def create
     @user = current_user
     if params[:supported_sharing_service][:operation] == "authorize"
@@ -113,6 +117,16 @@ class SupportedSharingServicesController < ApplicationController
   end
 
   private
+
+  def complete_app_authorization
+    if action_name == "oauth2_response"
+      authorization = ShareAuthorization.find(params[:state]) or return
+      redirect_to authorization.complete_oauth2(params), allow_other_host: true
+    elsif session[:oauth_token].blank?
+      authorization = ShareAuthorization.find_oauth1(params[:oauth_token]) or return
+      redirect_to authorization.complete_oauth1(params), allow_other_host: true
+    end
+  end
 
   def supported_sharing_service_params
     params.require(:supported_sharing_service).permit(:service_id, :email_name, :email_address, :kindle_address, :api_token)

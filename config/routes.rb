@@ -153,6 +153,13 @@ Rails.application.routes.draw do
         resources :actions, only: [:index, :create, :update, :destroy] do
           resources :entries, only: :index, module: :actions
         end
+        resources :share_services, only: [:index, :update, :destroy] do
+          scope module: :share_services do
+            resource :authorization, only: :create
+            resources :shares, only: :create
+          end
+        end
+        resources :custom_share_services, only: [:index, :create, :update, :destroy]
         resources :playlists, only: [:index, :create, :update, :destroy]
         resources :devices, only: [:create, :destroy]
         resources :imports, only: [:index, :create, :show, :destroy]
