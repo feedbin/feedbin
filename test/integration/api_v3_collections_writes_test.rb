@@ -17,6 +17,18 @@ class ApiV3CollectionsWritesTest < ActionDispatch::IntegrationTest
     @token = application.access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
   end
 
+  test "exports the starred articles by email, and only those" do
+    Sidekiq::Testing.fake! do
+      post "/v3/collections/starred/export", headers: bearer
+      assert_response :accepted
+      assert_equal({"object" => "export", "collection_id" => "starred", "email" => @user.email}, JSON.parse(response.body))
+      assert_equal 1, StarredEntriesExport.jobs.size
+
+      post "/v3/collections/unread/export", headers: bearer
+      assert_response :not_found
+    end
+  end
+
   test "lists the sidebar with hidden flags and an etag" do
     @user.setting_on!(:hide_updated)
     search = @user.saved_searches.create!(name: "Swift", query: "swift")

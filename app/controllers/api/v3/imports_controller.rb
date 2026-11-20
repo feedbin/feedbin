@@ -8,6 +8,13 @@ module Api
 
       skip_before_action :validate_content_type, only: :create
       before_action :ensure_opml, :throttle, only: :create
+      before_action :set_import, only: [:show, :destroy]
+
+      # Newest first, as the web's Import History lists them.
+      def index
+        imports = @user.imports.where.not(filename: nil).includes(:import_items).order(created_at: :desc, id: :desc)
+        render_list(imports.map { ImportSerializer.new(_1).to_h })
+      end
 
       # A filename makes the import show on the web's Import & Export page.
       def create
@@ -20,10 +27,20 @@ module Api
       end
 
       def show
-        render json: ImportSerializer.new(@user.imports.includes(:import_items).find(params[:id])).to_h
+        render json: ImportSerializer.new(@import).to_h
+      end
+
+      # Only the record of it: the subscriptions it made stay.
+      def destroy
+        @import.destroy!
+        head :no_content
       end
 
       private
+
+      def set_import
+        @import = @user.imports.includes(:import_items).find(params[:id])
+      end
 
       # Size is checked before the body is parsed.
       def ensure_opml

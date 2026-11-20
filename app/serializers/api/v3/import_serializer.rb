@@ -13,6 +13,7 @@ module Api
         {
           object: "import",
           id: @import.id,
+          filename: @import.filename,
           status: items.any?(&:pending?) ? "pending" : "complete",
           items: items.map { item(_1, subscription_ids) },
           created_at: @import.created_at.utc.iso8601

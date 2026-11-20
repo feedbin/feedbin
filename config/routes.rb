@@ -155,7 +155,7 @@ Rails.application.routes.draw do
         end
         resources :playlists, only: [:index, :create, :update, :destroy]
         resources :devices, only: [:create, :destroy]
-        resources :imports, only: [:create, :show]
+        resources :imports, only: [:index, :create, :show, :destroy]
         resources :pages, only: [:create, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           resources :purchases, only: :create, module: :account
@@ -163,6 +163,7 @@ Rails.application.routes.draw do
         resources :collections, only: :index do
           scope module: :collections do
             resource :ids, only: :show
+            resource :export, only: :create
             resources :entries, only: [:index, :create, :update, :destroy]
             resource :entries, only: [:update, :destroy], controller: "bulk_entries", as: :bulk_entries
           end

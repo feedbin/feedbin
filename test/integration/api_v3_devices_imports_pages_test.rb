@@ -59,7 +59,7 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     post "/v3/imports", params: opml, headers: bearer.merge("Content-Type" => "text/x-opml")
     assert_response :accepted
     body = JSON.parse(response.body)
-    assert_equal %w[object id status items created_at], body.keys
+    assert_equal %w[object id filename status items created_at], body.keys
     assert_equal "pending", body["status"]
     assert_equal [["Daring Fireball", "https://daringfireball.net/feeds/main", "pending", nil, nil], ["Old Blog", "https://example.com/rss", "pending", nil, nil]], body["items"].map { _1.values_at("title", "feed_url", "status", "subscription_id", "message") }
 
@@ -74,6 +74,18 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal "complete", body["status"]
     assert_equal [["complete", subscription.id, nil], ["failed", nil, "No feed found."]], body["items"].map { _1.values_at("status", "subscription_id", "message") }
+
+    assert_equal "Reader import", body["filename"]
+
+    get "/v3/imports", headers: bearer
+    assert_response :success
+    assert_equal [import.id], JSON.parse(response.body)["data"].map { _1["id"] }
+
+    delete "/v3/imports/#{import.id}", headers: bearer
+    assert_response :no_content
+    assert_equal subscription, Subscription.find(subscription.id)
+    get "/v3/imports/#{import.id}", headers: bearer
+    assert_response :not_found
 
     post "/v3/imports", params: "<html></html>", headers: bearer.merge("Content-Type" => "application/xml")
     assert_response :unsupported_media_type

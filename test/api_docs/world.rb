@@ -318,7 +318,7 @@ module ApiDocs
       SavedSearch.create!(id: 12, user: user, name: "Swift, unread", query: "title:swift is:unread", created_at: Time.utc(2026, 3, 2, 9, 11, 40), updated_at: Time.utc(2026, 3, 2, 9, 11, 40))
       Device.create!(id: 5120, user: user, token: "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c5b4a39281706f5e4d3c2b1a0", device_type: :notifier,
         application: "com.feedbin.app", model: "iPad16,3", operating_system: "iPadOS 27.0", created_at: Time.utc(2026, 6, 14, 20, 5, 31))
-      import = Import.new(id: 3310, user: user, complete: true, created_at: Time.utc(2026, 9, 9, 16, 58, 2))
+      import = Import.new(id: 3310, user: user, filename: "subscriptions.xml", complete: true, created_at: Time.utc(2026, 9, 9, 16, 58, 2))
       import.save!(validate: false)
       import.import_items.create!(status: :complete, details: {title: "Daring Fireball", xml_url: "https://daringfireball.net/feeds/main", html_url: "https://daringfireball.net"})
       import.import_items.create!(status: :failed, details: {title: "Old Blog", xml_url: "https://example.com/rss", html_url: "https://example.com"})

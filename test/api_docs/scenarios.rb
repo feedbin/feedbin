@@ -67,6 +67,7 @@ module ApiDocs
   object "collection", "/collections"
   object "feed", "/subscriptions/new", method: :post, body: {q: "daring fireball"}.to_json, pick: "data/0"
   object "image", "/entries?ids=2947218", pick: "data/0/images/preview"
+  object "import", "/imports/3310"
   object "newsletter-address", "/newsletters/addresses", pick: "data/1"
   object "newsletter-sender", "/newsletters/senders", pick: "data/0"
   object "playlist", "/playlists", pick: "data/0"
