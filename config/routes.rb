@@ -147,6 +147,9 @@ Rails.application.routes.draw do
           resources :addresses, only: [:index, :create, :update]
           resources :senders, only: [:index, :update]
         end
+        namespace :actions do
+          resource :preview, only: :create
+        end
         resources :actions, only: [:index, :create, :update, :destroy] do
           resources :entries, only: :index, module: :actions
         end

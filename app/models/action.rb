@@ -66,6 +66,12 @@ class Action < ApplicationRecord
     end
   end
 
+  # The feeds a save would scope the rule to, without saving: a preview's.
+  def scoped_feed_ids
+    compute_tag_ids
+    compute_feed_ids
+  end
+
   def compute_feed_ids
     final_feed_ids = []
     new_feed_ids = feed_ids || []

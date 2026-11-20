@@ -139,6 +139,40 @@ class ApiV3ActionsTest < ActionDispatch::IntegrationTest
     assert_equal "standard", JSON.parse(response.body)["data"].find { _1["id"] == action.id }&.dig("kind")
   end
 
+  test "previews a rule that isn't saved" do
+    other = Feed.create!(feed_url: "https://example.com/other", host: "example.com", title: "Other")
+    @user.subscriptions.create!(feed: other)
+    elsewhere = other.entries.create!(title: "Swift elsewhere", content: "<p>Swift</p>", url: "https://example.com/e", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: 3.days.ago)
+    index_entries([elsewhere])
+
+    post "/v3/actions/preview", params: {query: "swift", tag_ids: [@tag.id]}.to_json, headers: json
+    assert_response :success
+    assert_equal @entries.reverse.map(&:id), JSON.parse(response.body)["data"].map { _1["id"] }
+
+    post "/v3/actions/preview", params: {query: "swift"}.to_json, headers: json
+    assert_equal [*@entries.reverse.map(&:id), elsewhere.id], JSON.parse(response.body)["data"].map { _1["id"] }
+    assert_equal 0, @user.actions.count
+
+    post "/v3/actions/preview", params: {query: "title:("}.to_json, headers: json
+    assert_response :unprocessable_content
+    assert_equal "query_invalid", JSON.parse(response.body)["code"]
+  end
+
+  test "mark_existing_read marks what the rule already matches" do
+    Sidekiq::Testing.fake! do
+      post "/v3/actions", params: {title: "Read Swift", kind: "standard", query: "swift", actions: ["mark_read"], mark_existing_read: true}.to_json, headers: json
+      assert_response :created
+      assert_equal 1, Search::ActionsBulk.jobs.size
+
+      patch "/v3/actions/#{JSON.parse(response.body)["id"]}", params: {title: "Renamed"}.to_json, headers: json
+      assert_equal 1, Search::ActionsBulk.jobs.size
+
+      post "/v3/actions", params: {title: "Bad", kind: "standard", mark_existing_read: "yes"}.to_json, headers: json
+      assert_response :unprocessable_content
+      assert_equal "/mark_existing_read", JSON.parse(response.body)["errors"].first["pointer"]
+    end
+  end
+
   private
 
   def bearer
