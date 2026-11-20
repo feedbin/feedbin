@@ -25,6 +25,16 @@ class ApiV3TokensTest < ActionDispatch::IntegrationTest
     refute body["data"].any? { _1.key?("token") }
   end
 
+  test "an unchanged token list is a 304" do
+    get "/v3/tokens", headers: bearer
+    etag = response.headers["ETag"]
+    get "/v3/tokens", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :not_modified
+    @other.revoke
+    get "/v3/tokens", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+  end
+
   test "leaves out revoked tokens and other users' tokens" do
     @other.revoke
     @application.access_tokens.create!(resource_owner_id: users(:ann).id, scopes: "read write account")

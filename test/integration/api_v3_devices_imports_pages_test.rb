@@ -80,9 +80,14 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     get "/v3/imports", headers: bearer
     assert_response :success
     assert_equal [import.id], JSON.parse(response.body)["data"].map { _1["id"] }
+    etag = response.headers["ETag"]
+    get "/v3/imports", headers: bearer.merge("If-None-Match" => etag)
+    assert_response :not_modified
 
     delete "/v3/imports/#{import.id}", headers: bearer
     assert_response :no_content
+    get "/v3/imports", headers: bearer.merge("If-None-Match" => etag)
+    assert_equal [], JSON.parse(response.body)["data"]
     assert_equal subscription, Subscription.find(subscription.id)
     get "/v3/imports/#{import.id}", headers: bearer
     assert_response :not_found

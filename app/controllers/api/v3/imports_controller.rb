@@ -13,7 +13,9 @@ module Api
       # Newest first, as the web's Import History lists them.
       def index
         imports = @user.imports.where.not(filename: nil).includes(:import_items).order(created_at: :desc, id: :desc)
-        render_list(imports.map { ImportSerializer.new(_1).to_h })
+        data = imports.map { ImportSerializer.new(it).to_h }
+        return unless stale?(etag: digest(data))
+        render_list(data)
       end
 
       # A filename makes the import show on the web's Import & Export page.
