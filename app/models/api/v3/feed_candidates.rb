@@ -37,7 +37,7 @@ module Api
           feeds = found
           preload(feeds)
           existing = @user.existing_subscriptions(feeds)
-          stats = FeedStat.daily_counts(feed_ids: feeds.map(&:id))
+          stats = FeedStat.daily_counts(feed_ids: feeds.map(&:id), interval: FeedStat::API_INTERVAL)
           feeds.each { it.priority_refresh(@user) }
           feeds.map { Candidate.new(it, existing[it.id] || existing[it.feed_url], stats[it.id]&.counts || []) }
         end

@@ -1,6 +1,9 @@
 class FeedStat < ApplicationRecord
   belongs_to :feed
 
+  # The API's daily_entry_counts: the last 90 days, oldest first, ending today.
+  API_INTERVAL = "89 days"
+
   def self.daily_counts(feed_ids:, interval: "29 days")
     return {} if feed_ids.empty?
     sql = <<-SQL

@@ -15,8 +15,8 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
   test "a url lists every feed found, with subscription and daily counts, and subscribes to nothing" do
     subscription = @user.subscriptions.create!(feed: @second)
     FeedStat.create!(feed: @found, day: Date.current, entries_count: 4)
-    FeedStat.create!(feed: @found, day: 29.days.ago.to_date, entries_count: 2)
-    FeedStat.create!(feed: @found, day: 30.days.ago.to_date, entries_count: 9)
+    FeedStat.create!(feed: @found, day: 89.days.ago.to_date, entries_count: 2)
+    FeedStat.create!(feed: @found, day: 90.days.ago.to_date, entries_count: 9)
 
     finding([@found, @second]) do
       post "/v3/subscriptions/new", params: {q: "https://marco.example"}.to_json, headers: json
@@ -30,7 +30,7 @@ class ApiV3SubscriptionCandidatesTest < ActionDispatch::IntegrationTest
     assert_equal Api::V3::FeedSerializer.new(@found).to_h.keys.map(&:to_s) + %w[subscription_id daily_entry_counts], body["data"].first.keys
     assert_equal [nil, subscription.id], body["data"].map { it["subscription_id"] }
     counts = body["data"].first["daily_entry_counts"]
-    assert_equal 30, counts.size
+    assert_equal 90, counts.size
     assert_equal [2, 4], [counts.first, counts.last]
     assert_equal 6, counts.sum
     assert_nil body["tags"]

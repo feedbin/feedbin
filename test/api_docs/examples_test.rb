@@ -71,7 +71,12 @@ class ApiDocsExamplesTest < ActionDispatch::IntegrationTest
       ApiDocs::Sequences.reset
       Rails.cache.clear
       instance_exec(source, &scenario.setup) if scenario&.setup
-      result = yield
+      around = scenario.around if scenario.respond_to?(:around)
+      if around
+        instance_exec(-> { result = yield }, &around)
+      else
+        result = yield
+      end
       raise ActiveRecord::Rollback
     end
     result

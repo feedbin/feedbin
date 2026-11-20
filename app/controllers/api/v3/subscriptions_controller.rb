@@ -46,10 +46,11 @@ module Api
 
       private
 
+      # Every subscription's feed is loaded with the list: a subscription
+      # without a title of its own takes its feed's.
       def subscriptions
-        scope = subscription_list.subscriptions.order(:id)
-        scope = scope.includes(feed: [*Feed::ICON_PRELOADS, :touch_icon_image_record]) if expansions(SubscriptionSerializer::EXPANSIONS).include?("feed")
-        scope.to_a
+        feed = expansions(SubscriptionSerializer::EXPANSIONS).include?("feed") ? {feed: [*Feed::ICON_PRELOADS, :touch_icon_image_record]} : :feed
+        subscription_list.subscriptions.order(:id).includes(feed).to_a
       end
 
       def serialize(subscriptions)

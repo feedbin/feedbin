@@ -49,6 +49,17 @@ module ApiDocs
     OPML
   }
 
+  # A proposal's digits are random and its signature uses the machine's
+  # secret_key_base, so both are fixed.
+  ADDRESS_VERIFIER = ActiveSupport::MessageVerifier.new("docs-address-token-secret")
+  fixed_address = ->(request) {
+    AuthenticationToken.stub(:address_verifier, ADDRESS_VERIFIER) do
+      AuthenticationToken.stub(:generate_custom_token, "ac.522") { request.call }
+    end
+  }
+  scenario "newsletters/propose", around: fixed_address
+  scenario "newsletters/create", around: fixed_address
+
   # Object pages request every expansion.
   object "account", "/account"
   object "action", "/actions", pick: "data/0"
@@ -56,6 +67,8 @@ module ApiDocs
   object "collection", "/collections"
   object "feed", "/subscriptions/new", method: :post, body: {q: "daring fireball"}.to_json, pick: "data/0"
   object "image", "/entries?ids=2947218", pick: "data/0/images/preview"
+  object "newsletter-address", "/newsletters/addresses", pick: "data/1"
+  object "newsletter-sender", "/newsletters/senders", pick: "data/0"
   object "playlist", "/playlists", pick: "data/0"
   object "saved-search", "/saved_searches", pick: "data/0"
   object "subscription", "/subscriptions/525?expand=feed,tags"

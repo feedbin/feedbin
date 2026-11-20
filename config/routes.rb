@@ -141,6 +141,12 @@ Rails.application.routes.draw do
         resources :tags, only: [:index, :update, :destroy]
         get "search", to: "search#index"
         resources :saved_searches, only: [:index, :create, :update, :destroy]
+        namespace :newsletters do
+          # POST, as subscriptions/new is: a proposal, with the prefix in the body.
+          post "addresses/new", to: "addresses#new"
+          resources :addresses, only: [:index, :create, :update]
+          resources :senders, only: [:index, :update]
+        end
         resources :actions, only: [:index, :create, :update, :destroy] do
           resources :entries, only: :index, module: :actions
         end

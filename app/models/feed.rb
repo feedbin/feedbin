@@ -140,9 +140,9 @@ class Feed < ApplicationRecord
     FeedStat.daily_counts(feed_ids: [id])
   end
 
-  # Entries on each of the last 30 days, oldest first.
+  # Entries on each of the last 90 days, oldest first, as the API gives them.
   def daily_entry_counts
-    volume[id]&.counts || []
+    FeedStat.daily_counts(feed_ids: [id], interval: FeedStat::API_INTERVAL)[id]&.counts || []
   end
 
   def self.include_user_title

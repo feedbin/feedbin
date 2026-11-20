@@ -35,11 +35,11 @@ class ApiV3FeedsReadsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "expand=daily_entry_counts adds a count for each of the last 30 days" do
+  test "expand=daily_entry_counts adds a count for each of the last 90 days" do
     get "/v3/feeds/#{@feed.id}", params: {expand: "daily_entry_counts"}, headers: bearer
     assert_response :success
     counts = JSON.parse(response.body)["daily_entry_counts"]
-    assert_equal 30, counts.length
+    assert_equal 90, counts.length
     assert counts.all?(Integer)
 
     get "/v3/feeds/#{@feed.id}", params: {expand: "tags"}, headers: bearer

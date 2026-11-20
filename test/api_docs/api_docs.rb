@@ -24,7 +24,8 @@ module ApiDocs
   }.freeze
 
   # per_source: run once per source, yielding it. request: overrides the front matter's request.
-  Scenario = Data.define(:per_source, :setup, :request)
+  # around: wraps the request, for a stub that needs a block; it calls the block it is given.
+  Scenario = Data.define(:per_source, :setup, :request, :around)
 
   # An object (_data/objects/<name>.json, the JSON Pointer `pick` into the
   # response) or a snippet (_data/snippets/<name>.json, the whole response).
@@ -37,8 +38,8 @@ module ApiDocs
   class << self
     attr_reader :scenarios, :examples
 
-    def scenario(key, per_source: false, request: nil, &setup)
-      @scenarios[key] = Scenario.new(per_source: per_source, setup: setup, request: request)
+    def scenario(key, per_source: false, request: nil, around: nil, &setup)
+      @scenarios[key] = Scenario.new(per_source: per_source, setup: setup, request: request, around: around)
     end
 
     def object(name, path, method: :get, body: nil, per_source: false, pick: nil, &setup)

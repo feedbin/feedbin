@@ -143,6 +143,33 @@ class ApiV3FeedsTest < ActionDispatch::IntegrationTest
     assert_includes JSON.parse(response.body)["data"].map { _1["id"] }, other.id
   end
 
+  test "expand=daily_entry_counts gives every listed feed its last 90 days, with the body's etag" do
+    FeedStat.create!(feed: @feeds.first, day: Date.current, entries_count: 4)
+    FeedStat.create!(feed: @feeds.first, day: 89.days.ago.to_date, entries_count: 2)
+    FeedStat.create!(feed: @feeds.first, day: 90.days.ago.to_date, entries_count: 9)
+
+    get "/v3/feeds", params: {expand: "daily_entry_counts"}, headers: bearer
+    assert_response :success
+    counts = JSON.parse(response.body)["data"].to_h { [_1["id"], _1["daily_entry_counts"]] }
+    assert_equal [2, *Array.new(88, 0), 4], counts[@feeds.first.id]
+    assert_equal Array.new(90, 0), counts[@feeds.last.id]
+    etag = response.headers["ETag"]
+
+    get "/v3/feeds", params: {expand: "daily_entry_counts"}, headers: bearer.merge("If-None-Match" => etag)
+    assert_response :not_modified
+
+    # a feed publishing moves the counts, and the etag with them
+    FeedStat.find_by!(feed: @feeds.first, day: Date.current).update!(entries_count: 5)
+    get "/v3/feeds", params: {expand: "daily_entry_counts"}, headers: bearer.merge("If-None-Match" => etag)
+    assert_response :success
+
+    get "/v3/feeds", headers: bearer
+    refute JSON.parse(response.body)["data"].first.key?("daily_entry_counts")
+
+    get "/v3/feeds", params: {expand: "tags"}, headers: bearer
+    assert_response :unprocessable_entity
+  end
+
   private
 
   def entry_in(feed)

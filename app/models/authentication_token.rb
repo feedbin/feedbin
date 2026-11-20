@@ -55,6 +55,16 @@ class AuthenticationToken < ApplicationRecord
     nil
   end
 
+  # What the web keeps of a typed prefix: lowercase letters, digits, - . _
+  def self.newsletter_prefix(text)
+    text.to_s.downcase.gsub(/[^a-z0-9._-]+/, "")
+  end
+
+  # Signs a proposed address so a later create can trust it.
+  def self.address_verifier
+    Rails.application.message_verifier(:address_token)
+  end
+
   def title
     "#{token}@#{ENV["NEWSLETTER_ADDRESS_HOST"]}"
   end

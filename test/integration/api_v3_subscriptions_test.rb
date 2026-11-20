@@ -41,6 +41,20 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test "listing costs the same number of queries however many subscriptions there are" do
+    get "/v3/subscriptions", headers: bearer # the first request loads what later ones reuse
+    few = count_queries { get "/v3/subscriptions", headers: bearer }
+    8.times do |i|
+      feed = Feed.create!(feed_url: "https://more#{i}.example/feed", host: "more#{i}.example", title: "More #{i}")
+      @user.subscriptions.create!(feed: feed)
+    end
+    many = count_queries { get "/v3/subscriptions", headers: bearer }
+
+    assert_response :success
+    assert_equal 10, JSON.parse(response.body)["data"].size
+    assert_equal few, many, "#{few} queries for 2 subscriptions, #{many} for 10"
+  end
+
   test "returns 304 until a subscription changes" do
     get "/v3/subscriptions", headers: bearer
     etag = response.headers["ETag"]
@@ -128,6 +142,13 @@ class ApiV3SubscriptionsTest < ActionDispatch::IntegrationTest
     @user.subscriptions.create!(feed: feed, kind: :generated)
     entries = count.times.map { |i| feed.entries.create!(title: "Page #{i}", url: "https://page.example/#{i}", public_id: SecureRandom.hex, entry_id: SecureRandom.hex, published: i.days.ago) }
     [feed, entries]
+  end
+
+  def count_queries(&block)
+    count = 0
+    counter = ->(*, payload) { count += 1 unless payload[:name] == "SCHEMA" }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record", &block)
+    count
   end
 
   def bearer

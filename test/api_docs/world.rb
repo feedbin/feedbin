@@ -12,6 +12,7 @@ module ApiDocs
       user
       sources
       daring_fireball_articles
+      newsletters
       tags
       token
       states
@@ -37,7 +38,6 @@ module ApiDocs
         updated_at: Time.utc(2012, 11, 14, 2, 10, 55)
       })
       @user = User.find(1)
-      AuthenticationToken.create!(user: @user, token: "ben.x7k2", purpose: :newsletters)
     end
 
     def current_user = User.find(1)
@@ -252,6 +252,26 @@ module ApiDocs
           SQL
         end
       end
+    end
+
+    # ben.x7k2 is the newest active address, so it stays the account's
+    # newsletter_address. Platformer is allowed (subscribed); Naming Things,
+    # which wrote to the old address, is blocked.
+    def newsletters
+      user = current_user
+      AuthenticationToken.create!(id: 11, user: user, token: "kqzmv", purpose: :newsletters, active: false,
+        created_at: Time.utc(2019, 2, 3, 22, 1, 7), updated_at: Time.utc(2024, 5, 20, 8, 12, 40))
+      AuthenticationToken.create!(id: 12, user: user, token: "ben.x7k2", purpose: :newsletters, description: "Tech newsletters", newsletter_tag: "Apple",
+        created_at: Time.utc(2024, 5, 20, 8, 12, 40), updated_at: Time.utc(2024, 5, 20, 8, 12, 40))
+      naming_things = feed!(
+        id: 3878, title: "Naming Things", feed_url: "http://namingthings.substack.com?2c51e0f4d1b3f0a8e7c9b6d5a4f3e2d1c0b9a8f7",
+        site_url: "http://namingthings.substack.com", host: "namingthings.substack.com", feed_type: :newsletter,
+        last_published_entry: Time.utc(2026, 8, 31, 13, 0, 4)
+      )
+      NewsletterSender.create!(id: 7, feed_id: 3877, token: "ben.x7k2", full_token: "ben.x7k2", email: "casey@platformer.news", name: "Platformer",
+        created_at: Time.utc(2024, 5, 20, 8, 15, 33), updated_at: Time.utc(2024, 5, 20, 8, 15, 33))
+      NewsletterSender.create!(id: 8, feed: naming_things, token: "kqzmv", full_token: "kqzmv", email: "namingthings@substack.com", name: "Joel from Naming Things",
+        created_at: Time.utc(2022, 3, 9, 15, 40, 2), updated_at: Time.utc(2022, 3, 9, 15, 40, 2))
     end
 
     def tags
