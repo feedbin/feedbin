@@ -18,7 +18,7 @@ module Api
 
       # A filename makes the import show on the web's Import & Export page.
       def create
-        import = @user.imports.new(xml: request.raw_post, filename: "#{@token.application&.name || "API"} import")
+        import = @user.imports.new(xml: request.raw_post, filename: filename)
         if import.save
           render json: ImportSerializer.new(import).to_h, status: :accepted
         else
@@ -37,6 +37,11 @@ module Api
       end
 
       private
+
+      # The file's name when the app sends it, so the web's history can tell one upload from another.
+      def filename
+        params[:filename].to_s.strip.presence&.truncate(255) || "#{@token.application&.name || "API"} import"
+      end
 
       def set_import
         @import = @user.imports.includes(:import_items).find(params[:id])

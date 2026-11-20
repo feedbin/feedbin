@@ -87,6 +87,9 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     get "/v3/imports/#{import.id}", headers: bearer
     assert_response :not_found
 
+    post "/v3/imports?filename=feeds.opml", params: opml, headers: bearer.merge("Content-Type" => "text/x-opml")
+    assert_equal "feeds.opml", JSON.parse(response.body)["filename"]
+
     post "/v3/imports", params: "<html></html>", headers: bearer.merge("Content-Type" => "application/xml")
     assert_response :unsupported_media_type
 
