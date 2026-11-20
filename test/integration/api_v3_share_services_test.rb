@@ -15,11 +15,11 @@ class ApiV3ShareServicesTest < ActionDispatch::IntegrationTest
   test "lists every offered service with how it is set up and shares" do
     get "/v3/share_services", headers: bearer
     assert_response :success
-    services = JSON.parse(response.body)["data"].index_by { _1["id"] }
+    services = JSON.parse(response.body)["data"].index_by { it["id"] }
     refute services.key?("pocket")
     assert_equal %w[object id label setup sharing status share_url settings choices default_choice], services["email"].keys
     assert_equal [["email", "form", "inactive"], ["token", "form", "inactive"], ["oauth", "send", "inactive"], ["server", "form", "inactive"], ["none", "link", "inactive"], ["kindle", "send", "inactive"]],
-      %w[email pinboard instapaper mastodon twitter kindle].map { services[_1].values_at("setup", "sharing", "status") }
+      %w[email pinboard instapaper mastodon twitter kindle].map { services[it].values_at("setup", "sharing", "status") }
     assert_equal "https://twitter.com/intent/tweet?url=${url}&text=${title}", services["twitter"]["share_url"]
   end
 
@@ -61,11 +61,13 @@ class ApiV3ShareServicesTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     assert_equal "/return_to", JSON.parse(response.body)["errors"].first["pointer"]
 
-    post "/v3/share_services/instapaper/authorization", params: {return_to: "feedbin-test://share-services"}.to_json, headers: json
-    assert_response :created
-    url = URI.parse(JSON.parse(response.body)["authorize_url"])
+    url = start_instapaper_authorization
     state = Rack::Utils.parse_query(url.query)["state"]
     assert url.to_s.start_with?("https://www.instapaper.com/oauth2/authorize")
+    # the service can't read who the state is for, or where it goes back to
+    readable = state.split("--").map { Base64.urlsafe_decode64(it) }.join
+    refute_match "feedbin-test", readable
+    refute_match "user_id", readable
 
     host! "example.com"
     Share::Instapaper.stub_any_instance(:request_access, ->(_params) { {access_token: "abc"} }) do
@@ -74,12 +76,45 @@ class ApiV3ShareServicesTest < ActionDispatch::IntegrationTest
     assert_redirected_to "feedbin-test://share-services?service_id=instapaper&status=active"
     assert_equal "abc", @user.supported_sharing_services.find_by!(service_id: "instapaper").access_token
 
+    # a state signs in once
+    Share::Instapaper.stub_any_instance(:request_access, ->(_params) { {access_token: "replayed"} }) do
+      get "/supported_sharing_services/instapaper/oauth2_response", params: {code: "c0de", state: state}
+    end
+    assert_redirected_to "feedbin-test://share-services?service_id=instapaper&status=failed"
+    assert_equal "abc", @user.supported_sharing_services.find_by!(service_id: "instapaper").access_token
+
+    host! "api.example.com"
+    state = Rack::Utils.parse_query(start_instapaper_authorization.query)["state"]
+    host! "example.com"
     get "/supported_sharing_services/instapaper/oauth2_response", params: {state: state}
     assert_redirected_to "feedbin-test://share-services?service_id=instapaper&status=declined"
 
     get "/supported_sharing_services/instapaper/oauth2_response", params: {code: "c0de", state: "forged"}
     assert_response :redirect
     refute_match "feedbin-test://", response.location
+  end
+
+  test "signs in to an OAuth 1 service through the browser, once" do
+    request_token = OpenStruct.new(token: "req", secret: "s3cret", authorize_url: "https://www.tumblr.com/oauth/authorize?oauth_token=req")
+    Share::Tumblr.stub_any_instance(:request_token, request_token) do
+      post "/v3/share_services/tumblr/authorization", params: {return_to: "feedbin-test://share-services"}.to_json, headers: json
+    end
+    assert_response :created
+    assert_equal request_token.authorize_url, JSON.parse(response.body)["authorize_url"]
+
+    host! "example.com"
+    access = ->(token, secret, verifier) { (token == "req" && secret == "s3cret" && verifier == "v") ? OpenStruct.new(token: "acc", secret: "acc-s") : raise("wrong") }
+    Share::Tumblr.stub_any_instance(:request_access, access) do
+      SupportedSharingService.stub_any_instance(:after_activate, nil) do
+        get "/supported_sharing_services/tumblr/oauth_response", params: {oauth_token: "req", oauth_verifier: "v"}
+      end
+    end
+    assert_redirected_to "feedbin-test://share-services?service_id=tumblr&status=active"
+    assert_equal "acc", @user.supported_sharing_services.find_by!(service_id: "tumblr").access_token
+
+    # the request token is gone, so the callback can't be replayed into the app
+    get "/supported_sharing_services/tumblr/oauth_response", params: {oauth_token: "req", oauth_verifier: "v"}
+    refute_match "feedbin-test://", response.location.to_s
   end
 
   test "shares an article to a service set up for it" do
@@ -111,7 +146,7 @@ class ApiV3ShareServicesTest < ActionDispatch::IntegrationTest
     assert_equal "Find", JSON.parse(response.body)["label"]
 
     get "/v3/custom_share_services", headers: bearer
-    assert_equal [["Find", "https://example.com/?q=${title}"]], JSON.parse(response.body)["data"].map { _1.values_at("label", "url") }
+    assert_equal [["Find", "https://example.com/?q=${title}"]], JSON.parse(response.body)["data"].map { it.values_at("label", "url") }
 
     post "/v3/custom_share_services", params: {label: "", url: "x"}.to_json, headers: json
     assert_response :unprocessable_content
@@ -121,6 +156,12 @@ class ApiV3ShareServicesTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def start_instapaper_authorization
+    post "/v3/share_services/instapaper/authorization", params: {return_to: "feedbin-test://share-services"}.to_json, headers: json
+    assert_response :created
+    URI.parse(JSON.parse(response.body)["authorize_url"])
+  end
 
   def bearer
     {"Authorization" => "Bearer #{@token.plaintext_token}"}
