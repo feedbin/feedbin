@@ -39,6 +39,55 @@ class ApiV3DevicesImportsPagesTest < ActionDispatch::IntegrationTest
     assert_equal ["/app_bundle_id", "missing"], error.values_at("pointer", "code")
   end
 
+  test "lists a fixable feed's suggestions, and replaces one feed or all of them in the background" do
+    Sidekiq::Testing.fake! do
+      import = @user.imports.create!(filename: "feeds.opml", xml: <<~XML)
+        <?xml version="1.0" encoding="UTF-8"?>
+        <opml version="1.0"><head><title>Subs</title></head><body>
+          <outline type="rss" text="Moved" xmlUrl="https://moved.example/old.xml" htmlUrl="https://moved.example"/>
+          <outline type="rss" text="Also Moved" xmlUrl="https://also.example/old.xml" htmlUrl="https://also.example"/>
+          <outline type="rss" text="Fine" xmlUrl="https://fine.example/feed" htmlUrl="https://fine.example"/>
+        </body></opml>
+      XML
+      moved, also, fine = import.import_items.sort_by(&:id)
+      moved.fixable!
+      also.fixable!
+      fine.complete!
+      first = DiscoveredFeed.create!(site_url: "https://moved.example", feed_url: "https://moved.example/feed.xml", title: "Moved", created_at: 2.days.ago)
+      second = DiscoveredFeed.create!(site_url: "https://moved.example", feed_url: "https://moved.example/atom.xml", title: "Moved (Atom)")
+      DiscoveredFeed.create!(site_url: "https://also.example", feed_url: "https://also.example/feed.xml", title: "Also")
+      Sidekiq::Worker.clear_all
+
+      get "/v3/imports/#{import.id}", headers: bearer
+      items = JSON.parse(response.body)["items"]
+      assert_equal [moved.id, also.id, fine.id], items.map { it["id"] }
+      assert_equal [{"id" => first.id, "title" => "Moved", "feed_url" => "https://moved.example/feed.xml", "site_url" => "https://moved.example"}, {"id" => second.id, "title" => "Moved (Atom)", "feed_url" => "https://moved.example/atom.xml", "site_url" => "https://moved.example"}], items[0]["suggestions"]
+      assert_equal [], items[2]["suggestions"]
+
+      post "/v3/imports/#{import.id}/items/#{moved.id}/replacement", params: {suggestion_id: 0}.to_json, headers: json
+      assert_response :unprocessable_content
+      assert_equal "/suggestion_id", JSON.parse(response.body)["errors"].first["pointer"]
+
+      post "/v3/imports/#{import.id}/items/#{moved.id}/replacement", params: {suggestion_id: second.id}.to_json, headers: json
+      assert_response :accepted
+      body = JSON.parse(response.body)
+      assert_equal ["pending", "pending"], [body["status"], body["items"][0]["status"]]
+      assert_equal [@user.id, moved.id, second.id], FeedImportFixer.jobs.last["args"]
+
+      post "/v3/imports/#{import.id}/items/#{fine.id}/replacement", params: {}.to_json, headers: json
+      assert_response :unprocessable_content
+
+      post "/v3/imports/#{import.id}/replacement", headers: json
+      assert_response :accepted
+      assert_equal %w[pending pending complete], JSON.parse(response.body)["items"].map { it["status"] }
+      assert_equal [@user.id, also.id, nil], FeedImportFixer.jobs.last["args"]
+      assert_equal 2, FeedImportFixer.jobs.size
+
+      get "/v3/imports/#{users(:ben).imports.create!(filename: "x", xml: "<opml><body><outline xmlUrl='https://x.example'/></body></opml>").id}", headers: bearer
+      assert_response :not_found
+    end
+  end
+
   test "a device registered through v3 says so" do
     post "/v3/devices", params: {push_token: "abc123", platform: "ios", app_bundle_id: "com.feedbin.app"}.to_json, headers: json
 

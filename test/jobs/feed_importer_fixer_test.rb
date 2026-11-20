@@ -64,4 +64,13 @@ class FeedImportFixerTest < ActiveSupport::TestCase
 
     assert @import_item.reload.fixable?
   end
+
+  test "an item an app asked to replace is fixable again when the replacement can't be had" do
+    @import_item.update!(status: :pending)
+    stub_request(:any, /example\.com/).to_return(status: 404)
+
+    FeedImportFixer.new.perform(@user.id, @import_item.id, @discovered_feed.id)
+
+    assert @import_item.reload.fixable?
+  end
 end

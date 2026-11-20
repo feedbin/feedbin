@@ -162,7 +162,14 @@ Rails.application.routes.draw do
         resources :custom_share_services, only: [:index, :create, :update, :destroy]
         resources :playlists, only: [:index, :create, :update, :destroy]
         resources :devices, only: [:create, :destroy]
-        resources :imports, only: [:index, :create, :show, :destroy]
+        resources :imports, only: [:index, :create, :show, :destroy] do
+          scope module: :imports do
+            resource :replacement, only: :create
+            resources :items, only: [] do
+              resource :replacement, only: :create, module: :items
+            end
+          end
+        end
         resources :pages, only: [:create, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           resources :purchases, only: :create, module: :account

@@ -63,6 +63,11 @@ module ApiDocs
     ShareAuthorization.stub(:start, url) { request.call }
   }
 
+  # The replacement runs in the background; the answer is the item waiting for it.
+  in_background = ->(request) { Sidekiq::Testing.fake! { request.call } }
+  scenario "imports/replace", around: in_background
+  scenario "imports/replace_all", around: in_background
+
   scenario "newsletters/propose", around: fixed_address
   scenario "newsletters/create", around: fixed_address
 

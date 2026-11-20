@@ -24,12 +24,22 @@ module Api
 
       def item(item, subscription_ids)
         {
+          id: item.id,
           title: item.title,
           feed_url: item.feed_url,
           status: item.status,
           subscription_id: item.complete? ? subscription_ids[item.feed_url] : nil,
-          message: message(item)
+          message: message(item),
+          suggestions: suggestions(item)
         }
+      end
+
+      # The feeds found at a fixable item's site, which can replace it, oldest first as the web lists them.
+      def suggestions(item)
+        return [] unless item.fixable?
+        item.discovered_feeds.sort_by(&:created_at).map do |found|
+          {id: found.id, title: found.title, feed_url: found.feed_url, site_url: found.site_url}
+        end
       end
 
       # nil error means the URL had no feed.
