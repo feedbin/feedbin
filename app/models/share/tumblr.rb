@@ -23,7 +23,10 @@ class Share::Tumblr < Share::Service
       request_token_path: "/oauth/request_token",
       authorize_path: "/oauth/authorize",
       access_token_path: "/oauth/access_token",
-      http_method: :post
+      http_method: :post,
+      # Tumblr signs in at www.tumblr.com and answers at api.tumblr.com (API_URL); oauth 1.1.9 refuses to sign a
+      # request to a host other than `site` unless told it may.
+      access_token_cross_origin_requests: true
     }
     OAuth::Consumer.new(ENV["TUMBLR_KEY"], ENV["TUMBLR_SECRET"], options)
   end
