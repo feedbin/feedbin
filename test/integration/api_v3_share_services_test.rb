@@ -65,9 +65,10 @@ class ApiV3ShareServicesTest < ActionDispatch::IntegrationTest
     state = Rack::Utils.parse_query(url.query)["state"]
     assert url.to_s.start_with?("https://www.instapaper.com/oauth2/authorize")
     # the service can't read who the state is for, or where it goes back to
-    readable = state.split("--").map { Base64.urlsafe_decode64(it) }.join
-    refute_match "feedbin-test", readable
-    refute_match "user_id", readable
+    readable = state.tr("-_", "+/").unpack1("m")
+    refute readable.include?("feedbin-test".b)
+    refute readable.include?("user_id".b)
+    assert_equal @user.id, ShareAuthorization.encryptor.decrypt_and_verify(state)["user_id"]
 
     host! "example.com"
     Share::Instapaper.stub_any_instance(:request_access, ->(_params) { {access_token: "abc"} }) do
