@@ -11,7 +11,8 @@ module Api
 
         def create
           entry = readable_entry
-          result = @record.share(share_params.merge("entry_id" => entry.id).with_indifferent_access)
+          # The entry's link goes where the web's form puts it (Pinboard's url); the services read it from there.
+          result = @record.share(share_params.merge("entry_id" => entry.id, "url" => entry.fully_qualified_url).with_indifferent_access)
           render_result(result, entry)
         end
 
