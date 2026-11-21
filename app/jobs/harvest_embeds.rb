@@ -6,6 +6,13 @@ class HarvestEmbeds
 
   SET_NAME = "#{name}-ids"
   PAUSE_KEY = "#{name}-paused"
+  # How many pauses in a row, each twice the last; a successful request clears it.
+  BACKOFF_KEY = "#{name}-backoff"
+  FIRST_PAUSE = 5.minutes
+  LONGEST_PAUSE = 1.hour
+  # Ids sent to YouTube per run, every minute, so a backlog drains in steps
+  # rather than in one burst.
+  IDS_PER_RUN = 500
   # The embed patterns capture whatever sits where an id belongs. YouTube
   # refuses a request for one that isn't an id, and a refused batch is queued
   # again, so anything else would fail its batch on every pass.
@@ -33,11 +40,20 @@ class HarvestEmbeds
     Sidekiq.redis { it.call("EXISTS", PAUSE_KEY) } == 1
   end
 
-  # YouTube's daily quota resets at midnight Pacific.
-  def self.pause_until_quota_resets
-    now = Time.now.in_time_zone("America/Los_Angeles")
-    seconds = (now.tomorrow.beginning_of_day - now).ceil
-    Sidekiq.redis { it.call("SET", PAUSE_KEY, "1", "EX", seconds) }
+  # Nothing assumed about YouTube's limits or when they reset: a refused
+  # request costs no quota, so asking again later is free. The batches already
+  # sent are refused together; only the first refusal lengthens the pause.
+  def self.back_off
+    Sidekiq.redis do |redis|
+      next unless redis.call("SET", PAUSE_KEY, "1", "NX", "EX", LONGEST_PAUSE.to_i)
+      step = redis.call("INCR", BACKOFF_KEY)
+      redis.call("EXPIRE", BACKOFF_KEY, 1.day.to_i)
+      redis.call("EXPIRE", PAUSE_KEY, [FIRST_PAUSE * 2**(step - 1), LONGEST_PAUSE].min.to_i)
+    end
+  end
+
+  def self.reset_backoff
+    Sidekiq.redis { it.call("DEL", BACKOFF_KEY) }
   end
 
   private
@@ -65,7 +81,8 @@ class HarvestEmbeds
 
   def cache_embeds
     return if self.class.paused?
-    dequeue_ids(SET_NAME)&.each_slice(50) { |video_ids| Download.perform_async(video_ids) }
+    video_ids = Sidekiq.redis { it.call("SPOP", SET_NAME, IDS_PER_RUN) }
+    video_ids.each_slice(50) { Download.perform_async(it) }
   end
 
   class Download
@@ -82,18 +99,41 @@ class HarvestEmbeds
 
       # Deleted, private and region-blocked videos come back with no "items".
       video_items = videos["items"] || []
-      channel_ids = video_items.map { it.safe_dig("snippet", "channelId") }.uniq
-      channel_items = youtube_api("channels", channel_ids, %w[snippet statistics brandingSettings])&.dig("items") || []
+      channel_ids = stale_channels(video_items.filter_map { it.safe_dig("snippet", "channelId") }.uniq)
+      channel_items = channel_ids.empty? ? [] : youtube_api("channels", channel_ids, %w[snippet statistics brandingSettings])&.dig("items") || []
 
       embeds = video_items.map { embed(it, :youtube_video, parent_id: it.safe_dig("snippet", "channelId")) } +
         channel_items.map { embed(it, :youtube_channel) }
       changed = changed_embeds(embeds)
       Embed.import(changed, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if changed.present?
+      mark_fresh(channel_items.map { it["id"] })
 
       update_related_records(video_ids, changed.map(&:provider_id))
     end
 
     private
+
+    # A channel is fetched at most once a day: it changes rarely, and the
+    # request would otherwise spend a second unit on every batch.
+    CHANNEL_FRESH_FOR = 1.day
+
+    def stale_channels(ids)
+      return [] if ids.empty?
+      keys = ids.map { channel_key(it) }
+      fresh = Sidekiq.redis { it.call("MGET", *keys) }
+      ids.zip(fresh).filter_map { |id, stored| id unless stored }
+    end
+
+    def mark_fresh(ids)
+      return if ids.empty?
+      Sidekiq.redis do |redis|
+        redis.pipelined { |pipeline| ids.each { pipeline.call("SET", channel_key(it), "1", "EX", CHANNEL_FRESH_FOR.to_i) } }
+      end
+    end
+
+    def channel_key(id)
+      "#{HarvestEmbeds.name}-channel-fresh:#{id}"
+    end
 
     def embed(item, source, parent_id: nil)
       Embed.new(data: item, provider_id: item["id"], parent_id: parent_id, source: source)
@@ -154,13 +194,34 @@ class HarvestEmbeds
     def youtube_api(type, ids, parts)
       response = HTTP.timeout(write: 5, connect: 5, read: 10)
         .get("https://www.googleapis.com/youtube/v3/#{type}", params: {key: ENV["YOUTUBE_KEY"], part: parts.join(","), id: ids.join(",")})
-      return JSON.parse(response.to_s) if response.status.success?
+      body = response.to_s
+      if response.status.success?
+        HarvestEmbeds.reset_backoff
+        return without_nul(JSON.parse(body))
+      end
 
-      Sidekiq.logger.info "HarvestEmbeds youtube_api failed type=#{type} status=#{response.status.code}"
-      HarvestEmbeds.pause_until_quota_resets if response.status.code == 403 && response.to_s.include?("quotaExceeded")
+      Sidekiq.logger.info "HarvestEmbeds youtube_api failed type=#{type} status=#{response.status.code} body=#{body[0, 500].squish}"
+      HarvestEmbeds.back_off if refused?(response.status.code, body)
       nil
     rescue HTTP::Error, OpenSSL::SSL::SSLError
       nil
+    end
+
+    # YouTube answers 403 quotaExceeded or rateLimitExceeded (also
+    # userRateLimitExceeded); Google's front end can answer 429.
+    def refused?(status, body)
+      status == 429 || (status == 403 && body.match?(/quotaExceeded|rateLimitExceeded/i))
+    end
+
+    # jsonb refuses \u0000, and one in a channel's description failed the
+    # whole batch's import.
+    def without_nul(value)
+      case value
+      when String then value.delete("\u0000")
+      when Array then value.map { without_nul(it) }
+      when Hash then value.to_h { [without_nul(_1), without_nul(_2)] }
+      else value
+      end
     end
 
     class Redownload

@@ -283,16 +283,60 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_empty Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
   end
 
-  test "an exhausted quota puts the ids back and pauses harvesting until the quota resets" do
-    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
-      .to_return(status: 403, body: {error: {errors: [{reason: "quotaExceeded"}]}}.to_json)
+  test "a refused request puts the ids back and pauses harvesting for five minutes" do
+    stub_refusal
+
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    HarvestEmbeds::Download.new.perform(["other_id"])
+
+    assert_equal 5, pause_minutes, "the batch refused alongside it does not lengthen the pause"
+    assert_equal ["other_id", "video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }.sort
+    HarvestEmbeds.new.perform(nil, true)
+    assert_empty HarvestEmbeds::Download.jobs, "no downloads while paused"
+  end
+
+  test "each refusal in a row pauses twice as long, up to an hour, and a success starts over" do
+    stub_refusal
+    pauses = 6.times.map do
+      Sidekiq.redis { it.del(HarvestEmbeds::PAUSE_KEY) }
+      HarvestEmbeds::Download.new.perform(["video_id"])
+      pause_minutes
+    end
+    assert_equal [5, 10, 20, 40, 60, 60], pauses
+
+    stub_youtube_api
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    Sidekiq.redis { it.del(HarvestEmbeds::PAUSE_KEY) }
+    stub_refusal
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    assert_equal 5, pause_minutes
+  end
+
+  test "a run sends at most IDS_PER_RUN ids and leaves the rest queued" do
+    ids = (HarvestEmbeds::IDS_PER_RUN + 20).times.map { "video_#{it}" }
+    Sidekiq.redis { it.sadd(HarvestEmbeds::SET_NAME, ids) }
+
+    HarvestEmbeds.new.perform(nil, true)
+
+    assert_equal HarvestEmbeds::IDS_PER_RUN, HarvestEmbeds::Download.jobs.sum { it["args"].first.size }
+    assert_equal 20, Sidekiq.redis { it.scard(HarvestEmbeds::SET_NAME) }
+  end
+
+  test "a NUL character in YouTube's answer does not fail the batch" do
+    stub_youtube_api(channel_title: "before\u0000after")
 
     HarvestEmbeds::Download.new.perform(["video_id"])
 
-    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
-    HarvestEmbeds.new.perform(nil, true)
-    assert_empty HarvestEmbeds::Download.jobs, "no downloads until the quota resets"
-    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+    assert_equal "beforeafter", Embed.youtube_channel.find_by!(provider_id: "channel_id").data.dig("snippet", "title")
+  end
+
+  test "a channel fetched within the day is not fetched again" do
+    stub_youtube_api
+    HarvestEmbeds::Download.new.perform(["video_id"])
+    HarvestEmbeds::Download.new.perform(["video_id"])
+
+    assert_requested :get, %r{www.googleapis.com/youtube/v3/videos}, times: 2
+    assert_requested :get, %r{www.googleapis.com/youtube/v3/channels}, times: 1
   end
 
   test "downloading unchanged data does not mark entries edited again" do
@@ -363,7 +407,16 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     end
   end
 
-  def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil)
+  def stub_refusal
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
+      .to_return(status: 403, body: {error: {errors: [{reason: "quotaExceeded"}]}}.to_json)
+  end
+
+  def pause_minutes
+    (Sidekiq.redis { it.ttl(HarvestEmbeds::PAUSE_KEY) } / 60.0).round
+  end
+
+  def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil, channel_title: nil)
     video_item = {
       id: "video_id",
       snippet: {
@@ -387,6 +440,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
         {
           id: "channel_id",
           snippet: {
+            title: channel_title,
             thumbnails: {
               default: {
                 url: "image_url"
