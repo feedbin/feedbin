@@ -17,14 +17,23 @@ class HarvestEmbeds
   # again, so anything else would fail its batch on every pass.
   VIDEO_ID = /\A[\w-]+\z/
 
+  # Both answer whether there was anything to queue.
   def self.enqueue(video_ids)
-    Sidekiq.redis { it.call("SADD", SET_NAME, video_ids) } if video_ids.present?
+    return false if video_ids.empty?
+    Sidekiq.redis { it.call("SADD", SET_NAME, video_ids) }
+    true
   end
 
   # Queues the ids that have no stored video yet.
   def self.enqueue_missing(video_ids)
     video_ids = video_ids.uniq.grep(VIDEO_ID)
     enqueue(video_ids - Embed.youtube_video.where(provider_id: video_ids).pluck(:provider_id))
+  end
+
+  # Sends the queue to YouTube now rather than on the next minute's run, for
+  # videos someone is about to look at.
+  def self.harvest_now(video_ids)
+    perform_async(nil, true) if enqueue_missing(video_ids)
   end
 
   def perform(entry_id, process = false)

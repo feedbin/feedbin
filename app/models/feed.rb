@@ -129,6 +129,8 @@ class Feed < ApplicationRecord
       # The receiver never runs for these entries, so the avatar pass starts
       # here.
       ImageCrawler::MicropostAvatar.for_new_entries(new_feed, entries)
+      # Someone just subscribed and is looking at these entries.
+      HarvestEmbeds.harvest_now(entries.filter_map { it.data&.safe_dig("youtube_video_id") })
     end
   end
 

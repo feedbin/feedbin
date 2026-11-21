@@ -407,6 +407,18 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     end
   end
 
+  test "harvest_now sends the queue right away, and only when a video is missing" do
+    Embed.youtube_video.create!(provider_id: "stored_id", data: {})
+    HarvestEmbeds.jobs.clear
+
+    HarvestEmbeds.harvest_now(["stored_id"])
+    assert_empty HarvestEmbeds.jobs
+
+    HarvestEmbeds.harvest_now(["stored_id", "video_id"])
+    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+    assert_equal [[nil, true]], HarvestEmbeds.jobs.map { it["args"] }
+  end
+
   def stub_refusal
     stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
       .to_return(status: 403, body: {error: {errors: [{reason: "quotaExceeded"}]}}.to_json)

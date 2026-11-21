@@ -263,6 +263,22 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal [feed.id, nil, feed.entries.pluck(:id)], ImageCrawler::MicropostAvatar.jobs.sole["args"]
   end
 
+  test "create_from_parsed_feed sends a YouTube feed's videos to YouTube without waiting for the next run" do
+    Sidekiq::Worker.clear_all
+    flush_redis
+    parsed = Struct.new(:entries, :feed_hash) do
+      def to_feed = feed_hash
+    end
+    video = Struct.new(:entry_hash) do
+      def to_entry = entry_hash
+    end
+    entry = video.new({public_id: SecureRandom.hex, entry_id: SecureRandom.hex, url: "https://www.youtube.com/watch?v=video_id", title: "Video", published: Time.now, data: {"youtube_video_id" => "video_id"}})
+    Feed.create_from_parsed_feed(parsed.new([entry], {feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCnew", title: "Channel"}))
+
+    assert_equal ["video_id"], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }
+    assert_includes HarvestEmbeds.jobs.map { it["args"] }, [nil, true]
+  end
+
   # The host's images row, or nothing: the legacy favicons row is gone.
   test "site_favicon is the host's images row" do
     feed = create_feeds(users(:ben)).first
