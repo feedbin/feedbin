@@ -24,7 +24,10 @@ class Embed < ApplicationRecord
       channels.map { new(source: :youtube_channel, provider_id: it["id"], data: it) }
     return [] if embeds.empty?
 
-    stored = where(provider_id: embeds.map(&:provider_id))
+    # Scoped by source so each half rides index_embeds_on_source_and_provider_id;
+    # provider_id alone is a parallel scan of the whole table.
+    ids = embeds.group_by(&:source).transform_values { it.map(&:provider_id) }
+    stored = ids.map { |source, provider_ids| where(source:, provider_id: provider_ids) }.reduce(:or)
       .pluck(:source, :provider_id, :data)
       .to_h { |source, provider_id, data| [[source, provider_id], data] }
     changed = embeds.reject { stored[[it.source, it.provider_id]] == it.data }
