@@ -16,6 +16,22 @@ class Embed < ApplicationRecord
 
   enum :source, {youtube_video: 0, youtube_channel: 1}
 
+  # Stores YouTube API items and returns the provider ids of the ones whose
+  # data changed. The rest are left untouched: live streams are refetched
+  # hourly, and an unchanged answer must not look like an edit.
+  def self.store_youtube(videos:, channels:)
+    embeds = videos.map { new(source: :youtube_video, provider_id: it["id"], parent_id: it.safe_dig("snippet", "channelId"), data: it) } +
+      channels.map { new(source: :youtube_channel, provider_id: it["id"], data: it) }
+    return [] if embeds.empty?
+
+    stored = where(provider_id: embeds.map(&:provider_id))
+      .pluck(:source, :provider_id, :data)
+      .to_h { |source, provider_id, data| [[source, provider_id], data] }
+    changed = embeds.reject { stored[[it.source, it.provider_id]] == it.data }
+    import(changed, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if changed.present?
+    changed.map(&:provider_id)
+  end
+
   def channel
     youtube_video? && self.class.youtube_channel.find_by_provider_id(parent_id)
   end
@@ -75,5 +91,14 @@ class Embed < ApplicationRecord
   # When a stream was due to start, or started if it went live unscheduled.
   def start_time
     scheduled_time || actual_start_time
+  end
+
+  # Upcoming or live, until the stream ends, for up to a day after it started
+  # or was due to.
+  def unfinished_stream?
+    live_broadcast_content != "none" &&
+      actual_end_time.nil? &&
+      start_time.present? &&
+      start_time >= 24.hours.ago
   end
 end

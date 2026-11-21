@@ -149,7 +149,7 @@ class WebSubControllerTest < ActionController::TestCase
       assert_response :success
     end
     receiver_job = FeedCrawler::YoutubeReceiver.jobs.first.safe_dig("args", 0)
-    assert_equal(video_id, HarvestEmbeds.new.dequeue_ids(HarvestEmbeds::SET_NAME).first)
+    assert_equal([video_id], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) })
     assert_equal(video_id, receiver_job.safe_dig("entries", 0, "data", "youtube_video_id"))
     refute receiver_job.safe_dig("feed", "title"), "Refuse title from youtube WebSub data because it is bogus"
   end

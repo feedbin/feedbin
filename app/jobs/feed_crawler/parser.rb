@@ -44,7 +44,7 @@ module FeedCrawler
       }
 
       if video_ids.present?
-        HarvestEmbeds.new.add_missing_to_queue(video_ids)
+        HarvestEmbeds.enqueue_missing(video_ids)
         job_id = YoutubeReceiver.perform_in(2.minutes, data)
         Sidekiq.logger.info "Enqueued YoutubeReceiver job_id=#{job_id} feed_id=#{@feed.id}"
       elsif import

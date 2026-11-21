@@ -298,7 +298,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   test "each refusal in a row pauses twice as long, up to an hour, and a success starts over" do
     stub_refusal
     pauses = 6.times.map do
-      Sidekiq.redis { it.del(HarvestEmbeds::PAUSE_KEY) }
+      Sidekiq.redis { it.del(YoutubeApi::PAUSE_KEY) }
       HarvestEmbeds::Download.new.perform(["video_id"])
       pause_minutes
     end
@@ -306,7 +306,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
 
     stub_youtube_api
     HarvestEmbeds::Download.new.perform(["video_id"])
-    Sidekiq.redis { it.del(HarvestEmbeds::PAUSE_KEY) }
+    Sidekiq.redis { it.del(YoutubeApi::PAUSE_KEY) }
     stub_refusal
     HarvestEmbeds::Download.new.perform(["video_id"])
     assert_equal 5, pause_minutes
@@ -413,7 +413,7 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   def pause_minutes
-    (Sidekiq.redis { it.ttl(HarvestEmbeds::PAUSE_KEY) } / 60.0).round
+    (Sidekiq.redis { it.ttl(YoutubeApi::PAUSE_KEY) } / 60.0).round
   end
 
   def stub_youtube_api(live_broadcast_content: "none", live_streaming_details: nil, channel_title: nil)
@@ -480,9 +480,11 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
 
   test "survives videos whose channel embed was never imported" do
     Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/})
+      .to_return(body: "{}", headers: {content_type: "application/json"})
 
     assert_nothing_raised do
-      HarvestEmbeds::Download.new.send(:update_related_records, ["video_id"], [])
+      HarvestEmbeds::Download.new.perform(["video_id"])
     end
   end
 end
