@@ -24,6 +24,7 @@ module Api
         assign_scope if given?("feed_ids") || body.key?("tag_ids")
         @action.actions = rule_actions if body.key?("actions")
         @action.actions = FIXED_ACTIONS[@action.action_type] if FIXED_ACTIONS.key?(@action.action_type)
+        @action.apply_action = "1" if body.key?("mark_existing_read") && boolean("mark_existing_read")
         @action
       end
 

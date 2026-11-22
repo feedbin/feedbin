@@ -6,7 +6,9 @@ module Api
 
       def index
         tokens = active_tokens.includes(:application).order(created_at: :desc)
-        render_list(tokens.map { TokenSerializer.new(_1, current_token: @token).to_h })
+        data = tokens.map { TokenSerializer.new(it, current_token: @token).to_h }
+        return unless stale?(etag: digest(data))
+        render_list(data)
       end
 
       def destroy

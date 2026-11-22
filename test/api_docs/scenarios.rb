@@ -57,6 +57,17 @@ module ApiDocs
       AuthenticationToken.stub(:generate_custom_token, "ac.522") { request.call }
     end
   }
+  # The state is signed with an expiry, so the page the app opens is fixed.
+  scenario "share_services/authorize", around: ->(request) {
+    url = "https://www.instapaper.com/oauth2/authorize?client_id=feedbin&redirect_uri=https%3A%2F%2Ffeedbin.com%2Fsupported_sharing_services%2Finstapaper%2Foauth2_response&response_type=code&state=eyJfcmFpbHMiOnsiZGF0YSI6eyJ1c2VyX2lkIjoxfX19--4f1c"
+    ShareAuthorization.stub(:start, url) { request.call }
+  }
+
+  # The replacement runs in the background; the answer is the item waiting for it.
+  in_background = ->(request) { Sidekiq::Testing.fake! { request.call } }
+  scenario "imports/replace", around: in_background
+  scenario "imports/replace_all", around: in_background
+
   scenario "newsletters/propose", around: fixed_address
   scenario "newsletters/create", around: fixed_address
 
@@ -67,6 +78,9 @@ module ApiDocs
   object "collection", "/collections"
   object "feed", "/subscriptions/new", method: :post, body: {q: "daring fireball"}.to_json, pick: "data/0"
   object "image", "/entries?ids=2947218", pick: "data/0/images/preview"
+  object "import", "/imports/3310"
+  object "share-service", "/share_services", pick: "data/1"
+  object "custom-share-service", "/custom_share_services", pick: "data/0"
   object "newsletter-address", "/newsletters/addresses", pick: "data/1"
   object "newsletter-sender", "/newsletters/senders", pick: "data/0"
   object "playlist", "/playlists", pick: "data/0"

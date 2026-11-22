@@ -8,10 +8,21 @@ module Api
 
       skip_before_action :validate_content_type, only: :create
       before_action :ensure_opml, :throttle, only: :create
+      include ImportScoped
+
+      before_action :set_import, only: [:show, :destroy]
+
+      # Newest first, as the web's Import History lists them.
+      def index
+        imports = @user.imports.where.not(filename: nil).includes(import_items: :discovered_feeds).order(created_at: :desc, id: :desc)
+        data = imports.map { ImportSerializer.new(it).to_h }
+        return unless stale?(etag: digest(data))
+        render_list(data)
+      end
 
       # A filename makes the import show on the web's Import & Export page.
       def create
-        import = @user.imports.new(xml: request.raw_post, filename: "#{@token.application&.name || "API"} import")
+        import = @user.imports.new(xml: request.raw_post, filename: filename)
         if import.save
           render json: ImportSerializer.new(import).to_h, status: :accepted
         else
@@ -20,10 +31,21 @@ module Api
       end
 
       def show
-        render json: ImportSerializer.new(@user.imports.includes(:import_items).find(params[:id])).to_h
+        render json: ImportSerializer.new(@import).to_h
+      end
+
+      # Only the record of it: the subscriptions it made stay.
+      def destroy
+        @import.destroy!
+        head :no_content
       end
 
       private
+
+      # The file's name when the app sends it, so the web's history can tell one upload from another.
+      def filename
+        params[:filename].to_s.strip.presence&.truncate(255) || "#{@token.application&.name || "API"} import"
+      end
 
       # Size is checked before the body is parsed.
       def ensure_opml

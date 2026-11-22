@@ -194,6 +194,22 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_empty xml.xpath("//outline[@xmlUrl='#{@pages.feed_url}']")
   end
 
+  test "exports one tag's feeds" do
+    @feed.tag("Apple", @user)
+    @user.subscriptions.create!(feed: Feed.create!(feed_url: "https://plain.example/feed", title: "Plain"))
+    apple = Tag.find_by!(name: "Apple")
+
+    get "/v3/subscriptions.opml", params: {tag_id: apple.id}, headers: bearer
+
+    assert_response :success
+    xml = Nokogiri::XML(response.body)
+    assert_empty xml.xpath("/opml/body/outline[@type='rss']")
+    assert_equal ["Apple"], xml.xpath("/opml/body/outline").map { it["text"] }
+
+    get "/v3/subscriptions.opml", params: {tag_id: Tag.create!(name: "Not Mine").id}, headers: bearer
+    assert_response :not_found
+  end
+
   test "a tag name with a comma stays one tag" do
     put "/v3/subscriptions/#{@subscription.id}/tags", params: {tag_names: ["News, Sports"]}.to_json, headers: json
     assert_response :success

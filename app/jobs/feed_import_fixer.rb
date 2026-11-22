@@ -14,7 +14,7 @@ class FeedImportFixer
       import_item.discovered_feeds.order(created_at: :asc).take
     end
 
-    return if discovered_feed.nil?
+    return still_fixable(import_item) if discovered_feed.nil?
 
     feeds = begin
       FeedFinder.feeds(discovered_feed.feed_url, import_mode: true)
@@ -22,7 +22,7 @@ class FeedImportFixer
       []
     end
 
-    return unless feeds.present?
+    return still_fixable(import_item) unless feeds.present?
 
     feed = feeds.first
 
@@ -35,5 +35,12 @@ class FeedImportFixer
     # are feeds whose original url already failed once, so the replacement
     # failing to fetch is the ordinary case.
     import_item.complete!
+  end
+
+  private
+
+  # An item an app asked to replace waits as pending (ImportItem#replace); one that can't be is fixable again.
+  def still_fixable(import_item)
+    import_item.fixable! if import_item.pending?
   end
 end

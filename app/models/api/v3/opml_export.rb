@@ -4,8 +4,10 @@ module Api
   module V3
     # Only xml feeds: newsletter and Pages feed URLs aren't fetchable elsewhere.
     class OpmlExport
-      def initialize(user)
+      # tag: only that tag's outline and its feeds.
+      def initialize(user, tag: nil)
         @user = user
+        @tag = tag
       end
 
       def to_xml
@@ -14,7 +16,7 @@ module Api
         builder.opml(version: "1.0") do |opml|
           opml.head { |head| head.title("Feedbin") }
           opml.body do |body|
-            feeds.each_value { |feed| outline(body, feed) unless tagged_feed_ids.include?(feed.id) }
+            feeds.each_value { |feed| outline(body, feed) unless @tag || tagged_feed_ids.include?(feed.id) }
             tagged.keys.natural_sort_by { _1 }.each do |name|
               body.outline(text: name, title: name) do |tag|
                 tagged[name].sort.each { |feed_id| feeds[feed_id] && outline(tag, feeds[feed_id]) }
@@ -46,7 +48,11 @@ module Api
 
       # {tag name => [feed_id, ...]}
       def tagged
-        @tagged ||= @user.taggings.joins(:tag).pluck("tags.name", :feed_id).group_by(&:first).transform_values { |rows| rows.map(&:last) }
+        @tagged ||= begin
+          taggings = @user.taggings.joins(:tag)
+          taggings = taggings.where(tag: @tag) if @tag
+          taggings.pluck("tags.name", :feed_id).group_by(&:first).transform_values { |rows| rows.map(&:last) }
+        end
       end
 
       def tagged_feed_ids

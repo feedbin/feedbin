@@ -147,12 +147,29 @@ Rails.application.routes.draw do
           resources :addresses, only: [:index, :create, :update]
           resources :senders, only: [:index, :update]
         end
+        namespace :actions do
+          resource :preview, only: :create
+        end
         resources :actions, only: [:index, :create, :update, :destroy] do
           resources :entries, only: :index, module: :actions
         end
+        resources :share_services, only: [:index, :update, :destroy] do
+          scope module: :share_services do
+            resource :authorization, only: :create
+            resources :shares, only: :create
+          end
+        end
+        resources :custom_share_services, only: [:index, :create, :update, :destroy]
         resources :playlists, only: [:index, :create, :update, :destroy]
         resources :devices, only: [:create, :destroy]
-        resources :imports, only: [:create, :show]
+        resources :imports, only: [:index, :create, :show, :destroy] do
+          scope module: :imports do
+            resource :replacement, only: :create
+            resources :items, only: [] do
+              resource :replacement, only: :create, module: :items
+            end
+          end
+        end
         resources :pages, only: [:create, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
           resources :purchases, only: :create, module: :account
@@ -160,6 +177,7 @@ Rails.application.routes.draw do
         resources :collections, only: :index do
           scope module: :collections do
             resource :ids, only: :show
+            resource :export, only: :create
             resources :entries, only: [:index, :create, :update, :destroy]
             resource :entries, only: [:update, :destroy], controller: "bulk_entries", as: :bulk_entries
           end

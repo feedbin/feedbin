@@ -116,4 +116,11 @@ class Share::TumblrTest < ActiveSupport::TestCase
     assert_equal ["a.tumblr.com", "b.tumblr.com"], @share.after_activate
     assert_equal "https://api.tumblr.com/v2/user/info", requested
   end
+
+  test "after_activate signs its request to Tumblr's API, a different host than its sign-in" do
+    stub_request(:get, "https://api.tumblr.com/v2/user/info")
+      .with { it.headers["Authorization"].to_s.include?('oauth_token="tok"') }
+      .to_return(body: '{"response":{"user":{"blogs":[{"url":"https://a.tumblr.com"}]}}}')
+    assert_equal ["a.tumblr.com"], Share::Tumblr.new(@klass).after_activate
+  end
 end

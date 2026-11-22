@@ -29,6 +29,14 @@ class ImportItem < ApplicationRecord
     FeedImporter.perform_async(id)
   end
 
+  # Subscribes, in the background, to one of the feeds found at the item's site in place of the one that failed:
+  # `discovered_feed`, or the first found. The item is pending until then, and fixable again if that feed can't be
+  # had (FeedImportFixer).
+  def replace(discovered_feed = nil)
+    pending!
+    FeedImportFixer.perform_async(import.user_id, id, discovered_feed&.id)
+  end
+
   # The favicon to render for this host, or nil. See Feed#site_favicon.
   def site_favicon
     favicon_image_record

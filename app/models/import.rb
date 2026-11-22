@@ -9,6 +9,11 @@ class Import < ApplicationRecord
 
   attr_accessor :xml
 
+  # Every fixable item replaced with the first feed found at its site, as the web's Replace All does.
+  def replace_fixable
+    import_items.fixable.each(&:replace)
+  end
+
   def parse
     feeds = Opml::Parser.parse(xml)
     create_tags(feeds)

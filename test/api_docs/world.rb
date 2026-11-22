@@ -302,7 +302,7 @@ module ApiDocs
 
     # Doorkeeper stores only a hash, so the secret goes in through the generator.
     def token
-      application = Doorkeeper::Application.create!(id: 31, name: "Unread", redirect_uri: "", scopes: Api::V3::Scopes::FIRST_PARTY, owner: current_user)
+      application = Doorkeeper::Application.create!(id: 31, name: "Unread", redirect_uri: "unread://oauth", scopes: Api::V3::Scopes::FIRST_PARTY, owner: current_user)
       {61 => ["Reeder on Ben’s Mac", Time.utc(2026, 4, 12, 9, 30, 15), Time.utc(2026, 9, 7, 22, 3, 51), "fbn_v3_docsotherdevicetoken0000000000"],
        88 => ["Unread on Ben’s iPhone", Time.utc(2026, 9, 1, 18, 22, 4), Time.utc(2026, 9, 9, 8, 12, 40), ApiDocs::TOKEN]}.each do |id, (name, created_at, used_at, secret)|
         Api::V3::TokenGenerator.stub(:generate, secret) do
@@ -318,10 +318,16 @@ module ApiDocs
       SavedSearch.create!(id: 12, user: user, name: "Swift, unread", query: "title:swift is:unread", created_at: Time.utc(2026, 3, 2, 9, 11, 40), updated_at: Time.utc(2026, 3, 2, 9, 11, 40))
       Device.create!(id: 5120, user: user, token: "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c5b4a39281706f5e4d3c2b1a0", device_type: :notifier,
         application: "com.feedbin.app", model: "iPad16,3", operating_system: "iPadOS 27.0", created_at: Time.utc(2026, 6, 14, 20, 5, 31))
-      import = Import.new(id: 3310, user: user, complete: true, created_at: Time.utc(2026, 9, 9, 16, 58, 2))
+      import = Import.new(id: 3310, user: user, filename: "subscriptions.xml", complete: true, created_at: Time.utc(2026, 9, 9, 16, 58, 2))
       import.save!(validate: false)
-      import.import_items.create!(status: :complete, details: {title: "Daring Fireball", xml_url: "https://daringfireball.net/feeds/main", html_url: "https://daringfireball.net"})
-      import.import_items.create!(status: :failed, details: {title: "Old Blog", xml_url: "https://example.com/rss", html_url: "https://example.com"})
+      import.import_items.create!(id: 33101, status: :complete, details: {title: "Daring Fireball", xml_url: "https://daringfireball.net/feeds/main", html_url: "https://daringfireball.net"})
+      import.import_items.create!(id: 33102, status: :failed, details: {title: "Old Blog", xml_url: "https://example.com/rss", html_url: "https://example.com"})
+      import.import_items.create!(id: 33103, status: :fixable, details: {title: "Moved Blog", xml_url: "https://moved.example.com/rss.xml", html_url: "https://moved.example.com"})
+      DiscoveredFeed.create!(id: 7701, title: "Moved Blog", site_url: "https://moved.example.com", feed_url: "https://moved.example.com/feed.xml", created_at: Time.utc(2026, 9, 9, 16, 58, 40))
+      DiscoveredFeed.create!(id: 7702, title: "Moved Blog (Atom)", site_url: "https://moved.example.com", feed_url: "https://moved.example.com/atom.xml", created_at: Time.utc(2026, 9, 9, 16, 58, 41))
+      SupportedSharingService.create!(id: 41, user: user, service_id: "email", email_name: "Ben Ubois", email_address: "ben@example.com")
+      SupportedSharingService.create!(id: 42, user: user, service_id: "pinboard", access_token: "ben:0123456789ABCDEF", access_secret: "n/a")
+      SharingService.create!(id: 9, user: user, label: "Search DuckDuckGo", url: "https://duckduckgo.com/?q=${title}")
     end
 
     def index
