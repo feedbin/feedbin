@@ -32,9 +32,10 @@ You may need to open a new terminal to make the `bundle` command available in yo
 
 #### Postgres 9.2.4
 
-    brew install caskroom/cask/brew-cask
+    brew tap caskroom/cask
     brew cask install postgres
-    open ~/Applications/Postgres.app
+    brew install postgres
+    open /Applications/Postgres.app
 
 #### Redis 2.6.14
 
@@ -45,7 +46,10 @@ You may need to open a new terminal to make the `bundle` command available in yo
 #### ImageMagick (requirement for rmagick gem)
 
     brew update
-    brew install ImageMagick
+    brew install ImageMagick@6
+    brew link imagemagick@6 --force
+
+[Rmagick can't be built with ImageMagick 7](https://github.com/rmagick/rmagick/issues/256) so we use version 6 and we need to link it manually.
 
 Make sure to follow post install instructions.
 
