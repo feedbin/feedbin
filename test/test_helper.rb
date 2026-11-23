@@ -7,7 +7,7 @@ require "connection_pool"
 
 require File.expand_path("../../config/environment", __FILE__)
 
-# .env.test points REDIS_URL at the OrbStack Redis, on a database above
+# REDIS_URL (.env.test, or .env.test.local to override it) names a database above
 # development's 0. Each parallel worker takes its own database from there.
 REDIS_URL = URI(ENV.fetch("REDIS_URL"))
 REDIS_DATABASE = REDIS_URL.path.delete_prefix("/").to_i

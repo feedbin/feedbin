@@ -20,6 +20,7 @@
 .env
 .env-tmp
 .env.development
+.env.test.local
 /public
 coverage
 .byebug_history
