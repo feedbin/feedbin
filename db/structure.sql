@@ -2120,6 +2120,14 @@ ALTER TABLE ONLY public.entry_renderings
 
 
 --
+-- Name: entry_videos entry_videos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.entry_videos
+    ADD CONSTRAINT entry_videos_pkey PRIMARY KEY (provider_id, entry_id);
+
+
+--
 -- Name: feed_stats feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2547,13 +2555,6 @@ CREATE UNIQUE INDEX index_entries_on_public_id ON public.entries USING btree (pu
 --
 
 CREATE INDEX index_entry_videos_on_entry_id ON public.entry_videos USING btree (entry_id);
-
-
---
--- Name: index_entry_videos_on_provider_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_entry_videos_on_provider_id_and_entry_id ON public.entry_videos USING btree (provider_id, entry_id);
 
 
 --
@@ -3352,6 +3353,7 @@ ALTER TABLE ONLY public.oauth_application_profiles
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261122090000'),
 ('20261114090000'),
 ('20261112012500'),
 ('20261103120000'),
