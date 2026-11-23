@@ -474,7 +474,7 @@ GEM
     pg (1.7.0-arm64-darwin)
     pg (1.7.0-x86_64-darwin)
     pg (1.7.0-x86_64-linux)
-    phlex (2.4.1)
+    phlex (2.4.2)
       refract (~> 1.0)
       zeitwerk (~> 2.7)
     phlex-rails (2.4.0)
