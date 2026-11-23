@@ -210,15 +210,15 @@ class ApiV3SubscriptionWritesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "a tag name with a comma stays one tag" do
-    put "/v3/subscriptions/#{@subscription.id}/tags", params: {tag_names: ["News, Sports"]}.to_json, headers: json
+  test "a comma separates tags, as it does on the web" do
+    put "/v3/subscriptions/#{@subscription.id}/tags", params: {tag_names: ["News, Sports", "News", " ,"]}.to_json, headers: json
     assert_response :success
-    assert_equal ["News, Sports"], JSON.parse(response.body)["data"].map { it["name"] }
+    assert_equal %w[News Sports], JSON.parse(response.body)["data"].map { it["name"] }
 
     feed = Feed.create!(feed_url: "https://comma.example/feed", title: "Comma")
     StarredEntry.create_from_owners(@user, feed.entries.create!(title: "c", url: "https://comma.example/1", public_id: SecureRandom.hex, entry_id: SecureRandom.hex))
     post "/v3/subscriptions", params: {feeds: [{feed_url: feed.feed_url}], tag_names: ["Arts, Culture"]}.to_json, headers: json
-    assert_equal ["Arts, Culture"], @user.taggings.where(feed: feed).joins(:tag).pluck("tags.name")
+    assert_equal %w[Arts Culture], @user.taggings.where(feed: feed).joins(:tag).order("tags.name").pluck("tags.name")
   end
 
   private

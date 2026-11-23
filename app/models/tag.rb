@@ -9,6 +9,14 @@ class Tag < ApplicationRecord
   # nothing on screen to rename it back.
   validates :name, presence: true, length: {maximum: 255}
 
+  # Every way of tagging a feed (the web's tag field, the API, imports) takes
+  # a list in which a comma separates tags, so no tag name holds one.
+  # Accepts a string or an array of strings: "News, Sports" and
+  # ["News, Sports"] both give ["News", "Sports"].
+  def self.names_from(input)
+    Array(input).flat_map { it.to_s.split(",") }.map(&:strip).reject(&:empty?).uniq
+  end
+
   # Returns nil when the name cannot be used, so the caller can tell the
   # rename did not happen rather than moving taggings onto a junk tag.
   def self.rename(user, old_tag, new_name)

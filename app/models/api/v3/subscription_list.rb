@@ -21,9 +21,9 @@ module Api
           .transform_values { |rows| rows.map { _1.drop(1) }.uniq.sort_by { _1.last.to_s.downcase } }
       end
 
-      # Pass an array, never a joined string: Feed#tag splits strings on commas.
+      # Names are read as the web reads its tag field: see Tag.names_from.
       def tag(subscription, names)
-        subscription.feed.tag(names.map(&:strip).reject(&:empty?), @user)
+        subscription.feed.tag(names, @user)
       end
     end
   end

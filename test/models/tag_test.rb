@@ -57,6 +57,12 @@ class TagTest < ActiveSupport::TestCase
     assert_equal 1, @user.taggings.where(tag: tag).count
   end
 
+  test "names_from reads a string and an array alike: commas separate, blanks and repeats drop" do
+    assert_equal %w[News Sports], Tag.names_from(" News, Sports,, News ")
+    assert_equal %w[News Sports], Tag.names_from(["News, Sports", " ", "News"])
+    assert_equal [], Tag.names_from(nil)
+  end
+
   test "a name is required" do
     refute Tag.new(name: "").valid?
     refute Tag.new(name: "   ").valid?
