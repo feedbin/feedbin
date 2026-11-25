@@ -36,9 +36,21 @@ class AppStoreNotificationProcessor
   private
 
   def record
-    StoreSubscription.record(state, user: buyer)
+    StoreSubscription.record(state, user: buyer) || placed_by_apple
   rescue StoreSubscription::OwnedByAnotherAccount
     StoreSubscription.record(state)
+  end
+
+  # A notification doesn't always say which Apple Account pays; Apple's own
+  # answer about the subscription does, and that can place one Apple began
+  # afresh for someone it already bills (StoreSubscription.previous_holder).
+  def placed_by_apple
+    return nil unless state.store_account_id.nil? && AppStore::Api.configured?
+    bundle_id = state.bundle_id || @payload.dig("data", "bundleId")
+    asked = AppStore::Api.new(bundle_id: bundle_id, environment: @payload.dig("data", "environment")).subscription_state(state.external_id)
+    asked && StoreSubscription.record(asked)
+  rescue AppStore::Api::Error, HTTP::Error, OpenSSL::OpenSSLError
+    nil
   end
 
   # Who a new subscription goes to: the account whose token the purchase

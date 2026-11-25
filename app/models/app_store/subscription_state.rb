@@ -25,6 +25,10 @@ module AppStore
 
     def app_account_token = transaction["appAccountToken"]
 
+    # Apple's identifier for the Apple Account that pays, the same on every
+    # transaction it makes in the app. Older transactions don't carry it.
+    def store_account_id = transaction["appTransactionId"].presence
+
     def signed_at
       time([transaction["signedDate"], renewal["signedDate"]].compact.max)
     end
@@ -60,7 +64,7 @@ module AppStore
         currency: transaction["currency"],
         signed_at: signed_at,
         verified_at: Time.current
-      }
+      }.merge(store_account_id ? {store_account_id: store_account_id} : {})
     end
 
     private

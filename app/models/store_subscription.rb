@@ -44,8 +44,9 @@ class StoreSubscription < ApplicationRecord
 
   # Records what the store said about a subscription, for the account that
   # presented it (`user`), or for whoever holds it when the store itself is
-  # the one telling us. Returns the subscription, or nil when there is neither
-  # a row nor an account to give it to.
+  # the one telling us. A new one nobody presented goes to the account that
+  # held the store account's last (previous_holder). Returns the subscription,
+  # or nil when there is neither a row nor an account to give it to.
   #
   # A subscription that has lapsed goes to whoever buys it again, and stays
   # where it is when another account only shows it. A live one is not another
@@ -53,6 +54,7 @@ class StoreSubscription < ApplicationRecord
   def self.record(state, user: nil)
     transaction do
       subscription = lock.find_by(store: state.store, external_id: state.external_id)
+      user ||= previous_holder(state) if subscription.nil?
       return nil if subscription.nil? && user.nil?
 
       subscription ||= new(store: state.store, external_id: state.external_id, user: user)
@@ -68,6 +70,17 @@ class StoreSubscription < ApplicationRecord
       subscription.user.sync_store_plan
       subscription
     end
+  end
+
+  # The account that held the last subscription of the store account this one
+  # is from. Apple at times starts a subscription afresh for someone it
+  # already bills, under a new transaction and with no token (two of them in
+  # production, 2026-11-25, each beginning the day the old one ran out); a
+  # store account holds one at a time, so it is that person's.
+  def self.previous_holder(state)
+    return nil if state.store_account_id.blank?
+    where(store: state.store, app_identifier: state.bundle_id, store_account_id: state.store_account_id)
+      .order(:updated_at).last&.user
   end
 
   # Newer news only: notifications can arrive out of order.

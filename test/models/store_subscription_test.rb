@@ -30,6 +30,33 @@ class StoreSubscriptionTest < ActiveSupport::TestCase
     end
   end
 
+  test "a new subscription from a store account goes to the account that held its last one" do
+    StoreSubscription.record(apple_state(id: "1000", appTransactionId: "apple-account-1"), user: @trial)
+    StoreSubscription.record(apple_state(id: "1000", appTransactionId: "apple-account-1", expires: 1.minute.ago, ended: true))
+    assert @trial.reload.suspended
+
+    # nobody presents it and it carries no token: Apple began it afresh for the same Apple Account
+    subscription = StoreSubscription.record(apple_state(id: "2000", appTransactionId: "apple-account-1"))
+
+    assert_equal @trial, subscription.user
+    assert_not @trial.reload.suspended
+    assert_equal 2, @trial.store_subscriptions.count
+  end
+
+  test "one from a store account nobody knows, or that doesn't say, is still nobody's" do
+    StoreSubscription.record(apple_state(id: "1000", appTransactionId: "apple-account-1"), user: @trial)
+
+    assert_nil StoreSubscription.record(apple_state(id: "2000", appTransactionId: "apple-account-2"))
+    assert_nil StoreSubscription.record(apple_state(id: "3000"))
+  end
+
+  test "news that doesn't say the store account leaves the one recorded" do
+    StoreSubscription.record(apple_state(id: "1000", appTransactionId: "apple-account-1"), user: @trial)
+    StoreSubscription.record(apple_state(id: "1000", signed: 1.minute.from_now))
+
+    assert_equal "apple-account-1", StoreSubscription.sole.store_account_id
+  end
+
   test "an account is always required" do
     assert_raises(ActiveRecord::NotNullViolation) do
       StoreSubscription.new(store: :apple, external_id: "1", app_identifier: "a", environment: "production", product_id: "p", status: :active).save(validate: false)

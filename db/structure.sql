@@ -1361,7 +1361,8 @@ CREATE TABLE public.store_subscriptions (
     verified_at timestamp(6) without time zone,
     moved_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    store_account_id text
 );
 
 
@@ -3048,6 +3049,13 @@ CREATE UNIQUE INDEX index_store_subscriptions_on_store_and_external_id ON public
 
 
 --
+-- Name: index_store_subscriptions_on_store_and_store_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_store_subscriptions_on_store_and_store_account_id ON public.store_subscriptions USING btree (store, store_account_id);
+
+
+--
 -- Name: index_store_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3445,6 +3453,7 @@ ALTER TABLE ONLY public.oauth_application_profiles
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125100000'),
 ('20261125090000'),
 ('20261122090000'),
 ('20261114090000'),
