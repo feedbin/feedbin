@@ -209,6 +209,16 @@ class User < ApplicationRecord
     self.needs_onboarding = "1"
   end
 
+  # An account made from one of Feedbin's apps: on the trial, as one made on
+  # the website is, and able to connect the app it was made from. Unsaved,
+  # with its errors, when the email or password won't do.
+  def self.sign_up_from_app(attributes)
+    new(email: attributes[:email], password: attributes[:password]).with_params({}).tap do |user|
+      user.api_v3 = "1"
+      user.save
+    end
+  end
+
   def with_params(params)
     if params[:coupon_code].present?
       coupon = Coupon.find_by(coupon_code: params[:coupon_code])

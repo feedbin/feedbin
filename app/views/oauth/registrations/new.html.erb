@@ -1,0 +1,47 @@
+<% content_for :form_content do %>
+<div class="border rounded-md w-full max-w-[480px] mx-auto p-[40px]">
+  <h1 class="font-bold text-lg text-center mb-2">Create your Feedbin account</h1>
+  <p class="text-center text-500 mb-6">Free for <%= Feedbin::Application.config.trial_days %> days. No card needed.</p>
+
+  <% if @user.errors.present? %>
+    <div class="alert alert-error">
+      <%= @user.errors.full_messages.join(". ") %>.
+    </div>
+  <% end %>
+
+  <%= form_tag oauth_registration_path, method: :post, novalidate: true, data: {controller: "oauth-form", action: "visual-viewport:change@window->oauth-form#reveal"} do %>
+    <% Oauth::BaseController::OAUTH_PARAMS.each do |name| %>
+      <%= hidden_field_tag name, params[name], id: nil if params[name].present? %>
+    <% end %>
+    <div class="mb-4">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label_content do %>
+          <label for="email">Email</label>
+        <% end %>
+        <% text.input do %>
+          <%= email_field_tag :email, @user.email, class: "peer text-input !text-[16px] dark:[color-scheme:dark]", autocomplete: "username", autocapitalize: "off", autocorrect: "off", spellcheck: "false", enterkeyhint: "next", data: {action: "keydown.enter->oauth-form#next"} %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="mb-6">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label_content do %>
+          <label for="password">Password</label>
+        <% end %>
+        <% text.input do %>
+          <%= password_field_tag :password, nil, class: "text-input !text-[16px] dark:[color-scheme:dark]", autocomplete: "new-password", enterkeyhint: "go", data: {oauth_form_target: "password"} %>
+        <% end %>
+      <% end %>
+    </div>
+    <button type="submit" class="button flex w-full min-h-[44px]" data-oauth-form-target="submit">Create Account</button>
+  <% end %>
+
+  <p class="text-center text-sm text-500 mt-6">
+    By creating an account you agree to the <%= link_to "Privacy Policy", "/privacy-policy" %>.
+  </p>
+</div>
+<p class="text-center text-500 mt-6">Already have an account?</p>
+<p class="text-center"><%= link_to "Sign In", oauth_authorization_path(params.permit(*Oauth::BaseController::OAUTH_PARAMS).to_h), class: "font-medium" %></p>
+<% end %>
+
+<%= render template: "layouts/oauth_page" %>

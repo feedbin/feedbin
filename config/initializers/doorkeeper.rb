@@ -6,6 +6,8 @@ Doorkeeper.configure do
   base_controller "Oauth::BaseController"
 
   resource_owner_authenticator { oauth_resource_owner }
+  # The consent page is passed over once, for the app an account was just created from.
+  skip_authorization { |_resource_owner, client| authorizing_once?(client) }
 
   enable_application_owner confirmation: true
 

@@ -7,7 +7,12 @@ module Api
       FIRST_PARTY = "read write account"
 
       def self.for(application)
-        application.scopes.include?("account") ? FIRST_PARTY : DEFAULT
+        first_party?(application) ? FIRST_PARTY : DEFAULT
+      end
+
+      # Whether the application is one of Feedbin's own.
+      def self.first_party?(application)
+        application.scopes.include?("account")
       end
 
       # Marks the application with this client id as Feedbin's own: it and its

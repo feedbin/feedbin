@@ -51,6 +51,16 @@
     <% end %>
   <% end %>
 </div>
+<% if !signed_in? && Api::V3::Scopes.first_party?(@pre_auth.client.application) %>
+  <%# The same request, taken to the sign-up page; its scope is worked out there again. %>
+  <% registration_params = {
+    client_id: @pre_auth.client.uid, redirect_uri: @pre_auth.redirect_uri, state: @pre_auth.state,
+    response_type: @pre_auth.response_type, response_mode: @pre_auth.response_mode,
+    code_challenge: @pre_auth.code_challenge, code_challenge_method: @pre_auth.code_challenge_method
+  }.compact_blank %>
+  <p class="text-center text-500 mt-6">New to Feedbin?</p>
+  <p class="text-center"><%= link_to "Create an account", new_oauth_registration_path(registration_params), class: "font-medium" %></p>
+<% end %>
 
 <% end %>
 

@@ -50,6 +50,18 @@ class Oauth::BaseController < ApplicationController
     params.permit(*OAUTH_PARAMS).to_h
   end
 
+  # An account made on the app's own sign-up page (Oauth::RegistrationsController)
+  # is for that app: the next visit to the authorize page, which is the one
+  # that page redirects to, answers the app without asking. Once.
+  def authorize_once(application)
+    session[:oauth_authorize_once] = application.uid
+  end
+
+  # Doorkeeper's skip_authorization.
+  def authorizing_once?(client)
+    session.delete(:oauth_authorize_once) == client.uid
+  end
+
   # Requested scopes are replaced by Api::V3::Scopes.
   def assign_v3_scopes
     application = Doorkeeper::Application.by_uid(params[:client_id].to_s)

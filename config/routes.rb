@@ -210,6 +210,7 @@ Rails.application.routes.draw do
     skip_controllers :applications, :authorized_applications, :token_info
   end
   resource :session, only: :destroy, module: :oauth, path: "oauth/session", as: :oauth_session
+  resource :registration, only: [:new, :create], module: :oauth, path: "oauth/registration", as: :oauth_registration
 
   mount StripeEvent::Engine, at: "/stripe"
 
