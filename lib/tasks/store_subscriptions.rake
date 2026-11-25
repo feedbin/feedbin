@@ -29,4 +29,33 @@ namespace :store_subscriptions do
     puts "replayed: #{jobs.size}"
     puts "still held by no account: #{AppStoreNotification.where(user_id: nil).distinct.count(:original_transaction_id)}"
   end
+
+  desc "Development only: puts purchase-test@example.com on a fresh trial, clears what Xcode's test store left on this server, and prints the account's id."
+  task test_account: :environment do
+    abort "Only on a development server." unless Rails.env.development?
+    trial = Plan.find_by_stripe_id!("trial")
+    user = User.find_or_initialize_by(email: "purchase-test@example.com")
+    if user.new_record?
+      password = SecureRandom.hex
+      user.assign_attributes(password: password, password_confirmation: password, api_v3: "1", plan: trial)
+      user.update_auth_token = true
+      user.save!
+    end
+    # Xcode numbers its test transactions from zero each time, so the last run's rows would be taken for this one's.
+    stale = StoreSubscription.where(user: user).or(StoreSubscription.where(environment: "xcode"))
+    owners = User.where(id: stale.select(:user_id)).where.not(id: user.id).to_a
+    stale.delete_all
+    owners.each(&:sync_store_plan)
+    AppStoreNotification.where(user_id: user.id).delete_all
+    user.update_columns(plan_id: trial.id, suspended: false, expires_at: 30.days.from_now)
+    puts user.id
+  end
+
+  desc "Development only: what the server holds for purchase-test@example.com."
+  task test_account_status: :environment do
+    abort "Only on a development server." unless Rails.env.development?
+    user = User.find_by!(email: "purchase-test@example.com")
+    subscriptions = user.store_subscriptions.map { "#{_1.product_id} #{_1.status} (#{_1.environment})" }
+    puts "plan #{user.plan.stripe_id}#{user.suspended ? ", suspended" : ""}; subscriptions: #{subscriptions.presence&.join(", ") || "none"}"
+  end
 end
