@@ -9,8 +9,10 @@
 class StoreSubscription::Backfill
   Result = Struct.new(:created, :noted_on_deleted_users, :without_an_account, :would_lapse, :would_activate, keyword_init: true)
 
-  def initialize(apply: false, ask_apple: AppStore::Api.configured?, progress: nil)
+  # except: accounts to leave as they are, whatever their subscriptions say.
+  def initialize(apply: false, ask_apple: AppStore::Api.configured?, progress: nil, except: [])
     @apply = apply
+    @except = except.map(&:to_i)
     @ask_apple = ask_apple
     @progress = progress
   end
@@ -41,7 +43,7 @@ class StoreSubscription::Backfill
       end
     end
 
-    User.where(id: user_ids.to_a).find_each do |user|
+    User.where(id: user_ids.to_a - @except).find_each do |user|
       entitled = user.store_subscriptions.entitling.exists?
       result.would_lapse << user.id if !entitled && user.store_plan? && !user.suspended
       result.would_activate << user.id if entitled && (user.suspended || !user.store_plan?) && user.plan.stripe_id != "free"

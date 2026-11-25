@@ -4,12 +4,13 @@ namespace :store_subscriptions do
   #   2. store_subscriptions:replay              takes in the notifications that died in Sidekiq
   #   3. store_subscriptions:backfill APPLY=1    lapses and activates
   # Look at who step 1 says would lapse before step 3: a subscription the server never placed (bought with
-  # no token, as two were in production in 2026) leaves its account looking unpaid until it is attached by
-  # hand: AppStoreNotificationProcessor.new.perform(payload, user_id).
-  desc "Make store subscriptions from the App Store's notifications. APPLY=1 also puts accounts on, or takes them off, a plan; without it the task says who would change."
+  # no token) leaves its account looking unpaid. EXCEPT=51532,162401 leaves accounts as they are: those two
+  # were paying through subscriptions on other Apple Accounts in November 2026, attached to nobody, and
+  # were to keep their service (QUESTIONS.md 193 in feedbin-ios-reflex).
+  desc "Make store subscriptions from the App Store's notifications. APPLY=1 also puts accounts on, or takes them off, a plan; without it the task says who would change. EXCEPT=1,2 leaves those accounts alone."
   task backfill: :environment do
     progress = ->(index, total) { puts "#{index}/#{total}" if (index % 50).zero? || index == total }
-    result = StoreSubscription::Backfill.new(apply: ENV["APPLY"].present?, progress: progress).run
+    result = StoreSubscription::Backfill.new(apply: ENV["APPLY"].present?, progress: progress, except: ENV["EXCEPT"].to_s.split(",")).run
     puts "created: #{result.created}"
     puts "noted on deleted users: #{result.noted_on_deleted_users}"
     puts "with no account at all: #{result.without_an_account}"

@@ -37,6 +37,16 @@ class StoreSubscription::BackfillTest < ActiveSupport::TestCase
     assert @user.reload.suspended
   end
 
+  test "an account named as an exception is left as it is" do
+    notify @user.id, "DID_RENEW", id: "1000", expires: 3.months.ago
+
+    result = StoreSubscription::Backfill.new(apply: true, except: [@user.id.to_s]).run
+
+    assert_equal 1, result.created
+    assert_empty result.would_lapse
+    assert_not @user.reload.suspended
+  end
+
   test "a subscription whose account is gone is noted on the deleted user, and only while it bills" do
     deleted = DeletedUser.create!(email: "gone@example.com", original_user_id: 999_001)
     notify 999_001, "DID_RENEW", id: "2000", expires: 20.days.from_now
