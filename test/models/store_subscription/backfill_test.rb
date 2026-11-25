@@ -32,8 +32,10 @@ class StoreSubscription::BackfillTest < ActiveSupport::TestCase
     assert_equal [@user.id], result.would_lapse
     assert_not @user.reload.suspended
 
-    StoreSubscription.delete_all
-    StoreSubscription::Backfill.new(apply: true).run
+    # the run that applies finds the rows already made
+    applied = StoreSubscription::Backfill.new(apply: true).run
+    assert_equal 0, applied.created
+    assert_equal [@user.id], applied.would_lapse
     assert @user.reload.suspended
   end
 
@@ -56,7 +58,7 @@ class StoreSubscription::BackfillTest < ActiveSupport::TestCase
     assert_equal [@user.id], result.would_lapse
   end
 
-  test "a subscription whose account is gone is noted on the deleted user, and only while it bills" do
+  test "a subscription whose account is gone is noted on the deleted user, ended or not" do
     deleted = DeletedUser.create!(email: "gone@example.com", original_user_id: 999_001)
     notify 999_001, "DID_RENEW", id: "2000", expires: 20.days.from_now
     notify 999_001, "EXPIRED", id: "3000", expires: 3.months.ago
@@ -65,9 +67,19 @@ class StoreSubscription::BackfillTest < ActiveSupport::TestCase
     result = StoreSubscription::Backfill.new.run
 
     assert_equal 0, StoreSubscription.count
-    assert_equal 1, result.noted_on_deleted_users
+    assert_equal 2, result.noted_on_deleted_users
     assert_equal 1, result.without_an_account
-    assert_equal ["2000"], deleted.reload.store_subscriptions.map { _1["external_id"] }
+    assert_equal %w[2000 3000], deleted.reload.store_subscriptions.map { _1["external_id"] }.sort
+    assert_equal deleted, DeletedUser.holding(:apple, "3000").sole
+
+    assert_equal 0, StoreSubscription::Backfill.new.run.noted_on_deleted_users
+  end
+
+  test "an account on a store's plan that no store has billed would lapse" do
+    stray = users(:timed)
+    stray.update_columns(plan_id: plans(:app_subscription).id, suspended: false)
+
+    assert_includes StoreSubscription::Backfill.new.run.would_lapse, stray.id
   end
 
   test "Apple is asked about one not known to have ended" do

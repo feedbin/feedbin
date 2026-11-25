@@ -135,6 +135,20 @@ class ApiV3StoreSubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal token.reload.uuid, JSON.parse(response.body)["plan"]["billing"]["account_token"]
   end
 
+  test "a lapsed web plan is the web's to describe, whatever a store once billed" do
+    lapsed = users(:new)
+    StoreSubscription.record(apple_state(expires: 1.month.from_now), user: lapsed)
+    StoreSubscription.record(apple_state(expires: 1.minute.ago, ended: true))
+    lapsed.reload.update_columns(plan_id: plans(:basic_monthly_3).id, suspended: true)
+    @token = token_for(lapsed)
+
+    get "/v3/account", headers: bearer
+
+    plan = JSON.parse(response.body)["plan"]
+    assert_equal "expired", plan["status"]
+    assert_equal %w[web expired], plan["billing"].values_at("source", "state")
+  end
+
   test "an account nobody bills says so" do
     get "/v3/account", headers: bearer
 

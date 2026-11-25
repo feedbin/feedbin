@@ -2,6 +2,7 @@
 # notifications speak of, once, when this table is new. The account is the one
 # the latest notification was credited to. A subscription whose account is
 # gone is noted on the deleted user instead: it has nobody to belong to.
+# Running it again makes nothing twice.
 #
 # Apple is asked for the state of any not known to have ended, where there is
 # a key to ask with. Accounts are only put on or taken off a plan when
@@ -19,31 +20,34 @@ class StoreSubscription::Backfill
 
   def run
     result = Result.new(created: 0, noted_on_deleted_users: 0, without_an_account: 0, would_lapse: [], would_activate: [])
-    user_ids = Set.new
 
     transaction_ids.each_with_index do |external_id, index|
       @progress&.call(index + 1, transaction_ids.size)
       next if StoreSubscription.exists?(store: :apple, external_id: external_id)
 
       notification = latest(external_id)
-      state = current_state(notification)
       user = User.find_by_id(notification.user_id)
 
       if user
-        StoreSubscription.create!(state.attributes.merge(store: :apple, external_id: external_id, user: user))
-        user_ids << user.id
+        StoreSubscription.create!(current_state(notification).attributes.merge(store: :apple, external_id: external_id, user: user))
         result.created += 1
       elsif (deleted_user = DeletedUser.find_by(original_user_id: notification.user_id))
-        next unless state.entitling? || state.status == :retrying
-        reference = {"store" => "apple", "external_id" => external_id, "product_id" => state.attributes[:product_id]}
-        deleted_user.update!(store_subscriptions: (deleted_user.store_subscriptions + [reference]).uniq)
+        # Ended or not: later news of it is then known to be a deleted account's, and not somebody paying
+        # for nothing.
+        product_id = notification.data.safe_dig("data", "signedTransactionInfo", "productId")
+        reference = {"store" => "apple", "external_id" => external_id, "product_id" => product_id}
+        next if deleted_user.store_subscriptions.include?(reference)
+        deleted_user.update!(store_subscriptions: deleted_user.store_subscriptions + [reference])
         result.noted_on_deleted_users += 1
       else
         result.without_an_account += 1
       end
     end
 
-    User.where(id: user_ids.to_a - @except).find_each do |user|
+    # Every account a store has billed or is on a store's plan, on each run: the run that applies makes no rows.
+    store_plans = Plan.where(stripe_id: %w[app-subscription podcast-subscription])
+    accounts = User.where(id: StoreSubscription.select(:user_id)).or(User.where(plan: store_plans)).where.not(id: @except)
+    accounts.includes(:plan).find_each do |user|
       entitled = user.store_subscriptions.entitling.exists?
       result.would_lapse << user.id if !entitled && user.store_plan? && !user.suspended
       result.would_activate << user.id if entitled && (user.suspended || !user.store_plan?) && user.plan.stripe_id != "free"

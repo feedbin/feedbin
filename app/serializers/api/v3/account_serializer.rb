@@ -54,7 +54,11 @@ module Api
       # so a lapsed one can say when and why it ended.
       def billing
         subscription = store_subscription
-        billing = if @user.web_plan_active? || (subscription.nil? && @user.plan.stripe_id.start_with?("basic-"))
+        # A store that pays now comes first; else a web plan, lapsed or not, is the web's to describe, whatever
+        # a store once billed.
+        billing = if subscription&.entitling?
+          store_billing(subscription)
+        elsif @user.plan.stripe_id.start_with?("basic-")
           web_billing
         elsif subscription
           store_billing(subscription)
