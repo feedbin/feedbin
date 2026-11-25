@@ -1,6 +1,6 @@
 <% subscription = @customer.billing_subscription %>
 <% source = @customer.billing_source(subscription) %>
-<% subscriptions = @customer.store_subscriptions.order(Arel.sql("status IN (0, 1) DESC"), expires_at: :desc) %>
+<% others = @customer.store_subscriptions.where.not(id: subscription&.id).order(expires_at: :desc) %>
 <% purchases = @customer.purchases %>
 <% stripe_events = @customer.billing_events.order(created_at: :desc) %>
 
@@ -11,61 +11,62 @@
   Account <%= @customer.id %>, created <%= @customer.created_at.to_formatted_s(:date) %>. <%= link_to "All customers", admin_users_path %>
 <% end %>
 
+<%= render layout: "summary", locals: {summary: billing_summary(@customer, subscription)} do %>
+  <%= link_to "Open in Stripe", @customer.stripe_url, class: "button" if source == "web" && @customer.customer_id.present? %>
+<% end %>
+
 <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% group.header do %>
-    Billing
+    Details
   <% end %>
   <% group.item do %>
-    <%= render partial: "fact", locals: {title: "Standing", value: account_standing(@customer)} %>
-  <% end %>
-  <% group.item do %>
-    <%= render partial: "fact", locals: {title: "Plan", description: @customer.plan.stripe_id, value: @customer.plan.name} %>
-  <% end %>
-  <% group.item do %>
-    <%= render partial: "fact", locals: {title: "Billed by", value: biller_name(source)} %>
+    <%= render partial: "fact", locals: {title: "Plan in the database", value: @customer.plan.stripe_id} %>
   <% end %>
   <% if subscription && source != "web" %>
     <% group.item do %>
-      <%= render partial: "fact", locals: {title: "Subscription", description: subscription.product_id, value: store_subscription_standing(subscription)} %>
+      <%= render partial: "fact", locals: {
+        title: "#{biller_name(subscription.store)}'s ID for the subscription",
+        description: [subscription.product_id, (subscription.environment unless subscription.environment == "production")].compact.join(" · "),
+        value: subscription.external_id
+      } %>
+    <% end %>
+    <% if subscription.verified_at %>
+      <% group.item do %>
+        <%= render partial: "fact", locals: {title: "Last checked with #{biller_name(subscription.store)}", value: subscription.verified_at.to_formatted_s(:date)} %>
+      <% end %>
+    <% end %>
+    <% if subscription.renews_as %>
+      <% group.item do %>
+        <%= render partial: "fact", locals: {title: "Changes plan at renewal", value: subscription.renews_as} %>
+      <% end %>
+    <% end %>
+    <% if subscription.moved_at %>
+      <% group.item do %>
+        <%= render partial: "fact", locals: {title: "Moved here from another account", value: subscription.moved_at.to_formatted_s(:date)} %>
+      <% end %>
     <% end %>
   <% end %>
-  <% if @customer.expires_at && (@customer.trial_plan? || @customer.timed_plan?) %>
+  <% if @customer.customer_id.present? && source != "web" %>
     <% group.item do %>
-      <%= render partial: "fact", locals: {title: @customer.trial_plan? ? "Trial ends" : "Paid until", value: @customer.expires_at.to_formatted_s(:date)} %>
-    <% end %>
-  <% end %>
-  <% if @customer.billing_issue? %>
-    <% group.item do %>
-      <%= render partial: "fact", locals: {title: "Payment problem", value: "The last payment failed"} %>
+      <%= render partial: "fact", locals: {title: "Stripe customer", description: @customer.customer_id, value: link_to("Open in Stripe", @customer.stripe_url)} %>
     <% end %>
   <% end %>
   <% group.item do %>
     <%= render partial: "fact", locals: {title: "Price tier", value: @customer.price_tier} %>
   <% end %>
-  <% if @customer.customer_id.present? %>
-    <% group.item do %>
-      <%= render partial: "fact", locals: {title: "Stripe customer", description: @customer.customer_id, value: link_to("Open in Stripe", @customer.stripe_url)} %>
-    <% end %>
-  <% end %>
 <% end %>
 
-<% if subscriptions.any? %>
+<% if others.any? %>
   <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
-      Store Subscriptions
+      Earlier Store Subscriptions
     <% end %>
-    <% subscriptions.each do |store_subscription| %>
+    <% others.each do |other| %>
       <% group.item do %>
         <%= render partial: "fact", locals: {
-          title: "#{biller_name(store_subscription.store)} · #{store_subscription.period&.capitalize || store_subscription.product_id}",
-          description: safe_join([
-            [store_subscription.product_id, store_subscription_price(store_subscription), (store_subscription.environment unless store_subscription.environment == "production")].compact.join(" · "),
-            "Store's ID #{store_subscription.external_id}",
-            ("Becomes #{store_subscription.renews_as} at renewal" if store_subscription.renews_as),
-            ("Moved here #{store_subscription.moved_at.to_formatted_s(:date)}" if store_subscription.moved_at),
-            ("Last checked with the store #{store_subscription.verified_at.to_formatted_s(:date)}" if store_subscription.verified_at)
-          ].compact, tag.br),
-          value: store_subscription_standing(store_subscription)
+          title: [biller_name(other.store), other.period&.capitalize].compact.join(" · "),
+          description: other.external_id,
+          value: store_subscription_standing(other)
         } %>
       <% end %>
     <% end %>
@@ -75,20 +76,16 @@
 <% if purchases.any? %>
   <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
-      Payments
+      Recent Payments
     <% end %>
-    <% purchases.first(12).each do |purchase| %>
+    <% purchases.first(6).each do |purchase| %>
       <% group.item do %>
-        <%= render partial: "fact", locals: {
-          title: purchase.receipt_date,
-          description: payment_source(purchase),
-          value: payment_amount(purchase)
-        } %>
+        <%= render partial: "fact", locals: {title: purchase.receipt_date, description: payment_source(purchase), value: payment_amount(purchase)} %>
       <% end %>
     <% end %>
-    <% if purchases.size > 12 %>
+    <% if purchases.size > 6 %>
       <% group.description do %>
-        Showing the last 12 of <%= number_with_delimiter(purchases.size) %> payments.
+        The last 6 of <%= number_with_delimiter(purchases.size) %>.
       <% end %>
     <% end %>
   <% end %>
@@ -99,16 +96,16 @@
 <% if stripe_events.any? %>
   <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
-      What Stripe Has Said
+      Recent Stripe Events
     <% end %>
-    <% stripe_events.limit(15).each do |event| %>
+    <% stripe_events.limit(8).each do |event| %>
       <% group.item do %>
         <%= render partial: "fact", locals: {title: event.event_type, value: event.created_at.to_formatted_s(:date)} %>
       <% end %>
     <% end %>
-    <% if stripe_events.count > 15 %>
+    <% if stripe_events.count > 8 %>
       <% group.description do %>
-        Showing the last 15 of <%= number_with_delimiter(stripe_events.count) %> events.
+        The last 8 of <%= number_with_delimiter(stripe_events.count) %>.
       <% end %>
     <% end %>
   <% end %>
@@ -129,7 +126,7 @@
   <% group.item do %>
     <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.title do %>Close the account<% end %>
-      <% if subscriptions.select(&:entitling?).any? %>
+      <% if subscription&.entitling? %>
         <% row.description do %>A store bills this account, and only its owner can cancel that. Closing it does not stop the charges.<% end %>
       <% end %>
       <% row.control do %>

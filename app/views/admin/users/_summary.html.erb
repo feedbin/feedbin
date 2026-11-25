@@ -1,0 +1,15 @@
+<%# locals: (summary:) %>
+<div class="border rounded-lg p-4 mb-14">
+  <div class="flex items-center gap-2 text-sm font-bold text-700 mb-2">
+    <%= summary_dot(summary) %>
+    <%= summary.status %>
+  </div>
+  <div class="text-xl font-bold text-700"><%= summary.headline %></div>
+  <% if summary.line.present? %>
+    <div class="text-600 mt-1"><%= summary.line %></div>
+  <% end %>
+  <% if (action = yield).present? %>
+    <div class="mt-4"><%= action %></div>
+  <% end %>
+  <div class="text-sm text-500 mt-4"><%= summary.note %></div>
+</div>

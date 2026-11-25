@@ -2,32 +2,23 @@
   <span class="line-through"><%= @deleted_user.email %></span>
 <% end %>
 <%= render Settings::SubtitleComponent.new do %>
-  Closed account<%= " #{@deleted_user.original_user_id}" if @deleted_user.original_user_id %><%= ", closed #{@deleted_user.created_at.to_formatted_s(:date)}" if @deleted_user.created_at %>. <%= link_to "All customers", admin_users_path %>
+  Closed account<%= " #{@deleted_user.original_user_id}" if @deleted_user.original_user_id %>. <%= link_to "All customers", admin_users_path %>
 <% end %>
 
-<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
-  <% group.header do %>
-    Billing
-  <% end %>
-  <% if @deleted_user.customer_id.present? %>
-    <% group.item do %>
-      <%= render partial: "admin/users/fact", locals: {title: "Stripe customer", description: @deleted_user.customer_id, value: link_to("Open in Stripe", @deleted_user.stripe_url)} %>
+<%= render layout: "admin/users/summary", locals: {summary: closed_summary(@deleted_user)} do %>
+  <%= link_to "Open in Stripe", @deleted_user.stripe_url, class: "button" if @deleted_user.customer_id.present? %>
+<% end %>
+
+<% if @deleted_user.store_subscriptions.any? %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
+    <% group.header do %>
+      Details
     <% end %>
-  <% end %>
-  <% @deleted_user.store_subscriptions.each do |reference| %>
-    <% group.item do %>
-      <%= render partial: "admin/users/fact", locals: {
-        title: "#{biller_name(reference["store"])} subscription",
-        description: safe_join([reference["product_id"], "Store's ID #{reference["external_id"]}"].compact, tag.br),
-        value: "Only its owner can cancel it"
-      } %>
+    <% @deleted_user.store_subscriptions.each do |reference| %>
+      <% group.item do %>
+        <%= render partial: "admin/users/fact", locals: {title: "#{biller_name(reference["store"])}'s ID for the subscription", description: reference["product_id"], value: reference["external_id"]} %>
+      <% end %>
     <% end %>
-  <% end %>
-  <% group.item do %>
-    <%= render partial: "admin/users/fact", locals: {
-      title: "Told it is still being charged",
-      value: @deleted_user.store_billing_notified_at ? @deleted_user.store_billing_notified_at.to_formatted_s(:date) : "Not emailed"
-    } %>
   <% end %>
 <% end %>
 

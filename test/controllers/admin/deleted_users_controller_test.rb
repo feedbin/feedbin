@@ -23,9 +23,11 @@ class Admin::DeletedUsersControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_includes response.body, "gone@example.com"
-    assert_includes response.body, "App Store subscription"
+    assert_includes response.body, "Closed account"
+    assert_includes response.body, "Had a subscription with App Store"
     assert_includes response.body, "2000000700000001"
-    assert_includes response.body, "Not emailed"
+    assert_includes response.body, "It is emailed once if the store charges again"
+    assert_includes response.body, "Recent Apple Events"
     assert_includes response.body, "Did Renew"
     assert_includes response.body, "no account"
     assert_select "a[href=?]", @deleted.stripe_url

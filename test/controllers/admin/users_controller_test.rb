@@ -75,8 +75,10 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select "h1", text: /new@example.com/
-    assert_includes response.body, "Feedbin, by card (Stripe)"
-    assert_select "a[href=?]", target.stripe_url
+    assert_includes response.body, "Active"
+    assert_includes response.body, "Feedbin Monthly"
+    assert_includes response.body, "Card, through Stripe"
+    assert_select "a.button[href=?]", target.stripe_url
   end
 
   test "GET show lays out a store subscriber's subscription and what Apple has said" do
@@ -97,14 +99,27 @@ class Admin::UsersControllerTest < ActionController::TestCase
     get :show, params: {id: target.id}
 
     assert_response :success
-    assert_includes response.body, "App Store"
-    assert_includes response.body, "Active, renewal off, ends"
+    assert_includes response.body, "Active, not renewing"
+    assert_includes response.body, "Feedbin Yearly"
+    assert_match(/70\.00 USD a year · Ends \w+ \d+, \d{4} · App Store/, response.body)
     assert_includes response.body, "2000000712345678"
-    assert_includes response.body, "70.00 USD"
+    assert_includes response.body, "Recent Apple Events"
     assert_includes response.body, "Did Change Renewal Status / Auto Renew Disabled"
     assert_includes response.body, "only its owner can cancel"
   ensure
     StripeMock.stop
+  end
+
+  test "GET show calls out a lapsed account at the top" do
+    login_as @user
+    target = users(:ann)
+    target.update_columns(suspended: true, expires_at: 3.days.ago)
+
+    get :show, params: {id: target.id}
+
+    assert_response :success
+    assert_includes response.body, "Lapsed"
+    assert_includes response.body, "Nobody bills this account"
   end
 
   test "GET index links each customer to their page, not to Stripe" do
