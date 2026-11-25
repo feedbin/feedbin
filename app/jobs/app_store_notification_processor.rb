@@ -18,6 +18,7 @@ class AppStoreNotificationProcessor
     @payload = AppStore::SignedPayload.read(token)
     @named_user = User.find_by_id(user_id)
     return unless state.external_id
+    return report_foreign unless ours?
 
     notification = AppStoreNotification.create_with(
       notification_type: type,
@@ -50,6 +51,22 @@ class AppStoreNotificationProcessor
     AuthenticationToken.app.active.find_by(uuid: state.app_account_token)&.user
   rescue ActiveRecord::StatementInvalid
     nil # not a UUID
+  end
+
+  # Apple signs every app's notifications with the same key, so a valid
+  # signature says only that Apple wrote it. One for somebody else's app,
+  # stamped with a Feedbin account's token and posted here, would otherwise
+  # buy that account a subscription with a purchase made elsewhere.
+  def ours?
+    Feedbin::Application.config.app_store_bundle_ids.include?(@payload.dig("data", "bundleId") || transaction["bundleId"])
+  end
+
+  def report_foreign
+    ErrorService.notify(
+      error_class: "AppStoreNotificationProcessor",
+      error_message: "A notification for an app that isn't Feedbin's",
+      parameters: {bundle_id: @payload.dig("data", "bundleId") || transaction["bundleId"], notification_type: type}
+    )
   end
 
   # No account holds it and none was named. A deleted account is told it is

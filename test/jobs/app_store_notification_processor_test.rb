@@ -86,6 +86,21 @@ class AppStoreNotificationProcessorTest < ActiveSupport::TestCase
     assert_equal "1000", reported.sole.dig(:parameters, :original_transaction_id)
   end
 
+  test "another app's notification buys nothing, though Apple signed it and it carries an account's token" do
+    payload = JSON.parse(Base64.urlsafe_decode64(apple_notification("SUBSCRIBED", token: TOKEN, bundleId: "com.example.other").split(".")[1]))
+    payload["data"]["bundleId"] = "com.example.other"
+    reported = []
+
+    ErrorService.stub(:notify, ->(error, *) { reported << error }) do
+      AppStoreNotificationProcessor.new.perform(unsigned(payload))
+    end
+
+    assert_equal 0, StoreSubscription.count
+    assert_equal 0, AppStoreNotification.count
+    assert_equal plans(:basic_monthly_3), @user.reload.plan
+    assert_equal "com.example.other", reported.sole.dig(:parameters, :bundle_id)
+  end
+
   test "a token that matches no account places nothing" do
     ErrorService.stub(:notify, nil) do
       process "SUBSCRIBED", token: SecureRandom.uuid
