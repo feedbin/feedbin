@@ -86,28 +86,6 @@ class AppStoreNotificationProcessorTest < ActiveSupport::TestCase
     assert_equal "1000", reported.sole.dig(:parameters, :original_transaction_id)
   end
 
-  test "a subscription Apple began afresh, with no token, goes to the account its Apple Account's last one paid for" do
-    process "SUBSCRIBED", id: "1000", token: TOKEN, appTransactionId: "apple-account-1"
-    process "DID_RENEW", id: "2000", appTransactionId: "apple-account-1"
-
-    assert_equal [@user.id], StoreSubscription.pluck(:user_id).uniq
-    assert_equal 2, StoreSubscription.count
-    assert_equal [@user.id], AppStoreNotification.pluck(:user_id).uniq
-  end
-
-  test "Apple is asked whose Apple Account it is when the notification doesn't say" do
-    process "SUBSCRIBED", id: "1000", token: TOKEN, appTransactionId: "apple-account-1"
-    api = Minitest::Mock.new
-    api.expect(:subscription_state, apple_state(id: "2000", appTransactionId: "apple-account-1", status: 1), ["2000"])
-
-    AppStore::Api.stub(:configured?, true) do
-      AppStore::Api.stub(:new, api) { process "DID_RENEW", id: "2000" }
-    end
-
-    assert_equal @user, StoreSubscription.find_by!(external_id: "2000").user
-    api.verify
-  end
-
   test "a token that matches no account places nothing" do
     ErrorService.stub(:notify, nil) do
       process "SUBSCRIBED", token: SecureRandom.uuid

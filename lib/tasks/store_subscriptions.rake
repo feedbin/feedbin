@@ -3,8 +3,9 @@ namespace :store_subscriptions do
   #   1. store_subscriptions:backfill            makes the rows, and says who would lapse or be activated
   #   2. store_subscriptions:replay              takes in the notifications that died in Sidekiq
   #   3. store_subscriptions:backfill APPLY=1    lapses and activates
-  # Replay comes before APPLY: an account whose subscription Apple began afresh looks lapsed until the
-  # notifications for the new one, which died for want of a token, have been taken in.
+  # Look at who step 1 says would lapse before step 3: a subscription the server never placed (bought with
+  # no token, as two were in production in 2026) leaves its account looking unpaid until it is attached by
+  # hand: AppStoreNotificationProcessor.new.perform(payload, user_id).
   desc "Make store subscriptions from the App Store's notifications. APPLY=1 also puts accounts on, or takes them off, a plan; without it the task says who would change."
   task backfill: :environment do
     progress = ->(index, total) { puts "#{index}/#{total}" if (index % 50).zero? || index == total }
