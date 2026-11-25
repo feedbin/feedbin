@@ -57,7 +57,7 @@ class AppStoreNotificationProcessor
   def unplaced
     deleted_user = DeletedUser.holding(:apple, state.external_id).first
     if deleted_user
-      deleted_user.store_still_billing(:apple) if CHARGES.include?(type)
+      deleted_user.store_still_billing(:apple) if CHARGES.include?(type) && recent?
     else
       ErrorService.notify(
         error_class: "AppStoreNotificationProcessor",
@@ -79,6 +79,13 @@ class AppStoreNotificationProcessor
 
   def type
     @payload["notificationType"]
+  end
+
+  # News of a charge is only worth an email while it is news: a notification
+  # processed again long after says nothing the person can act on.
+  def recent?
+    signed = @payload["signedDate"]
+    signed.nil? || Time.at(signed / 1000.0) > 3.days.ago
   end
 
   def transaction

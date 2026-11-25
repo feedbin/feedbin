@@ -137,6 +137,17 @@ class AppStoreNotificationProcessorTest < ActiveSupport::TestCase
     assert_equal [nil], AppStoreNotification.where(notification_type: "DID_RENEW").pluck(:user_id).uniq
   end
 
+  test "an old charge to a deleted account, processed late, sends nothing" do
+    process "SUBSCRIBED", token: TOKEN
+    @user.destroy
+    Sidekiq::Worker.clear_all
+
+    payload = JSON.parse(Base64.urlsafe_decode64(apple_notification("DID_RENEW").split(".")[1]))
+    AppStoreNotificationProcessor.new.perform(unsigned(payload.merge("signedDate" => milliseconds(2.months.ago))))
+
+    assert_empty queued_mail
+  end
+
   test "a notification with no renewal info is taken as it is" do
     process "SUBSCRIBED", token: TOKEN
     process "REFUND", without_renewal: true, revocationDate: milliseconds(Time.now)
