@@ -98,6 +98,12 @@ class StoreSubscriptionTest < ActiveSupport::TestCase
     assert_equal :grace, apple_state(expires: 1.day.ago, status: 4).status
   end
 
+  test "a status Apple gave long ago doesn't outlive the dates beside it" do
+    assert_equal :expired, apple_state(expires: 1.year.ago, status: 1).status
+    assert_equal :retrying, apple_state(expires: 1.month.ago, status: 4, renewal: {gracePeriodExpiresDate: milliseconds(1.day.ago), isInBillingRetryPeriod: true}).status
+    assert_equal :active, apple_state(expires: 1.month.from_now, status: 1).status
+  end
+
   test "older news is ignored" do
     StoreSubscription.record(apple_state(signed: Time.now), user: @trial)
     StoreSubscription.record(apple_state(expires: 1.day.ago, signed: 1.hour.ago, ended: true))

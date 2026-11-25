@@ -47,6 +47,15 @@ class StoreSubscription::BackfillTest < ActiveSupport::TestCase
     assert_not @user.reload.suspended
   end
 
+  test "a notification that said active when it was kept is judged by its dates now" do
+    notify @user.id, "DID_RENEW", id: "1000", expires: 3.months.ago, status: 1
+
+    result = StoreSubscription::Backfill.new.run
+
+    assert StoreSubscription.sole.expired?
+    assert_equal [@user.id], result.would_lapse
+  end
+
   test "a subscription whose account is gone is noted on the deleted user, and only while it bills" do
     deleted = DeletedUser.create!(email: "gone@example.com", original_user_id: 999_001)
     notify 999_001, "DID_RENEW", id: "2000", expires: 20.days.from_now
@@ -77,11 +86,11 @@ class StoreSubscription::BackfillTest < ActiveSupport::TestCase
 
   private
 
-  def notify(user_id, type, id:, signed: Time.now, **transaction)
+  def notify(user_id, type, id:, signed: Time.now, status: nil, **transaction)
     AppStoreNotification.create!(
       user_id: user_id, original_transaction_id: id, notification_id: SecureRandom.uuid, notification_type: type, version: "2.0",
       data: {"notificationType" => type, "signedDate" => milliseconds(signed), "data" => {
-        "bundleId" => BUNDLE_ID, "environment" => "Production",
+        "bundleId" => BUNDLE_ID, "environment" => "Production", "status" => status,
         "signedTransactionInfo" => apple_transaction(id: id, signed: signed, **transaction),
         "signedRenewalInfo" => apple_renewal(signed: signed)
       }}

@@ -30,7 +30,8 @@ module AppStore
     end
 
     def status
-      return STATUSES.fetch(@apple_status) if STATUSES.key?(@apple_status)
+      said = STATUSES[@apple_status]
+      return said if said && !outdated?(said)
       return :revoked if transaction["revocationDate"]
       return :grace if grace_expires_at&.future? && !@ended
       return :retrying if renewal["isInBillingRetryPeriod"]
@@ -40,6 +41,13 @@ module AppStore
 
     def entitling?
       [:active, :grace].include?(status)
+    end
+
+    # Apple's status is how things stood when it signed this. Read later (a
+    # notification kept for years, one processed again), "active" with its
+    # paid time already over says only that it was active then.
+    def outdated?(said)
+      (said == :active && expires_at&.past?) || (said == :grace && grace_expires_at&.past?)
     end
 
     def expires_at = time(transaction["expiresDate"])
