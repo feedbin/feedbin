@@ -54,13 +54,16 @@ module Api
       # so a lapsed one can say when and why it ended.
       def billing
         subscription = store_subscription
-        if @user.web_plan_active? || (subscription.nil? && @user.plan.stripe_id.start_with?("basic-"))
+        billing = if @user.web_plan_active? || (subscription.nil? && @user.plan.stripe_id.start_with?("basic-"))
           web_billing
         elsif subscription
           store_billing(subscription)
         else
           no_billing
         end
+        # What an app hands the store with a purchase (StoreKit's
+        # appAccountToken), so the store's own notice of it names the account.
+        billing.merge(account_token: @user.app_account_token)
       end
 
       # The same keys whoever bills, so a client reads one shape.

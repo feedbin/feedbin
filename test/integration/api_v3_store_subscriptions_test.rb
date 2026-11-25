@@ -127,13 +127,21 @@ class ApiV3StoreSubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal true, billing["renews"]
   end
 
+  test "the account's token for a purchase is given" do
+    token = @user.authentication_tokens.app.create!
+
+    get "/v3/account", headers: bearer
+
+    assert_equal token.reload.uuid, JSON.parse(response.body)["plan"]["billing"]["account_token"]
+  end
+
   test "an account nobody bills says so" do
     get "/v3/account", headers: bearer
 
     billing = JSON.parse(response.body)["plan"]["billing"]
     assert_nil billing["source"]
     assert_equal false, billing["renews"]
-    assert_equal %w[source state product_id period price renews renews_as current_period_ends_at grace_ends_at], billing.keys
+    assert_equal %w[source state product_id period price renews renews_as current_period_ends_at grace_ends_at account_token], billing.keys
   end
 
   private
