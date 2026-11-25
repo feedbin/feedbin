@@ -58,4 +58,35 @@ namespace :store_subscriptions do
     subscriptions = user.store_subscriptions.map { "#{_1.product_id} #{_1.status} (#{_1.environment})" }
     puts "plan #{user.plan.stripe_id}#{user.suspended ? ", suspended" : ""}; subscriptions: #{subscriptions.presence&.join(", ") || "none"}"
   end
+
+  desc "Whether Apple takes the App Store key in APPLE_STORE_KEY, _KEY_ID and _ISSUER_ID. ENVIRONMENT=production asks production; the sandbox by default."
+  task check_apple: :environment do
+    abort "APPLE_STORE_KEY, APPLE_STORE_KEY_ID and APPLE_STORE_ISSUER_ID aren't all set." unless AppStore::Api.configured?
+    abort "No file at APPLE_STORE_KEY." unless File.file?(ENV["APPLE_STORE_KEY"])
+    environment = ENV.fetch("ENVIRONMENT", "sandbox")
+    bundle_id = ENV.fetch("BUNDLE_ID", "com.feedbin.feedbin.app")
+    accepted = AppStore::Api.new(bundle_id: bundle_id, environment: environment).accepted?
+    puts accepted ? "Apple's #{environment} accepts the key for #{bundle_id}." : "Apple's #{environment} refuses the key for #{bundle_id}: check the key ID, the issuer ID and that the key is an In-App Purchase key."
+  end
+
+  desc "Development only: takes in what Apple's sandbox has sent for the app, again and again, since Apple can't reach this server. EVERY=15 seconds, SINCE=60 minutes back."
+  task watch_sandbox: :environment do
+    abort "Only on a development server." unless Rails.env.development?
+    abort "APPLE_STORE_KEY, APPLE_STORE_KEY_ID and APPLE_STORE_ISSUER_ID aren't all set." unless AppStore::Api.configured?
+    api = AppStore::Api.new(bundle_id: ENV.fetch("BUNDLE_ID", "com.feedbin.feedbin.app"), environment: "sandbox")
+    since = ENV.fetch("SINCE", "60").to_i.minutes.ago
+    every = ENV.fetch("EVERY", "15").to_i
+    puts "watching Apple's sandbox every #{every} s; stop with Control-C"
+    loop do
+      api.notifications(since: since).each do |payload|
+        claims = AppStore::SignedPayload.decode(payload)
+        next if AppStoreNotification.exists?(notification_id: claims["notificationUUID"])
+        AppStoreNotificationProcessor.new.perform(payload)
+        notification = AppStoreNotification.find_by(notification_id: claims["notificationUUID"])
+        account = notification&.user_id ? "account #{notification.user_id}" : "no account"
+        puts "#{Time.now.strftime("%H:%M:%S")} #{[claims["notificationType"], claims["subtype"]].compact.join("/")} -> #{account}"
+      end
+      sleep every
+    end
+  end
 end

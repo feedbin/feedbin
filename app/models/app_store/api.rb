@@ -43,6 +43,32 @@ module AppStore
       )
     end
 
+    # Every notification Apple sent, or tried to send, for the app between two
+    # times, oldest first, as the signed payloads its webhook is posted. For a
+    # server Apple can't reach (a development one), and for finding what a
+    # webhook missed. Apple keeps 180 days of them.
+    def notifications(since:, upto: Time.now)
+      payloads = []
+      token = nil
+      loop do
+        url = "#{@host}/inApps/v1/notifications/history"
+        url += "?paginationToken=#{CGI.escape(token)}" if token
+        response = client.post(url, json: {startDate: (since.to_f * 1000).to_i, endDate: (upto.to_f * 1000).to_i})
+        raise Error.new(response.status.to_i, response.body) unless response.status.success?
+        page = response.parse
+        payloads.concat(Array(page["notificationHistory"]).filter_map { _1["signedPayload"] })
+        token = page["paginationToken"]
+        break unless page["hasMore"] && token
+      end
+      payloads
+    end
+
+    # Whether Apple takes the key: asks about a transaction that doesn't exist,
+    # which a good key is told (404) and a bad one is refused for (401).
+    def accepted?
+      [200, 400, 404].include?(client.get("#{@host}/inApps/v1/subscriptions/0").status.to_i)
+    end
+
     # Replaces the account token Apple stamps on the subscription's
     # transactions, so its notifications name the account that now holds it.
     def set_app_account_token(original_transaction_id, token)

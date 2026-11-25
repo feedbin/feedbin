@@ -4,11 +4,15 @@ module AppStore
   class SignedPayload
     class Invalid < StandardError; end
 
-    # Xcode's StoreKit testing signs with a local certificate, so a development
-    # server takes a payload as it is. Nothing else does.
-    def self.decode(token, verify: !Rails.env.development?)
-      raise Invalid, "The payload is not signed by Apple." if verify && !JwsVerifier.valid?(token)
-      read(token)
+    # Apple's signature is checked, with one exception: Xcode's StoreKit testing
+    # signs with a certificate of its own, so a development server takes what
+    # says it is from Xcode as it is. Apple's sandbox and production are
+    # checked there too.
+    def self.decode(token)
+      claims = read(token)
+      return claims if Rails.env.development? && claims["environment"] == "Xcode"
+      raise Invalid, "The payload is not signed by Apple." unless JwsVerifier.valid?(token)
+      claims
     end
 
     # The claims of a payload already known to be Apple's: one nested in a
