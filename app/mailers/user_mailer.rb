@@ -57,10 +57,24 @@ class UserMailer < ApplicationMailer
 
   # Takes the address rather than a user id: it is sent after the account has
   # been deleted, so there is no record left to look up.
-  def account_closed(email, opml)
+  # stores: the stores still billing for the account, which only its owner can stop.
+  def account_closed(email, opml, stores = [])
     @email = email
+    @stores = stores
     attachments["subscriptions.xml"] = opml
     mail to: @email, subject: "[Feedbin] Account Closed"
+  end
+
+  def store_subscription_moved(user_id, store)
+    @user = User.find(user_id)
+    @store = store
+    mail to: @user.email, subject: "[Feedbin] Your Subscription Moved to Another Account"
+  end
+
+  def store_still_billing(email, store)
+    @email = email
+    @store = store
+    mail to: @email, subject: "[Feedbin] You Are Still Being Charged for Feedbin"
   end
 
   def onboarding_health_alert(unhealthy_feeds)

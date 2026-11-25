@@ -1,7 +1,18 @@
 Hi <%= @email %>,
 
+<% if @stores.present? -%>
+You have successfully closed your Feedbin account.
+
+<% @stores.each do |store| -%>
+Your subscription is billed by <%= StoreSubscription::STORES.fetch(store)[:name] %>, and only you can cancel it. Until you do, you will keep being charged. Cancel it here:
+
+<%= StoreSubscription::STORES.fetch(store)[:manage_url] %>
+
+<% end -%>
+<% else -%>
 You have successfully closed your Feedbin account and canceled your subscription.
 
+<% end -%>
 Your feed subscriptions are attached. These can be imported into Feedbin or any other RSS reader.
 
 Thanks for your business!

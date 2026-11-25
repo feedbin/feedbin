@@ -55,16 +55,16 @@ class ApiV3ScopesTest < ActionDispatch::IntegrationTest
     assert_response :no_content
   end
 
-  test "third-party token cannot record a purchase" do
-    post "/v3/account/purchases", params: {receipt_data: "abc"}, headers: bearer(@reader), as: :json
+  test "third-party token cannot present or take a store subscription" do
+    post "/v3/account/store_subscriptions", params: {store: "apple", signed_transaction: "abc"}, headers: bearer(@reader), as: :json
+    assert_insufficient_scope
 
+    post "/v3/account/store_subscription_transfers", params: {store: "apple", signed_transaction: "abc"}, headers: bearer(@reader), as: :json
     assert_insufficient_scope
   end
 
-  test "first-party token reaches purchases" do
-    AppStoreReceipt.stub(:verify, {"status" => 21002}) do
-      post "/v3/account/purchases", params: {receipt_data: "abc"}, headers: bearer(@feedbin), as: :json
-    end
+  test "first-party token reaches store subscriptions" do
+    post "/v3/account/store_subscriptions", params: {store: "apple", signed_transaction: "abc"}, headers: bearer(@feedbin), as: :json
 
     assert_response :unprocessable_content
   end

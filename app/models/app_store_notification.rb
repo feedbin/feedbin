@@ -1,5 +1,6 @@
 class AppStoreNotification < ApplicationRecord
-  belongs_to :user
+  # Absent for a notification about a subscription no account holds.
+  belongs_to :user, optional: true
 
   # Apple sends the price in milliunits of the transaction's currency. Prefer
   # it: a price list kept in Ruby has to be updated in lockstep with the

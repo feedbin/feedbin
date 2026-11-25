@@ -54,6 +54,7 @@ require "support/stripe_payment_method_helper"
 require "support/assertions"
 require "support/api_controller_test_case"
 require "support/push_server_mock"
+require "support/store_subscription_helper"
 require "component_test_case"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper

@@ -94,6 +94,9 @@ class User < ApplicationRecord
   has_many :account_migrations, dependent: :delete_all
   has_many :in_app_purchases
   has_many :app_store_notifications
+  # Deleted with the account by the database, after before_destroy has noted
+  # them on the deleted user: `dependent:` would remove them first.
+  has_many :store_subscriptions
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
@@ -525,7 +528,7 @@ class User < ApplicationRecord
   end
 
   def create_deleted_user
-    DeletedUser.create(email: email, customer_id: customer_id, original_user_id: id)
+    DeletedUser.create(email: email, customer_id: customer_id, original_user_id: id, store_subscriptions: store_subscriptions.map(&:reference))
   end
 
   def record_stats
@@ -579,6 +582,56 @@ class User < ApplicationRecord
 
   def billing_issue!
     update(billing_issue: "1")
+  end
+
+  # Puts the account on the plan a store pays for, or lapses it when the store
+  # no longer does. A store's plan replaces a web one, so nobody pays twice.
+  # The ending of a store's subscription only lapses an account still on a
+  # store's plan: one that has since moved to the web keeps what it pays for.
+  def sync_store_plan
+    subscription = store_subscriptions.entitling.order(:expires_at).last
+
+    if subscription
+      return if plan.stripe_id == "free"
+
+      if suspended || plan != subscription.plan
+        self.free_ok = true
+        self.plan = subscription.plan
+        save!
+        activate
+      end
+      update(billing_issue: subscription.grace? ? "1" : "0") if billing_issue? != subscription.grace?
+    elsif store_plan? && !suspended
+      deactivate
+    end
+  end
+
+  def store_plan?
+    %w[app-subscription podcast-subscription].include?(plan.stripe_id)
+  end
+
+  def web_plan_active?
+    plan.stripe_id.start_with?("basic-") && !suspended
+  end
+
+  def billing_issue?
+    billing_issue == "1"
+  end
+
+  # The account's token as a store stamps it on a purchase.
+  def app_account_token
+    authentication_tokens.app.active.first&.uuid
+  end
+
+  # Attaches the subscription a signed-in app holds to this account. Raises
+  # StoreSubscription::OwnedByAnotherAccount when it is live on another.
+  def claim_store_subscription(signed_transaction:)
+    StoreSubscription::Claim.new(self, signed_transaction: signed_transaction).run
+  end
+
+  # Takes the same subscription from the account that has it.
+  def take_store_subscription(signed_transaction:)
+    StoreSubscription::Claim.new(self, signed_transaction: signed_transaction).take
   end
 
   def activate

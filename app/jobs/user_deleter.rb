@@ -10,9 +10,10 @@ class UserDeleter
     # the Stripe subscription cancelled in before_destroy — alive.
     email = @user.email
     opml = subscriptions_opml
+    stores = @user.store_subscriptions.entitling.pluck(:store).uniq
     refund_payment(signed_id)
     @user.destroy
-    email_subscriptions(email, opml)
+    email_subscriptions(email, opml, stores)
   end
 
   def refund_payment(signed_id)
@@ -42,8 +43,8 @@ class UserDeleter
 
   # InactiveRecipientError is one of several siblings under ApiInputError, all
   # of which mean the address is permanently undeliverable.
-  def email_subscriptions(email, opml)
-    UserMailer.account_closed(email, opml).deliver_now
+  def email_subscriptions(email, opml, stores)
+    UserMailer.account_closed(email, opml, stores).deliver_now
   rescue Net::SMTPSyntaxError, Postmark::ApiInputError
   end
 end

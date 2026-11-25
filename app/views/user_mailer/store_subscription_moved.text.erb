@@ -1,0 +1,11 @@
+Hi <%= @user.email %>,
+
+The Feedbin subscription that <%= StoreSubscription::STORES.fetch(@store)[:name] %> bills was moved to another Feedbin account. It was moved from the Feedbin app, by someone signed in to <%= StoreSubscription::STORES.fetch(@store)[:name] %> with the account that pays for it.
+
+This account is no longer paid for. To keep using it, sign in and subscribe.
+
+If you did not expect this, please reply to this email.
+
+Thanks,
+
+Feedbin

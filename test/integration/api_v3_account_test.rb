@@ -18,7 +18,8 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal %w[object id email created_at plan newsletter_address settings], body.keys
     assert_equal ["account", @user.id, @user.email, @user.created_at.utc.iso8601], body.values_at("object", "id", "email", "created_at")
-    assert_equal({"id" => "monthly", "name" => "Monthly", "status" => "active", "expires_at" => nil}, body["plan"])
+    assert_equal({"id" => "monthly", "name" => "Monthly", "status" => "active", "expires_at" => nil}, body["plan"].except("billing"))
+    assert_equal "web", body["plan"]["billing"]["source"]
     assert_equal @user.newsletter_address, body["newsletter_address"]
     assert_equal({"podcast_sort" => "published_desc", "podcast_download_limit" => 25, "hide_queue" => true, "hide_recently_read" => false, "hide_updated" => false, "hide_recently_played" => false}, body["settings"])
   end
@@ -72,41 +73,6 @@ class ApiV3AccountTest < ActionDispatch::IntegrationTest
 
     get "/v3/account", headers: bearer
     assert_response :unauthorized
-  end
-
-  test "records an App Store purchase and returns the account" do
-    @user = users(:timed)
-    @user.setting_on!(:api_v3)
-    @token = @user.oauth_applications.create!(name: "Reader", redirect_uri: "").access_tokens.create!(resource_owner_id: @user.id, scopes: "read write account")
-    product_id, product = Feedbin::Application.config.iap.to_a.first
-    receipt = {transaction_id: SecureRandom.hex, purchase_date_ms: Time.now.to_i * 1_000, product_id: product_id}
-    stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).to_return(body: {status: 0, receipt: {in_app: [receipt]}}.to_json, status: 200)
-
-    # A lapsed trial leaves the account suspended.
-    @user.update!(suspended: true)
-    time = Time.now
-    Time.stub(:now, time) do
-      post "/v3/account/purchases", params: {receipt_data: "base64=="}.to_json, headers: json
-    end
-
-    assert_response :success
-    body = JSON.parse(response.body)
-    assert_equal "account", body["object"]
-    assert_equal((time + product[:time]).utc.iso8601, body["plan"]["expires_at"])
-    assert_equal "timed", body["plan"]["id"]
-  end
-
-  test "reports a receipt Apple rejects" do
-    stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).to_return(body: {status: 21003}.to_json, status: 200)
-
-    post "/v3/account/purchases", params: {receipt_data: "bad=="}.to_json, headers: json
-
-    assert_response :unprocessable_content
-    body = JSON.parse(response.body)
-    assert_includes body["detail"], "21003"
-
-    post "/v3/account/purchases", params: {}.to_json, headers: json
-    assert_response :unprocessable_content
   end
 
   private

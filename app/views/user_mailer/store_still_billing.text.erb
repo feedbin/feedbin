@@ -1,0 +1,15 @@
+Hi <%= @email %>,
+
+You closed your Feedbin account, but <%= StoreSubscription::STORES.fetch(@store)[:name] %> has just charged you for it again.
+
+Feedbin can't cancel a subscription that <%= StoreSubscription::STORES.fetch(@store)[:name] %> bills. Only you can. Cancel it here:
+
+<%= StoreSubscription::STORES.fetch(@store)[:manage_url] %>
+
+If you would rather have your account back, sign up again with the Feedbin app and the subscription will be attached to it.
+
+Please reply to this email if you have any questions.
+
+Thanks,
+
+Feedbin

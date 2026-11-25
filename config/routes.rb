@@ -172,7 +172,10 @@ Rails.application.routes.draw do
         end
         resources :pages, only: [:create, :destroy]
         resource :account, only: [:show, :update, :destroy], controller: "account" do
-          resources :purchases, only: :create, module: :account
+          scope module: :account do
+            resources :store_subscriptions, only: :create
+            resources :store_subscription_transfers, only: :create
+          end
         end
         resources :collections, only: :index do
           scope module: :collections do

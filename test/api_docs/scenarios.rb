@@ -28,13 +28,24 @@ module ApiDocs
     }.to_json)
   end
 
-  scenario "account/purchases" do
-    product_id = Feedbin::Application.config.iap.keys.first
-    stub_request(:post, "https://buy.itunes.apple.com/verifyReceipt").to_return(headers: {"Content-Type" => "application/json"}, body: {
-      status: 0,
-      receipt: {in_app: [{transaction_id: "2000000712345678", product_id: product_id, purchase_date_ms: NOW.to_i * 1_000}]}
-    }.to_json)
-  end
+  # Apple signs what an app presents, and Stripe holds the web plan it
+  # replaces; the examples take both as read.
+  presented = ->(held_by_another_account: false) {
+    ->(request) {
+      transaction = {"originalTransactionId" => "2000000712345678", "bundleId" => "com.feedbin.feedbin.app", "productId" => "yearly_pro_v1",
+                     "expiresDate" => (NOW + 1.year).to_i * 1_000, "signedDate" => NOW.to_i * 1_000, "price" => 70_000, "currency" => "USD"}
+      customer = Struct.new(:id) { def update_plan(*) = true }.new("cus_docs")
+      Customer.stub(:retrieve, customer) do
+        if held_by_another_account
+          User.insert!({id: 2, email: "another@example.com", password_digest: "x", plan_id: Plan.find_by!(stripe_id: "trial").id, price_tier: 3})
+          StoreSubscription.record(AppStore::SubscriptionState.new(transaction: transaction), user: User.find(2))
+        end
+        AppStore::SignedPayload.stub(:decode, transaction) { request.call }
+      end
+    }
+  }
+  scenario "account/store_subscriptions", around: presented.call
+  scenario "account/store_subscription_transfers", around: presented.call(held_by_another_account: true)
 
   scenario "imports/create", request: ->(_source) {
     {content_type: "text/x-opml", body: <<~OPML}

@@ -166,7 +166,7 @@ ALTER SEQUENCE public.actions_id_seq OWNED BY public.actions.id;
 
 CREATE TABLE public.app_store_notifications (
     id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    user_id bigint,
     original_transaction_id text NOT NULL,
     notification_id uuid NOT NULL,
     notification_type text NOT NULL,
@@ -359,7 +359,9 @@ CREATE TABLE public.deleted_users (
     customer_id text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    original_user_id bigint
+    original_user_id bigint,
+    store_subscriptions jsonb DEFAULT '[]'::jsonb NOT NULL,
+    store_billing_notified_at timestamp(6) without time zone
 );
 
 
@@ -1337,6 +1339,52 @@ ALTER SEQUENCE public.starred_entries_id_seq OWNED BY public.starred_entries.id;
 
 
 --
+-- Name: store_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.store_subscriptions (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    store integer NOT NULL,
+    external_id text NOT NULL,
+    app_identifier text NOT NULL,
+    environment text NOT NULL,
+    product_id text NOT NULL,
+    status integer NOT NULL,
+    expires_at timestamp(6) without time zone,
+    grace_expires_at timestamp(6) without time zone,
+    auto_renew boolean DEFAULT true NOT NULL,
+    renews_as text,
+    price_milliunits bigint,
+    currency text,
+    signed_at timestamp(6) without time zone,
+    verified_at timestamp(6) without time zone,
+    moved_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: store_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.store_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: store_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.store_subscriptions_id_seq OWNED BY public.store_subscriptions.id;
+
+
+--
 -- Name: subscriptions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1930,6 +1978,13 @@ ALTER TABLE ONLY public.starred_entries ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
+-- Name: store_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.store_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.store_subscriptions_id_seq'::regclass);
+
+
+--
 -- Name: subscriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2293,6 +2348,14 @@ ALTER TABLE ONLY public.sharing_services
 
 ALTER TABLE ONLY public.starred_entries
     ADD CONSTRAINT starred_entries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_subscriptions store_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.store_subscriptions
+    ADD CONSTRAINT store_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2971,6 +3034,27 @@ CREATE UNIQUE INDEX index_starred_entries_on_user_id_and_entry_id ON public.star
 
 
 --
+-- Name: index_store_subscriptions_on_status_and_expires_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_store_subscriptions_on_status_and_expires_at ON public.store_subscriptions USING btree (status, expires_at);
+
+
+--
+-- Name: index_store_subscriptions_on_store_and_external_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_store_subscriptions_on_store_and_external_id ON public.store_subscriptions USING btree (store, external_id);
+
+
+--
+-- Name: index_store_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_store_subscriptions_on_user_id ON public.store_subscriptions USING btree (user_id);
+
+
+--
 -- Name: index_subscriptions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3339,6 +3423,14 @@ ALTER TABLE ONLY public.playlists
 
 
 --
+-- Name: store_subscriptions fk_rails_e9b2cfba76; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.store_subscriptions
+    ADD CONSTRAINT fk_rails_e9b2cfba76 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: oauth_application_profiles fk_rails_eb283eaca3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3353,6 +3445,7 @@ ALTER TABLE ONLY public.oauth_application_profiles
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125090000'),
 ('20261122090000'),
 ('20261114090000'),
 ('20261112012500'),

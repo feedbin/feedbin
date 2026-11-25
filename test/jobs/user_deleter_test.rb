@@ -24,7 +24,7 @@ class UserDeleterTest < ActiveSupport::TestCase
     StripeMock.start
     user = users(:ben)
 
-    rejected = ->(_user_id, _opml) {
+    rejected = ->(_user_id, _opml, _stores) {
       raise Postmark::InvalidEmailRequestError.new(300, "", {"Message" => "Error parsing 'To': Illegal email address 'pricing'."})
     }
 
@@ -70,5 +70,13 @@ class UserDeleterTest < ActiveSupport::TestCase
     event.data["object"] = @charge.to_h
 
     @billing_event = BillingEvent.create!(info: event.as_json)
+  end
+
+  test "an account a store still bills is told that only its owner can cancel" do
+    mail = UserMailer.account_closed("ann@example.com", "<opml/>", ["apple"])
+
+    assert_includes mail.text_part.body.to_s, "https://apps.apple.com/account/subscriptions"
+    assert_not_includes mail.text_part.body.to_s, "canceled your subscription"
+    assert_includes UserMailer.account_closed("ann@example.com", "<opml/>").text_part.body.to_s, "canceled your subscription"
   end
 end
