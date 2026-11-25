@@ -54,16 +54,10 @@ module Api
       # so a lapsed one can say when and why it ended.
       def billing
         subscription = store_subscription
-        # A store that pays now comes first; else a web plan, lapsed or not, is the web's to describe, whatever
-        # a store once billed.
-        billing = if subscription&.entitling?
-          store_billing(subscription)
-        elsif @user.plan.stripe_id.start_with?("basic-")
-          web_billing
-        elsif subscription
-          store_billing(subscription)
-        else
-          no_billing
+        billing = case @user.billing_source(subscription)
+        when "web" then web_billing
+        when nil then no_billing
+        else store_billing(subscription)
         end
         # What an app hands the store with a purchase (StoreKit's
         # appAccountToken), so the store's own notice of it names the account.
@@ -78,7 +72,7 @@ module Api
       # The one that pays, else the one that last did.
       def store_subscription
         return @store_subscription if defined?(@store_subscription)
-        @store_subscription = @user.store_subscriptions.order(Arel.sql("status IN (0, 1) DESC"), expires_at: :desc).first
+        @store_subscription = @user.billing_subscription
       end
 
       def store_billing(subscription)

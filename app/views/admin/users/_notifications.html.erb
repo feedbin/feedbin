@@ -1,0 +1,23 @@
+<%# locals: (notifications:, limit: 20) %>
+<% total = notifications.count %>
+<% if total > 0 %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
+    <% group.header do %>
+      What Apple Has Said
+    <% end %>
+    <% notifications.order(created_at: :desc).limit(limit).each do |notification| %>
+      <% group.item do %>
+        <%= render partial: "admin/users/fact", locals: {
+          title: notification_name(notification),
+          description: [notification.plan, ("not processed" if notification.processed_at.nil?), ("no account" if notification.user_id.nil?)].compact.join(" · "),
+          value: notification.created_at.to_formatted_s(:date)
+        } %>
+      <% end %>
+    <% end %>
+    <% if total > limit %>
+      <% group.description do %>
+        Showing the last <%= limit %> of <%= number_with_delimiter(total) %> notifications.
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

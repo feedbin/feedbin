@@ -152,11 +152,7 @@ class Settings::BillingsController < ApplicationController
       end
     end
 
-    stripe_purchases = @user.billing_events.where(event_type: "charge.succeeded")
-    in_app_purchases = @user.in_app_purchases
-    in_app_subscriptions = @user.app_store_notifications.where(notification_type: ["SUBSCRIBED", "DID_RENEW"])
-    all_purchases = (stripe_purchases.to_a + in_app_purchases.to_a + in_app_subscriptions.to_a)
-    @billing_events = all_purchases.sort_by { |billing_event| billing_event.purchase_date }.reverse
+    @billing_events = @user.purchases
   end
 
   def plan_setup

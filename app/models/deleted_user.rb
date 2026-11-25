@@ -12,6 +12,12 @@ class DeletedUser < ApplicationRecord
     UserMailer.store_still_billing(email, store.to_s).deliver_later
   end
 
+  # What Apple said of the account's subscriptions, before and since it closed.
+  def app_store_notifications
+    AppStoreNotification.where(user_id: original_user_id)
+      .or(AppStoreNotification.where(original_transaction_id: store_subscriptions.map { _1["external_id"] }))
+  end
+
   def stripe_url
     "https://manage.stripe.com/customers/#{customer_id}"
   end

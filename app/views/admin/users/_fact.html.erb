@@ -1,0 +1,8 @@
+<%# locals: (title:, value:, description: nil) %>
+<%= render Settings::ControlRowComponent.new do |row| %>
+  <% row.title do %><%= title %><% end %>
+  <% if description %>
+    <% row.description do %><%= description %><% end %>
+  <% end %>
+  <% row.control do %><span class="text-500 text-right"><%= value %></span><% end %>
+<% end %>

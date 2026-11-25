@@ -618,6 +618,28 @@ class User < ApplicationRecord
     billing_issue == "1"
   end
 
+  # The store subscription that pays for the account, else the one that last did.
+  def billing_subscription
+    store_subscriptions.order(Arel.sql("status IN (0, 1) DESC"), expires_at: :desc).first
+  end
+
+  # Who takes the money: "apple" or "google" while a store's subscription
+  # pays, else "web" for a web plan, lapsed or not, else the store that last
+  # billed. Nil when nobody ever has: a trial, a free plan, time paid ahead.
+  def billing_source(subscription = billing_subscription)
+    return subscription.store if subscription&.entitling?
+    return "web" if plan.stripe_id.start_with?("basic-")
+    subscription&.store
+  end
+
+  # Everything the account has paid, newest first: card charges, the App
+  # Store's subscription payments, and the one-time purchases before them.
+  def purchases
+    charges = billing_events.where(event_type: "charge.succeeded").to_a
+    renewals = app_store_notifications.where(notification_type: ["SUBSCRIBED", "DID_RENEW"]).to_a
+    (charges + in_app_purchases.to_a + renewals).sort_by(&:purchase_date).reverse
+  end
+
   # The account's token as a store stamps it on a purchase.
   def app_account_token
     authentication_tokens.app.active.first&.uuid

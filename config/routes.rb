@@ -492,11 +492,12 @@ Rails.application.routes.draw do
 
   constraints lambda { |request| AuthConstraint.admin?(request) } do
     namespace :admin do
-      resources :users, only: [:index, :destroy] do
+      resources :users, only: [:index, :show, :destroy] do
         member do
           post :reset_password
         end
       end
+      resources :deleted_users, only: [:show]
       resources :feeds, only: [:index]
     end
   end
