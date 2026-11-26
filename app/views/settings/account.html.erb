@@ -57,7 +57,14 @@
     Cancel Account
   <% end %>
 
-  <p class="mb-4">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
+  <% if (renewing = @user.renewing_store_subscription) %>
+    <div class="mb-4 p-4 bg-red-200 rounded-lg" data-store-warning>
+      <p><strong>Your <%= store_name(renewing).delete_prefix("the ") %> subscription keeps renewing.</strong> Canceling your account doesn’t cancel it: <%= store_name(renewing) %> will go on charging you until you cancel it in <%= store_name(renewing) %>’s subscription settings. Cancel it there first.</p>
+    </div>
+    <p class="mb-4">All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
+  <% else %>
+    <p class="mb-4">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
+  <% end %>
 
   <% if @last_payment %>
       <%= render Settings::ControlGroupComponent.new class: "mb-4" do |group| %>

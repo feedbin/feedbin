@@ -2,6 +2,8 @@ require "test_helper"
 require "minitest/stub_any_instance"
 
 class SettingsControllerTest < ActionController::TestCase
+  include StoreSubscriptionHelper
+
   setup do
     @user = users(:ben)
   end
@@ -28,6 +30,22 @@ class SettingsControllerTest < ActionController::TestCase
     login_as @user
     get :account
     assert_response :success
+  end
+
+  test "account warns, before the delete button, that a renewing store subscription goes on charging" do
+    start_stripe
+    user = users(:ann)
+    StoreSubscription.record(apple_state, user: user)
+    login_as user
+    get :account
+    assert_select "[data-store-warning]", text: /App Store will go on charging you/
+    refute_includes response.body, "will end your subscription immediately"
+
+    user.billing_subscription.update!(auto_renew: false)
+    get :account
+    assert_select "[data-store-warning]", count: 0
+  ensure
+    StripeMock.stop
   end
 
   test "account lists each app the user signed in to once, with a way to revoke it" do

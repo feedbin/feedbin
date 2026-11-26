@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Settings::BillingsControllerTest < ActionController::TestCase
+  include StoreSubscriptionHelper
+
   setup do
     @user = users(:ben)
   end
@@ -21,6 +23,21 @@ class Settings::BillingsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:next_payment_date)
     assert assigns(:billing_events).present?
+    StripeMock.stop
+  end
+
+  test "an app subscriber's billing page says the plan, its price and when it renews, and where it's managed" do
+    start_stripe
+    user = users(:ann)
+    StoreSubscription.record(apple_state(product: "yearly_pro_v1", expires: Time.utc(2027, 1, 5)), user: user)
+    user.reload.sync_store_plan
+    login_as user
+    get :index
+    assert_response :success
+    assert_includes response.body, "Feedbin Yearly"
+    assert_includes response.body, "$5.99 a year · Renews January 5, 2027"
+    assert_includes response.body, "Billed by the App Store"
+  ensure
     StripeMock.stop
   end
 

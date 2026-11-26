@@ -48,4 +48,25 @@ module SettingsHelper
     script = script.delete("\n").gsub('"', "%22").gsub(" ", "%20")
     "javascript:void%20#{script}"
   end
+
+  # A store subscription in a line, as the app's Billing page has it:
+  # "$7.00 a month · Renews December 25, 2026".
+  def store_subscription_summary(subscription)
+    parts = []
+    if subscription.price
+      price = (subscription.currency == "USD") ? number_to_currency(subscription.price) : "#{format("%.2f", subscription.price)} #{subscription.currency}"
+      parts << "#{price} a #{(subscription.period == "yearly") ? "year" : "month"}"
+    end
+    if subscription.grace? || subscription.retrying?
+      parts << "Payment failed"
+    elsif subscription.expires_at
+      parts << "#{subscription.renews? ? "Renews" : "Ends"} #{subscription.expires_at.to_date.strftime("%B %-d, %Y")}"
+    end
+    parts.join(" · ")
+  end
+
+  # Where a store subscription is managed: "the App Store" or "Google Play".
+  def store_name(subscription)
+    subscription.google? ? "Google Play" : "the App Store"
+  end
 end

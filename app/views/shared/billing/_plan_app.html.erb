@@ -1,3 +1,4 @@
+<% subscription = @user.billing_subscription %>
 <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% group.header do %>
     Your Plan
@@ -5,12 +6,19 @@
   <% group.item do %>
     <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.title do %>
-        In-App Subscription
+        <%= (subscription&.period == "yearly") ? "Feedbin Yearly" : "Feedbin Monthly" %>
+      <% end %>
+      <% if subscription %>
+        <% row.description { store_subscription_summary(subscription) } %>
       <% end %>
     <% end %>
   <% end %>
   <% group.description do %>
-    You can manage your subscription in the Feedbin app.
+    <% if subscription %>
+      Billed by <%= store_name(subscription) %>. Cancel or change your plan in <%= store_name(subscription) %>’s subscription settings, or in the Feedbin app under Settings → Billing.
+    <% else %>
+      You can manage your subscription in the Feedbin app.
+    <% end %>
   <% end %>
 <% end %>
 

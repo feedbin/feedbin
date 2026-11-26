@@ -100,6 +100,12 @@ class StoreSubscription < ApplicationRecord
     active? || grace?
   end
 
+  # Whether the store will take another payment: it goes on renewing until
+  # it is cancelled in the store, whatever happens to the account.
+  def renews?
+    auto_renew && !expired? && !revoked?
+  end
+
   def product
     PRODUCTS.fetch(product_id, DEFAULT_PRODUCT)
   end

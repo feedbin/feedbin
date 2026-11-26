@@ -633,6 +633,13 @@ class User < ApplicationRecord
     store_subscriptions.order(Arel.sql("status IN (0, 1) DESC"), expires_at: :desc).first
   end
 
+  # The store subscription that will go on charging, account or no account:
+  # deleting the account can't cancel it.
+  def renewing_store_subscription
+    subscription = billing_subscription
+    subscription if subscription&.renews?
+  end
+
   # Who takes the money: "apple" or "google" while a store's subscription
   # pays, else "web" for a web plan, lapsed or not, else the store that last
   # billed. Nil when nobody ever has: a trial, a free plan, time paid ahead.

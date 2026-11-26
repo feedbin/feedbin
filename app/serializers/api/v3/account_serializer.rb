@@ -82,7 +82,7 @@ module Api
           product_id: subscription.product_id,
           period: subscription.period,
           price: price(subscription.price, subscription.currency),
-          renews: subscription.auto_renew && !subscription.expired? && !subscription.revoked?,
+          renews: subscription.renews?,
           renews_as: subscription.renews_as,
           current_period_ends_at: subscription.expires_at&.utc&.iso8601,
           grace_ends_at: (subscription.grace_expires_at&.utc&.iso8601 if subscription.grace?)
