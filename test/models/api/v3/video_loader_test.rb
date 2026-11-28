@@ -33,6 +33,20 @@ class Api::V3::VideoLoaderTest < ActiveSupport::TestCase
     assert_equal({with_videos.id => [Api::V3::VideoSerializer.new(harvested).to_h], without.id => []}, result)
   end
 
+  test "call lists the video a micropost links to after the ones it embeds" do
+    Embed.create!(source: :youtube_video, provider_id: "AAA", parent_id: "UC1", data: {})
+    Embed.create!(source: :youtube_video, provider_id: "LLL", parent_id: "UC1", data: {})
+    linking = entry_with(%(<iframe src="https://www.youtube.com/embed/AAA"></iframe>))
+    linking.update!(data: {saved_pages: {"https://www.youtube.com/watch?v=LLL" => {"result" => {}}}})
+    article = entry_with("<p>Words</p>")
+    article.update!(data: {saved_pages: {"https://example.com/article" => {"result" => {}}}})
+
+    result = Api::V3::VideoLoader.call(load(linking, article))
+
+    assert_equal %w[AAA LLL], result[linking.id].map { it[:id] }
+    assert_equal [], result[article.id]
+  end
+
   test "call gives an entry that cannot be rendered no videos, and still loads the rest" do
     Embed.create!(source: :youtube_video, provider_id: "AAA", parent_id: "UC1", data: {"snippet" => {"title" => "A"}})
     with_videos = entry_with(%(<iframe src="https://www.youtube.com/embed/AAA"></iframe>))

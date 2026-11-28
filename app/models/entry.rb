@@ -388,6 +388,16 @@ class Entry < ApplicationRecord
     end
   end
 
+  # The YouTube video a micropost's linked page plays (HarvestLinks saves the
+  # page). The page has no article to extract, so apps show the video after
+  # the post instead, as the website does.
+  def linked_video_id
+    pages = data&.dig("saved_pages")
+    url = pages.keys.first if pages.respond_to?(:keys)
+    match = url.is_a?(String) && IframeEmbed::Youtube.recognize_url?(url)
+    match[1].presence if match
+  end
+
   def link_preview_url
     if tweet?
       tweet.main_tweet.urls.first.expanded_url.to_s

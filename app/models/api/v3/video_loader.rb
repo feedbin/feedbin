@@ -20,9 +20,11 @@ module Api
         nil
       end
 
-      # {entry id => [video object]}. Videos with no Embed row are left out.
+      # {entry id => [video object]}: the videos it embeds, then the one a
+      # micropost links to (Entry#linked_video_id). Videos with no Embed row
+      # are left out.
       def self.call(entries)
-        ids = entries.to_h { [it.id, video_ids(rendered(it))] }
+        ids = entries.to_h { [it.id, [*video_ids(rendered(it)), it.linked_video_id].compact.uniq] }
         wanted = ids.values.flatten.uniq
         return ids.transform_values { [] } if wanted.empty?
 

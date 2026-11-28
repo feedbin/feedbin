@@ -43,10 +43,12 @@ class HarvestEmbeds
 
   private
 
-  # Every video is queued; only the ones the entry shows are recorded for it.
+  # Every video is queued; only the ones the entry shows are recorded for it,
+  # a micropost's linked video among them (Entry#linked_video_id). HarvestLinks
+  # saves that page later, and the save scans again.
   def scan(entry)
     document = Nokogiri::HTML5(entry.content)
-    shown = [*youtube_ids(document.css("iframe"), "src"), entry.data&.safe_dig("youtube_video_id")].compact.uniq
+    shown = [*youtube_ids(document.css("iframe"), "src"), entry.data&.safe_dig("youtube_video_id"), entry.linked_video_id].compact.uniq
     linked = youtube_ids(document.css("a"), "href")
     record_videos(entry, shown)
     self.class.enqueue_missing(shown + linked)

@@ -191,6 +191,14 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal %w[link_id video_id], Sidekiq.redis { it.smembers(HarvestEmbeds::SET_NAME) }.sort
   end
 
+  test "records the video a micropost's linked page plays" do
+    @entry.update(data: {saved_pages: {"https://www.youtube.com/watch?v=link_id" => {"result" => {}}}})
+
+    HarvestEmbeds.new.perform(@entry.id)
+
+    assert_equal ["link_id"], EntryVideo.where(entry_id: @entry.id).pluck(:provider_id)
+  end
+
   test "records a YouTube feed entry's own video" do
     @entry.update(data: {youtube_video_id: "video_id"})
 
